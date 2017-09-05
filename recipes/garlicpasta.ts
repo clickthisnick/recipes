@@ -23,9 +23,11 @@ export class GarlicPasta extends Recipe {
         this.addSteps([
             ['Put 2 seconds of', this.getIng(Items.vegetableOil()), 'in pantelligent on 4'],
             ['Chop', this.getIng(Items.garlicClove())],
-            ['Sauttee', this.getIng(Items.crimniMushroom()), 'and', this.getIng(Items.garlicClove()), 'for 3 minutes'],
+            ['Put in', this.getIng(Items.crimniMushroom()), 'and', this.getIng(Items.garlicClove())],
+            ['Wait 3 minutes'],
             [this.getIng(Items.spiriliazer()), this.getIng(Items.zuchinni())],
-            ['Put zuchinni in pan for 5 minutes'],
+            ['Put zuchinni in pan'],
+            ['Wait 5 minutes'],
             ['Put in',this.getIng(Items.pepperFlake())],
             ['Wait 2 min'],
             ['Top with', this.getIng(Items.butter())],
