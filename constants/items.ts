@@ -80,6 +80,50 @@ export class Items {
         isTakoutUnitable: true,
     });
 
+    public static readonly leek: IItem = (quantity: number | null = null, unit: object) => ({
+        name: 'Leek',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity || null,
+        unit: unit || null,
+        wash: true,
+        isTakoutUnitable: true,
+    });
+
+    public static readonly sirachaSauce: IItem = (quantity: number | null = null, unit: object) => ({
+        name: 'Siracha Sauce',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Put siracha back in refridgerator',
+        quantity: quantity || null,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    });
+
+    public static readonly hoisonSauce: IItem = (quantity: number | null = null, unit: object) => ({
+        name: 'Hoison Sauce',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Put hoison back in refridgerator',
+        quantity: quantity || null,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    });
+
+    public static readonly pepperFlake: IItem = (quantity: number | null = null, unit: object) => ({
+        name: 'Pepper Flake',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Put pepper flake back in cupboard',
+        quantity: quantity || null,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    });
+
     public static readonly lime: IItem = (quantity: number | null = null, unit: object) => ({
         name: 'Lime',
         putAwayTime: 10,
