@@ -113,6 +113,28 @@ export class Items {
         isTakoutUnitable: false,
     });
 
+    public static readonly parmessanCheese: IItem = (quantity: number | null = null, unit: object) => ({
+        name: 'Parmessan Cheese',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Put parmessan cheese back in refridgerator',
+        quantity: quantity || null,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    });
+
+    public static readonly salt: IItem = (quantity: number | null = null, unit: object) => ({
+        name: 'Salt',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity || null,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    });
+
     public static readonly pepperFlake: IItem = (quantity: number | null = null, unit: object) => ({
         name: 'Pepper Flake',
         putAwayTime: 10,

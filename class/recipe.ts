@@ -54,11 +54,13 @@ export class Recipe {
          return ingredientObj.name === ingredient.name;
       });
 
+      if (ingredient === undefined) {
+          throw new Error(`Ingredient not found: ${ingredientObj.name}`)
+       } 
+
       let ingredientClone = this.cloneObj(ingredient);
 
-      if (ingredient === undefined) {
-         throw new Error(`Ingredient not found: ${ingredientObj.name}`)
-      } else if (ingredientObj.quantity === null || ingredient.quantity === null) {
+      if (ingredientObj.quantity === null || ingredient.quantity === null) {
          ingredient.quantity = 0
       } else if (ingredient.quantity === 0) {
          throw new Error(`No more left of ${ingredient.name}`)

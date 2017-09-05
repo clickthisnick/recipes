@@ -1,7 +1,7 @@
 // import { Bread } from './recipes/bread';
 // import { PadThaiStirFry } from './recipes/padthaistiryfry';
-import { SpicyLeekMushrooms } from './recipes/spicyleekmushrooms';
+import { GarlicPasta } from './recipes/garlicpasta';
 // import { PadThaiStirFry } from './recipes/guacamole';
 
-const recipe = new SpicyLeekMushrooms();
+const recipe = new GarlicPasta();
 recipe.generateRecipe();
