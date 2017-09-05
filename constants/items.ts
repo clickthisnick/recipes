@@ -69,6 +69,72 @@ export class Items {
         isTakoutUnitable: false,
     });
 
+    public static readonly avacado: IItem = (quantity: number | null = null, unit: object) => ({
+        name: 'Avacado',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity || null,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: true,
+    });
+
+    public static readonly lime: IItem = (quantity: number | null = null, unit: object) => ({
+        name: 'Lime',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity || null,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: true,
+    });
+
+    public static readonly romaTomato: IItem = (quantity: number | null = null, unit: object) => ({
+        name: 'Roma Tomato',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity || null,
+        unit: unit || null,
+        wash: true,
+        isTakoutUnitable: true,
+    });
+
+    public static readonly serranoChilli: IItem = (quantity: number | null = null, unit: object) => ({
+        name: 'Serrano Chilli',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity || null,
+        unit: unit || null,
+        wash: true,
+        isTakoutUnitable: true,
+    });
+
+    public static readonly cilantro: IItem = (quantity: number | null = null, unit: object) => ({
+        name: 'Cilantro',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity || null,
+        unit: unit || null,
+        wash: true,
+        isTakoutUnitable: false,
+    });
+
+    public static readonly blackPepper: IItem = (quantity: number | null = null, unit: object) => ({
+        name: 'Black Pepper',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity || null,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    });
+
     public static readonly egg: IItem = (quantity: number | null = null, unit: object) => ({
         name: 'Egg',
         putAwayTime: 10,
