@@ -1,0 +1,24 @@
+{
+  "name": "recipes",
+  "version": "1.0.0",
+  "description": "Vegetarian Recipes",
+  "main": "index.js",
+  "scripts": {
+    "compile": "./node_modules/typescript/bin/tsc",
+    "pregenerate": "npm run comile",
+    "generate": "node recipe-generator.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clickthisnick/recipes.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/clickthisnick/recipes/issues"
+  },
+  "homepage": "https://github.com/clickthisnick/recipes#readme",
+  "dependencies": {
+    "typescript": "^2.5.2"
+  }
+}
