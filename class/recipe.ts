@@ -3,15 +3,29 @@ import { IItemObj } from '../constants/items';
 export class Recipe {
     private headerStart = '<h1>';
     private headerEnd = '</h1>';
-    private itemStart = '<label><input type="checkbox">'
-    private itemEnd = '</label><br>';
     private mobileViewport = '<meta name="viewport" content="width=device-width, initial-scale=1">';
+    private chartSet = '<meta charset="utf-8">';
     private steps: any[] = [];
     public ingredients: IItemObj[];
     public recipeHtml: string = '';
 
     constructor() {
       this.recipeHtml += this.mobileViewport;
+      this.recipeHtml += this.chartSet;
+      this.recipeHtml += `<style>
+      .completed {
+             background-color:green;
+             color: white;
+         }
+
+         .panel {
+         border-right-style: solid;
+         border-bottom-style: solid;
+         border-left-style: solid;
+          padding: 25px;
+          border-width: 1px;
+         }
+         </style>`
       this.recipeHtml += this.generateHeader('Clean counter space:');
       this.recipeHtml += this.generateStep('Empty dishwasher');
       this.recipeHtml += this.generateStep('Load dishwasher');
@@ -24,7 +38,7 @@ export class Recipe {
     }
 
     private generateStep(text: string) {
-        return `${this.itemStart}${text}${this.itemEnd}`;
+        return `<div class="panel" onclick="this.classList.toggle('completed')">${text}</div>`;
     }
 
     private cloneObj(obj: {} | undefined | null) {
