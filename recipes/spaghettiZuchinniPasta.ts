@@ -1,5 +1,6 @@
 import { Recipe } from '../class/recipe';
 import { Items as i } from '../constants/items';
+import { Timer } from '../class/timer';
 
 export class SpaghettiZuchinniPasta extends Recipe {
     constructor() {
@@ -21,15 +22,15 @@ export class SpaghettiZuchinniPasta extends Recipe {
         this.addSteps([
             ['Put', this.get(i.vegetableOil()), 'in pantelligent on 4'],
             ['Chop', this.get(i.garlicClove())],
-            ['Wait 1 minute for pan to heat up'],
+            [Timer.set(1, 'm', 'for pan to be hot')],
             ['Put in', this.get(i.crimniMushroom()), 'and', this.get(i.garlicClove(), 0)],
-            ['Wait 3 minutes'],
+            [Timer.set(3, 'm', 'for vegetables to be cooked')],
             [this.get(i.spiriliazer()), this.get(i.zuchinni())],
             ['Put zuchinni in pan'],
-            ['Wait 5 minutes'],
+            [Timer.set(5, 'm', 'for zuchinni to be cooked')],
             ['Put in ', this.get(i.spaghettiSauce())],
             ['Turn heat to 5'],
-            ['Wait 5 min'],
+            [Timer.set(5, 'm', 'to be done with the recipe')],
             ['Season with', this.get(i.blackPepper())],
             ['Top with', this.get(i.parmessanCheese())]
         ]);

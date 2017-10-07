@@ -12,14 +12,14 @@ export class SpicyLeekMushrooms extends Recipe {
             i.sirachaSauce(.5, i.tbsp()),
             i.pepperFlake(.25, i.tbsp()),
             i.hoisonSauce(1, i.tsp()),
-            i.vegetableOil(),
+            i.vegetableOil(3, i.seconds()),
         ]);
     }
 
     public generateRecipe() {
         this.prep();
         this.addSteps([
-            ['Put 3 seconds of', this.get(i.vegetableOil()), 'in pantelligent on 4'],
+            ['Put', this.get(i.vegetableOil()), 'in pantelligent on 4'],
             ['Cut in half', this.get(i.leek())],
             ['Cut leek in strips and soak in glass bowl of water'],
             ['Chop', this.get(i.garlicClove())],
