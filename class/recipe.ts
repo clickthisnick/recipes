@@ -6,14 +6,6 @@ interface IStep {
    items: IItemObj[],
 }
 
-interface IIngredientMap {
-   [id: string]: {
-      used: boolean;
-      quantity: number,
-      unit: string,
-   }
-}
-
 export class Recipe {
     private headerStart = '<h1>';
     private headerEnd = '</h1>';
@@ -21,7 +13,6 @@ export class Recipe {
     private chartSet = '<meta charset="utf-8">';
     private steps: any[] = [];
     private recipeSteps: IStep[] = [];
-    private itemMap: IIngredientMap = {};
     public ingredients: IItemObj[];
     public recipeHtml: string = '';
 
@@ -52,14 +43,6 @@ export class Recipe {
     private generateHeader(text: string) {
         return `${this.headerStart}${text}${this.headerEnd}`;
     }
-
-    private checkAllIngredientsUsed() {
-      Object.keys(this.itemMap).forEach((key) => {
-         if (this.itemMap[key].used === false) {
-            throw new Error(`Item not used: ${key}`)
-         }
-      })
-   }
 
     private generateStep(text: string) {
         return `<div class="panel" onclick="this.classList.toggle('completed')">${text}</div>`;
@@ -118,14 +101,6 @@ export class Recipe {
         }
 
         this.ingredients.forEach((ingredient) => {
-           if (this.itemMap[ingredient.name] === undefined ) {
-             this.itemMap[ingredient.name] = {
-                used: false,
-                quantity: 0,
-                unit: 'whatever',
-             }
-         }
-
             const ingName = this.turnIngObjIntoStr(ingredient);
             const needsWashed = ingredient.wash === true ? ' and wash' : '';
 
@@ -192,16 +167,6 @@ export class Recipe {
       }
    }
 
-   private checkIfIngredientIsAvailable(items: IItemObj[]) {
-      items.forEach((item) => {
-         if (this.itemMap[item.name] === undefined) {
-            throw new Error(`Ingredient not in recipe: ${item.name}`);
-         } else if (this.itemMap[item.name].used === false) {
-            this.itemMap[item.name].used = true;
-         }
-      })
-   }
-
    public addSteps(steps: (string | void)[][]) {
       this.steps = steps;
     }
@@ -210,8 +175,6 @@ export class Recipe {
       steps.forEach((step: IStep) => {
          let items = step[2] === undefined ? [] : step[2];
          let stepText = step[0];
-
-         this.checkIfIngredientIsAvailable(items);
 
          // Replace step placeholder with item name
          items.forEach((item, index) => {
@@ -243,6 +206,5 @@ export class Recipe {
       this.recipeSteps.map((steps) => {
          console.log(this.generateStep(steps.name));
       });
-      this.checkAllIngredientsUsed();
    };
 }
