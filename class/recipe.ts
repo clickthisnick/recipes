@@ -1,11 +1,27 @@
 import { IItemObj } from '../constants/items';
 
+interface IStep {
+   name: string,
+   time: number,
+   items: IItemObj[],
+}
+
+interface IIngredientMap {
+   [id: string]: {
+      used: boolean;
+      quantity: number,
+      unit: string,
+   }
+}
+
 export class Recipe {
     private headerStart = '<h1>';
     private headerEnd = '</h1>';
     private mobileViewport = '<meta name="viewport" content="width=device-width, initial-scale=1">';
     private chartSet = '<meta charset="utf-8">';
     private steps: any[] = [];
+    private recipeSteps: IStep[] = [];
+    private itemMap: IIngredientMap = {};
     public ingredients: IItemObj[];
     public recipeHtml: string = '';
 
@@ -37,6 +53,14 @@ export class Recipe {
         return `${this.headerStart}${text}${this.headerEnd}`;
     }
 
+    private checkAllIngredientsUsed() {
+      Object.keys(this.itemMap).forEach((key) => {
+         if (this.itemMap[key].used === false) {
+            throw new Error(`Item not used: ${key}`)
+         }
+      })
+   }
+
     private generateStep(text: string) {
         return `<div class="panel" onclick="this.classList.toggle('completed')">${text}</div>`;
     }
@@ -49,33 +73,44 @@ export class Recipe {
       this.ingredients = ingredients;
     }
 
-    public getIng(ingredientObj: IItemObj) {
-      const ingredient = this.ingredients.find((ingredient) => {
-         return ingredientObj.name === ingredient.name;
-      });
+    public getIng(itemObj: IItemObj, quantity?: number) {
+      const ingredient = this.ingredients.find((ingredient) => itemObj.name === ingredient.name);
 
       if (ingredient === undefined) {
-          throw new Error(`Ingredient not found: ${ingredientObj.name}`)
-       } 
+          throw new Error(`Ingredient not found: ${itemObj.name}`)
+       }
 
-      let ingredientClone = this.cloneObj(ingredient);
+      let ing = this.cloneObj(ingredient);
 
-      if (ingredientObj.quantity === null || ingredient.quantity === null) {
-         ingredient.quantity = 0
-      } else if (ingredient.quantity === 0) {
-         throw new Error(`No more left of ${ingredient.name}`)
-      } else if (ingredient.quantity !== null && ingredientObj.quantity > ingredient.quantity) {
-         throw new Error(`Not enough ${ingredient.name}, \nCurrent: ${ingredient.quantity}\nNeeded: ${ingredientObj.quantity}`)
+      // If quantity is null then assume all quantity is meant to be used
+      itemObj.quantity = quantity || ingredient.quantity;
+
+      if (ing.quantity === 0) {
+         throw new Error(`No more left of ${ing.name}`)
+      } else if (itemObj.quantity > ing.quantity) {
+         throw new Error(`Not enough ${ing.name}, \nCurrent: ${ing.quantity}\nNeeded: ${itemObj.quantity}`)
       } else {
          // Subtracting the ingredients used from the ingredient amount
-         ingredient.quantity -= ingredientObj.quantity;
+         ingredient.quantity -= itemObj.quantity;
 
          // Make the clone have the same quantity as what we used up to fullfil this step
-         ingredientClone.quantity =  ingredientObj.quantity;
+         ing.quantity =  itemObj.quantity;
       }
 
-      return ingredientClone;
+      return ing;
     }
+
+   public turnIngObjIntoStr(ingObj: IItemObj, includeUnit = false) {
+      const ingQuantity = ingObj.quantity !== 1 ? `${ingObj.quantity} ` : '';
+      const ingName = ingObj.quantity > 1 ? `${ingObj.name}s` : ingObj.name;
+      let unit: String = '';
+
+      if (includeUnit && ingObj.unit !== null) {
+         unit = ingObj.unit.name;
+      }
+
+      return `${ingQuantity}${unit}${ingName}`;
+   }
 
     public prep() {
         if (this.ingredients.length === 0) {
@@ -83,17 +118,18 @@ export class Recipe {
         }
 
         this.ingredients.forEach((ingredient) => {
-            const prepIng = this.cloneObj(ingredient);
+           if (this.itemMap[ingredient.name] === undefined ) {
+             this.itemMap[ingredient.name] = {
+                used: false,
+                quantity: 0,
+                unit: 'whatever',
+             }
+         }
 
-            // If item can't be broken down into units upon taking out
-            // Set quantity to 1 so script prints correct output
-            prepIng.quantity = !prepIng.isTakoutUnitable ? 1 : prepIng.quantity;
+            const ingName = this.turnIngObjIntoStr(ingredient);
+            const needsWashed = ingredient.wash === true ? ' and wash' : '';
 
-            const prepIngQuantity = prepIng.quantity !== null && prepIng.quantity !== 1 ? `${prepIng.quantity} ` : '';
-            const needsWashed = prepIng.wash === true ? ' and wash' : '';
-            const prepIngName = prepIng.quantity !== null && prepIng.quantity > 1 ? `${prepIng.name}s` : prepIng.name;
-
-            this.recipeHtml += this.generateStep(`${prepIngQuantity}${prepIngName}${needsWashed}`);
+            this.recipeHtml += this.generateStep(`${ingName}${needsWashed}`);
         })
 
         this.recipeHtml += this.generateHeader('Recipe');
@@ -113,16 +149,7 @@ export class Recipe {
                stepText += item;
                stepText += ' ';
             } else if (typeof item === 'object') {
-               if (item.unit !== null && typeof item.unit === 'object') {
-                  stepText += item.quantity;
-                  stepText += ' ';
-                  stepText += item.unit.name;
-                  stepText += ' ';
-               } else if (item.quantity !== null) {
-                  stepText += item.quantity;
-                  stepText += ' ';
-               }
-               stepText += item.name;
+               stepText += this.turnIngObjIntoStr(item, true);
                stepText += ' ';
             }
          })
@@ -134,7 +161,10 @@ export class Recipe {
       })
    }
 
-   // This is horibble and I should fix
+   // This is horibble and I should fix'
+   // This should loop through items until it finds the item,
+   // Then loop the other way until it finds a timer item
+   // Then decrease the amount of time the timer item takes by the put away time
    private createCleanupSteps() {
       for (let i = 0; i < this.ingredients.length; i++ ) {
          let cleanedIngredient = false;
@@ -162,7 +192,57 @@ export class Recipe {
       }
    }
 
+   private checkIfIngredientIsAvailable(items: IItemObj[]) {
+      items.forEach((item) => {
+         if (this.itemMap[item.name] === undefined) {
+            throw new Error(`Ingredient not in recipe: ${item.name}`);
+         } else if (this.itemMap[item.name].used === false) {
+            this.itemMap[item.name].used = true;
+         }
+      })
+   }
+
    public addSteps(steps: (string | void)[][]) {
       this.steps = steps;
     }
+
+    public addTheSteps(steps: any) {
+      steps.forEach((step: IStep) => {
+         let items = step[2] === undefined ? [] : step[2];
+         let stepText = step[0];
+
+         this.checkIfIngredientIsAvailable(items);
+
+         // Replace step placeholder with item name
+         items.forEach((item, index) => {
+            let newText = stepText.replace(`$(${index})`, item.name);
+
+            if (stepText === newText) {
+               throw new Error(`Never used: ${item.name}`)
+            } else {
+               stepText = newText;
+            }
+         })
+
+         this.recipeSteps.push({
+            name: stepText,
+            time: step[1],
+            items: items,
+         })
+      })
+    }
+
+   // public addCleanUpSteps() {
+   //    for (let i = 0; i < this.ingredients.length; i++ ) {
+   //       // console.log(this.ingredients);
+   //    }
+   // }
+
+   public printRealRecipe() {
+      // this.addCleanUpSteps();
+      this.recipeSteps.map((steps) => {
+         console.log(this.generateStep(steps.name));
+      });
+      this.checkAllIngredientsUsed();
+   };
 }
