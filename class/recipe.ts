@@ -106,7 +106,7 @@ export class Recipe {
       let unit: String = '';
 
       if (includeUnit && ingObj.unit !== null) {
-         unit = ingObj.unit.name;
+         unit = `${ingObj.unit.name} `;
       }
 
       return `${ingQuantity}${unit}${ingName}`;
