@@ -25,6 +25,18 @@ export class Items {
         isTakoutUnitable: false,
     });
 
+    public static readonly seconds: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'Seconds',
+        putAwayTime: 0,
+        takeOutTime: 0,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    });
+
+
     public static readonly timer: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Timer',
         putAwayTime: 10,

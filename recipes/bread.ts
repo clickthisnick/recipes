@@ -1,36 +1,36 @@
 import { Recipe } from '../class/recipe';
-import { Items } from '../constants/items';
+import { Items as i } from '../constants/items';
 
 export class Bread extends Recipe {
     constructor() {
         super();
         this.addIngredients([
-            Items.brownSugar(.75, Items.cup()),
-            Items.breadFlour(4, Items.cup()),
-            Items.water(1, Items.cup()),
-            Items.egg(2),
-            Items.butter(.25, Items.cup()),
-            Items.dryActiveYeast(1.5, Items.tsp()),
-            Items.kosherSalt(1, Items.tsp()),
-            Items.cinnamon(2, Items.tsp()),
+            i.brownSugar(.75, i.cup()),
+            i.breadFlour(4, i.cup()),
+            i.water(1, i.cup()),
+            i.egg(2),
+            i.butter(.25, i.cup()),
+            i.dryActiveYeast(1.5, i.tsp()),
+            i.kosherSalt(1, i.tsp()),
+            i.cinnamon(2, i.tsp()),
         ]);
     }
 
     public generateRecipe() {
         this.prep();
         this.addSteps([
-            ['Put in breadmaker', this.getIng(Items.breadFlour())],
-            ['Put in breadmaker', this.getIng(Items.brownSugar(.25))],
-            ['Put in breadmaker', this.getIng(Items.water())],
-            ['Put in breadmaker', this.getIng(Items.kosherSalt())],
-            ['Put in breadmaker', this.getIng(Items.dryActiveYeast())],
-            ['Put in breadmaker', this.getIng(Items.butter())],
-            ['Put in breadmaker', this.getIng(Items.egg())],
+            ['Put in breadmaker', this.get(i.breadFlour())],
+            ['Put in breadmaker', this.get(i.brownSugar(.25))],
+            ['Put in breadmaker', this.get(i.water())],
+            ['Put in breadmaker', this.get(i.kosherSalt())],
+            ['Put in breadmaker', this.get(i.dryActiveYeast())],
+            ['Put in breadmaker', this.get(i.butter())],
+            ['Put in breadmaker', this.get(i.egg())],
             ['Put bread maker on dough setting (menu item 9) and hit start'],
             ['Set Timer For One Hour'],
             [
-                'Mix', this.getIng(Items.brownSugar(.5)),
-                this.getIng(Items.cinnamon()),
+                'Mix', this.get(i.brownSugar(.5)),
+                this.get(i.cinnamon()),
             ],
             ['Wait for timer to go off'],
             ['Pound down dough into a flat rectangle on floured cutting board'],

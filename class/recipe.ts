@@ -1,18 +1,11 @@
 import { IItemObj } from '../constants/items';
 
-interface IStep {
-   name: string,
-   time: number,
-   items: IItemObj[],
-}
-
 export class Recipe {
     private headerStart = '<h1>';
     private headerEnd = '</h1>';
     private mobileViewport = '<meta name="viewport" content="width=device-width, initial-scale=1">';
     private chartSet = '<meta charset="utf-8">';
     private steps: any[] = [];
-    private recipeSteps: IStep[] = [];
     public ingredients: IItemObj[];
     public recipeHtml: string = '';
 
@@ -56,7 +49,7 @@ export class Recipe {
       this.ingredients = ingredients;
     }
 
-    public getIng(itemObj: IItemObj, quantity?: number) {
+    public get(itemObj: IItemObj, quantity?: number) {
       const ingredient = this.ingredients.find((ingredient) => itemObj.name === ingredient.name);
 
       if (ingredient === undefined) {
@@ -65,6 +58,12 @@ export class Recipe {
 
       let ing = this.cloneObj(ingredient);
 
+      // If you specify 0 it will only print the ing name not assert quntity
+      if (quantity === 0) {
+         ing.quantity = 0;
+
+         return ing;
+      }
       // If quantity is null then assume all quantity is meant to be used
       itemObj.quantity = quantity || ingredient.quantity;
 
@@ -84,7 +83,7 @@ export class Recipe {
     }
 
    public turnIngObjIntoStr(ingObj: IItemObj, includeUnit = false) {
-      const ingQuantity = ingObj.quantity !== 1 ? `${ingObj.quantity} ` : '';
+      const ingQuantity = ingObj.quantity > 1 ? `${ingObj.quantity} ` : '';
       const ingName = ingObj.quantity > 1 ? `${ingObj.name}s` : ingObj.name;
       let unit: String = '';
 
@@ -122,11 +121,10 @@ export class Recipe {
          step.forEach((item) => {
             if (typeof item === 'string') {
                stepText += item;
-               stepText += ' ';
             } else if (typeof item === 'object') {
                stepText += this.turnIngObjIntoStr(item, true);
-               stepText += ' ';
             }
+            stepText += ' ';
          })
 
          stepText.trim();
@@ -170,41 +168,4 @@ export class Recipe {
    public addSteps(steps: (string | void)[][]) {
       this.steps = steps;
     }
-
-    public addTheSteps(steps: any) {
-      steps.forEach((step: IStep) => {
-         let items = step[2] === undefined ? [] : step[2];
-         let stepText = step[0];
-
-         // Replace step placeholder with item name
-         items.forEach((item, index) => {
-            let newText = stepText.replace(`$(${index})`, item.name);
-
-            if (stepText === newText) {
-               throw new Error(`Never used: ${item.name}`)
-            } else {
-               stepText = newText;
-            }
-         })
-
-         this.recipeSteps.push({
-            name: stepText,
-            time: step[1],
-            items: items,
-         })
-      })
-    }
-
-   // public addCleanUpSteps() {
-   //    for (let i = 0; i < this.ingredients.length; i++ ) {
-   //       // console.log(this.ingredients);
-   //    }
-   // }
-
-   public printRealRecipe() {
-      // this.addCleanUpSteps();
-      this.recipeSteps.map((steps) => {
-         console.log(this.generateStep(steps.name));
-      });
-   };
 }

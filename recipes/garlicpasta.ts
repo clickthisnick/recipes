@@ -1,38 +1,38 @@
 import { Recipe } from '../class/recipe';
-import { Items } from '../constants/items';
+import { Items as i } from '../constants/items';
 
 export class GarlicPasta extends Recipe {
     constructor() {
         super();
         this.addIngredients([
-            Items.zuchinni(2),
-            Items.crimniMushroom(3),
-            Items.garlicClove(2),
-            Items.parmessanCheese(.25, Items.cup()),
-            Items.vegetableOil(),
-            Items.spiriliazer(),
-            Items.blackPepper(),
-            Items.butter(2, Items.tbsp()),
-            Items.pepperFlake(.25, Items.tsp()),
-            Items.salt(.25, Items.tsp()),
+            i.zuchinni(2),
+            i.crimniMushroom(3),
+            i.garlicClove(2),
+            i.parmessanCheese(.25, i.cup()),
+            i.vegetableOil(2, i.seconds()),
+            i.spiriliazer(),
+            i.blackPepper(),
+            i.butter(2, i.tbsp()),
+            i.pepperFlake(.25, i.tsp()),
+            i.salt(.25, i.tsp()),
         ]);
     }
 
     public generateRecipe() {
         this.prep();
         this.addSteps([
-            ['Put 2 seconds of', this.getIng(Items.vegetableOil()), 'in pantelligent on 4'],
-            ['Chop', this.getIng(Items.garlicClove())],
-            ['Put in', this.getIng(Items.crimniMushroom()), 'and garlic'],
+            ['Put', this.get(i.vegetableOil()), 'in pantelligent on 4'],
+            ['Chop', this.get(i.garlicClove())],
+            ['Put in', this.get(i.crimniMushroom()), 'and', this.get(i.garlicClove(0))],
             ['Wait 3 minutes'],
-            [this.getIng(Items.spiriliazer()), this.getIng(Items.zuchinni())],
-            ['Put zuchinni in pan'],
+            [this.get(i.spiriliazer()), this.get(i.zuchinni())],
+            ['Put', this.get(i.zuchinni(0)), 'in pan'],
             ['Wait 5 minutes'],
-            ['Put in',this.getIng(Items.pepperFlake())],
+            ['Put in',this.get(i.pepperFlake())],
             ['Wait 2 min'],
-            ['Top with', this.getIng(Items.butter())],
-            ['Top with', this.getIng(Items.parmessanCheese())],
-            ['Season with', this.getIng(Items.blackPepper()), 'and', this.getIng(Items.salt())],
+            ['Top with', this.get(i.butter())],
+            ['Top with', this.get(i.parmessanCheese())],
+            ['Season with', this.get(i.blackPepper()), 'and', this.get(i.salt())],
         ]);
         this.printRecipe();
     }
