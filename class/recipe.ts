@@ -69,8 +69,8 @@ export class Recipe {
         return `<div class="panel" onclick="this.classList.toggle('completed')">${text}</div>`;
     }
 
-    private generateTimerStep(text: string, timerDuration: number) {
-        return `<div class="panel" onclick="this.classList.toggle('completed'); timer(${timerDuration})">${text}</div>`;
+    private generateTimerStep(timer: any) {
+        return `<div class="panel" id="${timer.id}" onclick="this.classList.toggle('completed'); timer(${timer.seconds})">${timer.text}</div>`;
     }
 
     private cloneObj(obj: {} | undefined | null) {
@@ -151,7 +151,7 @@ export class Recipe {
          let stepDirections;
 
          if (step.length === 1 && typeof(step[0]['type']) !== 'undefined') {
-            stepDirections = this.generateTimerStep(step[0].text, step[0].seconds);
+            stepDirections = this.generateTimerStep(step[0]);
          } else {
             let stepText = '';
 

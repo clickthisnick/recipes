@@ -1,4 +1,5 @@
 export class Timer {
+    public static timerCount: number = 0;
     public static set(duration: number, type: string, extratext: string = '') {
         let multiplier: number = 1000;
         let text = {
@@ -15,10 +16,12 @@ export class Timer {
         }
 
         typeText = duration > 1 ? `${text[type]}s` : text[type];
+        this.timerCount += 1;
 
         return {
             type: 'timer',
             seconds: duration * multiplier,
+            id: `timer${this.timerCount}`,
             text: `Wait ${duration} ${typeText} ${extratext}`
         };
     }
