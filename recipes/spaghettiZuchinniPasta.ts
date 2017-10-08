@@ -22,7 +22,7 @@ export class SpaghettiZuchinniPasta extends Recipe {
         this.addSteps([
             ['Put', this.get(i.vegetableOil()), 'in pantelligent on 4'],
             ['Chop', this.get(i.garlicClove())],
-            [Timer.set(1, 's', 'for pan to be hots')],
+            [Timer.set(5, 's', 'for pan to be hot')],
             ['Put in', this.get(i.crimniMushroom()), 'and', this.get(i.garlicClove(), 0)],
             [Timer.set(3, 'm', 'for vegetables to be cooked')],
             [this.get(i.spiriliazer()), this.get(i.zuchinni())],

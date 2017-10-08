@@ -18,6 +18,11 @@ export class Recipe {
              color: white;
          }
 
+         .timer {
+                background-color:yellow;
+                color: black;
+            }
+
          .panel {
          border-right-style: solid;
          border-bottom-style: solid;
@@ -48,10 +53,42 @@ export class Recipe {
          function timer(initialWait) {
          	setIntervalX(function () {
          		setIntervalX(function () {
-         			beep();
+                  var audio = new Audio('../sounds/tone.mp3');
+
+                  audio.play();
                }, 200, 10);
            }, initialWait, 1);
          }
+
+         function startTimer(duration, timerNum) {
+            var timerId = '#' + timerNum;
+            var display = document.querySelector(timerId);
+            var timer = duration, minutes, seconds;
+            var intervalID = window.setInterval(function () {
+                 minutes = parseInt(timer / 60, 10)
+                 seconds = parseInt(timer % 60, 10);
+
+                 minutes = minutes < 10 ? "0" + minutes : minutes;
+                 seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                 display.textContent = minutes + ":" + seconds + " ";
+
+                 if (--timer < 0) {
+                     window.clearInterval(intervalID);
+                     var panelId = "#panel" + timerNum;
+                     var panel = document.querySelector(panelId);
+                     panel.classList.toggle('timer');
+                     panel.classList.toggle('completed');
+                 }
+             }, 1000);
+         }
+
+         function loadTimer(seconds, timerNum) {
+            seconds = seconds / 1000;
+
+            startTimer(seconds, timerNum);
+         }
+
          </script>
       `
       this.recipeHtml += this.generateHeader('Clean counter space:');
@@ -70,7 +107,7 @@ export class Recipe {
     }
 
     private generateTimerStep(timer: any) {
-        return `<div class="panel" id="${timer.id}" onclick="this.classList.toggle('completed'); timer(${timer.seconds})">${timer.text}</div>`;
+        return `<div class="panel" id="panel${timer.id}" onclick="this.classList.toggle('timer'); timer(${timer.seconds}); loadTimer(${timer.seconds}, '${timer.id}')"><span id="${timer.id}"></span>${timer.text}</div>`;
     }
 
     private cloneObj(obj: {} | undefined | null) {
