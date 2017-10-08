@@ -96,6 +96,12 @@ export class Recipe {
       this.recipeHtml += this.generateStep('Load dishwasher');
       this.recipeHtml += this.generateStep('Put away anything not related to recipe away');
       this.recipeHtml += this.generateHeader('Get out the following ingredients:');
+      this.recipeHtml += `
+      <audio controls>
+        <source src="https://raw.githubusercontent.com/clickthisnick/recipes/master/sounds/tone.mp3" type="audio/mpeg">
+        Sorry. Your browser doesn't support the HTML5 audio element.
+      </audio>
+      `;
    }
 
     private generateHeader(text: string) {
