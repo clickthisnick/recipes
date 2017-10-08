@@ -38,10 +38,10 @@
          function timer(initialWait) {
          	setIntervalX(function () {
          		setIntervalX(function () {
-                  var audio = new Audio('https://raw.githubusercontent.com/clickthisnick/recipes/master/sounds/tone.mp3');
+                  var x = document.getElementById("beep");
 
-                  audio.play();
-               }, 200, 10);
+                  x.play();
+            }, 2000, 5);
            }, initialWait, 1);
          }
 
@@ -76,7 +76,7 @@
 
          </script>
       <h1>Clean counter space:</h1><div class="panel" onclick="this.classList.toggle('completed')">Empty dishwasher</div><div class="panel" onclick="this.classList.toggle('completed')">Load dishwasher</div><div class="panel" onclick="this.classList.toggle('completed')">Put away anything not related to recipe away</div><h1>Get out the following ingredients:</h1>
-      <audio controls>
+      <audio id="beep">
         <source src="https://raw.githubusercontent.com/clickthisnick/recipes/master/sounds/tone.mp3" type="audio/mpeg">
         Sorry. Your browser doesn't support the HTML5 audio element.
       </audio>

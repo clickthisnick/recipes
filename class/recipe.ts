@@ -53,9 +53,9 @@ export class Recipe {
          function timer(initialWait) {
          	setIntervalX(function () {
          		setIntervalX(function () {
-                  var audio = new Audio('https://raw.githubusercontent.com/clickthisnick/recipes/master/sounds/tone.mp3');
+                  var x = document.getElementById("beep");
 
-                  audio.play();
+                  x.play();
                }, 200, 10);
            }, initialWait, 1);
          }
@@ -97,7 +97,7 @@ export class Recipe {
       this.recipeHtml += this.generateStep('Put away anything not related to recipe away');
       this.recipeHtml += this.generateHeader('Get out the following ingredients:');
       this.recipeHtml += `
-      <audio controls>
+      <audio id="beep">
         <source src="https://raw.githubusercontent.com/clickthisnick/recipes/master/sounds/tone.mp3" type="audio/mpeg">
         Sorry. Your browser doesn't support the HTML5 audio element.
       </audio>
