@@ -1,5 +1,6 @@
 import { Recipe } from '../class/recipe';
 import { Items as i } from '../constants/items';
+import { Timer } from '../class/timer';
 
 export class SpicyLeekMushrooms extends Recipe {
     constructor() {
@@ -24,12 +25,12 @@ export class SpicyLeekMushrooms extends Recipe {
             ['Cut leek in strips and soak in glass bowl of water'],
             ['Chop', this.get(i.garlicClove())],
             ['Cut', this.get(i.crimniMushroom())],
-            ['Put vegetables in pan for 5 minutes'],
+            [Timer.set(5, 'm', 'put vegetables in pan')],
             ['Put in', this.get(i.soySauce())],
             ['Put in',this.get(i.sirachaSauce())],
             ['Put in',this.get(i.pepperFlake())],
             ['Put in',this.get(i.hoisonSauce())],
-            ['Wait 2 min'],
+            [Timer.set(2, 'm')],
         ]);
         this.printRecipe();
     }

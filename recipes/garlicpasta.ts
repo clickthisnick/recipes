@@ -1,5 +1,6 @@
 import { Recipe } from '../class/recipe';
 import { Items as i } from '../constants/items';
+import { Timer } from '../class/timer';
 
 export class GarlicPasta extends Recipe {
     constructor() {
@@ -24,12 +25,12 @@ export class GarlicPasta extends Recipe {
             ['Put', this.get(i.vegetableOil()), 'in pantelligent on 4'],
             ['Chop', this.get(i.garlicClove())],
             ['Put in', this.get(i.crimniMushroom()), 'and', this.get(i.garlicClove(0))],
-            ['Wait 3 minutes'],
+            [Timer.set(3, 'm')],
             [this.get(i.spiriliazer()), this.get(i.zuchinni())],
             ['Put', this.get(i.zuchinni(0)), 'in pan'],
-            ['Wait 5 minutes'],
+            [Timer.set(5, 'm')],
             ['Put in',this.get(i.pepperFlake())],
-            ['Wait 2 min'],
+            [Timer.set(2, 'm')],
             ['Top with', this.get(i.butter())],
             ['Top with', this.get(i.parmessanCheese())],
             ['Season with', this.get(i.blackPepper()), 'and', this.get(i.salt())],

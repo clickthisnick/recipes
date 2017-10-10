@@ -1,5 +1,6 @@
 import { Recipe } from '../class/recipe';
 import { Items as i } from '../constants/items';
+import { Timer } from '../class/timer';
 
 export class PadThaiStirFry extends Recipe {
     constructor() {
@@ -27,11 +28,11 @@ export class PadThaiStirFry extends Recipe {
             ['Cut', this.get(i.bellPepper())],
             ['Cut', this.get(i.garlicClove())],
             ['Cut', this.get(i.crimniMushroom())],
-            ['Put vegetables in pan for 7 minutes'],
+            [Timer.set(7, 'm', 'put vegetables in pan')],
             [this.get(i.spiriliazer()), this.get(i.zuchinni())],
-            ['Wait for 7 min timer'],
+            [Timer.set(7, 'm')],
             ['Put sprilized zuchinni in the pan'],
-            ['Wait 2 min'],
+            [Timer.set(2, 'm')],
             ['Put in', this.get(i.soySauce())],
             ['Put in',this.get(i.padThaiSauce())],
         ]);
