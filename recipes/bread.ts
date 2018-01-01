@@ -19,6 +19,7 @@ export class Bread extends Recipe {
     public generateRecipe() {
         this.prep();
         this.addSteps([
+            ['Attach breadmaker arm'],
             ['Put in breadmaker', this.get(i.breadFlour())],
             ['Put in breadmaker', this.get(i.brownSugar(.25))],
             ['Put in breadmaker', this.get(i.water())],
@@ -29,7 +30,8 @@ export class Bread extends Recipe {
             ['Put bread maker on dough setting (menu item 9) and hit start'],
             ['Set Timer For One Hour'],
             [
-                'Mix', this.get(i.brownSugar(.5)),
+                // TODO: Currently cannot use the same ingredient more than once
+                'Mix .5 Cups brownSugar',
                 this.get(i.cinnamon()),
             ],
             ['Wait for timer to go off'],
