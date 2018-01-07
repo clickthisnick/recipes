@@ -1,12 +1,12 @@
 export interface IItemObj {
-    name: string,
-    putAwayTime: number,
-    takeOutTime: number,
-    cleanSteps: string,
-    quantity: number,
-    unit: IItemObj | null,
-    wash: boolean,
-    isTakoutUnitable: boolean,
+    name: string;
+    putAwayTime: number;
+    takeOutTime: number;
+    cleanSteps: string;
+    quantity: number;
+    unit: IItemObj | null;
+    wash: boolean;
+    isTakoutUnitable: boolean;
 }
 
 export interface IItem {
@@ -23,7 +23,18 @@ export class Items {
         unit: unit || null,
         wash: false,
         isTakoutUnitable: false,
-    });
+    })
+
+    public static readonly honey: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'Honey',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
 
     public static readonly oldBay: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Old Bay Seasoning',
@@ -34,7 +45,7 @@ export class Items {
         unit: unit || null,
         wash: false,
         isTakoutUnitable: false,
-    });
+    })
 
     public static readonly chickenDrumstickPackage: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Chicken Drumstick Package',
@@ -45,7 +56,7 @@ export class Items {
         unit: unit || null,
         wash: false,
         isTakoutUnitable: false,
-    });
+    })
 
     public static readonly seconds: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Seconds',
@@ -56,8 +67,7 @@ export class Items {
         unit: unit || null,
         wash: false,
         isTakoutUnitable: false,
-    });
-
+    })
 
     public static readonly timer: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Timer',
@@ -68,7 +78,7 @@ export class Items {
         unit: unit || null,
         wash: false,
         isTakoutUnitable: false,
-    });
+    })
 
     public static readonly water: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Water',
@@ -79,7 +89,7 @@ export class Items {
         unit: unit || null,
         wash: false,
         isTakoutUnitable: false,
-    });
+    })
 
     public static readonly tsp: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Measuring tsp',
@@ -90,7 +100,7 @@ export class Items {
         unit: unit || null,
         wash: false,
         isTakoutUnitable: false,
-    });
+    })
 
     public static readonly tbsp: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Measuring tbsp',
@@ -101,7 +111,7 @@ export class Items {
         unit: unit || null,
         wash: false,
         isTakoutUnitable: false,
-    });
+    })
 
     public static readonly vegetableOil: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Vegetable Oil',
@@ -112,7 +122,7 @@ export class Items {
         unit: unit || null,
         wash: false,
         isTakoutUnitable: false,
-    });
+    })
 
     public static readonly avacado: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Avacado',
@@ -123,7 +133,7 @@ export class Items {
         unit: unit || null,
         wash: false,
         isTakoutUnitable: true,
-    });
+    })
 
     public static readonly leek: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Leek',
@@ -134,7 +144,7 @@ export class Items {
         unit: unit || null,
         wash: true,
         isTakoutUnitable: true,
-    });
+    })
 
     public static readonly sirachaSauce: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Siracha Sauce',
@@ -145,7 +155,7 @@ export class Items {
         unit: unit || null,
         wash: false,
         isTakoutUnitable: false,
-    });
+    })
 
     public static readonly hoisonSauce: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Hoison Sauce',
@@ -156,7 +166,7 @@ export class Items {
         unit: unit || null,
         wash: false,
         isTakoutUnitable: false,
-    });
+    })
 
     public static readonly parmessanCheese: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Parmessan Cheese',
@@ -167,7 +177,7 @@ export class Items {
         unit: unit || null,
         wash: false,
         isTakoutUnitable: false,
-    });
+    })
 
     public static readonly salt: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Salt',
@@ -178,7 +188,7 @@ export class Items {
         unit: unit || null,
         wash: false,
         isTakoutUnitable: false,
-    });
+    })
 
     public static readonly pepperFlake: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Pepper Flake',
@@ -189,7 +199,7 @@ export class Items {
         unit: unit || null,
         wash: false,
         isTakoutUnitable: false,
-    });
+    })
 
     public static readonly lime: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Lime',
@@ -200,7 +210,7 @@ export class Items {
         unit: unit || null,
         wash: false,
         isTakoutUnitable: true,
-    });
+    })
 
     public static readonly romaTomato: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Roma Tomato',
@@ -211,7 +221,7 @@ export class Items {
         unit: unit || null,
         wash: true,
         isTakoutUnitable: true,
-    });
+    })
 
     public static readonly serranoChilli: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Serrano Chilli',
@@ -222,7 +232,7 @@ export class Items {
         unit: unit || null,
         wash: true,
         isTakoutUnitable: true,
-    });
+    })
 
     public static readonly cilantro: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Cilantro',
@@ -233,7 +243,7 @@ export class Items {
         unit: unit || null,
         wash: true,
         isTakoutUnitable: false,
-    });
+    })
 
     public static readonly spaghettiSauce: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Spaghetti Sauce',
@@ -244,7 +254,7 @@ export class Items {
         unit: unit || null,
         wash: false,
         isTakoutUnitable: false,
-    });
+    })
 
     public static readonly blackPepper: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Black Pepper',
@@ -255,7 +265,7 @@ export class Items {
         unit: unit || null,
         wash: false,
         isTakoutUnitable: false,
-    });
+    })
 
     public static readonly egg: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Egg',
@@ -266,7 +276,7 @@ export class Items {
         unit: unit || null,
         wash: false,
         isTakoutUnitable: false,
-    });
+    })
 
     public static readonly butter: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Butter',
@@ -277,7 +287,7 @@ export class Items {
         unit: unit || null,
         wash: false,
         isTakoutUnitable: false,
-    });
+    })
 
     public static readonly spiriliazer: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Spirilizer',
@@ -288,7 +298,7 @@ export class Items {
         unit: unit || null,
         wash: false,
         isTakoutUnitable: false,
-    });
+    })
 
     public static readonly breadFlour: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Bread Flour',
@@ -299,7 +309,7 @@ export class Items {
         unit: unit || null,
         wash: false,
         isTakoutUnitable: false,
-    });
+    })
 
     public static readonly dryActiveYeast: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Active Dry Yeast',
@@ -310,7 +320,7 @@ export class Items {
         unit: unit || null,
         wash: false,
         isTakoutUnitable: false,
-    });
+    })
 
     public static readonly kosherSalt: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Kosher Salt',
@@ -321,7 +331,7 @@ export class Items {
         unit: unit || null,
         wash: false,
         isTakoutUnitable: false,
-    });
+    })
 
     public static readonly cinnamon: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Cinnamon',
@@ -332,7 +342,7 @@ export class Items {
         unit: unit || null,
         wash: false,
         isTakoutUnitable: false,
-    });
+    })
 
     public static readonly brownSugar: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Brown Sugar',
@@ -343,7 +353,7 @@ export class Items {
         unit: unit || null,
         wash: false,
         isTakoutUnitable: false,
-    });
+    })
 
     public static readonly redOnion: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Red Onion',
