@@ -4,6 +4,7 @@ import { Items as i } from '../constants/items';
 export class Bread extends Recipe {
     constructor() {
         super();
+        this.recipeName = 'CinnamonSugarBread';
         this.addIngredients([
             i.brownSugar(.75, i.cup()),
             i.breadFlour(4, i.cup()),
@@ -46,3 +47,7 @@ export class Bread extends Recipe {
         this.printRecipe();
     }
 }
+
+const recipe = new Bread();
+
+recipe.generateRecipe();

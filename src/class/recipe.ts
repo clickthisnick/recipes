@@ -96,6 +96,7 @@ export class Recipe {
 
          </script>
       `;
+      this.recipeHtml += this.generateBackToRecipes();
       this.recipeHtml += this.generateHeader('Clean counter space:');
       this.recipeHtml += this.generateStep('Empty dishwasher');
       this.recipeHtml += this.generateStep('Load dishwasher');
@@ -107,6 +108,10 @@ export class Recipe {
         Sorry. Your browser doesn't support the HTML5 audio element.
       </audio>
       `;
+   }
+
+   private generateBackToRecipes() {
+       return `<a href="https://github.com/clickthisnick/recipes/blob/master/README.MD">Back To Recipes</a>`;
    }
 
     private generateHeader(text: string) {
@@ -216,6 +221,14 @@ export class Recipe {
             stepDirections = this.generateStep(stepText);
          }
          this.recipeHtml += stepDirections;
+     });
+
+     const readmeText = `## [${this.recipeName}](https://rawgit.com/clickthisnick/recipes/master/dist/${this.recipeName}.html)\n\n`;
+
+     fs.appendFile(`/Users/mycomputer/Desktop/recipes/README.md`, readmeText, (err) => {
+         if(err) {
+             return console.log(err); //tslint:disable-line no-console
+         }
      });
 
      // TODO This has an error
