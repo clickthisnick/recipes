@@ -19,6 +19,7 @@ export class Bread extends Recipe {
     public generateRecipe() {
         this.prep();
         this.addSteps([
+            ['Attach breadmaker arm'],
             ['Put in breadmaker', this.get(i.breadFlour())],
             ['Put in breadmaker', this.get(i.water())],
             ['Put in breadmaker', this.get(i.kosherSalt())],
