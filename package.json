@@ -6,7 +6,10 @@
   "scripts": {
     "lint": "find src -name '*.ts' | xargs node_modules/tslint/bin/tslint",
     "compile": "./node_modules/typescript/bin/tsc",
-    "prebuild": "echo '# Recipes \\n\\n' > README.MD",
+    "createReadme": "echo '# Recipes \\n\\n' > README.MD",
+    "preremoveJs": "npm run createReadme",
+    "removeJs": "./src/builder/removeDist.sh",
+    "prebuild": "npm run removeJs",
     "build": "find src/recipes/ -iname '*.ts' -exec sh -c 'node_modules/ts-node/dist/bin.js {}' \\;"
   },
   "repository": {

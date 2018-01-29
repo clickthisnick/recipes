@@ -5,7 +5,7 @@ import { Timer } from '../class/timer';
 export class SpaghettiZuchinniPasta extends Recipe {
     constructor() {
         super();
-        this.recipeName = 'SpaghettiZuchinniPasta';
+        this.recipeName = SpaghettiZuchinniPasta.name;
         this.addIngredients([
             i.zuchinni(2),
             i.crimniMushroom(3),

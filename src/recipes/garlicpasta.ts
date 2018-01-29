@@ -5,7 +5,7 @@ import { Timer } from '../class/timer';
 export class GarlicPasta extends Recipe {
     constructor() {
         super();
-        this.recipeName = 'GarlicPasta';
+        this.recipeName = GarlicPasta.name;
         this.addIngredients([
             i.zuchinni(2),
             i.crimniMushroom(3),

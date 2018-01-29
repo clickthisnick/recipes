@@ -9,9 +9,11 @@
 
 ## [Guacamole](https://rawgit.com/clickthisnick/recipes/master/dist/Guacamole.html)
 
-## [PadThaisStirFry](https://rawgit.com/clickthisnick/recipes/master/dist/PadThaisStirFry.html)
+## [PadThaiStirFry](https://rawgit.com/clickthisnick/recipes/master/dist/PadThaiStirFry.html)
 
 ## [GarlicPasta](https://rawgit.com/clickthisnick/recipes/master/dist/GarlicPasta.html)
+
+## [EggsScrambled](https://rawgit.com/clickthisnick/recipes/master/dist/EggsScrambled.html)
 
 ## [CinnamonSugarBread](https://rawgit.com/clickthisnick/recipes/master/dist/CinnamonSugarBread.html)
 

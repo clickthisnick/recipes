@@ -5,7 +5,7 @@ import { Timer } from '../class/timer';
 export class AirFrozenChicken extends Recipe {
     constructor() {
         super();
-        this.recipeName = 'AirFrozenChicken';
+        this.recipeName = AirFrozenChicken.name;
         this.addIngredients([
             i.chickenDrumstickPackage(),
             i.oldBay()

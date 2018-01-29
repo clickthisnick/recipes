@@ -2,10 +2,10 @@ import { Recipe } from '../class/recipe';
 import { Items as i } from '../constants/items';
 
 // http://allrecipes.com/recipe/230162/softest-soft-bread-with-air-pockets-using-bread-machine/
-export class Bread extends Recipe {
+export class ToastingBread extends Recipe {
     constructor() {
         super();
-        this.recipeName = 'ToastingBread';
+        this.recipeName = ToastingBread.name;
         this.addIngredients([
             i.breadFlour(2, i.cup()),
             i.water(1, i.cup()),
@@ -34,6 +34,6 @@ export class Bread extends Recipe {
     }
 }
 
-const recipe = new Bread();
+const recipe = new ToastingBread();
 
 recipe.generateRecipe();

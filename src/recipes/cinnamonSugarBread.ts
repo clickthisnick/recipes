@@ -1,10 +1,10 @@
 import { Recipe } from '../class/recipe';
 import { Items as i } from '../constants/items';
 
-export class Bread extends Recipe {
+export class CinnamonSugarBread extends Recipe {
     constructor() {
         super();
-        this.recipeName = 'CinnamonSugarBread';
+        this.recipeName = CinnamonSugarBread.name;
         this.addIngredients([
             i.brownSugar(.75, i.cup()),
             i.breadFlour(4, i.cup()),
@@ -48,6 +48,6 @@ export class Bread extends Recipe {
     }
 }
 
-const recipe = new Bread();
+const recipe = new CinnamonSugarBread();
 
 recipe.generateRecipe();
