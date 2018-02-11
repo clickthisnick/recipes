@@ -7,9 +7,13 @@
 
 ## [ToastingBread](https://rawgit.com/clickthisnick/recipes/master/dist/ToastingBread.html)
 
+## [FrenchToast](https://rawgit.com/clickthisnick/recipes/master/dist/FrenchToast.html)
+
 ## [Guacamole](https://rawgit.com/clickthisnick/recipes/master/dist/Guacamole.html)
 
 ## [PadThaiStirFry](https://rawgit.com/clickthisnick/recipes/master/dist/PadThaiStirFry.html)
+
+## [FrenchToast](https://rawgit.com/clickthisnick/recipes/master/dist/FrenchToast.html)
 
 ## [GarlicPasta](https://rawgit.com/clickthisnick/recipes/master/dist/GarlicPasta.html)
 

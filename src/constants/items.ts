@@ -47,6 +47,17 @@ export class Items {
         isTakoutUnitable: false,
     })
 
+    public static readonly bread: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'Bread',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
     public static readonly chickenDrumstickPackage: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Chicken Drumstick Package',
         putAwayTime: 10,
@@ -190,6 +201,17 @@ export class Items {
         isTakoutUnitable: false,
     })
 
+    public static readonly montereyJackCheese: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'Monterey Jack Cheese',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Put monterey jack cheese back in refridgerator',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
     public static readonly salt: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Salt',
         putAwayTime: 10,
@@ -283,6 +305,28 @@ export class Items {
         putAwayTime: 10,
         takeOutTime: 10,
         cleanSteps: 'Put eggs back in refridgerator',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
+    public static readonly eggWhite: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'Egg White',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Put egg whites back in refridgerator',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
+    public static readonly ham: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'Ham',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Put ham back in refridgerator',
         quantity: quantity,
         unit: unit || null,
         wash: false,
