@@ -58,6 +58,17 @@ export class Items {
         isTakoutUnitable: false,
     })
 
+    public static readonly chickenBreastPackage: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'Chicken Breast Package',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
     public static readonly seconds: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Seconds',
         putAwayTime: 0,

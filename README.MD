@@ -17,5 +17,7 @@
 
 ## [CinnamonSugarBread](https://rawgit.com/clickthisnick/recipes/master/dist/CinnamonSugarBread.html)
 
+## [AirFryChickenBreast](https://rawgit.com/clickthisnick/recipes/master/dist/AirFryChickenBreast.html)
+
 ## [SpicyLeekMushrooms](https://rawgit.com/clickthisnick/recipes/master/dist/SpicyLeekMushrooms.html)
 
