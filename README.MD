@@ -17,6 +17,8 @@
 
 ## [GarlicPasta](https://rawgit.com/clickthisnick/recipes/master/dist/GarlicPasta.html)
 
+## [AirFryChickenThigh](https://rawgit.com/clickthisnick/recipes/master/dist/AirFryChickenThigh.html)
+
 ## [EggsScrambled](https://rawgit.com/clickthisnick/recipes/master/dist/EggsScrambled.html)
 
 ## [CinnamonSugarBread](https://rawgit.com/clickthisnick/recipes/master/dist/CinnamonSugarBread.html)
