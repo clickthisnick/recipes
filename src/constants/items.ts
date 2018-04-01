@@ -47,6 +47,17 @@ export class Items {
         isTakoutUnitable: false,
     })
 
+    public static readonly oliveOil: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'Olive Oil',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
     public static readonly bread: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Bread',
         putAwayTime: 10,

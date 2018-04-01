@@ -10,7 +10,7 @@ export class ToastingBread extends Recipe {
             i.breadFlour(2, i.cup()),
             i.water(1, i.cup()),
             i.honey(4, i.tsp()),
-            i.butter(5, i.tsp()),
+            i.oliveOil(4, i.tsp()),
             i.kosherSalt(1/2, i.tsp()),
             i.dryActiveYeast(2, i.tsp()),
         ]);
@@ -23,7 +23,7 @@ export class ToastingBread extends Recipe {
         this.addSteps([
             ['Attach breadmaker arm'],
             ['Put in', this.get(i.water())],
-            ['Put in melted', this.get(i.butter())],
+            ['Put in', this.get(i.oliveOil())],
             ['Put in', this.get(i.breadFlour())],
             ['Put in', this.get(i.kosherSalt())],
             ['Put in', this.get(i.honey())],
