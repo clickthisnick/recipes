@@ -199,7 +199,7 @@ export class Recipe {
     // Like .5 red onion we should put away the other half
 
    public printRecipe() {
-      this.createCleanupSteps();
+      // this.createCleanupSteps();
       this.steps.forEach((step) => {
          let stepDirections;
 

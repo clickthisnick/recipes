@@ -18,14 +18,16 @@ export class ToastingBread extends Recipe {
 
     public generateRecipe() {
         this.prep();
+        // Its important to put liquid items first
+        // Then the solid ones
         this.addSteps([
             ['Attach breadmaker arm'],
-            ['Put in breadmaker', this.get(i.breadFlour())],
-            ['Put in breadmaker', this.get(i.water())],
-            ['Put in breadmaker', this.get(i.kosherSalt())],
-            ['Put in breadmaker', this.get(i.honey())],
-            ['Put in breadmaker', this.get(i.butter())],
-            ['Put in breadmaker', this.get(i.dryActiveYeast())],
+            ['Put in', this.get(i.water())],
+            ['Put in melted', this.get(i.butter())],
+            ['Put in', this.get(i.breadFlour())],
+            ['Put in', this.get(i.kosherSalt())],
+            ['Put in', this.get(i.honey())],
+            ['Put in center the', this.get(i.dryActiveYeast())],
             ['Put bread maker on bread setting (menu item 1) with medium brust and 2 lb loaf and hit start'],
             ['Let bread cool for 20 minutes'],
             ['Slice bread'],
