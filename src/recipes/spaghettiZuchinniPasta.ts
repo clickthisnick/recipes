@@ -2,10 +2,11 @@ import { Recipe } from '../class/recipe';
 import { Items as i } from '../constants/items';
 import { Timer } from '../class/timer';
 
-export class SpaghettiZuchinniPasta extends Recipe {
+export class MealRecipe extends Recipe {
     constructor() {
         super();
-        this.recipeName = SpaghettiZuchinniPasta.name;
+        this.recipeName = 'SpaghettiZuchinniPasta';
+        this.recipeGroup = 'Pasta';
         this.addIngredients([
             i.zuchinni(2),
             i.crimniMushroom(3),
@@ -18,7 +19,7 @@ export class SpaghettiZuchinniPasta extends Recipe {
         ]);
     }
 
-    public generateRecipe() {
+    public async generateRecipe() {
         this.prep();
         this.addSteps([
             ['Put', this.get(i.vegetableOil()), 'in pantelligent on 4'],
@@ -35,10 +36,6 @@ export class SpaghettiZuchinniPasta extends Recipe {
             ['Season with', this.get(i.blackPepper())],
             ['Top with', this.get(i.parmessanCheese())]
         ]);
-        this.printRecipe();
+        await this.printRecipe();
     }
 }
-
-const recipe = new SpaghettiZuchinniPasta();
-
-recipe.generateRecipe();

@@ -2,17 +2,18 @@ import { Recipe } from '../class/recipe';
 import { Items as i } from '../constants/items';
 import { Timer } from '../class/timer';
 
-export class AirFrozenChicken extends Recipe {
+export class MealRecipe extends Recipe {
     constructor() {
         super();
-        this.recipeName = AirFrozenChicken.name;
+        this.recipeName = 'AirFrozenChicken';
+        this.recipeGroup = 'Chicken';
         this.addIngredients([
             i.chickenDrumstickPackage(),
             i.oldBay()
         ]);
     }
 
-    public generateRecipe() {
+    public async generateRecipe() {
         this.prep();
         this.addSteps([
             ['Open', this.get(i.chickenDrumstickPackage())],
@@ -24,10 +25,6 @@ export class AirFrozenChicken extends Recipe {
             ['Mix chicken and sprinkle', this.get(i.oldBay())],
             [Timer.set(10, 'm', 'Put chicken in airfryer @ 350 deg')],
         ]);
-        this.printRecipe();
+        await this.printRecipe();
     }
 }
-
-const recipe = new AirFrozenChicken();
-
-recipe.generateRecipe();

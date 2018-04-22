@@ -1,10 +1,11 @@
 import { Recipe } from '../class/recipe';
 import { Items as i } from '../constants/items';
 
-export class Guacamole extends Recipe {
+export class MealRecipe extends Recipe {
     constructor() {
         super();
-        this.recipeName = Guacamole.name;
+        this.recipeName = 'Guacamole';
+        this.recipeGroup = 'Snack';
         this.addIngredients([
             i.avacado(2),
             i.kosherSalt(.75, i.tsp()),
@@ -18,7 +19,7 @@ export class Guacamole extends Recipe {
         ]);
     }
 
-    public generateRecipe() {
+    public async generateRecipe() {
         this.prep();
         this.addSteps([
             ['Cut', this.get(i.avacado()), 'and place in glass bowl'],
@@ -33,10 +34,6 @@ export class Guacamole extends Recipe {
             ['Put', this.get(i.blackPepper())],
             ['Stir bowl'],
         ]);
-        this.printRecipe();
+        await this.printRecipe();
     }
 }
-
-const recipe = new Guacamole();
-
-recipe.generateRecipe();

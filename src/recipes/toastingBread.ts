@@ -2,10 +2,11 @@ import { Recipe } from '../class/recipe';
 import { Items as i } from '../constants/items';
 
 // http://allrecipes.com/recipe/230162/softest-soft-bread-with-air-pockets-using-bread-machine/
-export class ToastingBread extends Recipe {
+export class MealRecipe extends Recipe {
     constructor() {
         super();
-        this.recipeName = ToastingBread.name;
+        this.recipeName = 'ToastingBread';
+        this.recipeGroup = 'Bread';
         this.addIngredients([
             i.breadFlour(2, i.cup()),
             i.water(1, i.cup()),
@@ -16,7 +17,7 @@ export class ToastingBread extends Recipe {
         ]);
     }
 
-    public generateRecipe() {
+    public async generateRecipe() {
         this.prep();
         // Its important to put liquid items first
         // Then the solid ones
@@ -32,10 +33,6 @@ export class ToastingBread extends Recipe {
             ['Let bread cool for 20 minutes'],
             ['Slice bread'],
         ]);
-        this.printRecipe();
+        await this.printRecipe();
     }
 }
-
-const recipe = new ToastingBread();
-
-recipe.generateRecipe();

@@ -2,16 +2,17 @@ import { Recipe } from '../class/recipe';
 import { Items as i } from '../constants/items';
 import { Timer } from '../class/timer';
 
-export class EggsScrambled extends Recipe {
+export class MealRecipe extends Recipe {
     constructor() {
         super();
-        this.recipeName = EggsScrambled.name;
+        this.recipeName = 'EggsScrambled';
+        this.recipeGroup = 'Eggs';
         this.addIngredients([
             i.egg(),
         ]);
     }
 
-    public generateRecipe() {
+    public async generateRecipe() {
         this.prep();
         this.addSteps([
             ['Put pan on stove and turn to heat 5'],
@@ -20,10 +21,6 @@ export class EggsScrambled extends Recipe {
             [Timer.set(3, 'm', 'Cook the eggs')],
             [Timer.set(2, 'm', 'Flip and cook eegs')],
         ]);
-        this.printRecipe();
+        await this.printRecipe();
     }
 }
-
-const recipe = new EggsScrambled();
-
-recipe.generateRecipe();

@@ -4,13 +4,15 @@
   "description": "Vegetarian Recipes",
   "main": "index.js",
   "scripts": {
+    "prelint": "npm install",
     "lint": "find src -name '*.ts' | xargs node_modules/tslint/bin/tslint",
-    "compile": "./node_modules/typescript/bin/tsc",
+    "precreateReadme": "npm run lint",
     "createReadme": "echo '# Recipes \\n\\n' > README.MD",
-    "preremoveJs": "npm run createReadme",
-    "removeJs": "./src/builder/removeDist.sh",
-    "prebuild": "npm run removeJs",
-    "build": "find src/recipes/ -iname '*.ts' -exec sh -c 'node_modules/ts-node/dist/bin.js {}' \\;"
+    "preremoveDist": "npm run createReadme",
+    "removeDist": "./src/builder/removeDist.sh",
+    "prebuild": "npm run removeDist",
+    "build": "./node_modules/ts-node/dist/bin.js ./src/builder/createDist.ts",
+    "postBuild": "./node_modules/ts-node/dist/bin.js ./src/makeReadme.ts"
   },
   "repository": {
     "type": "git",
@@ -23,9 +25,9 @@
   },
   "homepage": "https://github.com/clickthisnick/recipes#readme",
   "dependencies": {
-    "@types/node": "^8.5.9",
+    "@types/node": "^8.10.9",
     "ts-node": "^4.1.0",
     "tslint": "^5.9.1",
-    "typescript": "^2.6.2"
+    "typescript": "^2.8.3"
   }
 }

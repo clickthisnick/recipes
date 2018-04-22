@@ -1,5 +1,6 @@
 import { IItemObj } from '../constants/items';
 import * as fs from 'fs';
+import { Readme } from './readme';
 
 export class Recipe {
     private headerStart = '<h1>';
@@ -10,6 +11,7 @@ export class Recipe {
     public ingredients: IItemObj[];
     public recipeHtml: string = '';
     public recipeName: string;
+    public recipeGroup: string;
 
     constructor() {
       this.recipeHtml += this.mobileViewport;
@@ -198,46 +200,47 @@ export class Recipe {
     // TODO Should be a new section after recipe that says clean excess ingredients
     // Like .5 red onion we should put away the other half
 
-   public printRecipe() {
-      // this.createCleanupSteps();
-      this.steps.forEach((step) => {
-         let stepDirections;
+   public printRecipe(): Promise<void> {
+       return new Promise((resolve) => {
+           // this.createCleanupSteps();
+           this.steps.forEach((step) => {
+              let stepDirections;
 
-         if (step.length === 1 && typeof(step[0].type) !== 'undefined') {
-            stepDirections = this.generateTimerStep(step[0]);
-         } else {
-            let stepText = '';
+              if (step.length === 1 && typeof(step[0].type) !== 'undefined') {
+                 stepDirections = this.generateTimerStep(step[0]);
+              } else {
+                 let stepText = '';
 
-            step.forEach((item) => {
-               if (typeof item === 'string') {
-                  stepText += item;
-               } else if (typeof item === 'object') {
-                  stepText += this.turnIngObjIntoStr(item, true);
-               }
-               stepText += ' ';
-           });
+                 step.forEach((item) => {
+                    if (typeof item === 'string') {
+                       stepText += item;
+                    } else if (typeof item === 'object') {
+                       stepText += this.turnIngObjIntoStr(item, true);
+                    }
+                    stepText += ' ';
+                });
 
-            stepText.trim();
-            stepDirections = this.generateStep(stepText);
-         }
-         this.recipeHtml += stepDirections;
-     });
+                 stepText.trim();
+                 stepDirections = this.generateStep(stepText);
+              }
+              this.recipeHtml += stepDirections;
+          });
 
-     const readmeText = `## [${this.recipeName}](https://rawgit.com/clickthisnick/recipes/master/dist/${this.recipeName}.html)\n\n`;
+          if (Readme.groups[this.recipeGroup] === undefined) {
+              Readme.groups[this.recipeGroup] = [];
+          }
 
-     fs.appendFile(`/Users/mycomputer/Desktop/recipes/README.md`, readmeText, (err) => {
-         if(err) {
-             return console.log(err); //tslint:disable-line no-console
-         }
-     });
+          Readme.groups[this.recipeGroup].push(`## [${this.recipeName}](https://rawgit.com/clickthisnick/recipes/master/dist/${this.recipeName}.html)\n\n`);
 
-     // TODO This has an error
-     fs.writeFile(`/Users/mycomputer/Desktop/recipes/dist/${this.recipeName}.html`, this.recipeHtml, (err) => {
-         if(err) {
-             return console.log(err); //tslint:disable-line no-console
-         }
-         console.log('The file was saved!'); //tslint:disable-line no-console
-     });
+          // TODO This has an error
+          fs.writeFile(`${process.cwd()}/dist/${this.recipeName}.html`, this.recipeHtml, (err) => {
+              if(err) {
+                  return console.log(err); //tslint:disable-line no-console
+              }
+              console.log('The file was saved!'); //tslint:disable-line no-console
+              resolve();
+          });
+       });
    }
 
    // This is horibble and I should fix'

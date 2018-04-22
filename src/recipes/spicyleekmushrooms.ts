@@ -2,10 +2,11 @@ import { Recipe } from '../class/recipe';
 import { Items as i } from '../constants/items';
 import { Timer } from '../class/timer';
 
-export class SpicyLeekMushrooms extends Recipe {
+export class MealRecipe extends Recipe {
     constructor() {
         super();
-        this.recipeName = SpicyLeekMushrooms.name;
+        this.recipeName = 'SpicyLeekMushrooms';
+        this.recipeGroup = 'Chinese';
         this.addIngredients([
             i.leek(2),
             i.crimniMushroom(5),
@@ -18,7 +19,7 @@ export class SpicyLeekMushrooms extends Recipe {
         ]);
     }
 
-    public generateRecipe() {
+    public async generateRecipe() {
         this.prep();
         this.addSteps([
             ['Put', this.get(i.vegetableOil()), 'in pantelligent on 4 / stove top on 6'],
@@ -33,10 +34,6 @@ export class SpicyLeekMushrooms extends Recipe {
             ['Put in',this.get(i.hoisonSauce())],
             [Timer.set(2, 'm')],
         ]);
-        this.printRecipe();
+        await this.printRecipe();
     }
 }
-
-const recipe = new SpicyLeekMushrooms();
-
-recipe.generateRecipe();

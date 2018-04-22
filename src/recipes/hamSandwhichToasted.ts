@@ -1,10 +1,11 @@
 import { Recipe } from '../class/recipe';
 import { Items as i } from '../constants/items';
 
-export class FrenchToast extends Recipe {
+export class MealRecipe extends Recipe {
     constructor() {
         super();
-        this.recipeName = FrenchToast.name;
+        this.recipeName = 'HamSandwhich';
+        this.recipeGroup = 'Sandwhich';
         this.addIngredients([
             i.bread(),
             i.butter(),
@@ -13,7 +14,7 @@ export class FrenchToast extends Recipe {
         ]);
     }
 
-    public generateRecipe() {
+    public async generateRecipe() {
         this.prep();
         this.addSteps([
             ['Put a pan on heat 5'],
@@ -24,10 +25,6 @@ export class FrenchToast extends Recipe {
             ['Cook for 1 and a half minutes'],
             ['Put 2 slices of', this.get(i.ham()), 'on the toasted bread'],
         ]);
-        this.printRecipe();
+        await this.printRecipe();
     }
 }
-
-const recipe = new FrenchToast();
-
-recipe.generateRecipe();

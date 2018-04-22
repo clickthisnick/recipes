@@ -1,10 +1,11 @@
 import { Recipe } from '../class/recipe';
 import { Items as i } from '../constants/items';
 
-export class CinnamonSugarBread extends Recipe {
+export class MealRecipe extends Recipe {
     constructor() {
         super();
-        this.recipeName = CinnamonSugarBread.name;
+        this.recipeName = 'CinnamonSugarBread';
+        this.recipeGroup = 'Bread';
         this.addIngredients([
             i.brownSugar(.75, i.cup()),
             i.breadFlour(4, i.cup()),
@@ -17,7 +18,7 @@ export class CinnamonSugarBread extends Recipe {
         ]);
     }
 
-    public generateRecipe() {
+    public async generateRecipe() {
         this.prep();
         this.addSteps([
             ['Attach breadmaker arm'],
@@ -44,10 +45,6 @@ export class CinnamonSugarBread extends Recipe {
             ['Preheat oven to 350 degrees'],
             ['Put bread in oven for 30 minutes'],
         ]);
-        this.printRecipe();
+        await this.printRecipe();
     }
 }
-
-const recipe = new CinnamonSugarBread();
-
-recipe.generateRecipe();

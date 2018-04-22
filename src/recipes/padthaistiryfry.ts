@@ -2,10 +2,11 @@ import { Recipe } from '../class/recipe';
 import { Items as i } from '../constants/items';
 import { Timer } from '../class/timer';
 
-export class PadThaiStirFry extends Recipe {
+export class MealRecipe extends Recipe {
     constructor() {
         super();
-        this.recipeName = PadThaiStirFry.name;
+        this.recipeName = 'PadThaiStirFry';
+        this.recipeGroup = 'Chinese';
         this.addIngredients([
             i.redOnion(.5),
             i.scallion(3),
@@ -20,7 +21,7 @@ export class PadThaiStirFry extends Recipe {
         ]);
     }
 
-    public generateRecipe() {
+    public async generateRecipe() {
         this.prep();
         this.addSteps([
             ['Put 3 seconds of', this.get(i.vegetableOil()), 'in pantelligent on 4'],
@@ -37,10 +38,6 @@ export class PadThaiStirFry extends Recipe {
             ['Put in', this.get(i.soySauce())],
             ['Put in',this.get(i.padThaiSauce())],
         ]);
-        this.printRecipe();
+        await this.printRecipe();
     }
 }
-
-const recipe = new PadThaiStirFry();
-
-recipe.generateRecipe();
