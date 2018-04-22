@@ -69,6 +69,17 @@ export class Items {
         isTakoutUnitable: false,
     })
 
+    public static readonly porkRoast: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'Pork Roast',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
     public static readonly chickenDrumstickPackage: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Chicken Drumstick Package',
         putAwayTime: 10,
@@ -278,6 +289,28 @@ export class Items {
         isTakoutUnitable: true,
     })
 
+    public static readonly lawlrySaltFree: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'Lawlry Salk Free Seasoning',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: true,
+        isTakoutUnitable: true,
+    })
+
+    public static readonly chilliPowder: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'Chilli Powder',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: true,
+        isTakoutUnitable: true,
+    })
+
     public static readonly serranoChilli: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Serrano Chilli',
         putAwayTime: 10,
@@ -462,6 +495,17 @@ export class Items {
         quantity: quantity,
         unit: unit || null,
         wash: true,
+        isTakoutUnitable: true,
+    })
+
+    public static readonly garlicPowder: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'Garlic Powder',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
         isTakoutUnitable: true,
     })
 

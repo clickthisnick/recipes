@@ -34,3 +34,6 @@
 
 ## [SpicyLeekMushrooms](https://rawgit.com/clickthisnick/recipes/master/dist/SpicyLeekMushrooms.html)
 
+# Pork
+## [PorkRoastSlowCooker](https://rawgit.com/clickthisnick/recipes/master/dist/PorkRoastSlowCooker.html)
+

@@ -1,12 +1,13 @@
 import { Recipe } from '../class/recipe';
 import { Items as i } from '../constants/items';
+import { Categories as c } from '../constants/categories';
 
 // http://allrecipes.com/recipe/230162/softest-soft-bread-with-air-pockets-using-bread-machine/
 export class MealRecipe extends Recipe {
     constructor() {
         super();
         this.recipeName = 'ToastingBread';
-        this.recipeGroup = 'Bread';
+        this.recipeGroup = c.bread;
         this.addIngredients([
             i.breadFlour(2, i.cup()),
             i.water(1, i.cup()),

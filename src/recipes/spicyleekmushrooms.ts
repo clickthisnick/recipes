@@ -1,12 +1,13 @@
 import { Recipe } from '../class/recipe';
 import { Items as i } from '../constants/items';
+import { Categories as c } from '../constants/categories';
 import { Timer } from '../class/timer';
 
 export class MealRecipe extends Recipe {
     constructor() {
         super();
         this.recipeName = 'SpicyLeekMushrooms';
-        this.recipeGroup = 'Chinese';
+        this.recipeGroup = c.chinese;
         this.addIngredients([
             i.leek(2),
             i.crimniMushroom(5),
