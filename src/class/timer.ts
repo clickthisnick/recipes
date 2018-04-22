@@ -7,13 +7,18 @@ export class Timer {
 
         const text = {
             s: 'second',
-            m: 'minute'
+            m: 'minute',
+            h: 'hour',
         };
         let typeText: string = '';
 
         // Overright multiplier if specified minutes
         if (type === 'm') {
-            multiplier = 60000;
+            multiplier = 60000; // Milliseconds in a minute
+        }
+
+        if (type === 'h') {
+            multiplier = 3600000; // Milliseconds in a hour
         }
 
         typeText = duration > 1 ? `${text[type]}s` : text[type];
