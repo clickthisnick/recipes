@@ -26,6 +26,8 @@
 # Snack
 ## [Guacamole](https://rawgit.com/clickthisnick/recipes/master/dist/Guacamole.html)
 
+## [KaleChips](https://rawgit.com/clickthisnick/recipes/master/dist/KaleChips.html)
+
 # Sandwhich
 ## [HamSandwhich](https://rawgit.com/clickthisnick/recipes/master/dist/HamSandwhich.html)
 
