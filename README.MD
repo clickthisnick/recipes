@@ -8,6 +8,9 @@
 
 ## [AirFryChickenThigh](https://rawgit.com/clickthisnick/recipes/master/dist/AirFryChickenThigh.html)
 
+# Smoothies
+## [BerrySmoothie](https://rawgit.com/clickthisnick/recipes/master/dist/BerrySmoothie.html)
+
 # Bread
 ## [CinnamonSugarBread](https://rawgit.com/clickthisnick/recipes/master/dist/CinnamonSugarBread.html)
 
