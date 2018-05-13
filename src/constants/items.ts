@@ -25,6 +25,39 @@ export class Items {
         isTakoutUnitable: false,
     })
 
+    public static readonly frozenBerries: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'Frozen Berries',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
+    public static readonly plainYogurt: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'Plain Yogurt',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
+    public static readonly almondMilk: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'Almond Milk',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
     public static readonly kale: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Kale',
         putAwayTime: 10,
