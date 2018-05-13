@@ -4,7 +4,7 @@ export class Readme {
     public static groups = {};
 
     public static makeReadme() {
-        for (const groupKey of Object.keys(this.groups)) {
+        for (const groupKey of Object.keys(this.groups).sort()) {
             this.appendReadme(`# ${groupKey}\n`);
 
             for (const recipe of this.groups[groupKey]) {
