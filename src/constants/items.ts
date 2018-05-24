@@ -36,6 +36,17 @@ export class Items {
         isTakoutUnitable: false,
     })
 
+    public static readonly frozenTatorTots: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'Frozen Tator Tots',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
     public static readonly plainYogurt: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Plain Yogurt',
         putAwayTime: 10,
