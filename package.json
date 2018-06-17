@@ -7,7 +7,7 @@
     "prelint": "npm install",
     "lint": "find src -name '*.ts' | xargs node_modules/tslint/bin/tslint",
     "precreateReadme": "npm run lint",
-    "createReadme": "echo '# Meat Temperature https://rawgit.com/clickthisnick/recipes/meatTemp.html \\n\\n # Recipes \\n\\n' > README.MD",
+    "createReadme": "echo '##[Meat Temperature](https://rawgit.com/clickthisnick/recipes/master/meatTemp.html) \\n\\n # Recipes \\n\\n' > README.MD",
     "preremoveDist": "npm run createReadme",
     "removeDist": "./src/builder/removeDist.sh",
     "prebuild": "npm run removeDist",
@@ -25,9 +25,9 @@
   },
   "homepage": "https://github.com/clickthisnick/recipes#readme",
   "dependencies": {
-    "@types/node": "^8.10.9",
-    "ts-node": "^4.1.0",
-    "tslint": "^5.9.1",
-    "typescript": "^2.8.3"
+    "@types/node": "^10.3.3",
+    "ts-node": "^6.1.1",
+    "tslint": "^5.10.0",
+    "typescript": "^2.9.2"
   }
 }
