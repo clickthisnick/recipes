@@ -202,7 +202,6 @@ export class Recipe {
 
    public printRecipe(): Promise<void> {
        return new Promise((resolve) => {
-           // this.createCleanupSteps();
            this.steps.forEach((step) => {
               let stepDirections;
 
@@ -241,37 +240,6 @@ export class Recipe {
               resolve();
           });
        });
-   }
-
-   // This is horibble and I should fix'
-   // This should loop through items until it finds the item,
-   // Then loop the other way until it finds a timer item
-   // Then decrease the amount of time the timer item takes by the put away time
-   private createCleanupSteps() {
-      for (const ingredient of this.ingredients) {
-         let cleanedIngredient = false;
-         if (cleanedIngredient) {
-            break;
-         }
-         for (let s = this.steps.length - 1; s >= 0; s--) {
-            if (cleanedIngredient) {
-               break;
-            }
-            for (let si = this.steps[s].length - 1; si >= 0; si--) {
-               if (typeof this.steps[s][si] === 'object' && this.steps[s][si].name === ingredient.name) {
-                  if (this.steps[s][si].cleanSteps !== '') {
-                     this.steps.splice(s+1, 0, [this.steps[s][si].cleanSteps]);
-                  }
-                  cleanedIngredient = true;
-                  break;
-               }
-            }
-         }
-
-         if (cleanedIngredient === false) {
-            throw new Error(`Never used ${ingredient.name}`);
-         }
-      }
    }
 
    public addSteps(steps: (string | void)[][]) {

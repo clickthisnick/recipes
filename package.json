@@ -7,7 +7,7 @@
     "prelint": "npm install",
     "lint": "find src -name '*.ts' | xargs node_modules/tslint/bin/tslint",
     "precreateReadme": "npm run lint",
-    "createReadme": "echo '##[Meat Temperature](https://rawgit.com/clickthisnick/recipes/master/meatTemp.html) \\n\\n # Recipes \\n\\n' > README.MD",
+    "createReadme": "echo '## [Meat Temperature](https://rawgit.com/clickthisnick/recipes/master/meatTemp.html)\\n\\n # Recipes\\n\\n' > README.MD",
     "preremoveDist": "npm run createReadme",
     "removeDist": "./src/builder/removeDist.sh",
     "prebuild": "npm run removeDist",

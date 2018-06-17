@@ -1,6 +1,6 @@
-##[Meat Temperature](https://rawgit.com/clickthisnick/recipes/master/meatTemp.html) 
+## [Meat Temperature](https://rawgit.com/clickthisnick/recipes/master/meatTemp.html)
 
- # Recipes 
+ # Recipes
 
 
 # Bread
