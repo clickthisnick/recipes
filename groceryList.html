@@ -1,0 +1,124 @@
+<h3><b>Expiration Date:</b> <span id='weekAhead'></span></h3>
+If existing item going to be past the expiration date, assume quantity is 0.</br></br>
+<style>
+
+
+    table {
+        color: #333;
+        /* Lighten up font color */
+        font-family: Helvetica, Arial, sans-serif;
+        /* Nicer font */
+        width: 640px;
+        border-collapse: collapse;
+        border-spacing: 0;
+    }
+
+    td,
+    th {
+        border: 1px solid #CCC;
+        height: 30px;
+    }
+
+    /* Make cells a bit taller */
+
+    th {
+        background: #F3F3F3;
+        /* Light grey background */
+        font-weight: bold;
+        /* Make sure they're bold */
+    }
+
+    td {
+        /* Lighter grey background */
+        text-align: left;
+        /* Center our text */
+        padding-left: 1rem;
+    }
+
+    .completed {
+        background-color:green;
+        color: white;
+    }
+
+    a:visited {
+        color:blue;
+    }
+
+    body {
+        padding: 1rem;
+    }
+
+</style>
+
+<script>
+    const oneWeekAhead = new Date();
+    oneWeekAhead.setDate(oneWeekAhead.getDate() + 7);
+    document.getElementById("weekAhead").innerHTML = oneWeekAhead.toLocaleDateString('en-US')
+</script>
+
+<table>
+    <th>Name</th>
+    <th>Quantity</th>
+    <th>Link</th>
+    <th>Price</th>
+    <tr onclick="this.classList.toggle('completed')">
+        <td>Almond Milk</td>
+        <td>2</td>
+        <td><a href="https://www.amazon.com/365-Everyday-Value-Almondmilk-Unsweetened/dp/B074H6M4LN?fpw=fresh" target="_blank" >Link</a></td>
+        <td>1.99</td>
+    </tr><tr onclick="this.classList.toggle('completed')">
+        <td>Plain Yogurt</td>
+        <td>1</td>
+        <td><a href="https://www.amazon.com/gp/product/B074H64BYN?ppw=fresh" target="_blank" >Link</a></td>
+        <td>3.39</td>
+    </tr><tr onclick="this.classList.toggle('completed')">
+        <td>Frozen Cascade Farm Fruit Raspberry</td>
+        <td>2</td>
+        <td><a href="https://www.amazon.com/Cascadian-Farm-Organic-Raspberries-Organically/dp/B06Y2GKMT9/?fpw=fresh" target="_blank" >Link</a></td>
+        <td>11.32</td>
+    </tr><tr onclick="this.classList.toggle('completed')">
+        <td>Chicken Breasts</td>
+        <td>5</td>
+        <td><a href="https://www.amazon.com/gp/product/B00AR0ZZ62?ppw=fresh" target="_blank" >Link</a></td>
+        <td>5.66</td>
+    </tr><tr onclick="this.classList.toggle('completed')">
+        <td>Spring Mix</td>
+        <td>1</td>
+        <td><a href="https://www.amazon.com/gp/product/B074H57S5G?ppw=fresh" target="_blank" >Link</a></td>
+        <td>4.99</td>
+    </tr><tr onclick="this.classList.toggle('completed')">
+        <td>Unsalted Butter</td>
+        <td>1</td>
+        <td><a href="https://www.amazon.com/gp/product/B074VDJ7KZ?ppw=fresh" target="_blank" >Link</a></td>
+        <td>3.49</td>
+    </tr><tr onclick="this.classList.toggle('completed')">
+        <td>Eggs Whites</td>
+        <td>2</td>
+        <td><a href="https://www.amazon.com/gp/product/B00L35T5F2?ppw=fresh" target="_blank" >Link</a></td>
+        <td>4.8</td>
+    </tr><tr onclick="this.classList.toggle('completed')">
+        <td>Dried Apricots</td>
+        <td>2</td>
+        <td><a href="https://www.amazon.com/gp/product/B0014D2992?ppw=fresh" target="_blank" >Link</a></td>
+        <td>4.29</td>
+    </tr><tr onclick="this.classList.toggle('completed')">
+        <td>Low Sodium Bacon</td>
+        <td>1</td>
+        <td><a href="https://www.amazon.com/gp/product/B00408JGB2?ppw=fresh" target="_blank" >Link</a></td>
+        <td>5.74</td>
+    </tr><tr onclick="this.classList.toggle('completed')">
+        <td>Briana Artichoke Dressing</td>
+        <td>1</td>
+        <td><a href="https://www.amazon.com/Briannas-Real-French-Vinaigrette-Dressing/dp/B000WLGD4O?fpw=fresh" target="_blank" >Link</a></td>
+        <td>3.32</td>
+    </tr><tr onclick="this.classList.toggle('completed')">
+        <td>Almond Butter</td>
+        <td>1</td>
+        <td><a href="https://www.amazon.com/365-Everyday-Value-Almond-Crunchy/dp/B074J76XG2?fpw=fresh" target="_blank" >Link</a></td>
+        <td>6.99</td>
+    </tr><tr onclick="this.classList.toggle('completed')">
+        <td>Monterey Jack Cheese</td>
+        <td>1</td>
+        <td><a href="https://www.amazon.com/gp/product/B074HJ4V7C?ppw=fresh" target="_blank" >Link</a></td>
+        <td>4.49</td>
+    </tr></table>

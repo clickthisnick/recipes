@@ -7,12 +7,15 @@
     "prelint": "npm install",
     "lint": "find src -name '*.ts' | xargs node_modules/tslint/bin/tslint",
     "precreateReadme": "npm run lint",
-    "createReadme": "echo '## [Meat Temperature](https://rawgit.com/clickthisnick/recipes/master/meatTemp.html)\\n\\n # Recipes\\n\\n' > README.MD",
+    "createReadme": "echo '## [Meat Temperature](https://rawgit.com/clickthisnick/recipes/master/meatTemp.html)\\n\\n' > README.MD",
+    "postcreateReadme": "echo '## [Grocery List](https://rawgit.com/clickthisnick/recipes/master/groceryList.html)\\n\\n # Recipes List\\n\\n' >> README.MD",
     "preremoveDist": "npm run createReadme",
     "removeDist": "./src/builder/removeDist.sh",
     "prebuild": "npm run removeDist",
     "build": "./node_modules/ts-node/dist/bin.js ./src/builder/createDist.ts",
-    "postBuild": "./node_modules/ts-node/dist/bin.js ./src/makeReadme.ts"
+    "postbuild": "npm run createGroceryList",
+    "createGroceryList": "./node_modules/ts-node/dist/bin.js ./src/grocerylist/groceries.ts",
+    "postCceateGroceryList": "./node_modules/ts-node/dist/bin.js ./src/makeReadme.ts"
   },
   "repository": {
     "type": "git",
