@@ -56,12 +56,12 @@ const items: IItem[] = [
         name: 'Dried Apricots',
         link: 'https://www.amazon.com/gp/product/B0014D2992?ppw=fresh',
     },
-    {
-        price: [5.74],
-        quantity: 1,
-        name: 'Low Sodium Bacon',
-        link: 'https://www.amazon.com/gp/product/B00408JGB2?ppw=fresh',
-    },
+    // {
+    //     price: [5.74],
+    //     quantity: 1,
+    //     name: 'Low Sodium Bacon',
+    //     link: 'https://www.amazon.com/gp/product/B00408JGB2?ppw=fresh',
+    // },
     {
         price: [3.32],
         quantity: 1,
@@ -79,6 +79,36 @@ const items: IItem[] = [
         quantity: 1,
         name: 'Monterey Jack Cheese',
         link: 'https://www.amazon.com/gp/product/B074HJ4V7C?ppw=fresh',
+    },
+    {
+        price: [4.99],
+        quantity: 1,
+        name: 'Dish Detergent',
+        link: 'https://www.amazon.com/Seventh-Generation-Dishwasher-Detergent-Lemon/dp/B004JX7N2W?fpw=fresh',
+    },
+    {
+        price: [2.99],
+        quantity: 1,
+        name: 'Wheat Squares',
+        link: 'https://www.amazon.com/365-Everyday-Value-Sized-Squares/dp/B074H6M3Z5?fpw=fresh',
+    },
+    {
+        price: [0],
+        quantity: 1,
+        name: 'Kosher Salt',
+        link: '?',
+    },
+    {
+        price: [0],
+        quantity: 1,
+        name: 'Olive Oil',
+        link: '?',
+    },
+    {
+        price: [0],
+        quantity: 1,
+        name: 'Laundry Detergent',
+        link: '?',
     },
 ];
 
