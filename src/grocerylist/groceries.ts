@@ -33,10 +33,10 @@ const items: IItem[] = [
         link: 'https://www.amazon.com/gp/product/B00AR0ZZ62?ppw=fresh',
     },
     {
-        price: [4.99],
+        price: [1.99],
         quantity: 1,
         name: 'Spring Mix',
-        link: 'https://www.amazon.com/gp/product/B074H57S5G?ppw=fresh',
+        link: 'https://www.amazon.com/365-Everyday-Value-Organic-Spring/dp/B074H7KKJT/?fpw=fresh',
     },
     {
         price: [3.49],
@@ -45,10 +45,10 @@ const items: IItem[] = [
         link: 'https://www.amazon.com/gp/product/B074VDJ7KZ?ppw=fresh',
     },
     {
-        price: [4.80],
+        price: [4.99],
         quantity: 2,
         name: 'Eggs Whites',
-        link: 'https://www.amazon.com/gp/product/B00L35T5F2?ppw=fresh',
+        link: 'https://www.amazon.com/365-Everyday-Value-Organic-Whites/dp/B074H5M1PM?ppw=fresh',
     },
     {
         price: [4.29],
@@ -93,22 +93,22 @@ const items: IItem[] = [
         link: 'https://www.amazon.com/365-Everyday-Value-Sized-Squares/dp/B074H6M3Z5?fpw=fresh',
     },
     {
-        price: [0],
+        price: [2.99],
         quantity: 1,
         name: 'Kosher Salt',
-        link: '?',
+        link: 'https://www.amazon.com/Morton-Coarse-Kosher-Salt-Ounce/dp/B000Q68WSA?fpw=fresh',
     },
     {
-        price: [0],
+        price: [10.17],
         quantity: 1,
         name: 'Olive Oil',
-        link: '?',
+        link: 'https://www.amazon.com/Pompeian-Robust-Extra-Virgin-Olive/dp/B00ZLUF01I?fpw=fresh',
     },
     {
-        price: [0],
+        price: [14.99],
         quantity: 1,
         name: 'Laundry Detergent',
-        link: '?',
+        link: 'https://www.amazon.com/Seventh-Generation-Laundry-Detergent-Concentrate/dp/B003X028NG?fpw=fresh',
     },
 ];
 
