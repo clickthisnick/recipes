@@ -110,6 +110,12 @@ const items: IItem[] = [
         name: 'Laundry Detergent',
         link: 'https://www.amazon.com/Seventh-Generation-Laundry-Detergent-Concentrate/dp/B003X028NG?fpw=fresh',
     },
+    {
+        price: [2.99],
+        quantity: 2,
+        name: 'Rapsberry Spread',
+        link: 'https://www.amazon.com/365-Everyday-Value-Raspberry-Spread/dp/B074H5H17J?&fpw=fresh',
+    },
 ];
 
 let groceryListHtml = `
