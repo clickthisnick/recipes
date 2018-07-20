@@ -116,6 +116,12 @@ const items: IItem[] = [
         name: 'Rapsberry Spread',
         link: 'https://www.amazon.com/365-Everyday-Value-Raspberry-Spread/dp/B074H5H17J?&fpw=fresh',
     },
+    {
+        price: [4.99],
+        quantity: 1,
+        name: 'Wheat Flour',
+        link: 'https://www.amazon.com/365-Everyday-Value-Organic-Whole/dp/B074VDMNDM/?fpw=fresh',
+    },
 ];
 
 let groceryListHtml = `
