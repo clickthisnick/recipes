@@ -6,6 +6,9 @@
  # Recipes List
 
 
+# Beef
+## [AirfryBonelessRibClubSteak](https://rawgit.com/clickthisnick/recipes/master/dist/AirfryBonelessRibClubSteak.html)
+
 # Bread
 ## [CinnamonSugarBread](https://rawgit.com/clickthisnick/recipes/master/dist/CinnamonSugarBread.html)
 
