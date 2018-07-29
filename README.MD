@@ -52,3 +52,6 @@
 
 ## [TatorTots](https://rawgit.com/clickthisnick/recipes/master/dist/TatorTots.html)
 
+# Vegetables
+## [RoastedCarrots](https://rawgit.com/clickthisnick/recipes/master/dist/RoastedCarrots.html)
+
