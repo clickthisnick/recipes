@@ -122,6 +122,12 @@ const items: IItem[] = [
         name: 'Wheat Flour',
         link: 'https://www.amazon.com/365-Everyday-Value-Organic-Whole/dp/B074VDMNDM/?fpw=fresh',
     },
+    {
+        price: [12.99],
+        quantity: 1,
+        name: 'Organic Peppercorn',
+        link: '',
+    },
 ];
 
 let groceryListHtml = `

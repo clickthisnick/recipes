@@ -1,0 +1,140 @@
+<style>
+    tr:nth-child(2),
+    tr:nth-child(3),
+    tr:nth-child(4),
+    tr:nth-child(5),
+    tr:nth-child(6),
+    tr:nth-child(7),
+    tr:nth-child(13),
+    tr:nth-child(14),
+    tr:nth-child(15)
+	{
+		background-color: rgb(186, 225, 248);
+		color:black;
+	}
+
+    tr:nth-child(8),
+    tr:nth-child(9),
+    tr:nth-child(10),
+    tr:nth-child(11),
+    tr:nth-child(12),
+    tr:nth-child(16)
+	{
+		background-color: rgb(248, 247, 186);
+		color:black;
+	}
+
+    table {
+        color: #333;
+        /* Lighten up font color */
+        font-family: Helvetica, Arial, sans-serif;
+        /* Nicer font */
+        width: 640px;
+        border-collapse: collapse;
+        border-spacing: 0;
+    }
+
+    td,
+    th {
+        border: 1px solid #CCC;
+        height: 30px;
+    }
+
+    /* Make cells a bit taller */
+
+    th {
+        background: #F3F3F3;
+        /* Light grey background */
+        font-weight: bold;
+        /* Make sure they're bold */
+    }
+
+    td {
+        
+        /* Lighter grey background */
+        text-align: left;
+        /* Center our text */
+        padding-left: 1rem;
+    }
+
+    body {
+        padding: 1rem;
+    }
+
+</style>
+
+<h2>How many containers needed to drink a gallon of water</h2>
+<table>
+    <tr>
+        <th>
+            Container
+        </th>
+        <th>
+            Quantity Needed For Gallon
+        </th>
+    </tr>
+    <tr>
+        <td>
+            Liter
+        </td>
+        <td>
+            3.78
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Clean Bottles
+        </td>
+        <td>
+            5.12
+        </td>
+    </tr>
+</table>
+
+
+<script>
+    function calculateWater() {
+        const liters = document.getElementById('liters').value;
+        const cleanBottles = document.getElementById('cleanBottles').value;
+        const gallonsDrank = (liters * .26) + (cleanBottles * .19);
+        const gallonsDrankElement = document.getElementById("gallonsDrank")
+
+        gallonsDrankElement.innerHTML = gallonsDrank
+    }
+</script>
+
+</br></br>
+<table>
+    <tr>
+        <td>
+            Quantity
+        </td>
+        <td>
+            Amount Drank
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Liters:
+        </td>
+        <td>
+            <input id="liters"></input>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Clean Bottles:
+        </td>
+        <td>
+            <input id="cleanBottles"></input>
+        </td>
+    </tr>
+    <tr>
+        <td>    
+            Gallons Drank: <span id="gallonsDrank">0</span>
+        </td>
+        <td>
+            <input type="submit" onclick="calculateWater();">
+        </td>
+    </tr>
+</table>

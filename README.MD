@@ -1,11 +1,5 @@
-## [Meat Temperature](https://rawgit.com/clickthisnick/recipes/master/meatTemp.html)
-
-
-## [Grocery List](https://rawgit.com/clickthisnick/recipes/master/groceryList.html)
-
- # Recipes List
-
-
+## [Water Intake](https://rawgit.com/clickthisnick/recipes/master/waterIntake.html)\\n\\n
+## [Grocery List](https://rawgit.com/clickthisnick/recipes/master/groceryList.html)\\n\\n # Recipes List\\n\\n
 # Beef
 ## [AirfryBonelessRibClubSteak](https://rawgit.com/clickthisnick/recipes/master/dist/AirfryBonelessRibClubSteak.html)
 
@@ -42,9 +36,9 @@
 # Sandwhich
 ## [HamSandwhich](https://rawgit.com/clickthisnick/recipes/master/dist/HamSandwhich.html)
 
-# Smoothies
 ## [BerrySmoothie](https://rawgit.com/clickthisnick/recipes/master/dist/BerrySmoothie.html)
 
+# Smoothies
 # Snack
 ## [Guacamole](https://rawgit.com/clickthisnick/recipes/master/dist/Guacamole.html)
 
