@@ -1,3 +1,5 @@
+## [Meat Temperature](https://rawgit.com/clickthisnick/recipes/master/meatTemp.html)
+## [Water Intake](https://rawgit.com/clickthisnick/recipes/master/waterIntake.html)
 ## [Grocery List](https://rawgit.com/clickthisnick/recipes/master/groceryList.html)
 # Recipes List
 # Beef
