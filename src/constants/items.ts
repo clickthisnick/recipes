@@ -25,6 +25,50 @@ export class Items {
         isTakoutUnitable: false,
     })
 
+    public static readonly italianSausage: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'Italian Sausage',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
+    public static readonly mozzarellaCheese: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'Mozzarella Cheese',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
+    public static readonly pizzaSauce: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'Pizza Sauce',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
+    public static readonly pizzaCrust: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'Pizza Crust',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
     public static readonly carrots: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Carrots',
         putAwayTime: 10,
