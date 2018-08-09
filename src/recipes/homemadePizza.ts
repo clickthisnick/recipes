@@ -7,7 +7,7 @@ export class MealRecipe extends Recipe {
     constructor() {
         super();
         this.recipeName = 'HomemadePizza';
-        this.recipeGroup = c.chicken;
+        this.recipeGroup = c.pizza;
         this.addIngredients([
             i.italianSausage(),
             i.pizzaSauce(),

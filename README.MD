@@ -19,8 +19,6 @@
 
 ## [AirFryChickenThigh](https://rawgit.com/clickthisnick/recipes/master/dist/AirFryChickenThigh.html)
 
-## [HomemadePizza](https://rawgit.com/clickthisnick/recipes/master/dist/HomemadePizza.html)
-
 # Chinese
 ## [PadThaiStirFry](https://rawgit.com/clickthisnick/recipes/master/dist/PadThaiStirFry.html)
 
@@ -33,6 +31,9 @@
 ## [GarlicPasta](https://rawgit.com/clickthisnick/recipes/master/dist/GarlicPasta.html)
 
 ## [SpaghettiZuchinniPasta](https://rawgit.com/clickthisnick/recipes/master/dist/SpaghettiZuchinniPasta.html)
+
+# Pizza
+## [HomemadePizza](https://rawgit.com/clickthisnick/recipes/master/dist/HomemadePizza.html)
 
 # Pork
 ## [PorkRoastSlowCooker](https://rawgit.com/clickthisnick/recipes/master/dist/PorkRoastSlowCooker.html)
