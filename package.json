@@ -13,7 +13,9 @@
     "prebuild": "npm run removeDist",
     "build": "./node_modules/ts-node/dist/bin.js ./src/builder/createDist.ts",
     "postbuild": "npm run createGroceryList",
-    "createGroceryList": "./node_modules/ts-node/dist/bin.js ./src/grocerylist/groceries.ts"
+    "createGroceryList": "./node_modules/ts-node/dist/bin.js ./src/grocerylist/groceries.ts",
+    "postcreateGroceryList": "npm run createExpirationCalculator",
+    "createExpirationCalculator": "./node_modules/ts-node/dist/bin.js ./src/expirationCalculator/expirationCalculator.ts"
   },
   "repository": {
     "type": "git",

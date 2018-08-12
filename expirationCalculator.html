@@ -1,0 +1,75 @@
+
+<style>
+
+
+    table {
+        color: #333;
+        /* Lighten up font color */
+        font-family: Helvetica, Arial, sans-serif;
+        /* Nicer font */
+        width: 640px;
+        border-collapse: collapse;
+        border-spacing: 0;
+    }
+
+    td,
+    th {
+        border: 1px solid #CCC;
+        height: 30px;
+    }
+
+    /* Make cells a bit taller */
+
+    th {
+        background: #F3F3F3;
+        /* Light grey background */
+        font-weight: bold;
+        /* Make sure they're bold */
+    }
+
+    td {
+        /* Lighter grey background */
+        text-align: left;
+        /* Center our text */
+        padding-left: 1rem;
+    }
+
+    .completed {
+        background-color:green;
+        color: white;
+    }
+
+    a:visited {
+        color:blue;
+    }
+
+    body {
+        padding: 1rem;
+    }
+
+</style>
+
+<script>
+    const oneWeekAhead = new Date();
+    oneWeekAhead.setDate(oneWeekAhead.getDate() + 7);
+    document.getElementById("weekAhead").innerHTML = oneWeekAhead.toLocaleDateString('en-US')
+</script>
+
+Todays Date: 8/12/2018</br>
+<table>
+    <th>Item</th>
+    <th>Days To Expire</th>
+    <th>Expiration Date</th>
+    <tr onclick="this.classList.toggle('completed')">
+        <td>Mushrooms</td>
+        <td>3</td>
+        <td>8/15/2018</td>
+    </tr><tr onclick="this.classList.toggle('completed')">
+        <td>Sausage</td>
+        <td>3</td>
+        <td>8/15/2018</td>
+    </tr><tr onclick="this.classList.toggle('completed')">
+        <td>Carrot</td>
+        <td>7</td>
+        <td>8/19/2018</td>
+    </tr></table>
