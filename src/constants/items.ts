@@ -146,6 +146,17 @@ export class Items {
         isTakoutUnitable: false,
     })
 
+    public static readonly asparagus: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'Asparagus',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
     public static readonly honey: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Honey',
         putAwayTime: 10,

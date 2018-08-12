@@ -10,6 +10,7 @@ export class MealRecipe extends Recipe {
         this.recipeGroup = c.pizza;
         this.addIngredients([
             i.italianSausage(),
+            i.redOnion(),
             i.pizzaSauce(),
             i.pizzaCrust(),
             i.mozzarellaCheese()
@@ -20,7 +21,8 @@ export class MealRecipe extends Recipe {
         this.prep();
         this.addSteps([
             ['Preheat oven to 400'],
-            ['Cook in pan for 10 minutes the', this.get(i.italianSausage())],
+            ['Cook in pan for 10 minutes the', this.get(i.italianSausage()), 'and', this.get(i.redOnion())],
+            ['Strain sausage in yellow pasta strainer to remove excess grease'],
             ['Get out', this.get(i.pizzaCrust())],
             ['Put', this.get(i.pizzaSauce()), 'on the pizza crust'],
             ['Put the italian sausage on the pizza'],

@@ -52,5 +52,7 @@
 ## [TatorTots](https://rawgit.com/clickthisnick/recipes/master/dist/TatorTots.html)
 
 # Vegetables
+## [AsparagusMushrooms](https://rawgit.com/clickthisnick/recipes/master/dist/AsparagusMushrooms.html)
+
 ## [RoastedCarrots](https://rawgit.com/clickthisnick/recipes/master/dist/RoastedCarrots.html)
 
