@@ -2,6 +2,7 @@
 ## [Water Intake](https://rawgit.com/clickthisnick/recipes/master/waterIntake.html)
 ## [Grocery List](https://rawgit.com/clickthisnick/recipes/master/groceryList.html)
 ## [Expiration Calculator](https://rawgit.com/clickthisnick/recipes/master/expirationCalculator.html)
+## [Bubble Bath](https://rawgit.com/clickthisnick/recipes/master/bubblebath.html)
 # Recipes List
 # Beef
 ## [AirfryBonelessRibClubSteak](https://rawgit.com/clickthisnick/recipes/master/dist/AirfryBonelessRibClubSteak.html)
