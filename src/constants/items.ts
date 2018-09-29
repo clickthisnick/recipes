@@ -25,6 +25,17 @@ export class Items {
         isTakoutUnitable: false,
     })
 
+    public static readonly paprika: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'Paprika',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
     public static readonly italianSausage: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Italian Sausage',
         putAwayTime: 10,
