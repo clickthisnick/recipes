@@ -21,6 +21,8 @@
 
 ## [AirFryChickenThigh](https://rawgit.com/clickthisnick/recipes/master/dist/AirFryChickenThigh.html)
 
+## [BrinedChickenThighs](https://rawgit.com/clickthisnick/recipes/master/dist/BrinedChickenThighs.html)
+
 # Chinese
 ## [PadThaiStirFry](https://rawgit.com/clickthisnick/recipes/master/dist/PadThaiStirFry.html)
 
