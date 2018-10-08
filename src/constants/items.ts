@@ -25,8 +25,30 @@ export class Items {
         isTakoutUnitable: false,
     })
 
+    public static readonly tandoriMasalla: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'Tandori Masalla',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
     public static readonly paprika: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Paprika',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
+    public static readonly lentils: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'Lentils',
         putAwayTime: 10,
         takeOutTime: 10,
         cleanSteps: '',
@@ -621,6 +643,17 @@ export class Items {
 
     public static readonly redOnion: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Red Onion',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: true,
+        isTakoutUnitable: true,
+    })
+
+    public static readonly driedOnion: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'Dried Onion',
         putAwayTime: 10,
         takeOutTime: 10,
         cleanSteps: '',

@@ -49,9 +49,13 @@
 ## [BerrySmoothie](https://rawgit.com/clickthisnick/recipes/master/dist/BerrySmoothie.html)
 
 # Snack
+## [DoubleLentils](https://rawgit.com/clickthisnick/recipes/master/dist/DoubleLentils.html)
+
 ## [Guacamole](https://rawgit.com/clickthisnick/recipes/master/dist/Guacamole.html)
 
 ## [KaleChips](https://rawgit.com/clickthisnick/recipes/master/dist/KaleChips.html)
+
+## [Lentils](https://rawgit.com/clickthisnick/recipes/master/dist/Lentils.html)
 
 ## [TatorTots](https://rawgit.com/clickthisnick/recipes/master/dist/TatorTots.html)
 
