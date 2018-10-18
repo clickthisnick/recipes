@@ -1,66 +1,66 @@
-## [Meat Temperature](https://rawgit.com/clickthisnick/recipes/master/meatTemp.html)
-## [Water Intake](https://rawgit.com/clickthisnick/recipes/master/waterIntake.html)
-## [Grocery List](https://rawgit.com/clickthisnick/recipes/master/groceryList.html)
-## [Expiration Calculator](https://rawgit.com/clickthisnick/recipes/master/expirationCalculator.html)
-## [Bubble Bath](https://rawgit.com/clickthisnick/recipes/master/bubblebath.html)
+## [Meat Temperature](https://clickthisnick/recipes/meatTemp.html)
+## [Water Intake](https://clickthisnick/recipes/waterIntake.html)
+## [Grocery List](https://clickthisnick/recipes/groceryList.html)
+## [Expiration Calculator](https://clickthisnick/recipes/expirationCalculator.html)
+## [Bubble Bath](https://clickthisnick/recipes/bubblebath.html)
 # Recipes List
 # Beef
-## [AirfryBonelessRibClubSteak](https://rawgit.com/clickthisnick/recipes/master/dist/AirfryBonelessRibClubSteak.html)
-
 # Bread
-## [CinnamonSugarBread](https://rawgit.com/clickthisnick/recipes/master/dist/CinnamonSugarBread.html)
-
-## [FrenchToast](https://rawgit.com/clickthisnick/recipes/master/dist/FrenchToast.html)
-
-## [ToastingBread](https://rawgit.com/clickthisnick/recipes/master/dist/ToastingBread.html)
+## [CinnamonSugarBread](https://clickthisnick/recipes/dist/CinnamonSugarBread.html)
 
 # Chicken
-## [AirFrozenChicken](https://rawgit.com/clickthisnick/recipes/master/dist/AirFrozenChicken.html)
+## [ToastingBread](https://clickthisnick/recipes/dist/ToastingBread.html)
 
-## [AirFryChickenBreast](https://rawgit.com/clickthisnick/recipes/master/dist/AirFryChickenBreast.html)
+## [AirFrozenChicken](https://clickthisnick/recipes/dist/AirFrozenChicken.html)
 
-## [AirFryChickenThigh](https://rawgit.com/clickthisnick/recipes/master/dist/AirFryChickenThigh.html)
+## [AirFryChickenBreast](https://clickthisnick/recipes/dist/AirFryChickenBreast.html)
 
-## [BrinedChickenThighs](https://rawgit.com/clickthisnick/recipes/master/dist/BrinedChickenThighs.html)
+## [AirFryChickenThigh](https://clickthisnick/recipes/dist/AirFryChickenThigh.html)
+
+## [BrinedChickenThighs](https://clickthisnick/recipes/dist/BrinedChickenThighs.html)
 
 # Chinese
-## [PadThaiStirFry](https://rawgit.com/clickthisnick/recipes/master/dist/PadThaiStirFry.html)
+## [PadThaiStirFry](https://clickthisnick/recipes/dist/PadThaiStirFry.html)
 
-## [SpicyLeekMushrooms](https://rawgit.com/clickthisnick/recipes/master/dist/SpicyLeekMushrooms.html)
+## [SpicyLeekMushrooms](https://clickthisnick/recipes/dist/SpicyLeekMushrooms.html)
 
 # Eggs
-## [EggsScrambled](https://rawgit.com/clickthisnick/recipes/master/dist/EggsScrambled.html)
+## [EggsScrambled](https://clickthisnick/recipes/dist/EggsScrambled.html)
 
 # Pasta
-## [GarlicPasta](https://rawgit.com/clickthisnick/recipes/master/dist/GarlicPasta.html)
+## [GarlicPasta](https://clickthisnick/recipes/dist/GarlicPasta.html)
 
-## [SpaghettiZuchinniPasta](https://rawgit.com/clickthisnick/recipes/master/dist/SpaghettiZuchinniPasta.html)
+## [SpaghettiZuchinniPasta](https://clickthisnick/recipes/dist/SpaghettiZuchinniPasta.html)
 
 # Pizza
-## [HomemadePizza](https://rawgit.com/clickthisnick/recipes/master/dist/HomemadePizza.html)
+## [HomemadePizza](https://clickthisnick/recipes/dist/HomemadePizza.html)
 
 # Pork
-## [PorkRoastSlowCooker](https://rawgit.com/clickthisnick/recipes/master/dist/PorkRoastSlowCooker.html)
+## [PorkRoastSlowCooker](https://clickthisnick/recipes/dist/PorkRoastSlowCooker.html)
 
 # Sandwhich
-## [HamSandwhich](https://rawgit.com/clickthisnick/recipes/master/dist/HamSandwhich.html)
+## [HamSandwhich](https://clickthisnick/recipes/dist/HamSandwhich.html)
 
 # Smoothies
-## [BerrySmoothie](https://rawgit.com/clickthisnick/recipes/master/dist/BerrySmoothie.html)
+## [BerrySmoothie](https://clickthisnick/recipes/dist/BerrySmoothie.html)
 
 # Snack
-## [DoubleLentils](https://rawgit.com/clickthisnick/recipes/master/dist/DoubleLentils.html)
+## [DoubleLentils](https://clickthisnick/recipes/dist/DoubleLentils.html)
 
-## [Guacamole](https://rawgit.com/clickthisnick/recipes/master/dist/Guacamole.html)
+## [Guacamole](https://clickthisnick/recipes/dist/Guacamole.html)
 
-## [KaleChips](https://rawgit.com/clickthisnick/recipes/master/dist/KaleChips.html)
+## [KaleChips](https://clickthisnick/recipes/dist/KaleChips.html)
 
-## [Lentils](https://rawgit.com/clickthisnick/recipes/master/dist/Lentils.html)
+## [Lentils](https://clickthisnick/recipes/dist/Lentils.html)
 
-## [TatorTots](https://rawgit.com/clickthisnick/recipes/master/dist/TatorTots.html)
+## [TatorTots](https://clickthisnick/recipes/dist/TatorTots.html)
 
 # Vegetables
-## [AsparagusMushrooms](https://rawgit.com/clickthisnick/recipes/master/dist/AsparagusMushrooms.html)
+## [AsparagusMushrooms](https://clickthisnick/recipes/dist/AsparagusMushrooms.html)
 
-## [RoastedCarrots](https://rawgit.com/clickthisnick/recipes/master/dist/RoastedCarrots.html)
+## [RoastedCarrots](https://clickthisnick/recipes/dist/RoastedCarrots.html)
+
+## [FrenchToast](https://clickthisnick/recipes/dist/FrenchToast.html)
+
+## [AirfryBonelessRibClubSteak](https://clickthisnick/recipes/dist/AirfryBonelessRibClubSteak.html)
 
