@@ -1,66 +1,66 @@
-## [Meat Temperature](https://clickthisnick/recipes/meatTemp.html)
-## [Water Intake](https://clickthisnick/recipes/waterIntake.html)
-## [Grocery List](https://clickthisnick/recipes/groceryList.html)
-## [Expiration Calculator](https://clickthisnick/recipes/expirationCalculator.html)
-## [Bubble Bath](https://clickthisnick/recipes/bubblebath.html)
+## [Meat Temperature](https://clickthisnick.com/recipes/meatTemp.html)
+## [Water Intake](https://clickthisnick.com/recipes/waterIntake.html)
+## [Grocery List](https://clickthisnick.com/recipes/groceryList.html)
+## [Expiration Calculator](https://clickthisnick.com/recipes/expirationCalculator.html)
+## [Bubble Bath](https://clickthisnick.com/recipes/bubblebath.html)
 # Recipes List
 # Beef
+## [AirfryBonelessRibClubSteak](https://clickthisnick.com/recipes/dist/AirfryBonelessRibClubSteak.html)
+
 # Bread
-## [CinnamonSugarBread](https://clickthisnick/recipes/dist/CinnamonSugarBread.html)
+## [CinnamonSugarBread](https://clickthisnick.com/recipes/dist/CinnamonSugarBread.html)
+
+## [FrenchToast](https://clickthisnick.com/recipes/dist/FrenchToast.html)
+
+## [ToastingBread](https://clickthisnick.com/recipes/dist/ToastingBread.html)
 
 # Chicken
-## [ToastingBread](https://clickthisnick/recipes/dist/ToastingBread.html)
+## [AirFryChickenBreast](https://clickthisnick.com/recipes/dist/AirFryChickenBreast.html)
 
-## [AirFrozenChicken](https://clickthisnick/recipes/dist/AirFrozenChicken.html)
+## [AirFrozenChicken](https://clickthisnick.com/recipes/dist/AirFrozenChicken.html)
 
-## [AirFryChickenBreast](https://clickthisnick/recipes/dist/AirFryChickenBreast.html)
+## [AirFryChickenThigh](https://clickthisnick.com/recipes/dist/AirFryChickenThigh.html)
 
-## [AirFryChickenThigh](https://clickthisnick/recipes/dist/AirFryChickenThigh.html)
-
-## [BrinedChickenThighs](https://clickthisnick/recipes/dist/BrinedChickenThighs.html)
+## [BrinedChickenThighs](https://clickthisnick.com/recipes/dist/BrinedChickenThighs.html)
 
 # Chinese
-## [PadThaiStirFry](https://clickthisnick/recipes/dist/PadThaiStirFry.html)
+## [PadThaiStirFry](https://clickthisnick.com/recipes/dist/PadThaiStirFry.html)
 
-## [SpicyLeekMushrooms](https://clickthisnick/recipes/dist/SpicyLeekMushrooms.html)
+## [SpicyLeekMushrooms](https://clickthisnick.com/recipes/dist/SpicyLeekMushrooms.html)
 
 # Eggs
-## [EggsScrambled](https://clickthisnick/recipes/dist/EggsScrambled.html)
+## [EggsScrambled](https://clickthisnick.com/recipes/dist/EggsScrambled.html)
 
 # Pasta
-## [GarlicPasta](https://clickthisnick/recipes/dist/GarlicPasta.html)
+## [GarlicPasta](https://clickthisnick.com/recipes/dist/GarlicPasta.html)
 
-## [SpaghettiZuchinniPasta](https://clickthisnick/recipes/dist/SpaghettiZuchinniPasta.html)
+## [SpaghettiZuchinniPasta](https://clickthisnick.com/recipes/dist/SpaghettiZuchinniPasta.html)
 
 # Pizza
-## [HomemadePizza](https://clickthisnick/recipes/dist/HomemadePizza.html)
+## [HomemadePizza](https://clickthisnick.com/recipes/dist/HomemadePizza.html)
 
 # Pork
-## [PorkRoastSlowCooker](https://clickthisnick/recipes/dist/PorkRoastSlowCooker.html)
+## [PorkRoastSlowCooker](https://clickthisnick.com/recipes/dist/PorkRoastSlowCooker.html)
 
 # Sandwhich
-## [HamSandwhich](https://clickthisnick/recipes/dist/HamSandwhich.html)
+## [HamSandwhich](https://clickthisnick.com/recipes/dist/HamSandwhich.html)
 
 # Smoothies
-## [BerrySmoothie](https://clickthisnick/recipes/dist/BerrySmoothie.html)
+## [BerrySmoothie](https://clickthisnick.com/recipes/dist/BerrySmoothie.html)
 
 # Snack
-## [DoubleLentils](https://clickthisnick/recipes/dist/DoubleLentils.html)
+## [DoubleLentils](https://clickthisnick.com/recipes/dist/DoubleLentils.html)
 
-## [Guacamole](https://clickthisnick/recipes/dist/Guacamole.html)
+## [Guacamole](https://clickthisnick.com/recipes/dist/Guacamole.html)
 
-## [KaleChips](https://clickthisnick/recipes/dist/KaleChips.html)
+## [KaleChips](https://clickthisnick.com/recipes/dist/KaleChips.html)
 
-## [Lentils](https://clickthisnick/recipes/dist/Lentils.html)
+## [Lentils](https://clickthisnick.com/recipes/dist/Lentils.html)
 
-## [TatorTots](https://clickthisnick/recipes/dist/TatorTots.html)
+## [TatorTots](https://clickthisnick.com/recipes/dist/TatorTots.html)
 
 # Vegetables
-## [AsparagusMushrooms](https://clickthisnick/recipes/dist/AsparagusMushrooms.html)
+## [AsparagusMushrooms](https://clickthisnick.com/recipes/dist/AsparagusMushrooms.html)
 
-## [RoastedCarrots](https://clickthisnick/recipes/dist/RoastedCarrots.html)
-
-## [FrenchToast](https://clickthisnick/recipes/dist/FrenchToast.html)
-
-## [AirfryBonelessRibClubSteak](https://clickthisnick/recipes/dist/AirfryBonelessRibClubSteak.html)
+## [RoastedCarrots](https://clickthisnick.com/recipes/dist/RoastedCarrots.html)
 

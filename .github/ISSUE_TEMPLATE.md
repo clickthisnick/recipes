@@ -1,1 +1,1 @@
-## 👉 [Issue templates](https://github.com/clickthisnick/dynamic-release-checklist/issues/new/choose) 👈
+## 👉 [Issue templates](https://github.com/clickthisnick/recipes/issues/new/choose) 👈
