@@ -229,7 +229,7 @@ export class Recipe {
               Readme.groups[this.recipeGroup] = [];
           }
 
-          Readme.groups[this.recipeGroup].push(`## [${this.recipeName}](https://clickthisnick.com/recipes/dist/${this.recipeName}.html)\n\n`);
+          Readme.groups[this.recipeGroup].push(`## [${this.recipeName}](https://www.clickthisnick.com/recipes/dist/${this.recipeName}.html)\n\n`);
 
           // TODO This has an error
           fs.writeFile(`${process.cwd()}/dist/${this.recipeName}.html`, this.recipeHtml, (err) => {
