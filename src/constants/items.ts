@@ -25,6 +25,50 @@ export class Items {
         isTakoutUnitable: false,
     })
 
+    public static readonly beyondBurger: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'Beyond Burger',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Rinse and put measuring cup in dishwasher',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
+    public static readonly sugar: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'Sugar',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Rinse and put measuring cup in dishwasher',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
+    public static readonly briocheHamburgerBun: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'Brioche Hamburger Bun',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Rinse and put measuring cup in dishwasher',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
+    public static readonly salmon4ozFilet: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'Salmon 4 oz Filet',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
     public static readonly tandoriMasalla: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Tandori Masalla',
         putAwayTime: 10,
