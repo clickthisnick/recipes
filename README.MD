@@ -12,8 +12,6 @@
 # Bread
 ## [CinnamonBuns](https://www.clickthisnick.com/recipes/dist/CinnamonBuns.html)
 
-## [CinnamonSugarBread](https://www.clickthisnick.com/recipes/dist/CinnamonSugarBread.html)
-
 ## [FrenchToast](https://www.clickthisnick.com/recipes/dist/FrenchToast.html)
 
 ## [ToastingBread](https://www.clickthisnick.com/recipes/dist/ToastingBread.html)
@@ -58,6 +56,12 @@
 # Snack
 ## [LentilsX2](https://www.clickthisnick.com/recipes/dist/LentilsX2.html)
 
+## [Guacamole](https://www.clickthisnick.com/recipes/dist/Guacamole.html)
+
+## [KaleChips](https://www.clickthisnick.com/recipes/dist/KaleChips.html)
+
+## [Lentils](https://www.clickthisnick.com/recipes/dist/Lentils.html)
+
 ## [TatorTots](https://www.clickthisnick.com/recipes/dist/TatorTots.html)
 
 # Vegetables
@@ -65,9 +69,5 @@
 
 ## [RoastedCarrots](https://www.clickthisnick.com/recipes/dist/RoastedCarrots.html)
 
-## [KaleChips](https://www.clickthisnick.com/recipes/dist/KaleChips.html)
-
-## [Lentils](https://www.clickthisnick.com/recipes/dist/Lentils.html)
-
-## [Guacamole](https://www.clickthisnick.com/recipes/dist/Guacamole.html)
+## [CinnamonSugarBread](https://www.clickthisnick.com/recipes/dist/CinnamonSugarBread.html)
 
