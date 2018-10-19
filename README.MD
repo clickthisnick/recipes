@@ -16,8 +16,6 @@
 
 ## [FrenchToast](https://www.clickthisnick.com/recipes/dist/FrenchToast.html)
 
-## [ToastingBread](https://www.clickthisnick.com/recipes/dist/ToastingBread.html)
-
 # Chicken
 ## [AirFrozenChicken](https://www.clickthisnick.com/recipes/dist/AirFrozenChicken.html)
 
@@ -33,15 +31,11 @@
 ## [SpicyLeekMushrooms](https://www.clickthisnick.com/recipes/dist/SpicyLeekMushrooms.html)
 
 # Eggs
-## [EggsScrambled](https://www.clickthisnick.com/recipes/dist/EggsScrambled.html)
-
 # Fish
-## [Salmon-4OzFilet](https://www.clickthisnick.com/recipes/dist/Salmon-4OzFilet.html)
+## [ToastingBread](https://www.clickthisnick.com/recipes/dist/ToastingBread.html)
 
 # Pasta
-## [GarlicPasta](https://www.clickthisnick.com/recipes/dist/GarlicPasta.html)
-
-## [SpaghettiZuchinniPasta](https://www.clickthisnick.com/recipes/dist/SpaghettiZuchinniPasta.html)
+## [Salmon-4OzFilet](https://www.clickthisnick.com/recipes/dist/Salmon-4OzFilet.html)
 
 # Pizza
 ## [HomemadePizza](https://www.clickthisnick.com/recipes/dist/HomemadePizza.html)
@@ -58,6 +52,12 @@
 # Snack
 ## [LentilsX2](https://www.clickthisnick.com/recipes/dist/LentilsX2.html)
 
+## [Guacamole](https://www.clickthisnick.com/recipes/dist/Guacamole.html)
+
+## [KaleChips](https://www.clickthisnick.com/recipes/dist/KaleChips.html)
+
+## [Lentils](https://www.clickthisnick.com/recipes/dist/Lentils.html)
+
 ## [TatorTots](https://www.clickthisnick.com/recipes/dist/TatorTots.html)
 
 # Vegetables
@@ -65,9 +65,9 @@
 
 ## [RoastedCarrots](https://www.clickthisnick.com/recipes/dist/RoastedCarrots.html)
 
-## [KaleChips](https://www.clickthisnick.com/recipes/dist/KaleChips.html)
+## [SpaghettiZuchinniPasta](https://www.clickthisnick.com/recipes/dist/SpaghettiZuchinniPasta.html)
 
-## [Lentils](https://www.clickthisnick.com/recipes/dist/Lentils.html)
+## [EggsScrambled](https://www.clickthisnick.com/recipes/dist/EggsScrambled.html)
 
-## [Guacamole](https://www.clickthisnick.com/recipes/dist/Guacamole.html)
+## [GarlicPasta](https://www.clickthisnick.com/recipes/dist/GarlicPasta.html)
 
