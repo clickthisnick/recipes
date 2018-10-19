@@ -7,7 +7,11 @@
 # Beef
 ## [AirfryBonelessRibClubSteak](https://www.clickthisnick.com/recipes/dist/AirfryBonelessRibClubSteak.html)
 
+## [BeyondBurger](https://www.clickthisnick.com/recipes/dist/BeyondBurger.html)
+
 # Bread
+## [CinnamonBuns](https://www.clickthisnick.com/recipes/dist/CinnamonBuns.html)
+
 ## [CinnamonSugarBread](https://www.clickthisnick.com/recipes/dist/CinnamonSugarBread.html)
 
 ## [FrenchToast](https://www.clickthisnick.com/recipes/dist/FrenchToast.html)
@@ -31,6 +35,9 @@
 # Eggs
 ## [EggsScrambled](https://www.clickthisnick.com/recipes/dist/EggsScrambled.html)
 
+# Fish
+## [Salmon-4OzFilet](https://www.clickthisnick.com/recipes/dist/Salmon-4OzFilet.html)
+
 # Pasta
 ## [GarlicPasta](https://www.clickthisnick.com/recipes/dist/GarlicPasta.html)
 
@@ -42,20 +49,14 @@
 # Pork
 ## [PorkRoastSlowCooker](https://www.clickthisnick.com/recipes/dist/PorkRoastSlowCooker.html)
 
-# Sandwhich
-## [HamSandwhich](https://www.clickthisnick.com/recipes/dist/HamSandwhich.html)
+# Sandwich
+## [HamSandwich](https://www.clickthisnick.com/recipes/dist/HamSandwich.html)
 
 # Smoothies
 ## [BerrySmoothie](https://www.clickthisnick.com/recipes/dist/BerrySmoothie.html)
 
 # Snack
-## [DoubleLentils](https://www.clickthisnick.com/recipes/dist/DoubleLentils.html)
-
-## [Guacamole](https://www.clickthisnick.com/recipes/dist/Guacamole.html)
-
-## [KaleChips](https://www.clickthisnick.com/recipes/dist/KaleChips.html)
-
-## [Lentils](https://www.clickthisnick.com/recipes/dist/Lentils.html)
+## [LentilsX2](https://www.clickthisnick.com/recipes/dist/LentilsX2.html)
 
 ## [TatorTots](https://www.clickthisnick.com/recipes/dist/TatorTots.html)
 
@@ -63,4 +64,10 @@
 ## [AsparagusMushrooms](https://www.clickthisnick.com/recipes/dist/AsparagusMushrooms.html)
 
 ## [RoastedCarrots](https://www.clickthisnick.com/recipes/dist/RoastedCarrots.html)
+
+## [KaleChips](https://www.clickthisnick.com/recipes/dist/KaleChips.html)
+
+## [Lentils](https://www.clickthisnick.com/recipes/dist/Lentils.html)
+
+## [Guacamole](https://www.clickthisnick.com/recipes/dist/Guacamole.html)
 
