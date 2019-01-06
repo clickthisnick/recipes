@@ -6,7 +6,7 @@ export class MealRecipe extends Recipe {
     constructor() {
         super();
         this.recipeName = 'ChickenMealPrep';
-        this.recipeGroup = c.snack;
+        this.recipeGroup = c.chicken;
         this.addIngredients([
             i.chickenThighPackage(),
         ]);

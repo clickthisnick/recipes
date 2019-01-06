@@ -4,10 +4,13 @@
 ## [Expiration Calculator](https://www.clickthisnick.com/recipes/expirationCalculator.html)
 ## [Bubble Bath](https://www.clickthisnick.com/recipes/bubblebath.html)
 # Recipes List
+# Beef
+## [AirfryBonelessRibClubSteak](https://www.clickthisnick.com/recipes/dist/AirfryBonelessRibClubSteak.html)
+
 ## [BeyondBurger](https://www.clickthisnick.com/recipes/dist/BeyondBurger.html)
 
 # Bread
-## [CinnamonBuns](https://www.clickthisnick.com/recipes/dist/CinnamonBuns.html)
+## [CinnamonBun](https://www.clickthisnick.com/recipes/dist/CinnamonBun.html)
 
 ## [CinnamonSugarBread](https://www.clickthisnick.com/recipes/dist/CinnamonSugarBread.html)
 
@@ -24,6 +27,8 @@
 
 ## [BrinedChickenThighs](https://www.clickthisnick.com/recipes/dist/BrinedChickenThighs.html)
 
+## [ChickenMealPrep](https://www.clickthisnick.com/recipes/dist/ChickenMealPrep.html)
+
 # Chinese
 ## [PadThaiStirFry](https://www.clickthisnick.com/recipes/dist/PadThaiStirFry.html)
 
@@ -33,7 +38,7 @@
 ## [EggsScrambled](https://www.clickthisnick.com/recipes/dist/EggsScrambled.html)
 
 # Fish
-## [Salmon-4OzFilet](https://www.clickthisnick.com/recipes/dist/Salmon-4OzFilet.html)
+## [Salmon4OunceFilet](https://www.clickthisnick.com/recipes/dist/Salmon4OunceFilet.html)
 
 # Pasta
 ## [GarlicPasta](https://www.clickthisnick.com/recipes/dist/GarlicPasta.html)
@@ -41,12 +46,9 @@
 ## [SpaghettiZuchinniPasta](https://www.clickthisnick.com/recipes/dist/SpaghettiZuchinniPasta.html)
 
 # Pizza
-# Beef
-## [AirfryBonelessRibClubSteak](https://www.clickthisnick.com/recipes/dist/AirfryBonelessRibClubSteak.html)
-
-# Pork
 ## [HomemadePizza](https://www.clickthisnick.com/recipes/dist/HomemadePizza.html)
 
+# Pork
 ## [PorkRoastSlowCooker](https://www.clickthisnick.com/recipes/dist/PorkRoastSlowCooker.html)
 
 # Sandwich
@@ -56,11 +58,9 @@
 ## [BerrySmoothie](https://www.clickthisnick.com/recipes/dist/BerrySmoothie.html)
 
 # Snack
-## [ChickenMealPrep](https://www.clickthisnick.com/recipes/dist/ChickenMealPrep.html)
-
 ## [Crepes](https://www.clickthisnick.com/recipes/dist/Crepes.html)
 
-## [LentilsX2](https://www.clickthisnick.com/recipes/dist/LentilsX2.html)
+## [DoubleLentils](https://www.clickthisnick.com/recipes/dist/DoubleLentils.html)
 
 ## [Guacamole](https://www.clickthisnick.com/recipes/dist/Guacamole.html)
 
@@ -72,8 +72,8 @@
 
 ## [TatorTots](https://www.clickthisnick.com/recipes/dist/TatorTots.html)
 
+# Vegetables
 ## [AsparagusMushrooms](https://www.clickthisnick.com/recipes/dist/AsparagusMushrooms.html)
 
-# Vegetables
 ## [RoastedCarrots](https://www.clickthisnick.com/recipes/dist/RoastedCarrots.html)
 
