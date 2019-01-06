@@ -146,7 +146,7 @@ export class Recipe {
 
       const ing = this.cloneObj(ingredient);
 
-      // If you specify 0 it will only print the ing name not assert quntity
+      // If you specify 0 it will only print the ing name not assert quantity
       if (quantity === 0) {
          ing.quantity = 0;
 

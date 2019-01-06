@@ -1,6 +1,6 @@
 export class Timer {
     public static timerCount: number = 0;
-    public static set(duration: number, type: string, extratext: string = '') {
+    public static set(duration: number, type: string, extraText: string = '') {
 
         // Default to seconds
         let multiplier: number = 1000;
@@ -12,7 +12,7 @@ export class Timer {
         };
         let typeText: string = '';
 
-        // Overright multiplier if specified minutes
+        // Overwrite multiplier if specified minutes
         if (type === 'm') {
             multiplier = 60000; // Milliseconds in a minute
         }
@@ -28,7 +28,7 @@ export class Timer {
             type: 'timer',
             seconds: duration * multiplier,
             id: `timer${this.timerCount}`,
-            text: `Wait ${duration} ${typeText} ${extratext}`
+            text: `Wait ${duration} ${typeText} ${extraText}`
         };
     }
 }

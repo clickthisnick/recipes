@@ -25,6 +25,39 @@ export class Items {
         isTakoutUnitable: false,
     })
 
+    public static readonly almondFlour: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'Almond Flour',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
+    public static readonly allPurposeFlour: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'Flour (All Purpose) Flour',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
+    public static readonly buckwheatFlour: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'Buckwheat Flour',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
     public static readonly beyondBurger: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Beyond Burger',
         putAwayTime: 10,
