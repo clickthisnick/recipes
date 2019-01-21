@@ -21,7 +21,7 @@ export class MealRecipe extends Recipe {
         this.prep();
         this.addSteps([
             ['Put in 1/4 cup in a pot', this.get(i.lentils())],
-            ['Put in 3 1/4 cup in a pot', this.get(i.water())],
+            ['Put in 3/4 cup in a pot', this.get(i.water())],
             [Timer.set(3, 'm', 'Turn on heat to 3 with no lid for 3 minutes')],
             ['Season with tandori masalla, dried onion, and salt'],
             [Timer.set(2.5, 'm', 'Turn on heat to 3 with no lid for 2.5 minutes')],
