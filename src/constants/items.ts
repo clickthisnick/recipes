@@ -25,6 +25,17 @@ export class Items {
         isTakoutUnitable: false,
     })
 
+    public static readonly vitalWheatGluten: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'Vital Wheat Gluten',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Rinse and put measuring cup in dishwasher',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
     public static readonly almondFlour: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Almond Flour',
         putAwayTime: 10,
@@ -667,7 +678,18 @@ export class Items {
         name: 'Bread Flour',
         putAwayTime: 10,
         takeOutTime: 10,
-        cleanSteps: 'Put bread flour back in cuboard',
+        cleanSteps: 'Put bread flour back in cupboard',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
+    public static readonly wheatBreadFlour: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'Wheat Bread Flour',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Put bread flour back in cupboard',
         quantity: quantity,
         unit: unit || null,
         wash: false,

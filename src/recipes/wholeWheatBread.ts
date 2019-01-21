@@ -2,19 +2,20 @@ import { Recipe } from '../class/recipe';
 import { Items as i } from '../constants/items';
 import { Categories as c } from '../constants/categories';
 
-// http://allrecipes.com/recipe/230162/softest-soft-bread-with-air-pockets-using-bread-machine/
 export class MealRecipe extends Recipe {
     constructor() {
         super();
-        this.recipeName = 'ToastingBread';
+        this.recipeName = 'WholeWheatBread';
         this.recipeGroup = c.bread;
         this.addIngredients([
-            i.breadFlour(2, i.cup()),
-            i.water(1, i.cup()),
-            i.honey(4, i.tsp()),
-            i.oliveOil(4, i.tsp()),
-            i.kosherSalt(1/2, i.tsp()),
-            i.dryActiveYeast(2, i.tsp()),
+            i.wheatBreadFlour(4.5, i.cup()),
+            i.water(1.5, i.cup()),
+            i.oliveOil(.33, i.cup()),
+            i.honey(.25, i.cup()),
+            i.kosherSalt(2, i.tsp()),
+            i.dryActiveYeast(1, i.tbsp()),
+            i.kosherSalt(2, i.tsp()),
+            i.vitalWheatGluten(1, i.tsp()),
         ]);
     }
 
@@ -24,11 +25,13 @@ export class MealRecipe extends Recipe {
         // Then the solid ones
         this.addSteps([
             ['Attach breadmaker arm'],
-            ['Put in', this.get(i.water())],
+            ['Put Ingredients in, in this order. Vital wheat gluten optional'],
             ['Put in', this.get(i.oliveOil())],
-            ['Put in', this.get(i.breadFlour())],
-            ['Put in', this.get(i.kosherSalt())],
             ['Put in', this.get(i.honey())],
+            ['Put in', this.get(i.water())],
+            ['Put in', this.get(i.kosherSalt())],
+            ['Put in', this.get(i.breadFlour())],
+            ['Put in', this.get(i.vitalWheatGluten())],
             ['Put in center the', this.get(i.dryActiveYeast())],
             ['Put bread maker on bread setting (menu item 1) with medium crust and 2 lb loaf and hit start'],
             ['Let bread cool for 20 minutes'],
