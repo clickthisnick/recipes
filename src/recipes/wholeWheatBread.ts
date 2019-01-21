@@ -30,7 +30,7 @@ export class MealRecipe extends Recipe {
             ['Put in', this.get(i.honey())],
             ['Put in', this.get(i.water())],
             ['Put in', this.get(i.kosherSalt())],
-            ['Put in', this.get(i.breadFlour())],
+            ['Put in', this.get(i.wheatBreadFlour())],
             ['Put in', this.get(i.vitalWheatGluten())],
             ['Put in center the', this.get(i.dryActiveYeast())],
             ['Put bread maker on bread setting (menu item 1) with medium crust and 2 lb loaf and hit start'],

@@ -18,6 +18,8 @@
 
 ## [ToastingBread](https://www.clickthisnick.com/recipes/dist/ToastingBread.html)
 
+## [WholeWheatBread](https://www.clickthisnick.com/recipes/dist/WholeWheatBread.html)
+
 # Chicken
 ## [AirFrozenChicken](https://www.clickthisnick.com/recipes/dist/AirFrozenChicken.html)
 
