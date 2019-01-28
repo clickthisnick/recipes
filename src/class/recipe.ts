@@ -131,7 +131,7 @@ export class Recipe {
 
     private cloneObj(obj: {} | undefined | null) {
       return JSON.parse(JSON.stringify(obj));
-   }
+    }
 
     public addIngredients(ingredients: IItemObj[]) {
       this.ingredients = ingredients;
@@ -189,6 +189,8 @@ export class Recipe {
         if (this.ingredients.length === 0) {
             throw new Error('This recipe has no ingredients');
         }
+
+        // Add all the unit measurers
 
         this.ingredients.forEach((ingredient) => {
             const ingName = this.turnIngObjIntoStr(ingredient);
