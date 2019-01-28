@@ -25,6 +25,28 @@ export class Items {
         isTakoutUnitable: false,
     })
 
+    public static readonly thirdCup: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: '1/3 Measuring Cup',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Rinse and put measuring cup in dishwasher',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
+    public static readonly fourthCup: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: '1/4 Measuring Cup',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Rinse and put measuring cup in dishwasher',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
     public static readonly vitalWheatGluten: IItem = (quantity: number = 1, unit: IItemObj) => ({
         name: 'Vital Wheat Gluten',
         putAwayTime: 10,
