@@ -26,7 +26,18 @@ export class Items {
     })
 
     public static readonly thirdCup: IItem = (quantity: number = 1, unit: IItemObj) => ({
-        name: '1/3 Measuring Cup',
+        name: 'One Third (1/3) Measuring Cup',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Rinse and put measuring cup in dishwasher',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
+    public static readonly halfCup: IItem = (quantity: number = 1, unit: IItemObj) => ({
+        name: 'One Half (1/2) Measuring Cup',
         putAwayTime: 10,
         takeOutTime: 10,
         cleanSteps: 'Rinse and put measuring cup in dishwasher',
@@ -37,7 +48,7 @@ export class Items {
     })
 
     public static readonly fourthCup: IItem = (quantity: number = 1, unit: IItemObj) => ({
-        name: '1/4 Measuring Cup',
+        name: 'One Fourth (1/4) Measuring Cup',
         putAwayTime: 10,
         takeOutTime: 10,
         cleanSteps: 'Rinse and put measuring cup in dishwasher',

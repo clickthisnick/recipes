@@ -134,7 +134,7 @@ export class Recipe {
     }
 
     public addIngredients(ingredients: IItemObj[]) {
-      this.ingredients = ingredients;
+        this.ingredients = ingredients;
     }
 
     public get(itemObj: IItemObj, quantity?: number) {
