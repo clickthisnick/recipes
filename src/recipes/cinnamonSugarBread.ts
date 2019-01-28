@@ -1,6 +1,7 @@
 import { Recipe } from '../class/recipe';
 import { Categories as c } from '../constants/categories';
 import { Items as i } from '../constants/items';
+import { Units as u } from '../constants/units';
 
 export class MealRecipe extends Recipe {
     constructor() {
@@ -8,14 +9,14 @@ export class MealRecipe extends Recipe {
         this.recipeName = 'CinnamonSugarBread';
         this.recipeGroup = c.bread;
         this.addIngredients([
-            i.brownSugar(.75, i.cup()),
-            i.breadFlour(4, i.cup()),
-            i.water(1, i.cup()),
+            i.brownSugar(.75, u.cup),
+            i.breadFlour(4, u.cup),
+            i.water(1, u.cup),
             i.egg(2),
-            i.butter(.25, i.cup()),
-            i.dryActiveYeast(1.5, i.tsp()),
-            i.kosherSalt(1, i.tsp()),
-            i.cinnamon(2, i.tsp()),
+            i.butter(.25, u.cup),
+            i.dryActiveYeast(1.5, u.tsp),
+            i.kosherSalt(1, u.tsp),
+            i.cinnamon(2, u.tsp),
         ]);
     }
 

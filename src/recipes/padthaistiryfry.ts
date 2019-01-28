@@ -2,6 +2,7 @@ import { Recipe } from '../class/recipe';
 import { Items as i } from '../constants/items';
 import { Categories as c } from '../constants/categories';
 import { Timer } from '../class/timer';
+import { Units as u } from '../constants/units';
 
 export class MealRecipe extends Recipe {
     constructor() {
@@ -15,8 +16,8 @@ export class MealRecipe extends Recipe {
             i.bellPepper(),
             i.zuchinni(2),
             i.crimniMushroom(5),
-            i.soySauce(1, i.tsp()),
-            i.padThaiSauce(2, i.tbsp()),
+            i.soySauce(1, u.tsp),
+            i.padThaiSauce(2, u.tbsp),
             i.spiriliazer(),
             i.vegetableOil(),
         ]);

@@ -1,5 +1,6 @@
 import { Recipe } from '../class/recipe';
 import { Items as i } from '../constants/items';
+import { Units as u } from '../constants/units';
 import { Categories as c } from '../constants/categories';
 
 // Serves 1
@@ -9,10 +10,10 @@ export class MealRecipe extends Recipe {
         this.recipeName = 'BerrySmoothie';
         this.recipeGroup = c.smoothies;
         this.addIngredients([
-            i.frozenBerries(1, i.cup()),
-            i.almondMilk(2.5/4, i.cup()),
-            i.plainYogurt(3, i.tbsp()),
-            i.honey(1, i.tbsp()),
+            i.frozenBerries(1, u.cup),
+            i.almondMilk(2.5/4, u.cup),
+            i.plainYogurt(3, u.tbsp),
+            i.honey(1, u.tbsp),
         ]);
     }
 

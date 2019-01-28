@@ -1,6 +1,7 @@
 import { Recipe } from '../class/recipe';
 import { Items as i } from '../constants/items';
 import { Categories as c } from '../constants/categories';
+import { Units as u } from '../constants/units';
 
 export class MealRecipe extends Recipe {
     constructor() {
@@ -8,14 +9,14 @@ export class MealRecipe extends Recipe {
         this.recipeName = 'WholeWheatBread';
         this.recipeGroup = c.bread;
         this.addIngredients([
-            i.wheatBreadFlour(4.5, i.cup()),
-            i.water(1.5, i.cup()),
-            i.oliveOil(1, i.thirdCup()),
-            i.honey(1, i.fourthCup()),
-            i.kosherSalt(2, i.tsp()),
-            i.dryActiveYeast(1, i.tbsp()),
-            i.kosherSalt(2, i.tsp()),
-            i.vitalWheatGluten(1, i.tsp()),
+            i.wheatBreadFlour(4.5, u.cup),
+            i.water(1.5, u.cup),
+            i.oliveOil(1, u.thirdCup),
+            i.honey(1, u.fourthCup),
+            i.kosherSalt(2, u.tsp),
+            i.dryActiveYeast(1, u.tbsp),
+            i.kosherSalt(2, u.tsp),
+            i.vitalWheatGluten(1, u.tsp),
         ]);
     }
 

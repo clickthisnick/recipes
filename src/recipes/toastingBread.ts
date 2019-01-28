@@ -1,6 +1,7 @@
 import { Recipe } from '../class/recipe';
 import { Items as i } from '../constants/items';
 import { Categories as c } from '../constants/categories';
+import { Units as u } from '../constants/units';
 
 // http://allrecipes.com/recipe/230162/softest-soft-bread-with-air-pockets-using-bread-machine/
 export class MealRecipe extends Recipe {
@@ -9,12 +10,12 @@ export class MealRecipe extends Recipe {
         this.recipeName = 'ToastingBread';
         this.recipeGroup = c.bread;
         this.addIngredients([
-            i.breadFlour(2, i.cup()),
-            i.water(1, i.cup()),
-            i.honey(4, i.tsp()),
-            i.oliveOil(4, i.tsp()),
-            i.kosherSalt(1/2, i.tsp()),
-            i.dryActiveYeast(2, i.tsp()),
+            i.breadFlour(2, u.cup),
+            i.water(1, u.cup),
+            i.honey(4, u.tsp),
+            i.oliveOil(4, u.tsp),
+            i.kosherSalt(1/2, u.tsp),
+            i.dryActiveYeast(2, u.tsp),
         ]);
     }
 
