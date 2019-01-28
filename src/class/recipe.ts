@@ -171,7 +171,10 @@ export class Recipe {
     }
 
    public turnIngObjIntoStr(ingObj: IItemObj, includeUnit = false) {
-      const ingQuantity = ingObj.quantity > 1 ? `${ingObj.quantity} ` : '';
+      // Quantity could be .25
+      const ingQuantity = ingObj.quantity > 0 ? `${ingObj.quantity} ` : '';
+
+      // Any quantity over 1 is considered many
       const ingName = ingObj.quantity > 1 ? `${ingObj.name}s` : ingObj.name;
       let unit: String = '';
 
