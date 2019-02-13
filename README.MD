@@ -42,6 +42,9 @@
 # Fish
 ## [Salmon4OunceFilet](https://www.clickthisnick.com/recipes/dist/Salmon4OunceFilet.html)
 
+# Miscellaneous
+## [CleanWaterBottle](https://www.clickthisnick.com/recipes/dist/CleanWaterBottle.html)
+
 # Pasta
 ## [GarlicPasta](https://www.clickthisnick.com/recipes/dist/GarlicPasta.html)
 
