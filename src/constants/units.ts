@@ -24,4 +24,7 @@ export class Units {
     public static readonly seconds: IUnitObj = {
         name: 'Seconds'
     };
+    public static readonly pounds: IUnitObj = {
+        name: 'Pounds'
+    };
 }

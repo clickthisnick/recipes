@@ -38,8 +38,52 @@ export class Items {
         isTakoutUnitable: false,
     })
 
+    public static readonly chilliPowder: IItem = (quantity: number = 1, unit: IUnitObj) => ({
+        name: 'Chilli Powder',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Rinse and put measuring cup in dishwasher',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
+    public static readonly brownRice: IItem = (quantity: number = 1, unit: IUnitObj) => ({
+        name: 'Brown Rice',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Rinse and put measuring cup in dishwasher',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
     public static readonly whiteVinegar: IItem = (quantity: number = 1, unit: IUnitObj) => ({
         name: 'White Vinegar',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Rinse and put measuring cup in dishwasher',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
+    public static readonly sesameOil: IItem = (quantity: number = 1, unit: IUnitObj) => ({
+        name: 'Sesame Oil',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Rinse and put measuring cup in dishwasher',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
+    public static readonly frozenStirFryVeggies: IItem = (quantity: number = 1, unit: IUnitObj) => ({
+        name: 'Frozen Stirfry Veggies',
         putAwayTime: 10,
         takeOutTime: 10,
         cleanSteps: 'Rinse and put measuring cup in dishwasher',
