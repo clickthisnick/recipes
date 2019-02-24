@@ -45,6 +45,8 @@
 ## [Salmon4OunceFilet](https://www.clickthisnick.com/recipes/dist/Salmon4OunceFilet.html)
 
 # Instant Pot
+## [PorkButtInstantPot](https://www.clickthisnick.com/recipes/dist/PorkButtInstantPot.html)
+
 ## [RiceInstantPot](https://www.clickthisnick.com/recipes/dist/RiceInstantPot.html)
 
 # Miscellaneous

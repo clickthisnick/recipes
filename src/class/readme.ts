@@ -6,7 +6,7 @@ export class Readme {
     public static makeReadme() {
         let text = '';
         const groups = Object.keys(this.groups).sort();
-
+        console.log(groups); // tslint:disable-line
         for (const group of groups) {
             text += `# ${group}\n`;
             text += this.groups[group].join('');
@@ -18,10 +18,6 @@ export class Readme {
     }
 
     public static appendReadme(text) {
-        fs.appendFile(`${process.cwd()}/README.md`, text, (err) => {
-            if (err) {
-                return console.log(err); //tslint:disable-line no-console
-            }
-        });
+        fs.appendFileSync(`${process.cwd()}/README.md`, text);
     }
 }

@@ -101,9 +101,5 @@ items.forEach((item) => {
 
 expirationCalculatorHtml += '</table>';
 
-fs.writeFile(`${process.cwd()}/expirationCalculator.html`, expirationCalculatorHtml, (err) => {
-    if(err) {
-        return console.log(err); //tslint:disable-line no-console
-    }
-    console.log('The file was saved!'); //tslint:disable-line no-console
-});
+fs.writeFileSync(`${process.cwd()}/expirationCalculator.html`, expirationCalculatorHtml);
+console.log('The file was saved!'); //tslint:disable-line no-console

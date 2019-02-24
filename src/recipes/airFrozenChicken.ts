@@ -14,7 +14,7 @@ export class MealRecipe extends Recipe {
         ]);
     }
 
-    public async generateRecipe() {
+    public generateRecipe() {
         this.prep();
         this.addSteps([
             ['Open', this.get(i.chickenDrumstickPackage())],
@@ -26,6 +26,6 @@ export class MealRecipe extends Recipe {
             ['Mix chicken and sprinkle', this.get(i.oldBay())],
             [Timer.set(10, 'm', 'Put chicken in airfryer @ 350 deg')],
         ]);
-        await this.printRecipe();
+        this.printRecipe();
     }
 }

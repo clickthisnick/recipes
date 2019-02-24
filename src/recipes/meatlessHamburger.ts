@@ -14,7 +14,7 @@ export class MealRecipe extends Recipe {
         ]);
     }
 
-    public async generateRecipe() {
+    public generateRecipe() {
         this.prep();
         this.addSteps([
             [Timer.set(3, 'm', 'Preheat pan on heat 6')],
@@ -23,6 +23,6 @@ export class MealRecipe extends Recipe {
             [Timer.set(4, 'm', 'Flip beyond burger')],
             ['Use', this.get(i.briocheHamburgerBun()), 'for buns'],
         ]);
-        await this.printRecipe();
+        this.printRecipe();
     }
 }

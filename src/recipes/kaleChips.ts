@@ -16,7 +16,7 @@ export class MealRecipe extends Recipe {
         ]);
     }
 
-    public async generateRecipe() {
+    public generateRecipe() {
         this.prep();
         this.addSteps([
             ['Preheat oven to 300 degrees'],
@@ -28,6 +28,6 @@ export class MealRecipe extends Recipe {
             [Timer.set(25, 'm', 'Bake in oven')],
             [Timer.set(2, 'm', 'Let cool')],
         ]);
-        await this.printRecipe();
+        this.printRecipe();
     }
 }

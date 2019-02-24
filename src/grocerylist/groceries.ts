@@ -210,9 +210,5 @@ If existing item going to be past the expiration date, assume quantity is 0.</br
 
 groceryListHtml = `${dateHtml}${groceryListHtml}`;
 
-fs.writeFile(`${process.cwd()}/groceryList.html`, groceryListHtml, (err) => {
-    if(err) {
-        return console.log(err); //tslint:disable-line no-console
-    }
-    console.log('The file was saved!'); //tslint:disable-line no-console
-});
+fs.writeFileSync(`${process.cwd()}/groceryList.html`, groceryListHtml);
+console.log('The file was saved!'); //tslint:disable-line no-console

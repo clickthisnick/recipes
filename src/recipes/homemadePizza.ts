@@ -17,7 +17,7 @@ export class MealRecipe extends Recipe {
         ]);
     }
 
-    public async generateRecipe() {
+    public generateRecipe() {
         this.prep();
         this.addSteps([
             ['Preheat oven to 400'],
@@ -29,6 +29,6 @@ export class MealRecipe extends Recipe {
             ['Put', this.get(i.mozzarellaCheese()), 'on the pizza'],
             [Timer.set(12, 'm', 'Cook pizza for 12 minutes @ 400 oven')],
         ]);
-        await this.printRecipe();
+        this.printRecipe();
     }
 }

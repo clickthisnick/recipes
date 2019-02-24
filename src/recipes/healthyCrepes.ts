@@ -16,7 +16,7 @@ export class MealRecipe extends Recipe {
         ]);
     }
 
-    public async generateRecipe() {
+    public generateRecipe() {
         this.prep();
         this.addSteps([
             ['Put half cup', this.get(i.almondFlour()), 'in a bowl'],
@@ -29,6 +29,6 @@ export class MealRecipe extends Recipe {
             ['Cook pancake for 40 seconds'],
             ['Flip and cook pancake for 30 seconds'],
         ]);
-        await this.printRecipe();
+        this.printRecipe();
     }
 }

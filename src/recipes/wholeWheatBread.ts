@@ -20,7 +20,7 @@ export class MealRecipe extends Recipe {
         ]);
     }
 
-    public async generateRecipe() {
+    public generateRecipe() {
         this.prep();
         // Its important to put liquid items first
         // Then the solid ones
@@ -38,6 +38,6 @@ export class MealRecipe extends Recipe {
             ['Let bread cool for 20 minutes'],
             ['Slice bread'],
         ]);
-        await this.printRecipe();
+        this.printRecipe();
     }
 }

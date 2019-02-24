@@ -21,7 +21,7 @@ export class MealRecipe extends Recipe {
         ]);
     }
 
-    public async generateRecipe() {
+    public generateRecipe() {
         this.prep();
         this.addSteps([
             ['Put', this.get(i.vegetableOil()), 'in pantelligent on 4 / stove top on 6'],
@@ -36,6 +36,6 @@ export class MealRecipe extends Recipe {
             ['Put in',this.get(i.hoisonSauce())],
             [Timer.set(2, 'm')],
         ]);
-        await this.printRecipe();
+        this.printRecipe();
     }
 }

@@ -17,7 +17,7 @@ export class MealRecipe extends Recipe {
         ]);
     }
 
-    public async generateRecipe() {
+    public generateRecipe() {
         this.prep();
         this.addSteps([
             ['Put', this.get(i.porkRoast()), 'in bowl'],
@@ -31,6 +31,6 @@ export class MealRecipe extends Recipe {
             [Timer.set(10, 'm', 'Take pork roast out of slow cooker and let sit for 10 minutes')],
             ['Trim excess fat'],
         ]);
-        await this.printRecipe();
+        this.printRecipe();
     }
 }

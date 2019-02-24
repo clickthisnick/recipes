@@ -12,7 +12,7 @@ export class MealRecipe extends Recipe {
         ]);
     }
 
-    public async generateRecipe() {
+    public generateRecipe() {
         this.prep();
         this.addSteps([
             ['Preheat oven to 375 degrees'],
@@ -22,6 +22,6 @@ export class MealRecipe extends Recipe {
             ['Cook for 14 min'],
             ['Makes 9 containers of chicken'],
         ]);
-        await this.printRecipe();
+        this.printRecipe();
     }
 }

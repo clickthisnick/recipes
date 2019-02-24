@@ -14,13 +14,13 @@ export class MealRecipe extends Recipe {
         ]);
     }
 
-    public async generateRecipe() {
+    public generateRecipe() {
         this.prep();
         this.addSteps([
             ['Open', this.get(i.frozenTatorTots())],
             ['Put one layer of tator tots in airfryer and sprinkle', this.get(i.lawlrySaltFree())],
             [Timer.set(19, 'm', 'Cook @ 400 deg')],
         ]);
-        await this.printRecipe();
+        this.printRecipe();
     }
 }

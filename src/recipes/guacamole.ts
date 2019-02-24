@@ -21,7 +21,7 @@ export class MealRecipe extends Recipe {
         ]);
     }
 
-    public async generateRecipe() {
+    public generateRecipe() {
         this.prep();
         this.addSteps([
             ['Cut', this.get(i.avacado()), 'and place in glass bowl'],
@@ -36,6 +36,6 @@ export class MealRecipe extends Recipe {
             ['Put', this.get(i.blackPepper())],
             ['Stir bowl'],
         ]);
-        await this.printRecipe();
+        this.printRecipe();
     }
 }

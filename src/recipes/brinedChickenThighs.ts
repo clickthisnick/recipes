@@ -15,7 +15,7 @@ export class MealRecipe extends Recipe {
         ]);
     }
 
-    public async generateRecipe() {
+    public generateRecipe() {
         this.prep();
         this.addSteps([
             ['Cut out glass bowl and fill half way with warm water'],
@@ -24,6 +24,6 @@ export class MealRecipe extends Recipe {
             ['Cook in airfryer @ 370 deg for 12 minutes', this.get(i.chickenThighPackage())],
             [Timer.set(5, 'm', 'Flip chicken and cook for 7 minutes @ 370')],
         ]);
-        await this.printRecipe();
+        this.printRecipe();
     }
 }

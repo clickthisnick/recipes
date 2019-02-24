@@ -14,7 +14,7 @@ export class MealRecipe extends Recipe {
         ]);
     }
 
-    public async generateRecipe() {
+    public generateRecipe() {
         this.prep();
         this.addSteps([
             ['Put 5 seconds water in water bottle'],
@@ -40,6 +40,6 @@ export class MealRecipe extends Recipe {
             ['Rinse top and bottom of bottle'],
             ['Let air dry'],
         ]);
-        await this.printRecipe();
+        this.printRecipe();
     }
 }

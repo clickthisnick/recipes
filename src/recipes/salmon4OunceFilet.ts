@@ -13,7 +13,7 @@ export class MealRecipe extends Recipe {
         ]);
     }
 
-    public async generateRecipe() {
+    public generateRecipe() {
         this.prep();
         this.addSteps([
             // Whole foods marinated salmon filet are great
@@ -21,6 +21,6 @@ export class MealRecipe extends Recipe {
             ['Put', this.get(i.salmon4ozFilet()), 'skin down for 3 minutes'],
             [Timer.set(5, 'm', 'Flip salmon')],
         ]);
-        await this.printRecipe();
+        this.printRecipe();
     }
 }

@@ -17,16 +17,16 @@ export class MealRecipe extends Recipe {
         ]);
     }
 
-    public async generateRecipe() {
+    public generateRecipe() {
         this.prep();
         this.addSteps([
             ['Put the instant pot on sear and put in', this.get(i.sesameOil())],
             ['Put', this.get(i.salt()), this.get(i.blackPepper()), this.get(i.chilliPowder()), 'on all sides of pork'],
             ['Sear 4 minutes on every side'],
-            ['Put in metal riser']
+            ['Put in metal riser'],
             ['Put in 1 Cup of water'],
             ['Pressure cook for 30 minutes'],
         ]);
-        await this.printRecipe();
+        this.printRecipe();
     }
 }

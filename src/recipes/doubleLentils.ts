@@ -17,7 +17,7 @@ export class MealRecipe extends Recipe {
         ]);
     }
 
-    public async generateRecipe() {
+    public generateRecipe() {
         this.prep();
         this.addSteps([
             ['Put in 2 1/4 cup in a pot', this.get(i.lentils())],
@@ -29,6 +29,6 @@ export class MealRecipe extends Recipe {
             [Timer.set(5, 'm', 'Turn on heat to 8 with no lid for 5 minutes')],
             ['Season with', this.get(i.tandoriMasalla()), this.get(i.driedOnion()), this.get(i.salt())]
         ]);
-        await this.printRecipe();
+        this.printRecipe();
     }
 }

@@ -17,7 +17,7 @@ export class MealRecipe extends Recipe {
         ]);
     }
 
-    public async generateRecipe() {
+    public generateRecipe() {
         this.prep();
         this.addSteps([
             ['Put in', this.get(i.frozenBerries())],
@@ -26,6 +26,6 @@ export class MealRecipe extends Recipe {
             ['Put in', this.get(i.honey())],
             ['Mix with nutribullet'],
         ]);
-        await this.printRecipe();
+        this.printRecipe();
     }
 }

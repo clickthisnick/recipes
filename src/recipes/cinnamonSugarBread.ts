@@ -20,7 +20,7 @@ export class MealRecipe extends Recipe {
         ]);
     }
 
-    public async generateRecipe() {
+    public generateRecipe() {
         this.prep();
         this.addSteps([
             ['Attach breadmaker arm'],
@@ -47,6 +47,6 @@ export class MealRecipe extends Recipe {
             ['Preheat oven to 350 degrees'],
             ['Put bread in oven for 30 minutes'],
         ]);
-        await this.printRecipe();
+        this.printRecipe();
     }
 }

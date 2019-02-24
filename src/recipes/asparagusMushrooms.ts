@@ -14,7 +14,7 @@ export class MealRecipe extends Recipe {
         ]);
     }
 
-    public async generateRecipe() {
+    public generateRecipe() {
         this.prep();
         this.addSteps([
             ['Cut ends of the', this.get(i.asparagus())],
@@ -25,6 +25,6 @@ export class MealRecipe extends Recipe {
             ['Season with salt'],
             ['Cook 2 minutes on heath 8 without lid'],
         ]);
-        await this.printRecipe();
+        this.printRecipe();
     }
 }

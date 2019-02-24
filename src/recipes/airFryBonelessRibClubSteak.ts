@@ -15,7 +15,7 @@ export class MealRecipe extends Recipe {
         ]);
     }
 
-    public async generateRecipe() {
+    public generateRecipe() {
         this.prep();
         this.addSteps([
             ['Open the package with', this.get(i.bonelessRibClubSteak())],
@@ -28,6 +28,6 @@ export class MealRecipe extends Recipe {
             [Timer.set(3, 'm', 'Put steak in airfryer @ 370 deg until correct temperature')],
 
         ]);
-        await this.printRecipe();
+        this.printRecipe();
     }
 }

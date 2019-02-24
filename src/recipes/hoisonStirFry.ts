@@ -15,7 +15,7 @@ export class MealRecipe extends Recipe {
         ]);
     }
 
-    public async generateRecipe() {
+    public generateRecipe() {
         this.prep();
         this.addSteps([
             ['Put oven on 7 heat'],
@@ -27,6 +27,6 @@ export class MealRecipe extends Recipe {
             ['Put in', this.get(i.pepperFlake())],
             ['Cook for 5 minutes'],
         ]);
-        await this.printRecipe();
+        this.printRecipe();
     }
 }

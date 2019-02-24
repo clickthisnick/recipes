@@ -14,13 +14,13 @@ export class MealRecipe extends Recipe {
         ]);
     }
 
-    public async generateRecipe() {
+    public generateRecipe() {
         this.prep();
         this.addSteps([
             ['Sprinkle Chicken top and bottom with', this.get(i.oldBay())],
             ['Cook in airfryer @ 400 deg for 13 minutes', this.get(i.chickenBreastPackage())],
             [Timer.set(5, 'm', 'Let chicken sit')],
         ]);
-        await this.printRecipe();
+        this.printRecipe();
     }
 }

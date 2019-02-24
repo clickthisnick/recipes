@@ -15,7 +15,7 @@ export class MealRecipe extends Recipe {
         ]);
     }
 
-    public async generateRecipe() {
+    public generateRecipe() {
         this.prep();
         this.addSteps([
             ['Put a pan on heat 5'],
@@ -25,6 +25,6 @@ export class MealRecipe extends Recipe {
             ['Put the bread on the pan for 3 minutes'],
             ['Flip the bread and keep on pan for 2 and a half minutes'],
         ]);
-        await this.printRecipe();
+        this.printRecipe();
     }
 }

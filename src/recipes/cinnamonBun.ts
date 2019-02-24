@@ -16,7 +16,7 @@ export class MealRecipe extends Recipe {
         ]);
     }
 
-    public async generateRecipe() {
+    public generateRecipe() {
         this.prep();
         // Its important to put liquid items first
         // Then the solid ones
@@ -25,6 +25,6 @@ export class MealRecipe extends Recipe {
             ['Mix 2 parts', this.get(i.sugar()), 'with one part', this.get(i.cinnamon())],
             [Timer.set(17, 's', 'Microwave for 17 seconds')],
         ]);
-        await this.printRecipe();
+        this.printRecipe();
     }
 }

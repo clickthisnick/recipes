@@ -13,7 +13,7 @@ export class MealRecipe extends Recipe {
         ]);
     }
 
-    public async generateRecipe() {
+    public generateRecipe() {
         this.prep();
         this.addSteps([
             ['Put', this.get(i.brownRice()), 'in instant pot'],
@@ -22,6 +22,6 @@ export class MealRecipe extends Recipe {
             ['Let sit for 5 minutes'],
             ['Open steam valve'],
         ]);
-        await this.printRecipe();
+        this.printRecipe();
     }
 }
