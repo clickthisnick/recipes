@@ -32,7 +32,7 @@
 ## [ChickenMealPrep](https://www.clickthisnick.com/recipes/dist/ChickenMealPrep.html)
 
 # Chinese
-## [hoisonStirFry](https://www.clickthisnick.com/recipes/dist/hoisonStirFry.html)
+## [HoisonStirFry](https://www.clickthisnick.com/recipes/dist/HoisonStirFry.html)
 
 ## [PadThaiStirFry](https://www.clickthisnick.com/recipes/dist/PadThaiStirFry.html)
 
@@ -43,6 +43,9 @@
 
 # Fish
 ## [Salmon4OunceFilet](https://www.clickthisnick.com/recipes/dist/Salmon4OunceFilet.html)
+
+# Instant Pot
+## [RiceInstantPot](https://www.clickthisnick.com/recipes/dist/RiceInstantPot.html)
 
 # Miscellaneous
 ## [CleanWaterBottle](https://www.clickthisnick.com/recipes/dist/CleanWaterBottle.html)
@@ -83,7 +86,4 @@
 ## [AsparagusMushrooms](https://www.clickthisnick.com/recipes/dist/AsparagusMushrooms.html)
 
 ## [RoastedCarrots](https://www.clickthisnick.com/recipes/dist/RoastedCarrots.html)
-
-# rice
-## [riceInstantPot](https://www.clickthisnick.com/recipes/dist/riceInstantPot.html)
 

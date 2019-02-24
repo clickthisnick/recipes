@@ -5,7 +5,7 @@ export class Categories {
     public static readonly vegetables = 'Vegetables';
     public static readonly bread = 'Bread';
     public static readonly eggs = 'Eggs';
-    public static readonly rice = 'rice';
+    public static readonly instantPot = 'Instant Pot';
     public static readonly pasta = 'Pasta';
     public static readonly snack = 'Snack';
     public static readonly sandwich = 'Sandwich';
