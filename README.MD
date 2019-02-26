@@ -47,7 +47,7 @@
 # Instant Pot
 ## [PorkButtInstantPot](https://www.clickthisnick.com/recipes/dist/porkbuttinstantpot.html)
 
-## [riceInstantPot](https://www.clickthisnick.com/recipes/dist/riceinstantpot.html)
+## [RiceInstantPot](https://www.clickthisnick.com/recipes/dist/riceinstantpot.html)
 
 # Miscellaneous
 ## [CleanWaterBottle](https://www.clickthisnick.com/recipes/dist/cleanwaterbottle.html)
