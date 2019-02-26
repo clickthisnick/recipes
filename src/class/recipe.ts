@@ -233,11 +233,12 @@ export class Recipe {
             Readme.groups[this.recipeGroup] = [];
         }
 
-        Readme.groups[this.recipeGroup].push(`## [${this.recipeName}](https://www.clickthisnick.com/recipes/dist/${this.recipeName}.html)\n\n`);
+        Readme.groups[this.recipeGroup].push(`## [${this.recipeName}](https://www.clickthisnick.com/recipes/dist/${this.recipeName.toLowerCase()}.html)\n\n`);
    }
 
    public writeRecipe() {
-    fs.writeFileSync(`${process.cwd()}/dist/${this.recipeName}.html`, this.recipeHtml);
+       // Need to lowerCase otherwise lame error where once its set to lowercase, server will response with that even if it later changes to uppercase
+    fs.writeFileSync(`${process.cwd()}/dist/${this.recipeName.toLowerCase()}.html`, this.recipeHtml);
    }
 
    public addSteps(steps: (string | void)[][]) {

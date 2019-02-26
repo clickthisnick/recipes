@@ -5,87 +5,87 @@
 ## [Bubble Bath](https://www.clickthisnick.com/recipes/bubblebath.html)
 # Recipes List
 # Beef
-## [AirfryBonelessRibClubSteak](https://www.clickthisnick.com/recipes/dist/AirfryBonelessRibClubSteak.html)
+## [AirfryBonelessRibClubSteak](https://www.clickthisnick.com/recipes/dist/airfrybonelessribclubsteak.html)
 
-## [BeyondBurger](https://www.clickthisnick.com/recipes/dist/BeyondBurger.html)
+## [BeyondBurger](https://www.clickthisnick.com/recipes/dist/beyondburger.html)
 
 # Bread
-## [CinnamonBun](https://www.clickthisnick.com/recipes/dist/CinnamonBun.html)
+## [CinnamonBun](https://www.clickthisnick.com/recipes/dist/cinnamonbun.html)
 
-## [CinnamonSugarBread](https://www.clickthisnick.com/recipes/dist/CinnamonSugarBread.html)
+## [CinnamonSugarBread](https://www.clickthisnick.com/recipes/dist/cinnamonsugarbread.html)
 
-## [FrenchToast](https://www.clickthisnick.com/recipes/dist/FrenchToast.html)
+## [FrenchToast](https://www.clickthisnick.com/recipes/dist/frenchtoast.html)
 
-## [ToastingBread](https://www.clickthisnick.com/recipes/dist/ToastingBread.html)
+## [ToastingBread](https://www.clickthisnick.com/recipes/dist/toastingbread.html)
 
-## [WholeWheatBread](https://www.clickthisnick.com/recipes/dist/WholeWheatBread.html)
+## [WholeWheatBread](https://www.clickthisnick.com/recipes/dist/wholewheatbread.html)
 
 # Chicken
-## [AirFrozenChicken](https://www.clickthisnick.com/recipes/dist/AirFrozenChicken.html)
+## [AirFrozenChicken](https://www.clickthisnick.com/recipes/dist/airfrozenchicken.html)
 
-## [AirFryChickenBreast](https://www.clickthisnick.com/recipes/dist/AirFryChickenBreast.html)
+## [AirFryChickenBreast](https://www.clickthisnick.com/recipes/dist/airfrychickenbreast.html)
 
-## [AirFryChickenThigh](https://www.clickthisnick.com/recipes/dist/AirFryChickenThigh.html)
+## [AirFryChickenThigh](https://www.clickthisnick.com/recipes/dist/airfrychickenthigh.html)
 
-## [BrinedChickenThighs](https://www.clickthisnick.com/recipes/dist/BrinedChickenThighs.html)
+## [BrinedChickenThighs](https://www.clickthisnick.com/recipes/dist/brinedchickenthighs.html)
 
-## [ChickenMealPrep](https://www.clickthisnick.com/recipes/dist/ChickenMealPrep.html)
+## [ChickenMealPrep](https://www.clickthisnick.com/recipes/dist/chickenmealprep.html)
 
 # Chinese
-## [HoisonStirFry](https://www.clickthisnick.com/recipes/dist/HoisonStirFry.html)
+## [HoisonStirFry](https://www.clickthisnick.com/recipes/dist/hoisonstirfry.html)
 
-## [PadThaiStirFry](https://www.clickthisnick.com/recipes/dist/PadThaiStirFry.html)
+## [PadThaiStirFry](https://www.clickthisnick.com/recipes/dist/padthaistirfry.html)
 
-## [SpicyLeekMushrooms](https://www.clickthisnick.com/recipes/dist/SpicyLeekMushrooms.html)
+## [SpicyLeekMushrooms](https://www.clickthisnick.com/recipes/dist/spicyleekmushrooms.html)
 
 # Eggs
-## [EggsScrambled](https://www.clickthisnick.com/recipes/dist/EggsScrambled.html)
+## [EggsScrambled](https://www.clickthisnick.com/recipes/dist/eggsscrambled.html)
 
 # Fish
-## [Salmon4OunceFilet](https://www.clickthisnick.com/recipes/dist/Salmon4OunceFilet.html)
+## [Salmon4OunceFilet](https://www.clickthisnick.com/recipes/dist/salmon4ouncefilet.html)
 
 # Instant Pot
-## [PorkButtInstantPot](https://www.clickthisnick.com/recipes/dist/PorkButtInstantPot.html)
+## [PorkButtInstantPot](https://www.clickthisnick.com/recipes/dist/porkbuttinstantpot.html)
 
-## [RiceInstantPot](https://www.clickthisnick.com/recipes/dist/RiceInstantPot.html)
+## [riceInstantPot](https://www.clickthisnick.com/recipes/dist/riceinstantpot.html)
 
 # Miscellaneous
-## [CleanWaterBottle](https://www.clickthisnick.com/recipes/dist/CleanWaterBottle.html)
+## [CleanWaterBottle](https://www.clickthisnick.com/recipes/dist/cleanwaterbottle.html)
 
 # Pasta
-## [GarlicPasta](https://www.clickthisnick.com/recipes/dist/GarlicPasta.html)
+## [GarlicPasta](https://www.clickthisnick.com/recipes/dist/garlicpasta.html)
 
-## [SpaghettiZuchinniPasta](https://www.clickthisnick.com/recipes/dist/SpaghettiZuchinniPasta.html)
+## [SpaghettiZuchinniPasta](https://www.clickthisnick.com/recipes/dist/spaghettizuchinnipasta.html)
 
 # Pizza
-## [HomemadePizza](https://www.clickthisnick.com/recipes/dist/HomemadePizza.html)
+## [HomemadePizza](https://www.clickthisnick.com/recipes/dist/homemadepizza.html)
 
 # Pork
-## [PorkRoastSlowCooker](https://www.clickthisnick.com/recipes/dist/PorkRoastSlowCooker.html)
+## [PorkRoastSlowCooker](https://www.clickthisnick.com/recipes/dist/porkroastslowcooker.html)
 
 # Sandwich
-## [HamSandwich](https://www.clickthisnick.com/recipes/dist/HamSandwich.html)
+## [HamSandwich](https://www.clickthisnick.com/recipes/dist/hamsandwich.html)
 
 # Smoothies
-## [BerrySmoothie](https://www.clickthisnick.com/recipes/dist/BerrySmoothie.html)
+## [BerrySmoothie](https://www.clickthisnick.com/recipes/dist/berrysmoothie.html)
 
 # Snack
-## [Crepes](https://www.clickthisnick.com/recipes/dist/Crepes.html)
+## [Crepes](https://www.clickthisnick.com/recipes/dist/crepes.html)
 
-## [DoubleLentils](https://www.clickthisnick.com/recipes/dist/DoubleLentils.html)
+## [DoubleLentils](https://www.clickthisnick.com/recipes/dist/doublelentils.html)
 
-## [Guacamole](https://www.clickthisnick.com/recipes/dist/Guacamole.html)
+## [Guacamole](https://www.clickthisnick.com/recipes/dist/guacamole.html)
 
-## [HealthyCrepes](https://www.clickthisnick.com/recipes/dist/HealthyCrepes.html)
+## [HealthyCrepes](https://www.clickthisnick.com/recipes/dist/healthycrepes.html)
 
-## [KaleChips](https://www.clickthisnick.com/recipes/dist/KaleChips.html)
+## [KaleChips](https://www.clickthisnick.com/recipes/dist/kalechips.html)
 
-## [Lentils](https://www.clickthisnick.com/recipes/dist/Lentils.html)
+## [Lentils](https://www.clickthisnick.com/recipes/dist/lentils.html)
 
-## [TatorTots](https://www.clickthisnick.com/recipes/dist/TatorTots.html)
+## [TatorTots](https://www.clickthisnick.com/recipes/dist/tatortots.html)
 
 # Vegetables
-## [AsparagusMushrooms](https://www.clickthisnick.com/recipes/dist/AsparagusMushrooms.html)
+## [AsparagusMushrooms](https://www.clickthisnick.com/recipes/dist/asparagusmushrooms.html)
 
-## [RoastedCarrots](https://www.clickthisnick.com/recipes/dist/RoastedCarrots.html)
+## [RoastedCarrots](https://www.clickthisnick.com/recipes/dist/roastedcarrots.html)
 
