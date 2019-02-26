@@ -237,7 +237,7 @@ export class Recipe {
    }
 
    public writeRecipe() {
-       // Need to lowerCase otherwise lame error where once its set to lowercase, server will response with that even if it later changes to uppercase
+    // Just setting to lowercase incase git isn't case sensitive (Like on osx/windows)
     fs.writeFileSync(`${process.cwd()}/dist/${this.recipeName.toLowerCase()}.html`, this.recipeHtml);
    }
 
