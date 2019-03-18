@@ -39,7 +39,7 @@
 ## [SpicyLeekMushrooms](https://www.clickthisnick.com/recipes/dist/spicyleekmushrooms.html)
 
 # Coffee
-## [AirFrozenChicken](https://www.clickthisnick.com/recipes/dist/airfrozenchicken.html)
+## [FrenchPress](https://www.clickthisnick.com/recipes/dist/frenchpress.html)
 
 # Eggs
 ## [EggsScrambled](https://www.clickthisnick.com/recipes/dist/eggsscrambled.html)
