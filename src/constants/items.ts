@@ -27,6 +27,17 @@ export class Items {
         isTakoutUnitable: false,
     })
 
+    public static readonly coffeeGrounds: IItem = (quantity: number = 1, unit: IUnitObj) => ({
+        name: 'Coffee Grounds',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Rinse and put measuring cup in dishwasher',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+    })
+
     public static readonly bakingPowder: IItem = (quantity: number = 1, unit: IUnitObj) => ({
         name: 'Baking Powder',
         putAwayTime: 10,
