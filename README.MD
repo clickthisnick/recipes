@@ -53,7 +53,9 @@
 ## [RiceInstantPot](https://www.clickthisnick.com/recipes/dist/riceinstantpot.html)
 
 # Miscellaneous
-## [CleanWaterBottle](https://www.clickthisnick.com/recipes/dist/cleanwaterbottle.html)
+## [CleanWaterBottleBig](https://www.clickthisnick.com/recipes/dist/cleanwaterbottlebig.html)
+
+## [CleanWaterBottleSmall](https://www.clickthisnick.com/recipes/dist/cleanwaterbottlesmall.html)
 
 # Pasta
 ## [GarlicPasta](https://www.clickthisnick.com/recipes/dist/garlicpasta.html)
