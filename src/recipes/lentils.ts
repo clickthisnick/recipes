@@ -14,20 +14,18 @@ export class MealRecipe extends Recipe {
             i.driedOnion(),
             i.tandoriMasalla(),
             i.salt(),
+            i.instaPot(),
         ]);
     }
 
     public generateRecipe() {
         this.prep();
         this.addSteps([
-            ['Put in 1/4 cup in a pot', this.get(i.lentils())],
-            ['Put in 3/4 cup in a pot', this.get(i.water())],
-            [Timer.set(3, 'm', 'Turn on heat to 3 with no lid for 3 minutes')],
-            ['Season with tandori masalla, dried onion, and salt'],
-            [Timer.set(2.5, 'm', 'Turn on heat to 3 with no lid for 2.5 minutes')],
-            [Timer.set(2.5, 'm', 'Turn on heat to 8 with no lid for 2.5 minutes')],
-            [Timer.set(2, 'm', 'Turn on heat to 8 with no lid for 2 minutes')],
-            ['Season with', this.get(i.tandoriMasalla()), this.get(i.driedOnion()), this.get(i.salt())]
+            ['Put in 1/4 cup', this.get(i.lentils()), 'in an', this.get(i.instaPot())],
+            ['Put in 3/4 cup', this.get(i.water())],
+            ['Season with', this.get(i.tandoriMasalla()), this.get(i.driedOnion()), this.get(i.salt())],
+            [Timer.set(5, 'm', 'Turn on saute for 10 minutes')],
+            ['Stir occasionally'],
         ]);
         this.printRecipe();
     }

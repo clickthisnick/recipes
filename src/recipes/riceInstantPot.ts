@@ -7,16 +7,17 @@ export class MealRecipe extends Recipe {
     constructor() {
         super();
         this.recipeName = 'RiceInstantPot';
-        this.recipeGroup = c.instantPot;
+        this.recipeGroup = c.snack;
         this.addIngredients([
             i.brownRice(1, u.cup),
+            i.instaPot(1)
         ]);
     }
 
     public generateRecipe() {
         this.prep();
         this.addSteps([
-            ['Put', this.get(i.brownRice()), 'in instant pot'],
+            ['Put', this.get(i.brownRice()), 'in', this.get(i.instaPot())],
             ['Put in  1.5 cups of water'],
             ['Put on pressure cook for 15 minutes'],
             ['Let sit for 5 minutes'],

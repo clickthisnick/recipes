@@ -47,11 +47,6 @@
 # Fish
 ## [Salmon4OunceFilet](https://www.clickthisnick.com/recipes/dist/salmon4ouncefilet.html)
 
-# Instant Pot
-## [PorkButtInstantPot](https://www.clickthisnick.com/recipes/dist/porkbuttinstantpot.html)
-
-## [RiceInstantPot](https://www.clickthisnick.com/recipes/dist/riceinstantpot.html)
-
 # Miscellaneous
 ## [CleanWaterBottleBig](https://www.clickthisnick.com/recipes/dist/cleanwaterbottlebig.html)
 
@@ -66,6 +61,8 @@
 ## [HomemadePizza](https://www.clickthisnick.com/recipes/dist/homemadepizza.html)
 
 # Pork
+## [PorkButtInstantPot](https://www.clickthisnick.com/recipes/dist/porkbuttinstantpot.html)
+
 ## [PorkRoastSlowCooker](https://www.clickthisnick.com/recipes/dist/porkroastslowcooker.html)
 
 # Sandwich
@@ -86,6 +83,8 @@
 ## [KaleChips](https://www.clickthisnick.com/recipes/dist/kalechips.html)
 
 ## [Lentils](https://www.clickthisnick.com/recipes/dist/lentils.html)
+
+## [RiceInstantPot](https://www.clickthisnick.com/recipes/dist/riceinstantpot.html)
 
 ## [TatorTots](https://www.clickthisnick.com/recipes/dist/tatortots.html)
 
