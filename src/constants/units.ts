@@ -6,7 +6,10 @@ export class Units {
     public static readonly cup: IUnitObj = {
         name: 'x (1 Cup)'
     };
-    public static readonly empty: IUnitObj = {
+    public static readonly dash: IUnitObj = {
+        name: 'dash'
+    };
+    public static readonly noUnitQuantity: IUnitObj = {
         name: ''
     };
     public static readonly halfCup: IUnitObj = {

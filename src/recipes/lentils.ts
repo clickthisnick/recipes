@@ -12,10 +12,10 @@ export class MealRecipe extends Recipe {
         this.addIngredients([
             i.lentils(.25, u.cup),
             i.water(.75, u.cup),
-            i.driedOnion(1, u.empty),
-            i.tandoriMasalla(1, u.empty),
-            i.salt(1, u.empty),
-            i.instaPot(1, u.empty),
+            i.driedOnion(2, u.dash),
+            i.tandoriMasalla(3, u.dash),
+            i.salt(1, u.dash),
+            i.instaPot(1, u.noUnitQuantity),
         ]);
     }
 

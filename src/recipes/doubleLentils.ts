@@ -2,6 +2,7 @@ import { Recipe } from '../class/recipe';
 import { Items as i } from '../constants/items';
 import { Categories as c } from '../constants/categories';
 import { Timer } from '../class/timer';
+import { Units as u } from '../constants/units';
 
 export class MealRecipe extends Recipe {
     constructor() {
@@ -9,25 +10,23 @@ export class MealRecipe extends Recipe {
         this.recipeName = 'DoubleLentils';
         this.recipeGroup = c.snack;
         this.addIngredients([
-            i.lentils(),
-            i.water(),
-            i.driedOnion(),
-            i.tandoriMasalla(),
-            i.salt(),
+            i.lentils(.50, u.cup),
+            i.water(1.25, u.cup),
+            i.driedOnion(2, u.dash),
+            i.tandoriMasalla(3, u.dash),
+            i.salt(1, u.dash),
+            i.instaPot(1, u.noUnitQuantity),
         ]);
     }
 
     public generateRecipe() {
         this.prep();
         this.addSteps([
-            ['Put in 2 1/4 cup in a pot', this.get(i.lentils())],
-            ['Put in 6 1/4 cup in a pot', this.get(i.water())],
-            [Timer.set(3, 'm', 'Turn on heat to 3 with no lid for 3 minutes')],
-            ['Season with tandori masalla, dried onion, and salt'],
-            [Timer.set(2.5, 'm', 'Turn on heat to 3 with no lid for 2.5 minutes')],
-            [Timer.set(2.5, 'm', 'Turn on heat to 8 with no lid for 2.5 minutes')],
-            [Timer.set(5, 'm', 'Turn on heat to 8 with no lid for 5 minutes')],
-            ['Season with', this.get(i.tandoriMasalla()), this.get(i.driedOnion()), this.get(i.salt())]
+            ['Put in', this.get(i.lentils()), 'in an', this.get(i.instaPot())],
+            ['Put in', this.get(i.water())],
+            ['Season with', this.get(i.tandoriMasalla()), this.get(i.driedOnion()), this.get(i.salt())],
+            [Timer.set(10, 'm', 'Turn on saute for 13 minutes')],
+            ['Stir occasionally'],
         ]);
         this.printRecipe();
     }

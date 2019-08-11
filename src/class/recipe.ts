@@ -1,6 +1,7 @@
 import { IItemObj } from '../constants/items';
 import * as fs from 'fs';
 import { Readme } from './readme';
+import { Units as u } from '../constants/units';
 
 export class Recipe {
     private headerStart = '<h1>';
@@ -171,6 +172,11 @@ export class Recipe {
     }
 
    public turnIngObjIntoStr(ingObj: IItemObj, includeUnit = false) {
+      // If unit is noUnitQuantity just display the name
+      if (ingObj.unit !== null && ingObj.unit.name === u.noUnitQuantity.name) {
+          return ingObj.name;
+      }
+
       // Quantity could be .25
       const ingQuantity = ingObj.quantity > 0 ? `${ingObj.quantity} ` : '';
 
