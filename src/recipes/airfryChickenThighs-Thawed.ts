@@ -10,7 +10,7 @@ export class MealRecipe extends Recipe {
         this.recipeGroup = c.chicken;
         this.addIngredients([
             i.chickenThighPackage(),
-            i.oldBay()
+            i.oldBay(),
         ]);
     }
 

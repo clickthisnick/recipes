@@ -1,4 +1,4 @@
-import { IItemObj } from '../constants/items';
+import { IItemObj } from './ingredients/item';
 import * as fs from 'fs';
 import { Readme } from './readme';
 import { Units as u } from '../constants/units';
