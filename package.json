@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "prelint": "npm install",
-    "lint": "find src -name '*.ts' | xargs node_modules/tslint/bin/tslint",
+    "lint": "",
     "precreateReadme": "npm run lint",
     "createReadme": "./src/hydrateReadme.sh",
     "preremoveDist": "npm run createReadme",

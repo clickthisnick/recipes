@@ -13,8 +13,10 @@ export class Recipe {
     public recipeHtml: string = '';
     public recipeName: string;
     public recipeGroup: string;
+    public vegan: boolean;
 
     constructor() {
+      this.vegan = true;
       this.recipeHtml += this.mobileViewport;
       this.recipeHtml += this.chartSet;
       this.recipeHtml += `<style>
@@ -197,15 +199,21 @@ export class Recipe {
         }
 
         // Add all the unit measurers
-
         this.ingredients.forEach((ingredient) => {
             const ingName = this.turnIngObjIntoStr(ingredient);
             const needsWashed = ingredient.wash === true ? ' and wash' : '';
 
             this.recipeHtml += this.generateStep(`${ingName}${needsWashed}`);
+            if (ingredient.isMeatProduct === true) {
+                this.vegan = false;
+            }
         });
 
-        this.recipeHtml += this.generateHeader('Recipe');
+        if (this.vegan === true) {
+            this.recipeHtml += this.generateHeader('Vegan Recipe');
+        } else {
+            this.recipeHtml += this.generateHeader('Recipe');
+        }
     }
 
     // TODO Should be a new section after recipe that says clean excess ingredients
