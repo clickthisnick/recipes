@@ -74,15 +74,13 @@
 # Snack
 ## [Crepes](https://www.clickthisnick.com/recipes/dist/crepes.html)
 
-## [DoubleLentils](https://www.clickthisnick.com/recipes/dist/doublelentils.html)
-
 ## [Guacamole](https://www.clickthisnick.com/recipes/dist/guacamole.html)
 
 ## [HealthyCrepes](https://www.clickthisnick.com/recipes/dist/healthycrepes.html)
 
 ## [KaleChips](https://www.clickthisnick.com/recipes/dist/kalechips.html)
 
-## [Lentils](https://www.clickthisnick.com/recipes/dist/lentils.html)
+## [Lentils1Cup](https://www.clickthisnick.com/recipes/dist/lentils1cup.html)
 
 ## [RiceInstantPot](https://www.clickthisnick.com/recipes/dist/riceinstantpot.html)
 
