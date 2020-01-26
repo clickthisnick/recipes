@@ -47,6 +47,9 @@
 # Fish
 ## [Salmon4OunceFilet](https://www.clickthisnick.com/recipes/dist/salmon4ouncefilet.html)
 
+# Instant Pot
+## [Quinoa](https://www.clickthisnick.com/recipes/dist/quinoa.html)
+
 # Miscellaneous
 ## [CleanWaterBottleBig](https://www.clickthisnick.com/recipes/dist/cleanwaterbottlebig.html)
 
