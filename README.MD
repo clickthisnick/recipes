@@ -50,6 +50,8 @@
 # Instant Pot
 ## [Quinoa](https://www.clickthisnick.com/recipes/dist/quinoa.html)
 
+## [Quinoa Small](https://www.clickthisnick.com/recipes/dist/quinoa small.html)
+
 # Miscellaneous
 ## [CleanWaterBottleBig](https://www.clickthisnick.com/recipes/dist/cleanwaterbottlebig.html)
 
