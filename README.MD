@@ -52,6 +52,8 @@
 
 ## [Quinoa Small](https://www.clickthisnick.com/recipes/dist/quinoa small.html)
 
+## [WildBasmatiRice](https://www.clickthisnick.com/recipes/dist/wildbasmatirice.html)
+
 # Miscellaneous
 ## [CleanWaterBottleBig](https://www.clickthisnick.com/recipes/dist/cleanwaterbottlebig.html)
 
@@ -78,6 +80,8 @@
 
 # Snack
 ## [Crepes](https://www.clickthisnick.com/recipes/dist/crepes.html)
+
+## [Frozen Chicken Wings](https://www.clickthisnick.com/recipes/dist/frozen chicken wings.html)
 
 ## [Guacamole](https://www.clickthisnick.com/recipes/dist/guacamole.html)
 
