@@ -2,7 +2,6 @@
 ## [Water Intake](https://www.clickthisnick.com/recipes/waterIntake.html)
 ## [Grocery List](https://www.clickthisnick.com/recipes/groceryList.html)
 ## [Expiration Calculator](https://www.clickthisnick.com/recipes/expirationCalculator.html)
-## [Bubble Bath](https://www.clickthisnick.com/recipes/bubblebath.html)
 # Recipes List
 # Beef
 ## [AirfryBonelessRibClubSteak](https://www.clickthisnick.com/recipes/dist/airfrybonelessribclubsteak.html)
@@ -54,11 +53,6 @@
 
 ## [WildBasmatiRice](https://www.clickthisnick.com/recipes/dist/wildbasmatirice.html)
 
-# Miscellaneous
-## [CleanWaterBottleBig](https://www.clickthisnick.com/recipes/dist/cleanwaterbottlebig.html)
-
-## [CleanWaterBottleSmall](https://www.clickthisnick.com/recipes/dist/cleanwaterbottlesmall.html)
-
 # Pasta
 ## [GarlicPasta](https://www.clickthisnick.com/recipes/dist/garlicpasta.html)
 
@@ -94,6 +88,9 @@
 ## [RiceInstantPot](https://www.clickthisnick.com/recipes/dist/riceinstantpot.html)
 
 ## [TatorTots](https://www.clickthisnick.com/recipes/dist/tatortots.html)
+
+# Souvide
+## [Cauliflower Souvide](https://www.clickthisnick.com/recipes/dist/cauliflower souvide.html)
 
 # Vegetables
 ## [AsparagusMushrooms](https://www.clickthisnick.com/recipes/dist/asparagusmushrooms.html)

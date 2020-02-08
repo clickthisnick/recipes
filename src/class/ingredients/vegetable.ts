@@ -292,6 +292,18 @@ export class VegetableItems extends SpiceItems {
         isMeatProduct: false,
     })
 
+    public static readonly cauliflower: IItem = (quantity: number = 1, unit: IUnitObj) => ({
+        name: 'Cauliflower',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: true,
+        isTakoutUnitable: true,
+        isMeatProduct: false,
+    })
+
     public static readonly leek: IItem = (quantity: number = 1, unit: IUnitObj) => ({
         name: 'Leek',
         putAwayTime: 10,
