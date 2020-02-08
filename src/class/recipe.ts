@@ -253,7 +253,7 @@ export class Recipe {
 
    public writeRecipe() {
     // Just setting to lowercase incase git isn't case sensitive (Like on osx/windows)
-    fs.writeFileSync(`${process.cwd()}/dist/${this.recipeName.toLowerCase()}.html`, this.recipeHtml);
+    fs.writeFileSync(`${process.cwd()}/dist/${this.recipeName.toLowerCase().split(' ').join('')}.html`, this.recipeHtml);
    }
 
    public addSteps(steps: (string | void)[][]) {
