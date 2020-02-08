@@ -49,7 +49,7 @@
 # Instant Pot
 ## [Quinoa](https://www.clickthisnick.com/recipes/dist/quinoa.html)
 
-## [Quinoa Small](https://www.clickthisnick.com/recipes/dist/quinoa small.html)
+## [QuinoaSmall](https://www.clickthisnick.com/recipes/dist/quinoa small.html)
 
 ## [WildBasmatiRice](https://www.clickthisnick.com/recipes/dist/wildbasmatirice.html)
 
@@ -75,7 +75,7 @@
 # Snack
 ## [Crepes](https://www.clickthisnick.com/recipes/dist/crepes.html)
 
-## [Frozen Chicken Wings](https://www.clickthisnick.com/recipes/dist/frozen chicken wings.html)
+## [FrozenChickenWings](https://www.clickthisnick.com/recipes/dist/frozen chicken wings.html)
 
 ## [Guacamole](https://www.clickthisnick.com/recipes/dist/guacamole.html)
 
@@ -90,7 +90,7 @@
 ## [TatorTots](https://www.clickthisnick.com/recipes/dist/tatortots.html)
 
 # Souvide
-## [Cauliflower Souvide](https://www.clickthisnick.com/recipes/dist/cauliflower souvide.html)
+## [CauliflowerSouvide](https://www.clickthisnick.com/recipes/dist/cauliflowersouvide.html)
 
 # Vegetables
 ## [AsparagusMushrooms](https://www.clickthisnick.com/recipes/dist/asparagusmushrooms.html)
