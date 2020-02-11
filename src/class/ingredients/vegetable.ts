@@ -100,6 +100,18 @@ export class VegetableItems extends SpiceItems {
         isMeatProduct: false,
     })
 
+    public static readonly archerFlour: IItem = (quantity: number = 1, unit: IUnitObj) => ({
+        name: 'Archer Flour',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+    })
+
     public static readonly buckwheatFlour: IItem = (quantity: number = 1, unit: IUnitObj) => ({
         name: 'Buckwheat Flour',
         putAwayTime: 10,
