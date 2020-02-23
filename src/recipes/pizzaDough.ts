@@ -17,8 +17,8 @@ export class MealRecipe extends Recipe {
     public generateRecipe() {
         this.prep();
         this.addSteps([
-            ['In a bowl put 2 1/4 teaspoons and 1/8 teaspoon sugar', this.get(i.dryActiveYeast())],
-            ['Put warm water 110 F into bowl and stir'],
+            ['Put 12 ounces warm water 110 F into bowl and stir'],
+            ['In a bowl put 2 1/4 teaspoons', this.get(i.dryActiveYeast()), 'and 1/8 teaspoon sugar in the bowl'],
             ['In another bowl put 3 1/2 cups', this.get(i.archerFlour())],
             ['Wait for yeast to get cloudy, 20 min'],
             ['Pour yeast mixture into flour bowl and mix'],
