@@ -2,7 +2,7 @@
 ## [Water Intake](https://www.clickthisnick.com/recipes/waterIntake.html)
 ## [Grocery List](https://www.clickthisnick.com/recipes/groceryList.html)
 ## [Expiration Calculator](https://www.clickthisnick.com/recipes/expirationCalculator.html)
-## [Frozen Meat Portions](https://www.clickthisnick.com/recipes/frozenMeat.html)
+## [Frozen Food Portions](https://www.clickthisnick.com/recipes/frozenFood.html)
 # Recipes List
 # Beef
 ## [AirfryBonelessRibClubSteak](https://www.clickthisnick.com/recipes/dist/airfrybonelessribclubsteak.html)
@@ -97,6 +97,8 @@
 
 # Vegetables
 ## [AsparagusMushrooms](https://www.clickthisnick.com/recipes/dist/asparagusmushrooms.html)
+
+## [FrozenAsparagus](https://www.clickthisnick.com/recipes/dist/frozenasparagus.html)
 
 ## [RoastedCarrots](https://www.clickthisnick.com/recipes/dist/roastedcarrots.html)
 
