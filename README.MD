@@ -50,6 +50,8 @@
 ## [Salmon4OunceFilet](https://www.clickthisnick.com/recipes/dist/salmon4ouncefilet.html)
 
 # Instant Pot
+## [LentilSpaghetti](https://www.clickthisnick.com/recipes/dist/lentil spaghetti.html)
+
 ## [Quinoa](https://www.clickthisnick.com/recipes/dist/quinoa.html)
 
 ## [QuinoaSmall](https://www.clickthisnick.com/recipes/dist/quinoa small.html)
