@@ -23,7 +23,8 @@ export class MealRecipe extends Recipe {
             ['Wait for yeast to get cloudy, 20 min'],
             ['Pour yeast mixture into flour bowl and mix'],
             ['Knead the dough about 7 times'],
-            ['Break dough in half and place in 2 red joesph containers (16oz) and let rise till double the size (1 hr)'],
+            ['Break dough in half and place in 2 red joesph containers (16oz) and let rise till double the size (1.5 hr)'],
+            ['Break the pizza dough in half again'],
             ['Either freeze the dough with olive oil around it or use it now for pizza'],
         ]);
         this.printRecipe();
