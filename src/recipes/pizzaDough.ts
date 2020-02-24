@@ -27,6 +27,7 @@ export class MealRecipe extends Recipe {
             ['Let sit for (1.5 hr)'],
             ['Break the pizza dough in half again'],
             ['Either freeze the dough with olive oil around it or use it now for pizza'],
+            ['If freezing once in the bag, let sit for 15 minutes before sucking air out'],
         ]);
         this.printRecipe();
     }
