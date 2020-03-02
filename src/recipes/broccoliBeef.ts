@@ -37,7 +37,7 @@ export class MealRecipe extends Recipe {
             ['Add', this.get(i.broccoli()), 'in same pan with cover.'],
             [Timer.set(5, 'm', 'Cook')],
             ['In a bowl mix', this.get(i.arrowRootStarch()), ',', this.get(i.water()), ',', this.get(i.aminosCoconut()), ',', this.get(i.groundGinger()), ',', this.get(i.redPepperFlakes())],
-            [Timer.set(5, 'm', 'Once broccoli is done, remove cover and add sauce. Continue cooking.')],
+            [Timer.set(4, 'm', 'Once broccoli is done, remove cover and add sauce. Continue cooking.')],
             [Timer.set(2, 'm', 'Add beef and finish cooking.')],
         ]);
         this.printRecipe();
