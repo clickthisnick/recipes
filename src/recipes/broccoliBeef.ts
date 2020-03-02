@@ -13,7 +13,7 @@ export class MealRecipe extends Recipe {
         this.addIngredients([
             i.oliveOil(1, u.tbsp),
             i.flankSteak(.5, u.pound),
-            i.garlicClove(3, u.clove),
+            i.garlicClove(3, u.unit),
             i.greenOnions(4, u.unit),
             i.shallot(1, u.unit),
             i.broccoli(1, u.unit),
