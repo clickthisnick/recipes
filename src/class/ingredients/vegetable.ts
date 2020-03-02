@@ -292,6 +292,18 @@ export class VegetableItems extends SpiceItems {
         isMeatProduct: false,
     })
 
+    public static readonly aminosCoconut: IItem = (quantity: number = 1, unit: IUnitObj) => ({
+        name: 'Aminos Coconut',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+    })
+
     public static readonly avacado: IItem = (quantity: number = 1, unit: IUnitObj) => ({
         name: 'Avacado',
         putAwayTime: 10,
@@ -342,6 +354,30 @@ export class VegetableItems extends SpiceItems {
 
     public static readonly romaTomato: IItem = (quantity: number = 1, unit: IUnitObj) => ({
         name: 'Roma Tomato',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: true,
+        isTakoutUnitable: true,
+        isMeatProduct: false,
+    })
+
+    public static readonly groundGinger: IItem = (quantity: number = 1, unit: IUnitObj) => ({
+        name: 'Ground Ginger',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: true,
+        isTakoutUnitable: true,
+        isMeatProduct: false,
+    })
+
+    public static readonly shallot: IItem = (quantity: number = 1, unit: IUnitObj) => ({
+        name: 'Shallot',
         putAwayTime: 10,
         takeOutTime: 10,
         cleanSteps: '',
@@ -436,6 +472,30 @@ export class VegetableItems extends SpiceItems {
         isMeatProduct: false,
     })
 
+    public static readonly greenOnions: IItem = (quantity: number = 1, unit: IUnitObj) => ({
+        name: 'Green Onions',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: true,
+        isTakoutUnitable: true,
+        isMeatProduct: false,
+    })
+
+    public static readonly redPepperFlakes: IItem = (quantity: number = 1, unit: IUnitObj) => ({
+        name: 'Red Pepper Flakes',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: true,
+        isTakoutUnitable: true,
+        isMeatProduct: false,
+    })
+
     public static readonly redOnion: IItem = (quantity: number = 1, unit: IUnitObj) => ({
         name: 'Red Onion',
         putAwayTime: 10,
@@ -468,6 +528,30 @@ export class VegetableItems extends SpiceItems {
         quantity: quantity,
         unit: unit || null,
         wash: true,
+        isTakoutUnitable: true,
+        isMeatProduct: false,
+    })
+
+    public static readonly arrowRootStarch: IItem = (quantity: number = 1, unit: IUnitObj) => ({
+        name: 'Arrow Root Starch',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: true,
+        isMeatProduct: false,
+    })
+
+    public static readonly broccoli: IItem = (quantity: number = 1, unit: IUnitObj) => ({
+        name: 'Broccoli',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
         isTakoutUnitable: true,
         isMeatProduct: false,
     })

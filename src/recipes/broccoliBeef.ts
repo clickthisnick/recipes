@@ -1,0 +1,43 @@
+import { Recipe } from '../class/recipe';
+import { Items as i } from '../constants/items';
+import { Categories as c } from '../constants/categories';
+import { Units as u } from '../constants/units';
+import { Timer } from '../class/timer';
+
+// Serves 1
+export class MealRecipe extends Recipe {
+    constructor() {
+        super();
+        this.recipeName = 'BeyondBurger';
+        this.recipeGroup = c.beef;
+        this.addIngredients([
+            i.oliveOil(1, u.tbsp),
+            i.flankSteak(.5, u.pounds),
+            i.garlicClove(3, u.cloves),
+            i.greenOnions(4, u.units),
+            i.shallot(1, u.units),
+            i.broccoli(1, u.units),
+            i.arrowRootStarch(2, u.tbsp),
+            i.water(.75, u.cup),
+            i.aminosCoconut(.25, u.cup),
+            i.groundGinger(1, u.tsp),
+            i.redPepperFlakes(1, u.tsp),
+        ]);
+    }
+
+    public generateRecipe() {
+        this.prep();
+        this.addSteps([
+            ['Put', this.get(i.oliveOil()), 'on pan on heat 5'],
+            ['Cut', this.get(i.flankSteak()), 'into strips'],
+            [Timer.set(6, 'm', 'Cook beef')],
+            ['Put beef in pyrex bowl'],
+            [Timer.set(1, 'm', 'Cook' + this.get(i.greenOnions()) + this.get(i.garlicClove()) + this.get(i.shallot()) + 'in same pan.')],
+            [Timer.set(5, 'm', 'Add' + this.get(i.broccoli()) + 'in same pan with cover.')],
+            ['In a bowl mix', this.get(i.arrowRootStarch()), this.get(i.water()), this.get(i.aminosCoconut()), this.get(i.groundGinger()), this.get(i.redPepperFlakes())],
+            [Timer.set(5, 'm', 'Once broccoli is done, remove cover and add sauce. Continue cooking.')],
+            [Timer.set(2, 'm', 'Add beef and finish cooking.')],
+        ]);
+        this.printRecipe();
+    }
+}

@@ -33,4 +33,10 @@ export class Units {
     public static readonly pounds: IUnitObj = {
         name: 'Pounds'
     };
+    public static readonly units: IUnitObj = {
+        name: 'Units'
+    };
+    public static readonly cloves: IUnitObj = {
+        name: 'Cloves'
+    };
 }

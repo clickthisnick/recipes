@@ -1,8 +1,8 @@
 import { IItem } from './item';
 import { IUnitObj } from '../../constants/units';
-import { FruitItems } from './fruit';
+import { MeatItems } from './meat';
 
-export class OilItems extends FruitItems {
+export class OilItems extends MeatItems {
     public static readonly sesameOil: IItem = (quantity: number = 1, unit: IUnitObj) => ({
         name: 'Sesame Oil',
         putAwayTime: 10,

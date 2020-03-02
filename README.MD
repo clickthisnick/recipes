@@ -9,6 +9,8 @@
 
 ## [BeyondBurger](https://www.clickthisnick.com/recipes/dist/beyondburger.html)
 
+## [BeyondBurger](https://www.clickthisnick.com/recipes/dist/beyondburger.html)
+
 # Bread
 ## [CinnamonBun](https://www.clickthisnick.com/recipes/dist/cinnamonbun.html)
 
