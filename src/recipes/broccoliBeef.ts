@@ -32,11 +32,11 @@ export class MealRecipe extends Recipe {
             ['Cut', this.get(i.flankSteak()), 'into strips'],
             [Timer.set(6, 'm', 'Cook beef')],
             ['Put beef in pyrex bowl'],
-            ['Put', this.get(i.greenOnion()), ',', this.get(i.garlicClove()), ',', this.get(i.shallot()), ',', 'in same pan.'],
+            ['Put', this.get(i.greenOnion()), ',', this.get(i.garlicClove()), ',', this.get(i.shallot()), 'in same pan.'],
             [Timer.set(1, 'm', 'Cook')],
             ['Add', this.get(i.broccoli()), 'in same pan with cover.'],
             [Timer.set(5, 'm', 'Cook')],
-            ['In a bowl mix', this.get(i.arrowRootStarch()), this.get(i.water()), this.get(i.aminosCoconut()), this.get(i.groundGinger()), this.get(i.redPepperFlakes())],
+            ['In a bowl mix', this.get(i.arrowRootStarch()), ',', this.get(i.water()), ',', this.get(i.aminosCoconut()), ',', this.get(i.groundGinger()), ',', this.get(i.redPepperFlakes())],
             [Timer.set(5, 'm', 'Once broccoli is done, remove cover and add sauce. Continue cooking.')],
             [Timer.set(2, 'm', 'Add beef and finish cooking.')],
         ]);
