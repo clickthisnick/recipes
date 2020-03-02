@@ -173,24 +173,40 @@ export class Recipe {
       return ing;
     }
 
+   public convertUnitIntoStr(unit: string, quantity: number): string {
+      if (unit === u.cup.name) {
+        if (quantity === .75) {
+            return '¾ cup';
+        }
+        if (quantity === .5) {
+            return '½ cup';
+        }
+        if (quantity === .33) {
+            return '⅓ cup';
+        }
+        if (quantity === .25) {
+            return '¼ cup';
+        }
+      }
+
+      return `${quantity} ${unit}`;
+   }
+
    public turnIngObjIntoStr(ingObj: IItemObj, includeUnit = false) {
       // If unit is noUnitQuantity just display the name
       if (ingObj.unit !== null && ingObj.unit.name === u.noUnitQuantity.name) {
           return ingObj.name;
       }
 
-      // Quantity could be .25
-      const ingQuantity = ingObj.quantity > 0 ? `${ingObj.quantity} ` : '';
-
       // Any quantity over 1 is considered many
       const ingName = ingObj.quantity > 1 ? `${ingObj.name}s` : ingObj.name;
-      let unit: String = '';
 
+      let unitQuantity: String = '';
       if (includeUnit && ingObj.unit !== null) {
-         unit = `${ingObj.unit.name} `;
+        unitQuantity = this.convertUnitIntoStr(ingObj.unit.name, ingObj.quantity);
       }
 
-      return `${ingQuantity}${unit}${ingName}`;
+      return `${unitQuantity} ${ingName}`;
    }
 
     public prep() {
