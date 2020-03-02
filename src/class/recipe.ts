@@ -204,19 +204,19 @@ export class Recipe {
           return ingObj.name;
       }
 
-      // Any quantity over 1 is considered many
-      const ingName = ingObj.quantity > 1 ? `${ingObj.name}s` : ingObj.name;
-
       // Return the name if unit is "unit"
       if (ingObj.unit !== null) {
         if (ingObj.unit.name === u.unit.name) {
             if (ingObj.quantity > 1) {
-                return `${ingName}s`;
+                return `${ingObj.quantity} ${ingObj.name}s`;
             }
 
-            return `${ingName}`;
+            return `${ingObj.name}`;
           }
       }
+
+      // Any quantity over 1 is considered many
+      const ingName = ingObj.quantity > 1 ? `${ingObj.name}s` : ingObj.name;
 
       // Return the correct unit
       let unitQuantity: String = '';
