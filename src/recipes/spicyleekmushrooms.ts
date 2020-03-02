@@ -17,7 +17,7 @@ export class MealRecipe extends Recipe {
             i.sirachaSauce(.5, u.tbsp),
             i.pepperFlake(.25, u.tbsp),
             i.hoisonSauce(1, u.tsp),
-            i.vegetableOil(3, u.seconds),
+            i.vegetableOil(3, u.second),
         ]);
     }
 

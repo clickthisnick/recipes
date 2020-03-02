@@ -174,22 +174,28 @@ export class Recipe {
     }
 
    public convertUnitIntoStr(unit: string, quantity: number): string {
-      if (unit === u.cup.name) {
-        if (quantity === .75) {
-            return '¾ cup';
-        }
-        if (quantity === .5) {
-            return '½ cup';
-        }
-        if (quantity === .33) {
-            return '⅓ cup';
-        }
-        if (quantity === .25) {
-            return '¼ cup';
-        }
+      let quantityString: string = `${quantity}`;
+
+      if (quantity === .75) {
+        quantityString = '¾ cup';
+      }
+      if (quantity === .5) {
+        quantityString = '½ cup';
+      }
+      if (quantity === .33) {
+        quantityString = '⅓ cup';
+      }
+      if (quantity === .25) {
+        quantityString = '¼ cup';
       }
 
-      return `${quantity} ${unit}`;
+      let unitString: string = unit;
+
+      if (quantity > 0) {
+        unitString = `${unitString}s`;
+      }
+
+      return `${quantityString} ${unitString}`;
    }
 
    public turnIngObjIntoStr(ingObj: IItemObj, includeUnit = false) {

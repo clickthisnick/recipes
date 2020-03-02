@@ -9,7 +9,7 @@ export class MealRecipe extends Recipe {
         this.recipeName = 'Frozen Chicken Wings';
         this.recipeGroup = c.snack;
         this.addIngredients([
-            i.frozenChickenWings(1, u.pounds),
+            i.frozenChickenWings(1, u.pound),
         ]);
     }
 

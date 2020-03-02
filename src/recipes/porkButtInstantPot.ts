@@ -9,7 +9,7 @@ export class MealRecipe extends Recipe {
         this.recipeName = 'PorkButtInstantPot';
         this.recipeGroup = c.pork;
         this.addIngredients([
-            i.porkRoast(2, u.pounds),
+            i.porkRoast(2, u.pound),
             i.sesameOil(),
             i.salt(),
             i.blackPepper(),

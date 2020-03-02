@@ -14,7 +14,7 @@ export class MealRecipe extends Recipe {
             i.crimniMushroom(3),
             i.garlicClove(2),
             i.parmessanCheese(.25, u.cup),
-            i.vegetableOil(2, u.seconds),
+            i.vegetableOil(2, u.second),
             i.spiriliazer(),
             i.blackPepper(),
             i.butter(2, u.tbsp),

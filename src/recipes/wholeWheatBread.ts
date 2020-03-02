@@ -11,8 +11,8 @@ export class MealRecipe extends Recipe {
         this.addIngredients([
             i.wheatBreadFlour(4.5, u.cup),
             i.water(1.5, u.cup),
-            i.oliveOil(1, u.thirdCup),
-            i.honey(1, u.fourthCup),
+            i.oliveOil(.33, u.cup),
+            i.honey(.25, u.cup),
             i.kosherSalt(2, u.tsp),
             i.dryActiveYeast(1, u.tbsp),
             i.kosherSalt(2, u.tsp),

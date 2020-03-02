@@ -12,11 +12,11 @@ export class MealRecipe extends Recipe {
         this.recipeGroup = c.chinese;
         this.addIngredients([
             i.oliveOil(1, u.tbsp),
-            i.flankSteak(.5, u.pounds),
-            i.garlicClove(3, u.cloves),
-            i.greenOnions(4, u.units),
-            i.shallot(1, u.units),
-            i.broccoli(1, u.units),
+            i.flankSteak(.5, u.pound),
+            i.garlicClove(3, u.clove),
+            i.greenOnions(4, u.unit),
+            i.shallot(1, u.unit),
+            i.broccoli(1, u.unit),
             i.arrowRootStarch(2, u.tbsp),
             i.water(.75, u.cup),
             i.aminosCoconut(.25, u.cup),
