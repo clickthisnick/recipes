@@ -9,8 +9,6 @@
 
 ## [BeyondBurger](https://www.clickthisnick.com/recipes/dist/beyondburger.html)
 
-## [BeyondBurger](https://www.clickthisnick.com/recipes/dist/beyondburger.html)
-
 # Bread
 ## [CinnamonBun](https://www.clickthisnick.com/recipes/dist/cinnamonbun.html)
 
@@ -36,6 +34,8 @@
 ## [ChickenMealPrep](https://www.clickthisnick.com/recipes/dist/chickenmealprep.html)
 
 # Chinese
+## [BroccoliBeef](https://www.clickthisnick.com/recipes/dist/broccolibeef.html)
+
 ## [HoisonStirFry](https://www.clickthisnick.com/recipes/dist/hoisonstirfry.html)
 
 ## [PadThaiStirFry](https://www.clickthisnick.com/recipes/dist/padthaistirfry.html)

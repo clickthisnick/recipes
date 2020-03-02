@@ -8,8 +8,8 @@ import { Timer } from '../class/timer';
 export class MealRecipe extends Recipe {
     constructor() {
         super();
-        this.recipeName = 'BeyondBurger';
-        this.recipeGroup = c.beef;
+        this.recipeName = 'Broccoli Beef';
+        this.recipeGroup = c.chinese;
         this.addIngredients([
             i.oliveOil(1, u.tbsp),
             i.flankSteak(.5, u.pounds),
