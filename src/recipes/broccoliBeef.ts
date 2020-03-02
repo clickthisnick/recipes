@@ -32,7 +32,7 @@ export class MealRecipe extends Recipe {
             ['Cut', this.get(i.flankSteak()), 'into strips'],
             [Timer.set(6, 'm', 'Cook beef')],
             ['Put beef in pyrex bowl'],
-            ['Put', this.get(i.greenOnions()), this.get(i.garlicClove()), this.get(i.shallot()), 'in same pan.'],
+            ['Put', this.get(i.greenOnions()), ',', this.get(i.garlicClove()), ',', this.get(i.shallot()), ',', 'in same pan.'],
             [Timer.set(1, 'm', 'Cook')],
             ['Add', this.get(i.broccoli()), 'in same pan with cover.'],
             [Timer.set(5, 'm', 'Cook')],

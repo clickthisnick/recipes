@@ -177,21 +177,21 @@ export class Recipe {
       let quantityString: string = `${quantity}`;
 
       if (quantity === .75) {
-        quantityString = '¾ cup';
+        quantityString = '¾';
       }
       if (quantity === .5) {
-        quantityString = '½ cup';
+        quantityString = '½';
       }
       if (quantity === .33) {
-        quantityString = '⅓ cup';
+        quantityString = '⅓';
       }
       if (quantity === .25) {
-        quantityString = '¼ cup';
+        quantityString = '¼';
       }
 
       let unitString: string = unit;
 
-      if (quantity > 0) {
+      if (quantity > 1) {
         unitString = `${unitString}s`;
       }
 
