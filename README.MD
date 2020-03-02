@@ -50,11 +50,11 @@
 ## [Salmon4OunceFilet](https://www.clickthisnick.com/recipes/dist/salmon4ouncefilet.html)
 
 # Instant Pot
-## [LentilSpaghetti](https://www.clickthisnick.com/recipes/dist/lentil spaghetti.html)
+## [LentilSpaghetti](https://www.clickthisnick.com/recipes/dist/lentilspaghetti.html)
 
 ## [Quinoa](https://www.clickthisnick.com/recipes/dist/quinoa.html)
 
-## [QuinoaSmall](https://www.clickthisnick.com/recipes/dist/quinoa small.html)
+## [QuinoaSmall](https://www.clickthisnick.com/recipes/dist/quinoasmall.html)
 
 ## [WildBasmatiRice](https://www.clickthisnick.com/recipes/dist/wildbasmatirice.html)
 
@@ -80,7 +80,7 @@
 # Snack
 ## [Crepes](https://www.clickthisnick.com/recipes/dist/crepes.html)
 
-## [FrozenChickenWings](https://www.clickthisnick.com/recipes/dist/frozen chicken wings.html)
+## [FrozenChickenWings](https://www.clickthisnick.com/recipes/dist/frozenchickenwings.html)
 
 ## [Guacamole](https://www.clickthisnick.com/recipes/dist/guacamole.html)
 

@@ -248,7 +248,7 @@ export class Recipe {
         }
 
         // Spaces messes up the markdown
-        Readme.groups[this.recipeGroup].push(`## [${this.recipeName.split(' ').join('')}](https://www.clickthisnick.com/recipes/dist/${this.recipeName.toLowerCase()}.html)\n\n`);
+        Readme.groups[this.recipeGroup].push(`## [${this.recipeName.split(' ').join('')}](https://www.clickthisnick.com/recipes/dist/${this.recipeName.toLowerCase().split(' ').join('')}.html)\n\n`);
    }
 
    public writeRecipe() {
