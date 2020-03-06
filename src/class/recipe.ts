@@ -176,17 +176,21 @@ export class Recipe {
    public convertUnitIntoStr(unit: string, quantity: number): string {
       let quantityString: string = `${quantity}`;
 
-      if (quantity === .75) {
-        quantityString = '¾';
+      if (`${quantity}`.endsWith('.75')) {
+        quantityString = `${quantity-.75}¾`;
       }
-      if (quantity === .5) {
-        quantityString = '½';
+      if (`${quantity}`.endsWith('.5')) {
+        quantityString = `${quantity-.5}½`;
       }
-      if (quantity === .33) {
-        quantityString = '⅓';
+      if (`${quantity}`.endsWith('.33')) {
+        quantityString = `${quantity-.33}⅓`;
       }
-      if (quantity === .25) {
-        quantityString = '¼';
+      if (`${quantity}`.endsWith('.25')) {
+        quantityString = `${quantity-.25}¼`;
+      }
+
+      if (quantityString.startsWith('0')) {
+        quantityString = quantityString.substring(1);
       }
 
       let unitString: string = unit;
