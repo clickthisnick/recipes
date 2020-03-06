@@ -1,6 +1,7 @@
 import { Recipe } from '../class/recipe';
 import { Items as i } from '../constants/items';
 import { Categories as c } from '../constants/categories';
+import { Units as u } from '../constants/units';
 
 export class MealRecipe extends Recipe {
     constructor() {
@@ -8,9 +9,9 @@ export class MealRecipe extends Recipe {
         this.recipeName = 'Crepes';
         this.recipeGroup = c.snack;
         this.addIngredients([
-            i.allPurposeFlour(),
-            i.egg(),
-            i.water(),
+            i.allPurposeFlour(1, u.cup),
+            i.egg(3, u.unit),
+            i.water(1.5, u.cup),
             i.salt(),
         ]);
     }
@@ -18,9 +19,9 @@ export class MealRecipe extends Recipe {
     public generateRecipe() {
         this.prep();
         this.addSteps([
-            ['Put 1 cup', this.get(i.allPurposeFlour()), 'in a bowl'],
-            ['Put 1.5 cup', this.get(i.water()), 'in a bowl'],
-            ['Put in 3', this.get(i.egg()), 'in a bowl'],
+            ['Put', this.get(i.allPurposeFlour()), 'in a bowl'],
+            ['Put', this.get(i.water()), 'in a bowl'],
+            ['Put', this.get(i.egg()), 'in a bowl'],
             ['Add pinch of', this.get(i.salt())],
             ['Mix batter'],
             ['Put stove on heat 6.5'],
