@@ -1,6 +1,7 @@
 import { Recipe } from '../class/recipe';
 import { Items as i } from '../constants/items';
 import { Categories as c } from '../constants/categories';
+import { Units as u } from '../constants/units';
 
 export class MealRecipe extends Recipe {
     constructor() {
@@ -18,7 +19,8 @@ export class MealRecipe extends Recipe {
         this.prep();
         this.addSteps([
             ['Put 12 ounces warm water 110 F into bowl and stir'],
-            ['In a bowl put 2 1/4 teaspoons', this.get(i.dryActiveYeast()), 'and 1/8 teaspoon sugar in the bowl'],
+            ['Put', this.get(i.dryActiveYeast(2.25, u.tsp)), 'in a bowl'],
+            ['Put', this.get(i.sugar(.125, u.tsp)), 'in the bowl'],
             ['In another bowl put 3 1/2 cups', this.get(i.archerFlour())],
             ['Wait for yeast to get cloudy, 20 min'],
             ['Pour yeast mixture into flour bowl and mix'],

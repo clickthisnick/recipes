@@ -188,6 +188,9 @@ export class Recipe {
       if (`${quantity}`.endsWith('.25')) {
         quantityString = `${quantity-.25}¼`;
       }
+      if (`${quantity}`.endsWith('.125')) {
+        quantityString = `${quantity-.125}⅛`;
+      }
 
       if (quantityString.startsWith('0')) {
         quantityString = quantityString.substring(1);
