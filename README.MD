@@ -51,6 +51,9 @@
 # Fish
 ## [Salmon4OunceFilet](https://www.clickthisnick.com/recipes/dist/salmon4ouncefilet.html)
 
+# Indian
+## [ButterChicken](https://www.clickthisnick.com/recipes/dist/butterchicken.html)
+
 # Instant Pot
 ## [LentilSpaghetti](https://www.clickthisnick.com/recipes/dist/lentilspaghetti.html)
 
@@ -91,6 +94,8 @@
 ## [KaleChips](https://www.clickthisnick.com/recipes/dist/kalechips.html)
 
 ## [Lentils1Cup](https://www.clickthisnick.com/recipes/dist/lentils1cup.html)
+
+## [MacaroniCheese](https://www.clickthisnick.com/recipes/dist/macaronicheese.html)
 
 ## [RiceInstantPot](https://www.clickthisnick.com/recipes/dist/riceinstantpot.html)
 

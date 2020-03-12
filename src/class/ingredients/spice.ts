@@ -40,6 +40,54 @@ export class SpiceItems extends SauceItems {
         isMeatProduct: false,
     })
 
+    public static readonly sugar: IItem = (quantity: number = 1, unit: IUnitObj) => ({
+        name: 'Sugar',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Rinse and put measuring cup in dishwasher',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+    })
+
+    public static readonly cumin: IItem = (quantity: number = 1, unit: IUnitObj) => ({
+        name: 'Cumin',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Rinse and put measuring cup in dishwasher',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+    })
+
+    public static readonly turmeric: IItem = (quantity: number = 1, unit: IUnitObj) => ({
+        name: 'Turmeric',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Rinse and put measuring cup in dishwasher',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+    })
+
+    public static readonly gramMasala: IItem = (quantity: number = 1, unit: IUnitObj) => ({
+        name: 'Gram Masala',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+    })
+
     public static readonly salt: IItem = (quantity: number = 1, unit: IUnitObj) => ({
         name: 'Salt',
         putAwayTime: 10,

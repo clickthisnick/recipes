@@ -24,10 +24,10 @@ export class Units {
     public static readonly pound: IUnitObj = {
         name: 'pound'
     };
+    public static readonly ounce: IUnitObj = {
+        name: 'ounce'
+    };
     public static readonly unit: IUnitObj = {
         name: 'unit'
-    };
-    public static readonly clove: IUnitObj = {
-        name: 'clove'
     };
 }

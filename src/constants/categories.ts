@@ -14,6 +14,7 @@ export class Categories {
     public static readonly pizza = 'Pizza';
     public static readonly souvide = 'Souvide';
     public static readonly chinese = 'Chinese';
+    public static readonly indian = 'Indian';
     public static readonly smoothies = 'Smoothies';
     public static readonly misc = 'Miscellaneous';
     public static readonly frozen = 'Frozen';

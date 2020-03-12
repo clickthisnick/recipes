@@ -3,6 +3,18 @@ import { IUnitObj } from '../../constants/units';
 import { OilItems } from './oil';
 
 export class SauceItems extends OilItems {
+    public static readonly coconutCream: IItem = (quantity: number = 1, unit: IUnitObj) => ({
+        name: 'Coconut Cream',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Put soy sauce back in refridgerator',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+    })
+
     public static readonly soySauce: IItem = (quantity: number = 1, unit: IUnitObj) => ({
         name: 'Soy Sauce',
         putAwayTime: 10,

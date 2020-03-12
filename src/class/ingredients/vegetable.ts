@@ -136,17 +136,6 @@ export class VegetableItems extends SpiceItems {
         isMeatProduct: false,
     })
 
-    public static readonly sugar: IItem = (quantity: number = 1, unit: IUnitObj) => ({
-        name: 'Sugar',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Rinse and put measuring cup in dishwasher',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-    })
 
     public static readonly briocheHamburgerBun: IItem = (quantity: number = 1, unit: IUnitObj) => ({
         name: 'Brioche Hamburger Bun',
@@ -496,6 +485,18 @@ export class VegetableItems extends SpiceItems {
         isMeatProduct: false,
     })
 
+    public static readonly whiteOnion: IItem = (quantity: number = 1, unit: IUnitObj) => ({
+        name: 'Red Onion',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: true,
+        isTakoutUnitable: true,
+        isMeatProduct: false,
+    })
+
     public static readonly redOnion: IItem = (quantity: number = 1, unit: IUnitObj) => ({
         name: 'Red Onion',
         putAwayTime: 10,
@@ -546,6 +547,18 @@ export class VegetableItems extends SpiceItems {
 
     public static readonly broccoli: IItem = (quantity: number = 1, unit: IUnitObj) => ({
         name: 'Broccoli',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: true,
+        isMeatProduct: false,
+    })
+
+    public static readonly tomatoPaste: IItem = (quantity: number = 1, unit: IUnitObj) => ({
+        name: 'Tomato Paste',
         putAwayTime: 10,
         takeOutTime: 10,
         cleanSteps: '',

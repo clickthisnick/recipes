@@ -99,6 +99,18 @@ export class AnimalItems {
         isMeatProduct: true,
     })
 
+    public static readonly cheddarCheese: IItem = (quantity: number = 1, unit: IUnitObj) => ({
+        name: 'Cheedar Cheese',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Put monterey jack cheese back in refridgerator',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: true,
+    })
+
     public static readonly montereyJackCheese: IItem = (quantity: number = 1, unit: IUnitObj) => ({
         name: 'Monterey Jack Cheese',
         putAwayTime: 10,
