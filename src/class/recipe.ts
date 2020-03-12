@@ -279,6 +279,7 @@ export class Recipe {
             });
 
                 stepText.trim();
+                stepText += 'hi';
                 stepDirections = this.generateStep(stepText);
             }
             this.recipeHtml += stepDirections;
