@@ -486,7 +486,7 @@ export class VegetableItems extends SpiceItems {
     })
 
     public static readonly whiteOnion: IItem = (quantity: number = 1, unit: IUnitObj) => ({
-        name: 'Red Onion',
+        name: 'White Onion',
         putAwayTime: 10,
         takeOutTime: 10,
         cleanSteps: '',
