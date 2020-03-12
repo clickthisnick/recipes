@@ -51,6 +51,18 @@ export class AnimalItems {
         isMeatProduct: true,
     })
 
+    public static readonly sirloinTop: IItem = (quantity: number = 1, unit: IUnitObj) => ({
+        name: 'Sirloin Top',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: true,
+    })
+
     public static readonly italianSausage: IItem = (quantity: number = 1, unit: IUnitObj) => ({
         name: 'Italian Sausage',
         putAwayTime: 10,
