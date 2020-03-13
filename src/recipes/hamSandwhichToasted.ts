@@ -22,13 +22,13 @@ export class MealRecipe extends Recipe {
         this.prep();
         this.addSteps([
             [Timer.preheatPan(5)],
-            [this.get(i.butter()), 'the', this.get(i.bread())],
+            [i.butter(), 'the', i.bread()],
             ['Put the bread on the pan'],
-            ['Put the', this.get(i.pepperJackCheese()), 'on the bread'],
+            ['Put the', i.pepperJackCheese(), 'on the bread'],
             ['Put pan lid on'],
             [Timer.panSear(1.5, 'm', 'bread')],
-            ['Put', this.get(i.ham()), 'on the toasted bread'],
-            ['Put', this.get(i.pickleHotdogSlice()), 'on the toasted bread'],
+            ['Put', i.ham(), 'on the toasted bread'],
+            ['Put', i.pickleHotdogSlice(), 'on the toasted bread'],
         ]);
         this.printRecipe();
     }

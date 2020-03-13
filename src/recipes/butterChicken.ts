@@ -1,8 +1,8 @@
 import { Recipe } from '../class/recipe';
 import { Items as i } from '../constants/items';
 import { Categories as c } from '../constants/categories';
-import { Timer } from '../class/timer';
 import { Units as u } from '../constants/units';
+import { Timer } from '../class/timer';
 
 export class MealRecipe extends Recipe {
     constructor() {
@@ -33,26 +33,26 @@ export class MealRecipe extends Recipe {
         this.prep();
         this.addSteps([
             ['Preheat Instant Pot with Saute setting'],
-            ['Dice', this.get(i.whiteOnion())],
-            ['Dice', this.get(i.garlicClove())],
+            ['Dice', i.whiteOnion()],
+            ['Dice', i.garlicClove()],
             ['Cut chicken into 1 inch cubes'],
-            ['Add', this.get(i.oliveOil()), 'and', this.get(i.butter()), 'into instant pot'],
-            ['Add', this.get(i.whiteOnion(0)), 'and', this.get(i.groundGinger()), 'and all the', this.get(i.garlicClove(0))],
+            ['Add', i.oliveOil(), 'and', i.butter(), 'into instant pot'],
+            ['Add', i.whiteOnion(0), 'and', i.groundGinger(), 'and all the', i.garlicClove(0)],
             [Timer.set(4, 'm', 'Sear')],
-            ['Add', this.get(i.tomatoPaste())],
+            ['Add', i.tomatoPaste()],
             [Timer.set(3, 'm', 'Constantly stir')],
-            ['Put', this.get(i.water()), 'in instant pot'],
-            ['Put', this.get(i.chickenThighPackage()), 'in instant pot'],
-            ['Add spice', this.get(i.gramMasala())],
-            ['Add spice', this.get(i.paprika())],
-            ['Add spice', this.get(i.sugar())],
-            ['Add spice', this.get(i.cumin())],
-            ['Add spice', this.get(i.turmeric())],
-            ['Add spice', this.get(i.salt())],
-            ['Add spice', this.get(i.blackPepper())],
-            [Timer.set(5, 'm', 'Cook on high pressure')],
+            ['Put', i.water(), 'in instant pot'],
+            ['Put', i.chickenThighPackage(), 'in instant pot'],
+            ['Add spice', i.gramMasala()],
+            ['Add spice', i.paprika()],
+            ['Add spice', i.sugar()],
+            ['Add spice', i.cumin()],
+            ['Add spice', i.turmeric()],
+            ['Add spice', i.salt()],
+            ['Add spice', i.blackPepper()],
+            [Timer.pressureCook(5, 'm')],
             [Timer.set(10, 'm', 'Let it slow release')],
-            ['Stir in', this.get(i.coconutCream())],
+            ['Stir in', i.coconutCream()],
         ]);
         this.printRecipe();
     }
