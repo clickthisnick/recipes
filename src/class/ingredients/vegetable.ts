@@ -353,6 +353,18 @@ export class VegetableItems extends SpiceItems {
         isMeatProduct: false,
     })
 
+    public static readonly pickleHotdogSlice: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+        name: 'Pickle',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: true,
+        isTakoutUnitable: true,
+        isMeatProduct: false,
+    })
+
     public static readonly groundGinger: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
         name: 'Ground Ginger',
         putAwayTime: 10,

@@ -12,6 +12,14 @@ export class Timer {
         return 'error timer sanitizing';
     }
 
+    public static preheatPan(heat: number): any {
+        // This is a guess.. should test it out
+        if (heat === 5) {
+            // Return how long preheating pan takes
+            return Timer.set(3, 'm', 'Preheat pan on heat 5');
+        }
+    }
+
     public static pressureCook(duration: number, type: string): any {
         return Timer.set(duration, type, 'Pressure cook on high pressure');
     }

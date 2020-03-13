@@ -9,7 +9,7 @@ export class MealRecipe extends Recipe {
     constructor() {
         super();
         this.recipeName = 'Broccoli Beef';
-        this.recipeGroup = c.chinese;
+        this.recipeGroup = c.meal;
         this.addIngredients([
             i.oliveOil(1, u.tbsp),
             i.flankSteak(.5, u.pound),
