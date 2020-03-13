@@ -2,6 +2,7 @@ import { Recipe } from '../class/recipe';
 import { Items as i } from '../constants/items';
 import { Categories as c } from '../constants/categories';
 import { Timer } from '../class/timer';
+import { Units as u } from '../constants/units';
 
 export class MealRecipe extends Recipe {
     constructor() {
@@ -9,8 +10,8 @@ export class MealRecipe extends Recipe {
         this.recipeName = 'Lentil Spaghetti';
         this.recipeGroup = c.instantPot;
         this.addIngredients([
-            i.lentilSpaghetti(),
-            i.spaghettiSauce(),
+            i.lentilSpaghetti(8, u.ounce),
+            i.spaghettiSauce(25, u.ounce),
         ]);
     }
 
@@ -19,10 +20,10 @@ export class MealRecipe extends Recipe {
         this.addSteps([
             ['Optional: Saute mushrooms and/or sausage in instant pot'],
             ['Add 1/2 cup water'],
-            ['Add 25 ounce can of ', this.get(i.spaghettiSauce())],
-            ['Add 8 ounce pkg of ', this.get(i.lentilSpaghetti())],
-            ['Add 1/2 cup water. (Dont stir)'],
-            [Timer.set(10, 'm', 'Pressure cook on high pressure for 10 minutes')],
+            ['Add', this.get(i.spaghettiSauce())],
+            ['Add', this.get(i.lentilSpaghetti())],
+            ['Add 1/2 cup water. (Don\'t stir)'],
+            [Timer.pressureCook(10, 'm')],
             ['Release steam valve and serve'],
         ]);
         this.printRecipe();

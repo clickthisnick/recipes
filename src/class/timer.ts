@@ -1,5 +1,9 @@
 export class Timer {
     public static timerCount: number = 0;
+    public static pressureCook(duration: number, type: string) {
+        return Timer.set(duration, type, 'Pressure cook on high pressure');
+    }
+
     public static set(duration: number, type: string, extraText: string = '') {
 
         // Default to seconds
