@@ -24,7 +24,7 @@ export class MealRecipe extends Recipe {
             [Timer.preheatPan(5)],
             [this.get(i.butter()), 'the', this.get(i.bread())],
             ['Put the bread on the pan'],
-            ['Sprinkle the', this.get(i.pepperJackCheese()), 'on the bread'],
+            ['Put the', this.get(i.pepperJackCheese()), 'on the bread'],
             ['Put pan lid on'],
             [Timer.panSear(1.5, 'm', 'bread')],
             ['Put', this.get(i.ham()), 'on the toasted bread'],

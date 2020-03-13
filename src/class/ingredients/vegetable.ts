@@ -360,7 +360,7 @@ export class VegetableItems extends SpiceItems {
         cleanSteps: '',
         quantity: quantity,
         unit: unit || null,
-        wash: true,
+        wash: false,
         isTakoutUnitable: true,
         isMeatProduct: false,
     })
