@@ -20,10 +20,10 @@ export class MealRecipe extends Recipe {
         this.prep();
         this.addSteps([
             ['Optional: Saute mushrooms and/or sausage in instant pot'],
-            ['Add', this.get(i.water(.5, u.cup))],
-            ['Add', this.get(i.spaghettiSauce())],
-            ['Add', this.get(i.lentilSpaghetti())],
-            ['Add', this.get(i.water(.5, u.cup)), '(Don\'t stir)'],
+            ['Add', i.water(.5, u.cup)],
+            ['Add', i.spaghettiSauce()],
+            ['Add', i.lentilSpaghetti()],
+            ['Add', i.water(.5, u.cup), '(Don\'t stir)'],
             [Timer.pressureCook(10, 'm')],
             ['Release steam valve and serve'],
         ]);

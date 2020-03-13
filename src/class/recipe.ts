@@ -126,10 +126,10 @@ export class Recipe {
          </script>
       `;
       this.recipeHtml += this.generateBackToRecipes();
-      this.recipeHtml += this.generateHeader('Clean counter space:');
-      this.recipeHtml += this.generateStep('Empty dishwasher');
-      this.recipeHtml += this.generateStep('Load dishwasher');
-      this.recipeHtml += this.generateStep('Put away anything not related to recipe away');
+    //   this.recipeHtml += this.generateHeader('Clean counter space:');
+    //   this.recipeHtml += this.generateStep('Empty dishwasher');
+    //   this.recipeHtml += this.generateStep('Load dishwasher');
+    //   this.recipeHtml += this.generateStep('Put away anything not related to recipe away');
       this.recipeHtml += this.generateHeader('Get out the following ingredients:');
       this.recipeHtml += `
       <audio id="beep">
@@ -237,6 +237,9 @@ export class Recipe {
                 if (typeof item === 'string') {
                     stepText += item;
                 } else if (typeof item === 'object') {
+                    // this.get make the recipe aware we are using the item
+                    // also does some validation like item is in our ingredients and we have enough
+                    this.get(item);
                     stepText += s.turnIngObjIntoStr(item, true);
                 }
                 stepText += ' ';

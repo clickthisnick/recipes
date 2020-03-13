@@ -12,6 +12,6 @@ export class MeatItems extends FruitItems {
         unit: unit || null,
         wash: false,
         isTakoutUnitable: false,
-        isMeatProduct: false,
+        isMeatProduct: true,
     })
 }

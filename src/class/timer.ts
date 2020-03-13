@@ -20,27 +20,27 @@ export class Timer {
         }
     }
 
-    public static pressureCook(duration: number, type: string): any {
-        return Timer.set(duration, type, 'Pressure cook on high pressure');
+    public static pressureCook(duration: number, type: string, async: boolean = false): any {
+        return Timer.set(duration, type, 'Pressure cook on high pressure', async);
     }
 
-    public static souVide(duration: number, type: string, item: any, degrees: number): any {
-        return Timer.set(duration, type, `Souvide ${this.sanitize(item)} @ ${degrees}°`);
+    public static souVide(duration: number, type: string, item: any, degrees: number, async: boolean = false): any {
+        return Timer.set(duration, type, `Souvide ${this.sanitize(item)} @ ${degrees}°`, async);
     }
 
     public static airFry(duration: number, type: string, item: any, degrees: number): any {
         return Timer.set(duration, type, `Airfry ${this.sanitize(item)} @ ${degrees}°`);
     }
 
-    public static panSear(duration: number, type: string, item: any): any {
-        return Timer.set(duration, type, `Pan sear ${this.sanitize(item)}`);
+    public static panSear(duration: number, type: string, item: any, async: boolean = false): any {
+        return Timer.set(duration, type, `Pan sear ${this.sanitize(item)}`, async);
     }
 
-    public static ovenCook(duration: number, type: string, item: any, degrees: number): any {
-        return Timer.set(duration, type, `Cook ${this.sanitize(item)} in oven @ ${degrees}°`);
+    public static ovenCook(duration: number, type: string, item: any, degrees: number, async: boolean = false): any {
+        return Timer.set(duration, type, `Cook ${this.sanitize(item)} in oven @ ${degrees}°`, async);
     }
 
-    public static set(duration: number, type: string, extraText: string = '') {
+    public static set(duration: number, type: string, extraText: string = '', async: boolean = false) {
 
         // Default to seconds
         let multiplier: number = 1000;
@@ -64,11 +64,13 @@ export class Timer {
         typeText = duration > 1 ? `${text[type]}s` : text[type];
         this.timerCount += 1;
 
+        const timerText = async ? 'Async' : 'Timer';
+
         return {
             type: 'timer',
             milliseconds: duration * multiplier,
             id: `timer${this.timerCount}`,
-            text: `Wait ${duration} ${typeText} ${extraText}`
+            text: `${timerText} ${duration} ${typeText} ${extraText}`
         };
     }
 }

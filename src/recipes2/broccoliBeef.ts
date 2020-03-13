@@ -28,14 +28,15 @@ export class MealRecipe extends Recipe {
     public generateRecipe() {
         this.prep();
         this.addSteps([
-            ['Put', this.get(i.oliveOil()), 'on pan on heat 5'],
+            [Timer.preheatPan(5)],
+            ['Add', this.get(i.oliveOil()), 'to pan'],
             ['Cut', this.get(i.flankSteak(.5)), 'into strips'],
-            [Timer.set(6, 'm', 'Cook beef')],
+            [Timer.panSear(6, 'm', this.get(i.flankSteak(0)))],
             ['Put beef in pyrex bowl'],
             ['Put', this.get(i.greenOnion()), ',', this.get(i.garlicClove()), ',', this.get(i.shallot()), 'in same pan.'],
-            [Timer.set(1, 'm', 'Cook')],
+            [Timer.panSear(1, 'm', '')],
             ['Add', this.get(i.broccoli()), 'in same pan with cover.'],
-            [Timer.set(5, 'm', 'Cook')],
+            [Timer.panSear(5, 'm', '')],
             ['In a bowl mix', this.get(i.arrowRootStarch()), ',', this.get(i.water(.75)), ',', this.get(i.aminosCoconut(.25)), ',', this.get(i.groundGinger()), ',', this.get(i.redPepperFlakes())],
             [Timer.set(4, 'm', 'Once broccoli is done, remove cover and add sauce. Continue cooking.')],
             [Timer.set(2, 'm', 'Add beef and finish cooking.')],
