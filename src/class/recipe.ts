@@ -3,6 +3,28 @@ import * as fs from 'fs';
 import { Readme } from './readme';
 import { Units as u } from '../constants/units';
 
+// if (`${quantity}`.endsWith('.75')) {
+//     quantityString = `${quantity-.75}¾`;
+//   }
+//   if (`${quantity}`.endsWith('.5')) {
+//     quantityString = `${quantity-.5}½`;
+//   }
+//   if (`${quantity}`.endsWith('.33')) {
+//     quantityString = `${quantity-.33}⅓`;
+//   }
+//   if (`${quantity}`.endsWith('.25')) {
+//     quantityString = `${quantity-.25}¼`;
+//   }
+//   if (`${quantity}`.endsWith('.125')) {
+//     quantityString = `${quantity-.125}⅛`;
+//   }
+
+function finalStepReplace(text: string) {
+    const tmpText: string = text.replace(/1\/2/g, '½');
+
+    return tmpText;
+}
+
 export class Recipe {
     private headerStart = '<h1>';
     private headerEnd = '</h1>';
@@ -124,7 +146,9 @@ export class Recipe {
     }
 
     private generateStep(text: string) {
-        return `<div class="panel" onclick="this.classList.toggle('completed')">${text}</div>`;
+        const tmpText =  finalStepReplace(text);
+
+        return `<div class="panel" onclick="this.classList.toggle('completed')">${tmpText}</div>`;
     }
 
     private generateTimerStep(timer: any) {
@@ -279,7 +303,6 @@ export class Recipe {
             });
 
                 stepText.trim();
-                stepText += 'hi';
                 stepDirections = this.generateStep(stepText);
             }
             this.recipeHtml += stepDirections;
