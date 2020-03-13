@@ -4,6 +4,14 @@ export class Timer {
         return Timer.set(duration, type, 'Pressure cook on high pressure');
     }
 
+    public static airFry(duration: number, type: string, item: string, degrees: number) {
+        return Timer.set(duration, type, `Airfry ${item} @ ${degrees}°`);
+    }
+
+    public static ovenCook(duration: number, type: string, item: string, degrees: number) {
+        return Timer.set(duration, type, `Cook ${item} in oven @ ${degrees}°`);
+    }
+
     public static set(duration: number, type: string, extraText: string = '') {
 
         // Default to seconds

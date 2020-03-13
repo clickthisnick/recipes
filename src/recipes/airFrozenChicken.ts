@@ -22,9 +22,9 @@ export class MealRecipe extends Recipe {
             ['Run water until hot'],
             ['Fill bowl with hot water'],
             [Timer.set(30, 'm')],
-            [Timer.set(12, 'm', 'Put chicken in airfryer @ 400 deg')],
+            [Timer.airFry(12, 'm', 'chicken', 400)],
             ['Mix chicken and sprinkle', this.get(i.oldBay())],
-            [Timer.set(10, 'm', 'Put chicken in airfryer @ 350 deg')],
+            [Timer.airFry(10, 'm', 'chicken', 350)],
         ]);
         this.printRecipe();
     }

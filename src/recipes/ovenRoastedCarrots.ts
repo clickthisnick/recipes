@@ -17,7 +17,7 @@ export class MealRecipe extends Recipe {
         this.prep();
         this.addSteps([
             ['Peel and cut', this.get(i.carrots())],
-            [Timer.set(25, 'm', 'Cook carrots in oven @ 400')],
+            [Timer.ovenCook(25, 'm', 'carrots', 400)],
             ['Broil carrots for 3 minutes on bottom shelf'],
         ]);
         this.printRecipe();

@@ -19,7 +19,7 @@ export class MealRecipe extends Recipe {
         this.addSteps([
             ['Open', this.get(i.frozenTatorTots())],
             ['Put one layer of tator tots in airfryer and sprinkle', this.get(i.lawlrySaltFree())],
-            [Timer.set(19, 'm', 'Cook @ 400 deg')],
+            [Timer.ovenCook(19, 'm', 'tator tots', 400)],
         ]);
         this.printRecipe();
     }
