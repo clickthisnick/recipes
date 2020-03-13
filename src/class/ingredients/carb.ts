@@ -4,7 +4,7 @@ import { AnimalItems } from './animal';
 
 export class CarbItems extends AnimalItems {
 
-    public static readonly raoPastaElbow: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly raoPastaElbow: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
         name: 'Rao Pasta Elbow',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -16,7 +16,7 @@ export class CarbItems extends AnimalItems {
         isMeatProduct: false,
     })
 
-    public static readonly lentilSpaghetti: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly lentilSpaghetti: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
         name: 'Lentil Spaghetti',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -28,7 +28,7 @@ export class CarbItems extends AnimalItems {
         isMeatProduct: false,
     })
 
-    public static readonly quinoa: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly quinoa: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
         name: 'Quinoa',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -40,7 +40,7 @@ export class CarbItems extends AnimalItems {
         isMeatProduct: false,
     })
 
-    public static readonly brownRice: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly brownRice: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
         name: 'Brown Rice',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -52,7 +52,7 @@ export class CarbItems extends AnimalItems {
         isMeatProduct: false,
     })
 
-    public static readonly frozenChickenWings: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly frozenChickenWings: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
         name: 'Frozen Chicken Wings',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -64,7 +64,7 @@ export class CarbItems extends AnimalItems {
         isMeatProduct: false,
     })
 
-    public static readonly wildBasmatiRice: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly wildBasmatiRice: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
         name: 'Wild Basmati Rice',
         putAwayTime: 10,
         takeOutTime: 10,

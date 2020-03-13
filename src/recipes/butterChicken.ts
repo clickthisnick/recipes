@@ -33,11 +33,11 @@ export class MealRecipe extends Recipe {
         this.prep();
         this.addSteps([
             ['Preheat Instant Pot with Saute setting'],
-            ['Dice white onion'],
-            ['Dice garlic'],
+            ['Dice', this.get(i.whiteOnion())],
+            ['Dice', this.get(i.garlicClove())],
             ['Cut chicken into 1 inch cubes'],
             ['Add', this.get(i.oliveOil()), 'and', this.get(i.butter())],
-            ['Add', this.get(i.whiteOnion()), 'and', this.get(i.groundGinger()), 'and', this.get(i.garlicClove())],
+            ['Add', this.get(i.whiteOnion(0)), 'and', this.get(i.groundGinger()), 'and', this.get(i.garlicClove(0))],
             [Timer.set(4, 'm', 'Sear')],
             ['Add', this.get(i.tomatoPaste())],
             [Timer.set(3, 'm', 'Constantly stir')],

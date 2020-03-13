@@ -173,18 +173,15 @@ export class Recipe {
 
       const ing = this.cloneObj(ingredient);
 
-      // If you specify 0 it will only print the ing name not assert quantity
-      if (itemObj.quantity === 0) {
-         ing.quantity = 0;
-
-         return ing;
+      // .00001 is a number that no one would ever use in a recipe
+      // Its what we default item values to
+      // If you just want to use an items text, you can use "0" of it in a recipe
+      // If no quantity is specified in the recipe, assume it means use all of it
+      if (itemObj.quantity === .00001) {
+        itemObj.quantity = ingredient.quantity;
       }
-      // If quantity is null then assume all quantity is meant to be used
-      itemObj.quantity = itemObj.quantity || ingredient.quantity;
 
-      if (ing.quantity === 0) {
-         throw new Error(`No more left of ${ing.name}`);
-      } else if (itemObj.quantity > ing.quantity) {
+      if (itemObj.quantity > ing.quantity) {
          throw new Error(`Not enough ${ing.name}, \nCurrent: ${ing.quantity}\nNeeded: ${itemObj.quantity}`);
       } else {
          // Subtracting the ingredients used from the ingredient amount

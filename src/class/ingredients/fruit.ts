@@ -3,7 +3,7 @@ import { IUnitObj } from '../../constants/units';
 import { CarbItems } from './carb';
 
 export class FruitItems extends CarbItems {
-    public static readonly apple: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly apple: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
         name: 'Apple',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -15,7 +15,7 @@ export class FruitItems extends CarbItems {
         isMeatProduct: false,
     })
 
-    public static readonly frozenBerries: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly frozenBerries: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
         name: 'Frozen Berries',
         putAwayTime: 10,
         takeOutTime: 10,

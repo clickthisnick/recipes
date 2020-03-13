@@ -3,7 +3,7 @@ import { IUnitObj } from '../../constants/units';
 import { MeatItems } from './meat';
 
 export class OilItems extends MeatItems {
-    public static readonly sesameOil: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly sesameOil: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
         name: 'Sesame Oil',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -15,7 +15,7 @@ export class OilItems extends MeatItems {
         isMeatProduct: false,
     })
 
-    public static readonly oliveOil: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly oliveOil: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
         name: 'Olive Oil',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -27,7 +27,7 @@ export class OilItems extends MeatItems {
         isMeatProduct: false,
     })
 
-    public static readonly vegetableOil: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly vegetableOil: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
         name: 'Vegetable Oil',
         putAwayTime: 10,
         takeOutTime: 10,
