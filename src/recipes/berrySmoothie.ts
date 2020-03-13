@@ -11,7 +11,7 @@ export class MealRecipe extends Recipe {
         this.recipeGroup = c.smoothies;
         this.addIngredients([
             i.frozenBerries(1, u.cup),
-            i.almondMilk(2.5/4, u.cup),
+            i.almondMilk(2.5, u.cup),
             i.plainYogurt(3, u.tbsp),
             i.honey(1, u.tbsp),
         ]);

@@ -9,9 +9,9 @@ export class MealRecipe extends Recipe {
         this.recipeName = 'PizzaDough';
         this.recipeGroup = c.bread;
         this.addIngredients([
-            i.dryActiveYeast(),
-            i.archerFlour(),
-            i.sugar(),
+            i.dryActiveYeast(2.25, u.tsp),
+            i.archerFlour(3.5, u.cup),
+            i.sugar(.125, u.tsp),
         ]);
     }
 
@@ -19,9 +19,9 @@ export class MealRecipe extends Recipe {
         this.prep();
         this.addSteps([
             ['Put 12 ounces warm water 110 F into bowl and stir'],
-            ['Put', this.get(i.dryActiveYeast(2.25, u.tsp)), 'in a bowl'],
-            ['Put', this.get(i.sugar(.125, u.tsp)), 'in the bowl'],
-            ['In another bowl put 3 1/2 cups', this.get(i.archerFlour())],
+            ['Put', this.get(i.dryActiveYeast()), 'in a bowl'],
+            ['Put', this.get(i.sugar()), 'in the bowl'],
+            ['In another bowl put', this.get(i.archerFlour())],
             ['Wait for yeast to get cloudy, 20 min'],
             ['Pour yeast mixture into flour bowl and mix'],
             ['Knead the dough about 7 times'],

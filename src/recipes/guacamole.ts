@@ -25,11 +25,11 @@ export class MealRecipe extends Recipe {
         this.prep();
         this.addSteps([
             ['Cut', this.get(i.avacado()), 'and place in glass bowl'],
-            ['Put', this.get(i.kosherSalt()), 'in bowl'],
+            ['Put', this.get(i.kosherSalt(.75)), 'in bowl'],
             ['Mash avacado with fork'],
-            ['Mince', this.get(i.redOnion()), 'and put in bowl'],
+            ['Mince', this.get(i.redOnion(.66)), 'and put in bowl'],
             ['Mince', this.get(i.serranoChilli()), 'and put in bowl'],
-            ['Chop', this.get(i.scallion()), 'and put in bowl'],
+            ['Chop', this.get(i.scallion(.5)), 'and put in bowl'],
             ['Mince and deseed and depulp', this.get(i.romaTomato()), 'and put in bowl'],
             ['Put', this.get(i.cilantro()), 'in bowl'],
             ['Squeeze', this.get(i.lime()), 'into bowl'],

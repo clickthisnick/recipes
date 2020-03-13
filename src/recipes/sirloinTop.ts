@@ -2,6 +2,7 @@ import { Recipe } from '../class/recipe';
 import { Items as i } from '../constants/items';
 import { Categories as c } from '../constants/categories';
 import { Units as u } from '../constants/units';
+import { Timer } from '../class/timer';
 
 export class MealRecipe extends Recipe {
     constructor() {
@@ -16,7 +17,7 @@ export class MealRecipe extends Recipe {
     public generateRecipe() {
         this.prep();
         this.addSteps([
-            ['Souvide', this.get(i.sirloinTop()), 'at 131 degrees for 2 1/2 hours'],
+            [Timer.souVide(19, 'm', this.get(i.sirloinTop()), 131)],
             ['Sear on both sides for a minute'],
         ]);
         this.printRecipe();

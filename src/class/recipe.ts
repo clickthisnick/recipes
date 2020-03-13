@@ -1,7 +1,7 @@
 import { IItemObj } from './ingredients/item';
 import * as fs from 'fs';
 import { Readme } from './readme';
-import { Units as u } from '../constants/units';
+import { Serializer as s } from './serializer';
 
 // if (`${quantity}`.endsWith('.75')) {
 //     quantityString = `${quantity-.75}¾`;
@@ -164,7 +164,7 @@ export class Recipe {
         this.ingredients = ingredients;
     }
 
-    public get(itemObj: IItemObj, quantity?: number) {
+    public get(itemObj: IItemObj): any {
       const ingredient = this.ingredients.find((x) => x.name === itemObj.name);
 
       if (ingredient === undefined) {
@@ -174,13 +174,13 @@ export class Recipe {
       const ing = this.cloneObj(ingredient);
 
       // If you specify 0 it will only print the ing name not assert quantity
-      if (quantity === 0) {
+      if (itemObj.quantity === 0) {
          ing.quantity = 0;
 
          return ing;
       }
       // If quantity is null then assume all quantity is meant to be used
-      itemObj.quantity = quantity || ingredient.quantity;
+      itemObj.quantity = itemObj.quantity || ingredient.quantity;
 
       if (ing.quantity === 0) {
          throw new Error(`No more left of ${ing.name}`);
@@ -197,67 +197,6 @@ export class Recipe {
       return ing;
     }
 
-   public convertUnitIntoStr(unit: string, quantity: number): string {
-      let quantityString: string = `${quantity}`;
-
-      if (`${quantity}`.endsWith('.75')) {
-        quantityString = `${quantity-.75}¾`;
-      }
-      if (`${quantity}`.endsWith('.5')) {
-        quantityString = `${quantity-.5}½`;
-      }
-      if (`${quantity}`.endsWith('.33')) {
-        quantityString = `${quantity-.33}⅓`;
-      }
-      if (`${quantity}`.endsWith('.25')) {
-        quantityString = `${quantity-.25}¼`;
-      }
-      if (`${quantity}`.endsWith('.125')) {
-        quantityString = `${quantity-.125}⅛`;
-      }
-
-      if (quantityString.startsWith('0')) {
-        quantityString = quantityString.substring(1);
-      }
-
-      let unitString: string = unit;
-
-      if (quantity > 1) {
-        unitString = `${unitString}s`;
-      }
-
-      return `${quantityString} ${unitString}`;
-   }
-
-   public turnIngObjIntoStr(ingObj: IItemObj, includeUnit = false) {
-      // If unit is noUnitQuantity just display the name
-      if (ingObj.unit !== null && ingObj.unit.name === u.noUnitQuantity.name) {
-          return ingObj.name;
-      }
-
-      // Return the name if unit is "unit"
-      if (ingObj.unit !== null) {
-        if (ingObj.unit.name === u.unit.name) {
-            if (ingObj.quantity > 1) {
-                return `${ingObj.quantity} ${ingObj.name}s`;
-            }
-
-            return `${ingObj.name}`;
-          }
-      }
-
-      // Any quantity over 1 is considered many
-      const ingName = ingObj.quantity > 1 ? `${ingObj.name}s` : ingObj.name;
-
-      // Return the correct unit
-      let unitQuantity: String = '';
-      if (includeUnit && ingObj.unit !== null) {
-        unitQuantity = this.convertUnitIntoStr(ingObj.unit.name, ingObj.quantity);
-      }
-
-      return `${unitQuantity} ${ingName}`;
-   }
-
     public prep() {
         if (this.ingredients.length === 0) {
             throw new Error('This recipe has no ingredients');
@@ -265,7 +204,7 @@ export class Recipe {
 
         // Add all the unit measurers
         this.ingredients.forEach((ingredient) => {
-            const ingName = this.turnIngObjIntoStr(ingredient);
+            const ingName = s.turnIngObjIntoStr(ingredient);
             const needsWashed = ingredient.wash === true ? ' and wash' : '';
 
             this.recipeHtml += this.generateStep(`${ingName}${needsWashed}`);
@@ -297,7 +236,7 @@ export class Recipe {
                 if (typeof item === 'string') {
                     stepText += item;
                 } else if (typeof item === 'object') {
-                    stepText += this.turnIngObjIntoStr(item, true);
+                    stepText += s.turnIngObjIntoStr(item, true);
                 }
                 stepText += ' ';
             });

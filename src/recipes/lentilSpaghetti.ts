@@ -12,6 +12,7 @@ export class MealRecipe extends Recipe {
         this.addIngredients([
             i.lentilSpaghetti(8, u.ounce),
             i.spaghettiSauce(25, u.ounce),
+            i.water(1, u.cup),
         ]);
     }
 
@@ -19,10 +20,10 @@ export class MealRecipe extends Recipe {
         this.prep();
         this.addSteps([
             ['Optional: Saute mushrooms and/or sausage in instant pot'],
-            ['Add 1/2 cup water'],
+            ['Add', this.get(i.water(.5, u.cup))],
             ['Add', this.get(i.spaghettiSauce())],
             ['Add', this.get(i.lentilSpaghetti())],
-            ['Add 1/2 cup water. (Don\'t stir)'],
+            ['Add', this.get(i.water(.5, u.cup)), '(Don\'t stir)'],
             [Timer.pressureCook(10, 'm')],
             ['Release steam valve and serve'],
         ]);

@@ -29,7 +29,7 @@ export class MealRecipe extends Recipe {
             ['Put in breadmaker', this.get(i.water())],
             ['Put in breadmaker', this.get(i.kosherSalt())],
             ['Put in breadmaker', this.get(i.dryActiveYeast())],
-            ['Put in breadmaker', this.get(i.butter())],
+            ['Put in breadmaker', this.get(i.butter(.25))],
             ['Put in breadmaker', this.get(i.egg())],
             ['Put bread maker on dough setting (menu item 9) and hit start'],
             ['Set Timer For One Hour'],

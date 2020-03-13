@@ -29,14 +29,14 @@ export class MealRecipe extends Recipe {
         this.prep();
         this.addSteps([
             ['Put', this.get(i.oliveOil()), 'on pan on heat 5'],
-            ['Cut', this.get(i.flankSteak()), 'into strips'],
+            ['Cut', this.get(i.flankSteak(.5)), 'into strips'],
             [Timer.set(6, 'm', 'Cook beef')],
             ['Put beef in pyrex bowl'],
             ['Put', this.get(i.greenOnion()), ',', this.get(i.garlicClove()), ',', this.get(i.shallot()), 'in same pan.'],
             [Timer.set(1, 'm', 'Cook')],
             ['Add', this.get(i.broccoli()), 'in same pan with cover.'],
             [Timer.set(5, 'm', 'Cook')],
-            ['In a bowl mix', this.get(i.arrowRootStarch()), ',', this.get(i.water()), ',', this.get(i.aminosCoconut()), ',', this.get(i.groundGinger()), ',', this.get(i.redPepperFlakes())],
+            ['In a bowl mix', this.get(i.arrowRootStarch()), ',', this.get(i.water(.75)), ',', this.get(i.aminosCoconut(.25)), ',', this.get(i.groundGinger()), ',', this.get(i.redPepperFlakes())],
             [Timer.set(4, 'm', 'Once broccoli is done, remove cover and add sauce. Continue cooking.')],
             [Timer.set(2, 'm', 'Add beef and finish cooking.')],
         ]);

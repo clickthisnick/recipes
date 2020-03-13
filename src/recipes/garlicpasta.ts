@@ -33,11 +33,11 @@ export class MealRecipe extends Recipe {
             [this.get(i.spiriliazer()), this.get(i.zuchinni())],
             ['Put zuchinni in pan'],
             [Timer.set(5, 'm')],
-            ['Put in',this.get(i.pepperFlake())],
+            ['Put in',this.get(i.pepperFlake(.25))],
             [Timer.set(2, 'm')],
             ['Top with', this.get(i.butter())],
-            ['Top with', this.get(i.parmessanCheese())],
-            ['Season with', this.get(i.blackPepper()), 'and', this.get(i.salt())],
+            ['Top with', this.get(i.parmessanCheese(.25))],
+            ['Season with', this.get(i.blackPepper()), 'and', this.get(i.salt(.25))],
         ]);
         this.printRecipe();
     }

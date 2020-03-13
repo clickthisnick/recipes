@@ -1,15 +1,31 @@
+import { Serializer as s } from './serializer';
+
 export class Timer {
     public static timerCount: number = 0;
-    public static pressureCook(duration: number, type: string) {
+    private static sanitize(item: any): string {
+        if (typeof item === 'string') {
+            return item;
+        } else if (typeof item === 'object') {
+            return s.turnIngObjIntoStr(item, true);
+        }
+
+        return 'error timer sanitizing';
+    }
+
+    public static pressureCook(duration: number, type: string): any {
         return Timer.set(duration, type, 'Pressure cook on high pressure');
     }
 
-    public static airFry(duration: number, type: string, item: string, degrees: number) {
-        return Timer.set(duration, type, `Airfry ${item} @ ${degrees}°`);
+    public static souVide(duration: number, type: string, item: any, degrees: number): any {
+        return Timer.set(duration, type, `Souvide ${this.sanitize(item)} @ ${degrees}°`);
     }
 
-    public static ovenCook(duration: number, type: string, item: string, degrees: number) {
-        return Timer.set(duration, type, `Cook ${item} in oven @ ${degrees}°`);
+    public static airFry(duration: number, type: string, item: any, degrees: number): any {
+        return Timer.set(duration, type, `Airfry ${this.sanitize(item)} @ ${degrees}°`);
+    }
+
+    public static ovenCook(duration: number, type: string, item: any, degrees: number): any {
+        return Timer.set(duration, type, `Cook ${this.sanitize(item)} in oven @ ${degrees}°`);
     }
 
     public static set(duration: number, type: string, extraText: string = '') {
