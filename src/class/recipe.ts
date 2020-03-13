@@ -36,9 +36,11 @@ export class Recipe {
     public recipeName: string;
     public recipeGroup: string;
     public vegan: boolean;
+    public timeEstimateMilliseconds: number;
 
     constructor() {
       this.vegan = true;
+      this.timeEstimateMilliseconds = 0;
       this.recipeHtml += this.mobileViewport;
       this.recipeHtml += this.chartSet;
       this.recipeHtml += `<style>
@@ -153,7 +155,7 @@ export class Recipe {
 
     private generateTimerStep(timer: any) {
         // tslint:disable-next-line max-line-length
-        return `<div class="panel" id="panel${timer.id}" onclick="this.classList.toggle('timer'); timer(${timer.seconds}); loadTimer(${timer.seconds}, '${timer.id}')"><span id="${timer.id}"></span>${timer.text}</div>`;
+        return `<div class="panel" id="panel${timer.id}" onclick="this.classList.toggle('timer'); timer(${timer.milliseconds}); loadTimer(${timer.milliseconds}, '${timer.id}')"><span id="${timer.id}"></span>${timer.text}</div>`;
     }
 
     private cloneObj(obj: {} | undefined | null) {
@@ -225,6 +227,8 @@ export class Recipe {
             let stepDirections;
 
             if (step.length === 1 && typeof(step[0].type) !== 'undefined') {
+                // Incrementing the rough estimate of how long the recipe will take.
+                this.timeEstimateMilliseconds += step[0].milliseconds;
                 stepDirections = this.generateTimerStep(step[0]);
             } else {
                 let stepText = '';
@@ -249,7 +253,11 @@ export class Recipe {
         }
 
         // Spaces messes up the markdown
-        Readme.groups[this.recipeGroup].push(`## [${this.recipeName.split(' ').join('')}](https://www.clickthisnick.com/recipes/dist/${this.recipeName.toLowerCase().split(' ').join('')}.html)\n\n`);
+
+        // TODO find something better to do with seconds
+        const recipeEstimatedMinutes = Math.round(this.timeEstimateMilliseconds / 60000);
+
+        Readme.groups[this.recipeGroup].push(`## [${this.recipeName.split(' ').join('')} - ${recipeEstimatedMinutes} Min.](https://www.clickthisnick.com/recipes/dist/${this.recipeName.toLowerCase().split(' ').join('')}.html)\n\n`);
    }
 
    public writeRecipe() {

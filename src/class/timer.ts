@@ -32,6 +32,10 @@ export class Timer {
         return Timer.set(duration, type, `Airfry ${this.sanitize(item)} @ ${degrees}°`);
     }
 
+    public static panSear(duration: number, type: string, item: any): any {
+        return Timer.set(duration, type, `Pan sear ${this.sanitize(item)}`);
+    }
+
     public static ovenCook(duration: number, type: string, item: any, degrees: number): any {
         return Timer.set(duration, type, `Cook ${this.sanitize(item)} in oven @ ${degrees}°`);
     }
@@ -62,7 +66,7 @@ export class Timer {
 
         return {
             type: 'timer',
-            seconds: duration * multiplier,
+            milliseconds: duration * multiplier,
             id: `timer${this.timerCount}`,
             text: `Wait ${duration} ${typeText} ${extraText}`
         };

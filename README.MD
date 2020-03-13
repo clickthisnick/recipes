@@ -5,14 +5,14 @@
 ## [Frozen Food Portions](https://www.clickthisnick.com/recipes/frozenFood.html)
 # Recipes List
 # 1 Meal
-## [BroccoliBeef](https://www.clickthisnick.com/recipes/dist/broccolibeef.html)
+## [BroccoliBeef - 18 Min.](https://www.clickthisnick.com/recipes/dist/broccolibeef.html)
 
 # Indian
-## [ButterChicken](https://www.clickthisnick.com/recipes/dist/butterchicken.html)
+## [ButterChicken - 22 Min.](https://www.clickthisnick.com/recipes/dist/butterchicken.html)
 
 # Instant Pot
-## [LentilSpaghetti](https://www.clickthisnick.com/recipes/dist/lentilspaghetti.html)
+## [LentilSpaghetti - 10 Min.](https://www.clickthisnick.com/recipes/dist/lentilspaghetti.html)
 
 # Sandwich
-## [HamSandwich](https://www.clickthisnick.com/recipes/dist/hamsandwich.html)
+## [HamSandwich - 5 Min.](https://www.clickthisnick.com/recipes/dist/hamsandwich.html)
 
