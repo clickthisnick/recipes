@@ -32,6 +32,11 @@ export class Serializer {
     }
 
     public static convertUnitIntoStr(unit: string, quantity: number): string {
+        // Dont return a quantity or unit if you just want the name using 0
+        if (quantity === 0) {
+          return '';
+        }
+
         let quantityString: string = `${quantity}`;
 
         if (`${quantity}`.endsWith('.75')) {
