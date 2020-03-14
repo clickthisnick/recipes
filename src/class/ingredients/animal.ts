@@ -27,8 +27,8 @@ export class AnimalItems {
         isMeatProduct: true,
     })
 
-    public static readonly chickenThighPackage: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
-        name: 'Chicken Thigh Package',
+    public static readonly chickenThigh: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+        name: 'Chicken Thigh',
         putAwayTime: 10,
         takeOutTime: 10,
         cleanSteps: '',

@@ -21,7 +21,7 @@ export class MealRecipe extends Recipe {
             ['Cut out glass bowl and fill half way with warm water'],
             ['Put', this.get(i.salt()), 'and', this.get(i.paprika()), 'in the bowl and mix'],
             [Timer.set(25, 'm', 'Put chicken in the bowl and put in fridge for 25 minutes')],
-            ['Cook in airfryer @ 370 deg for 12 minutes', this.get(i.chickenThighPackage())],
+            ['Cook in airfryer @ 370 deg for 12 minutes', this.get(i.chickenThigh())],
             [Timer.set(5, 'm', 'Flip chicken and cook for 7 minutes @ 370')],
         ]);
         this.printRecipe();

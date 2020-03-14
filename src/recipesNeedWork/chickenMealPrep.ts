@@ -8,7 +8,7 @@ export class MealRecipe extends Recipe {
         this.recipeName = 'ChickenMealPrep';
         this.recipeGroup = c.chicken;
         this.addIngredients([
-            i.chickenThighPackage(),
+            i.chickenThigh(),
         ]);
     }
 
@@ -16,7 +16,7 @@ export class MealRecipe extends Recipe {
         this.prep();
         this.addSteps([
             ['Preheat oven to 375 degrees'],
-            ['Put 5 packs of', this.get(i.chickenThighPackage()), 'on oven tray'],
+            ['Put 5 packs of', this.get(i.chickenThigh()), 'on oven tray'],
             ['Cook for 14 min'],
             ['Flip + Season'],
             ['Cook for 14 min'],
