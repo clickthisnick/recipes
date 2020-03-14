@@ -240,8 +240,7 @@ export class Recipe {
                 } else if (typeof item === 'object') {
                     // this.get make the recipe aware we are using the item
                     // also does some validation like item is in our ingredients and we have enough
-                    this.get(item);
-                    stepText += s.turnIngObjIntoStr(item, true);
+                    stepText += s.turnIngObjIntoStr(this.get(item), true);
                 }
                 stepText += ' ';
             });

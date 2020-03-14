@@ -10,13 +10,13 @@ export class Serializer {
 
         // Return the name if unit is "unit"
         if (ingObj.unit !== null) {
-        if (ingObj.unit.name === u.unit.name) {
+          if (ingObj.unit.name === u.unit.name) {
             if (ingObj.quantity > 1) {
                 return `${ingObj.quantity} ${ingObj.name}s`;
             }
 
             return `${ingObj.name}`;
-            }
+          }
         }
 
         // Any quantity over 1 is considered many
@@ -25,7 +25,7 @@ export class Serializer {
         // Return the correct unit
         let unitQuantity: String = '';
         if (includeUnit && ingObj.unit !== null) {
-        unitQuantity = this.convertUnitIntoStr(ingObj.unit.name, ingObj.quantity);
+          unitQuantity = this.convertUnitIntoStr(ingObj.unit.name, ingObj.quantity);
         }
 
         return `${unitQuantity} ${ingName}`;
