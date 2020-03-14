@@ -14,7 +14,7 @@
 ## [LentilSpaghetti - 10 Min.](https://www.clickthisnick.com/recipes/dist/lentilspaghetti.html)
 
 # Component
-## [asparagus - 9 Min.](https://www.clickthisnick.com/recipes/dist/asparagus.html)
+## [asparagus - 12 Min.](https://www.clickthisnick.com/recipes/dist/asparagus.html)
 
 ## [popcorn - 5 Min.](https://www.clickthisnick.com/recipes/dist/popcorn.html)
 

@@ -12,7 +12,7 @@ export class MealRecipe extends Recipe {
         this.addIngredients([
             i.popcorn(4, u.tbsp),
             i.salt(1, u.unit),
-            i.chilliPowder(1, u.tbsp),
+            i.oliveOil(1, u.tbsp),
             i.dash(1, u.unit),
         ]);
     }
@@ -20,7 +20,7 @@ export class MealRecipe extends Recipe {
     public generateRecipe() {
         this.prep();
         this.addSteps([
-            ['Put', i.chilliPowder(), 'in pot'],
+            ['Put', i.oliveOil(), 'in pot'],
             ['Put in 3', i.popcorn(0), 'kernels'],
             [Timer.set(4.5, 'm', 'Turn stove to heat 5')],
             ['Once 3 kernels pop, turn stove to heat 4'],
