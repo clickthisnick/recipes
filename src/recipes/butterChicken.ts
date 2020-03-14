@@ -32,7 +32,7 @@ export class MealRecipe extends Recipe {
     public generateRecipe() {
         this.prep();
         this.addSteps([
-            ['Preheat Instant Pot with Saute setting'],
+            ['Preheat Instant Pot with Saute on medium setting'],
             ['Dice', i.whiteOnion()],
             ['Dice', i.garlicClove()],
             ['Cut', i.chickenThigh(), 'into 1 inch cubes'],
@@ -41,6 +41,7 @@ export class MealRecipe extends Recipe {
             [Timer.set(4, 'm', 'Sear')],
             ['Add', i.tomatoPaste()],
             [Timer.set(3, 'm', 'Constantly stir')],
+            ['Turn off instant pot sautee'],
             ['Put', i.water(), 'in instant pot'],
             ['Put', i.chickenThigh(0), 'in instant pot'],
             ['Add spice', i.gramMasala()],
