@@ -173,6 +173,18 @@ export class VegetableItems extends SpiceItems {
         isMeatProduct: false,
     })
 
+    public static readonly popcorn: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+        name: 'Popcorn',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+    })
+
     public static readonly carrots: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
         name: 'Carrots',
         putAwayTime: 10,

@@ -1,5 +1,12 @@
 import { Serializer as s } from './serializer';
 
+export interface ITimer {
+    type: string;
+    milliseconds: number;
+    id: string;
+    text: string;
+}
+
 export class Timer {
     public static timerCount: number = 0;
     private static sanitize(item: any): string {
@@ -12,35 +19,51 @@ export class Timer {
         return 'error timer sanitizing';
     }
 
-    public static preheatPan(heat: number): any {
+    public static preheatNinja(heat: number): ITimer {
+        // This is a guess.. should test it out
+        if (heat === 500) {
+            // Return how long preheating pan takes
+            return Timer.set(8, 'm', 'Preheat ninja to 500°');
+        }
+
+        return Timer.set(5, 'm', 'Preheat pan on heat ???');
+    }
+
+    public static preheatPan(heat: number): ITimer {
         // This is a guess.. should test it out
         if (heat === 5) {
             // Return how long preheating pan takes
             return Timer.set(3, 'm', 'Preheat pan on heat 5');
         }
+
+        return Timer.set(5, 'm', 'Preheat pan on heat ???');
     }
 
-    public static pressureCook(duration: number, type: string, async: boolean = false): any {
+    public static pressureCook(duration: number, type: string, async: boolean = false): ITimer {
         return Timer.set(duration, type, 'Pressure cook on high pressure', async);
     }
 
-    public static souVide(duration: number, type: string, item: any, degrees: number, async: boolean = false): any {
+    public static souVide(duration: number, type: string, item: any, degrees: number, async: boolean = false): ITimer {
         return Timer.set(duration, type, `Souvide ${this.sanitize(item)} @ ${degrees}°`, async);
     }
 
-    public static airFry(duration: number, type: string, item: any, degrees: number): any {
+    public static airFry(duration: number, type: string, item: any, degrees: number): ITimer {
         return Timer.set(duration, type, `Airfry ${this.sanitize(item)} @ ${degrees}°`);
     }
 
-    public static panSear(duration: number, type: string, item: any, async: boolean = false): any {
+    public static panSear(duration: number, type: string, item: any, async: boolean = false): ITimer {
         return Timer.set(duration, type, `Pan sear ${this.sanitize(item)}`, async);
     }
 
-    public static ovenCook(duration: number, type: string, item: any, degrees: number, async: boolean = false): any {
+    public static ovenCook(duration: number, type: string, item: any, degrees: number, async: boolean = false): ITimer {
         return Timer.set(duration, type, `Cook ${this.sanitize(item)} in oven @ ${degrees}°`, async);
     }
 
-    public static set(duration: number, type: string, extraText: string = '', async: boolean = false) {
+    public static ninjaCook(duration: number, type: string, item: any, degrees: number, async: boolean = false): ITimer {
+        return Timer.set(duration, type, `Cook ${this.sanitize(item)} in oven @ ${degrees}°`, async);
+    }
+
+    public static set(duration: number, type: string, extraText: string = '', async: boolean = false): ITimer {
 
         // Default to seconds
         let multiplier: number = 1000;

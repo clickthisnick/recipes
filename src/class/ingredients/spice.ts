@@ -124,6 +124,30 @@ export class SpiceItems extends SauceItems {
         isMeatProduct: false,
     })
 
+    public static readonly dash: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+        name: 'Dash Seasoning',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: true,
+        isTakoutUnitable: true,
+        isMeatProduct: false,
+    })
+
+    public static readonly chilliOil: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+        name: 'Chilli Oil',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: true,
+        isTakoutUnitable: true,
+        isMeatProduct: false,
+    })
+
     public static readonly chilliPowder: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
         name: 'Chilli Powder',
         putAwayTime: 10,

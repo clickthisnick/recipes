@@ -7,12 +7,16 @@
 # 1 Meal
 ## [BroccoliBeef - 21 Min.](https://www.clickthisnick.com/recipes/dist/broccolibeef.html)
 
-# Indian
 ## [ButterChicken - 22 Min.](https://www.clickthisnick.com/recipes/dist/butterchicken.html)
 
-# Instant Pot
+## [HamSandwich - 5 Min.](https://www.clickthisnick.com/recipes/dist/hamsandwich.html)
+
 ## [LentilSpaghetti - 10 Min.](https://www.clickthisnick.com/recipes/dist/lentilspaghetti.html)
 
-# Sandwich
-## [HamSandwich - 5 Min.](https://www.clickthisnick.com/recipes/dist/hamsandwich.html)
+# Component
+## [asparagus - 9 Min.](https://www.clickthisnick.com/recipes/dist/asparagus.html)
+
+## [popcorn - 5 Min.](https://www.clickthisnick.com/recipes/dist/popcorn.html)
+
+## [rice - 20 Min.](https://www.clickthisnick.com/recipes/dist/rice.html)
 

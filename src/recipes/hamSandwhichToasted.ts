@@ -8,7 +8,7 @@ export class MealRecipe extends Recipe {
     constructor() {
         super();
         this.recipeName = 'HamSandwich';
-        this.recipeGroup = c.sandwich;
+        this.recipeGroup = c.meal;
         this.addIngredients([
             i.bread(2, u.unit),
             i.butter(2, u.tbsp),

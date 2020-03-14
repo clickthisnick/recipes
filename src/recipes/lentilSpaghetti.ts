@@ -8,7 +8,7 @@ export class MealRecipe extends Recipe {
     constructor() {
         super();
         this.recipeName = 'Lentil Spaghetti';
-        this.recipeGroup = c.instantPot;
+        this.recipeGroup = c.meal;
         this.addIngredients([
             i.lentilSpaghetti(8, u.ounce),
             i.spaghettiSauce(25, u.ounce),

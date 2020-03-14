@@ -2,6 +2,7 @@ import { IItemObj } from './ingredients/item';
 import * as fs from 'fs';
 import { Readme } from './readme';
 import { Serializer as s } from './serializer';
+import { ITimer } from './timer';
 
 // if (`${quantity}`.endsWith('.75')) {
 //     quantityString = `${quantity-.75}¾`;
@@ -268,7 +269,7 @@ export class Recipe {
     fs.writeFileSync(`${process.cwd()}/dist/${this.recipeName.toLowerCase().split(' ').join('')}.html`, this.recipeHtml);
    }
 
-   public addSteps(steps: (string | void)[][]) {
+   public addSteps(steps: (string | ITimer | IItemObj)[][]) {
       this.steps = steps;
     }
 }

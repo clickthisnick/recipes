@@ -9,6 +9,7 @@ export class Categories {
     public static readonly instantPot = 'Instant Pot';
     public static readonly pasta = 'Pasta';
     public static readonly snack = 'Snack';
+    public static readonly component = 'Component';
     public static readonly sandwich = 'Sandwich';
     public static readonly fish = 'Fish';
     public static readonly pizza = 'Pizza';

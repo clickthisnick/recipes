@@ -8,7 +8,7 @@ export class MealRecipe extends Recipe {
     constructor() {
         super();
         this.recipeName = 'ButterChicken';
-        this.recipeGroup = c.indian;
+        this.recipeGroup = c.meal;
         this.addIngredients([
             i.oliveOil(1, u.tbsp),
             i.butter(1, u.tbsp),
