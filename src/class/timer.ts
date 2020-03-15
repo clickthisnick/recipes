@@ -35,6 +35,14 @@ export class Timer {
             // Return how long preheating pan takes
             return Timer.set(3, 'm', 'Preheat pan on heat 5');
         }
+        if (heat === 6) {
+            // Return how long preheating pan takes
+            return Timer.set(4, 'm', 'Preheat pan on heat 5');
+        }
+        if (heat === 7) {
+            // Return how long preheating pan takes
+            return Timer.set(5, 'm', 'Preheat pan on heat 5');
+        }
 
         return Timer.set(5, 'm', 'Preheat pan on heat ???');
     }
