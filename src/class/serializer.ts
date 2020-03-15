@@ -20,7 +20,9 @@ export class Serializer {
         }
 
         // Any quantity over 1 is considered many
-        const ingName = ingObj.quantity > 1 ? `${ingObj.name}s` : ingObj.name;
+        // const ingName = ingObj.quantity > 1 ? `${ingObj.name}s` : ingObj.name;
+        // The unit gets the plural not the item itself
+        const ingName = ingObj.name;
 
         // Return the correct unit
         let unitQuantity: String = '';
