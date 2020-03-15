@@ -12,7 +12,7 @@ export class MealRecipe extends Recipe {
         this.addIngredients([
             i.asparagus(.5, u.bunch),
             i.oliveOil(1, u.unit),
-            i.salt(1, u.unit),
+            i.dash(1, u.unit),
         ]);
     }
 
@@ -23,7 +23,7 @@ export class MealRecipe extends Recipe {
             ['Put', i.asparagus()],
             ['Brush with', i.oliveOil()],
             [Timer.ninjaCook(4, 'm', i.asparagus(0), 500)],
-            ['Season with', i.salt()],
+            ['Season with', i.dash()],
         ]);
         this.printRecipe();
     }

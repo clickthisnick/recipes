@@ -8,7 +8,7 @@ export class MealRecipe extends Recipe {
     constructor() {
         super();
         this.recipeName = 'MacaroniCheese';
-        this.recipeGroup = c.snack;
+        this.recipeGroup = c.meal;
         this.addIngredients([
             i.butter(3, u.tbsp),
             i.water(4, u.cup),
@@ -22,14 +22,14 @@ export class MealRecipe extends Recipe {
     public generateRecipe() {
         this.prep();
         this.addSteps([
-            ['Put', this.get(i.butter()), 'in instant pot'],
-            ['Put', this.get(i.water()), 'in instant pot'],
-            ['Put', this.get(i.salt()), 'in instant pot'],
-            ['Put', this.get(i.raoPastaElbow()), 'in instant pot'],
+            ['Put', i.butter(), 'in instant pot'],
+            ['Put', i.water(), 'in instant pot'],
+            ['Put', i.salt(), 'in instant pot'],
+            ['Put', i.raoPastaElbow(), 'in instant pot'],
             [Timer.pressureCook(2, 'm')],
-            ['Grate the', this.get(i.cheddarCheese())],
+            ['Grate the', i.cheddarCheese()],
             ['Release valve'],
-            ['Stir in', this.get(i.almondMilk())],
+            ['Stir in', i.almondMilk()],
             ['Stir in cheese'],
             [Timer.set(5, 'm', 'Put lid back on (but don\'t cook)')],
         ]);
