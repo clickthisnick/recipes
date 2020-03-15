@@ -20,10 +20,12 @@ export class MealRecipe extends Recipe {
             i.chickenThigh(2, u.pound),
             i.gramMasala(1, u.tbsp),
             i.paprika(1, u.tsp),
-            i.sugar(1, u.tbsp),
+            // i.sugar(1, u.tbsp), This was original amount
+            i.sugar(2, u.tsp),
             i.cumin(1, u.tsp),
             i.turmeric(.5, u.tsp),
-            i.salt(1, u.tsp),
+            // i.salt(1, u.tsp), This was original amount
+            i.salt(.5, u.tsp),
             i.blackPepper(1, u.tsp),
             i.coconutCream(.75, u.cup),
         ]);
@@ -38,10 +40,10 @@ export class MealRecipe extends Recipe {
             ['Cut', i.chickenThigh(), 'into 1 inch cubes'],
             ['Add', i.oliveOil(), 'and', i.butter(), 'into instant pot'],
             ['Add', i.whiteOnion(0), 'and', i.groundGinger(), 'and all the', i.garlicClove(0)],
-            [Timer.set(4, 'm', 'Sear')],
+            [Timer.set(4, 'm', 'Saute in instant pot')],
             ['Add', i.tomatoPaste()],
             [Timer.set(3, 'm', 'Constantly stir')],
-            ['Turn off instant pot sautee'],
+            ['Turn off instant pot saute'],
             ['Put', i.water(), 'in instant pot'],
             ['Put', i.chickenThigh(0), 'in instant pot'],
             ['Add spice', i.gramMasala()],

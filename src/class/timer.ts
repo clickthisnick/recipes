@@ -31,17 +31,14 @@ export class Timer {
 
     public static preheatPan(heat: number): ITimer {
         // This is a guess.. should test it out
-        if (heat === 5) {
-            // Return how long preheating pan takes
-            return Timer.set(3, 'm', 'Preheat pan on heat 5');
-        }
-        if (heat === 6) {
-            // Return how long preheating pan takes
-            return Timer.set(4, 'm', 'Preheat pan on heat 5');
-        }
-        if (heat === 7) {
-            // Return how long preheating pan takes
-            return Timer.set(5, 'm', 'Preheat pan on heat 5');
+        const heatToMin = {
+            5:3,
+            6:4,
+            7:5,
+        };
+
+        if (heat in heatToMin) {
+            return Timer.set(heatToMin[heat], 'm', `Preheat pan on heat ${heat}`);
         }
 
         return Timer.set(5, 'm', 'Preheat pan on heat ???');
