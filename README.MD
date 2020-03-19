@@ -7,7 +7,7 @@
 # 1 Meal
 ## [BroccoliBeef - 21 Min.](https://www.clickthisnick.com/recipes/dist/broccolibeef.html)
 
-## [ButterChicken - 22 Min.](https://www.clickthisnick.com/recipes/dist/butterchicken.html)
+## [ButterChicken - 25 Min.](https://www.clickthisnick.com/recipes/dist/butterchicken.html)
 
 ## [HamSandwich - 5 Min.](https://www.clickthisnick.com/recipes/dist/hamsandwich.html)
 
