@@ -5,6 +5,7 @@ export interface ITimer {
     milliseconds: number;
     id: string;
     text: string;
+    async: boolean;
 }
 
 export class Timer {
@@ -98,7 +99,8 @@ export class Timer {
             type: 'timer',
             milliseconds: duration * multiplier,
             id: `timer${this.timerCount}`,
-            text: `${timerText} ${duration} ${typeText} ${extraText}`
+            text: `${timerText} ${duration} ${typeText} ${extraText}`,
+            async: async
         };
     }
 }

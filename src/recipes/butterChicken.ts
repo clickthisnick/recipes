@@ -3,6 +3,7 @@ import { Items as i } from '../constants/items';
 import { Categories as c } from '../constants/categories';
 import { Units as u } from '../constants/units';
 import { Timer } from '../class/timer';
+import { Async } from '../class/async';
 
 export class MealRecipe extends Recipe {
     constructor() {
@@ -37,10 +38,12 @@ export class MealRecipe extends Recipe {
             ['Preheat Instant Pot with Saute on low setting'],
             ['Dice', i.whiteOnion()],
             ['Dice', i.garlicClove()],
-            ['Cut', i.chickenThigh(), 'into 1 inch cubes'],
             ['Add', i.oliveOil(), 'and', i.butter(), 'into instant pot'],
             ['Add', i.whiteOnion(0), 'and', i.groundGinger(), 'and all the', i.garlicClove(0)],
-            [Timer.set(4, 'm', 'Saute in instant pot')],
+            [Timer.set(4, 'm', 'Saute in instant pot', true)],
+                [Async.step, 'Cut', i.chickenThigh(), 'into 1 inch cubes'],
+                [Async.step, 'Wash knife'],
+                [Async.step, 'Wash cutting boards'],
             ['Add', i.tomatoPaste()],
             [Timer.set(3, 'm', 'Constantly stir')],
             ['Put', i.water(), 'in instant pot'],
@@ -54,6 +57,8 @@ export class MealRecipe extends Recipe {
             ['Add spice', i.blackPepper()],
             [Timer.pressureCook(5, 'm')],
             [Timer.set(10, 'm', 'Let it slow release', true)],
+                [Async.step, 'Put away spices'],
+                [Async.step, 'Wash utensils'],
             ['Stir in', i.coconutCream()],
             [Timer.set(3, 'm', 'Saute on medium')],
         ]);

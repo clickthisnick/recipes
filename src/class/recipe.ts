@@ -71,7 +71,7 @@ export class Recipe {
          //  snd.play();
          // }
 
-      this.recipeHtml += `
+         this.recipeHtml += `
          <script>
          function setIntervalX(callback, delay, repetitions) {
              var x = 0;
@@ -198,21 +198,17 @@ export class Recipe {
     }
 
     public prep() {
-        return;
-    }
-
-    // Skip ingredient listing out for now
-    public prep_old() {
         if (this.ingredients.length === 0) {
             throw new Error('This recipe has no ingredients');
         }
 
         // Add all the unit measurers
         this.ingredients.forEach((ingredient) => {
-            const ingName = s.turnIngObjIntoStr(ingredient);
-            const needsWashed = ingredient.wash === true ? ' and wash' : '';
+            // Skip ingredient takeout for now
+            //const ingName = s.turnIngObjIntoStr(ingredient);
+            //const needsWashed = ingredient.wash === true ? ' and wash' : '';
 
-            this.recipeHtml += this.generateStep(`${ingName}${needsWashed}`);
+            //this.recipeHtml += this.generateStep(`${ingName}${needsWashed}`);
             if (ingredient.isMeatProduct === true) {
                 this.vegan = false;
             }
@@ -225,21 +221,20 @@ export class Recipe {
         }
     }
 
-    // TODO Should be a new section after recipe that says clean excess ingredients
-    // Like .5 red onion we should put away the other half
+    public generateRow(step) {
+        let stepDirections;
 
-   public printRecipe(): void {
-        this.steps.forEach((step) => {
-            let stepDirections;
+        if (step.length === 1 && typeof(step[0].type) !== 'undefined') {
+            // Incrementing the rough estimate of how long the recipe will take.
+            this.timeEstimateMilliseconds += step[0].milliseconds;
+            stepDirections = this.generateTimerStep(step[0]);
 
-            if (step.length === 1 && typeof(step[0].type) !== 'undefined') {
-                // Incrementing the rough estimate of how long the recipe will take.
-                this.timeEstimateMilliseconds += step[0].milliseconds;
-                stepDirections = this.generateTimerStep(step[0]);
-            } else {
-                let stepText = '';
+            return stepDirections;
 
-                step.forEach((item) => {
+        } else {
+            let stepText = '';
+
+            step.forEach((item) => {
                 if (typeof item === 'string') {
                     stepText += item;
                 } else if (typeof item === 'object') {
@@ -250,10 +245,18 @@ export class Recipe {
                 stepText += ' ';
             });
 
-                stepText.trim();
-                stepDirections = this.generateStep(stepText);
-            }
-            this.recipeHtml += stepDirections;
+            stepText.trim();
+            stepDirections = this.generateStep(stepText);
+
+            return stepDirections;
+        }
+    }
+
+    // TODO Should be a new section after recipe that says clean excess ingredients
+    // Like .5 red onion we should put away the other half
+   public printRecipe(): void {
+        this.steps.forEach((step) => {
+            this.recipeHtml += this.generateRow(step);
         });
 
         if (Readme.groups[this.recipeGroup] === undefined) {

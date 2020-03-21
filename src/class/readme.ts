@@ -6,13 +6,10 @@ export class Readme {
     public static makeReadme() {
         let text = '';
         const groups = Object.keys(this.groups).sort();
-        console.log(groups); // tslint:disable-line
         for (const group of groups) {
             text += `# ${group}\n`;
             text += this.groups[group].join('');
         }
-
-        console.log(text); // tslint:disable-line
 
         this.appendReadme(text);
     }
