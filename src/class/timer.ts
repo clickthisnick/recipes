@@ -20,17 +20,17 @@ export class Timer {
         return 'error timer sanitizing';
     }
 
-    public static preheatNinja(heat: number): ITimer {
+    public static preheatNinja(heat: number, async: boolean = false): ITimer {
         // This is a guess.. should test it out
         if (heat === 500) {
             // Return how long preheating pan takes
-            return Timer.set(8, 'm', 'Preheat ninja to 500°');
+            return Timer.set(8, 'm', 'Preheat ninja to 500°', async);
         }
 
-        return Timer.set(5, 'm', 'Preheat pan on heat ???');
+        return Timer.set(5, 'm', 'Preheat pan on heat ???', async);
     }
 
-    public static preheatPan(heat: number): ITimer {
+    public static preheatPan(heat: number, async: boolean = false): ITimer {
         // This is a guess.. should test it out
         const heatToMin = {
             5:3,
@@ -39,7 +39,7 @@ export class Timer {
         };
 
         if (heat in heatToMin) {
-            return Timer.set(heatToMin[heat], 'm', `Preheat pan on heat ${heat}`);
+            return Timer.set(heatToMin[heat], 'm', `Preheat pan on heat ${heat}`, async);
         }
 
         return Timer.set(5, 'm', 'Preheat pan on heat ???');
@@ -59,6 +59,10 @@ export class Timer {
 
     public static panSear(duration: number, type: string, item: any, async: boolean = false): ITimer {
         return Timer.set(duration, type, `Pan sear ${this.sanitize(item)}`, async);
+    }
+
+    public static panSautee(duration: number, type: string, item: any, async: boolean = false): ITimer {
+        return Timer.set(duration, type, `Pan sautee ${this.sanitize(item)}`, async);
     }
 
     public static ovenCook(duration: number, type: string, item: any, degrees: number, async: boolean = false): ITimer {

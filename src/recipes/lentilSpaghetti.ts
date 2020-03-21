@@ -24,7 +24,7 @@ export class MealRecipe extends Recipe {
             ['Add', i.spaghettiSauce()],
             ['Add', i.lentilSpaghetti()],
             ['Add', i.water(.5, u.cup), '(Don\'t stir)'],
-            [Timer.pressureCook(10, 'm')],
+            [Timer.pressureCook(10, 'm', true)],
             ['Release steam valve and serve'],
         ]);
         this.printRecipe();

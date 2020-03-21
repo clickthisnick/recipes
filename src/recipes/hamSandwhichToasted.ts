@@ -3,6 +3,7 @@ import { Items as i } from '../constants/items';
 import { Categories as c } from '../constants/categories';
 import { Units as u } from '../constants/units';
 import { Timer } from '../class/timer';
+import { Async } from '../class/async';
 
 export class MealRecipe extends Recipe {
     constructor() {
@@ -21,8 +22,8 @@ export class MealRecipe extends Recipe {
     public generateRecipe() {
         this.prep();
         this.addSteps([
-            [Timer.preheatPan(5)],
-            [i.butter(), 'the', i.bread()],
+            [Timer.preheatPan(5, true)],
+                [Async.step, i.butter(), 'the', i.bread()],
             ['Put the bread on the pan'],
             ['Put the', i.pepperJackCheese(), 'on the bread'],
             ['Put pan lid on'],

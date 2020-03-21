@@ -18,6 +18,8 @@
 # Component
 ## [asparagus - 12 Min.](https://www.clickthisnick.com/recipes/dist/asparagus.html)
 
+## [mushrooms - 7 Min.](https://www.clickthisnick.com/recipes/dist/mushrooms.html)
+
 ## [PizzaDough - 110 Min.](https://www.clickthisnick.com/recipes/dist/pizzadough.html)
 
 ## [popcorn - 5 Min.](https://www.clickthisnick.com/recipes/dist/popcorn.html)
