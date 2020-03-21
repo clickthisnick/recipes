@@ -53,9 +53,9 @@ export class MealRecipe extends Recipe {
             ['Add spice', i.salt()],
             ['Add spice', i.blackPepper()],
             [Timer.pressureCook(5, 'm')],
-            [Timer.set(10, 'm', 'Let it slow release')],
+            [Timer.set(10, 'm', 'Let it slow release', true)],
             ['Stir in', i.coconutCream()],
-            [Timer.set(3, 'm', 'Saute medium')],
+            [Timer.set(3, 'm', 'Saute on medium')],
         ]);
         this.printRecipe();
     }
