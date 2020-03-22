@@ -9,6 +9,7 @@ export class MealRecipe extends Recipe {
         super();
         this.recipeName = 'Lentil Spaghetti';
         this.recipeGroup = c.meal;
+        this.recipeId = '';
         this.addIngredients([
             i.lentilSpaghetti(8, u.ounce),
             i.spaghettiSauce(25, u.ounce),

@@ -35,6 +35,7 @@ export class Recipe {
     public ingredients: IItemObj[];
     public recipeHtml: string = '';
     public recipeName: string;
+    public recipeId: string;
     public recipeGroup: string;
     public vegan: boolean;
     public timeEstimateMilliseconds: number;
