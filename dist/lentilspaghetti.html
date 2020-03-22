@@ -1,73 +1,126 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"><meta charset="utf-8"><style>
-      .completed {
-             background-color:green;
-             color: white;
-         }
+    button {
+        display: inline-block;
+        border-radius: 4px;
+        background-color: #f4511e;
+        border: none;
+        color: #FFFFFF;
+        text-align: center;
+        font-size: 28px;
+        padding: 20px;
+        width: 200px;
+        transition: all 0.5s;
+        cursor: pointer;
+        margin: 5px;
+      }
 
-         .timer {
-                background-color:yellow;
-                color: black;
+    .completed {
+           background-color:green;
+           color: white;
+       }
+
+       .timer {
+              background-color:yellow;
+              color: black;
+          }
+
+       .panel {
+       border-right-style: solid;
+       border-bottom-style: solid;
+       border-left-style: solid;
+        padding: 25px;
+        border-width: 1px;
+       }
+       </style>
+       <script>
+       function setIntervalX(callback, delay, repetitions) {
+           var x = 0;
+           var intervalID = window.setInterval(function () {
+
+              callback();
+
+              if (++x === repetitions) {
+                  window.clearInterval(intervalID);
+              }
+           }, delay);
+       }
+
+       function timer(initialWait) {
+           setIntervalX(function () {
+               setIntervalX(function () {
+                var x = document.getElementById("beep");
+
+                x.play();
+             }, 200, 10);
+         }, initialWait, 1);
+       }
+
+       function startTimer(duration, timerNum) {
+          var timerId = '#' + timerNum;
+          var display = document.querySelector(timerId);
+          var timer = duration, minutes, seconds;
+          var intervalID = window.setInterval(function () {
+               minutes = parseInt(timer / 60, 10)
+               seconds = parseInt(timer % 60, 10);
+
+               minutes = minutes < 10 ? "0" + minutes : minutes;
+               seconds = seconds < 10 ? "0" + seconds : seconds;
+
+               display.textContent = minutes + ":" + seconds + " ";
+
+               if (--timer < 0) {
+                   window.clearInterval(intervalID);
+                   var panelId = "#panel" + timerNum;
+                   var panel = document.querySelector(panelId);
+                   panel.classList.toggle('timer');
+                   panel.classList.toggle('completed');
+               }
+           }, 1000);
+       }
+
+       function loadTimer(seconds, timerNum) {
+          seconds = seconds / 1000;
+
+          startTimer(seconds, timerNum);
+       }
+
+       var shownId = '';
+
+       function getCheckedOptions() {
+          var id = '';
+          var htmlCollection = document.getElementById('options').getElementsByTagName('button')
+
+          for (const item of htmlCollection) {
+            if (item.classList[0] == 'completed') {
+                id += item.innerHTML
+            }
+          }
+
+          return id
+       }
+
+       // Used to hide/show recipes
+       function showRecipe() {
+            var id = getCheckedOptions()
+
+            console.log('id');
+            console.log(id);
+
+            // Show
+            if (document.getElementById(id)) {
+                document.getElementById(id).style.display = 'block';
             }
 
-         .panel {
-         border-right-style: solid;
-         border-bottom-style: solid;
-         border-left-style: solid;
-          padding: 25px;
-          border-width: 1px;
-         }
-         </style>
-         <script>
-         function setIntervalX(callback, delay, repetitions) {
-             var x = 0;
-             var intervalID = window.setInterval(function () {
+            console.log('shownId');
+            console.log(shownId);
 
-                callback();
+            if (document.getElementById(shownId)) {
+                // Hide previously shown
+                document.getElementById(shownId).style.display = 'none';
+            }
 
-                if (++x === repetitions) {
-                    window.clearInterval(intervalID);
-                }
-             }, delay);
-         }
+            shownId = id;
+        }
 
-         function timer(initialWait) {
-         	setIntervalX(function () {
-         		setIntervalX(function () {
-                  var x = document.getElementById("beep");
-
-                  x.play();
-               }, 200, 10);
-           }, initialWait, 1);
-         }
-
-         function startTimer(duration, timerNum) {
-            var timerId = '#' + timerNum;
-            var display = document.querySelector(timerId);
-            var timer = duration, minutes, seconds;
-            var intervalID = window.setInterval(function () {
-                 minutes = parseInt(timer / 60, 10)
-                 seconds = parseInt(timer % 60, 10);
-
-                 minutes = minutes < 10 ? "0" + minutes : minutes;
-                 seconds = seconds < 10 ? "0" + seconds : seconds;
-
-                 display.textContent = minutes + ":" + seconds + " ";
-
-                 if (--timer < 0) {
-                     window.clearInterval(intervalID);
-                     var panelId = "#panel" + timerNum;
-                     var panel = document.querySelector(panelId);
-                     panel.classList.toggle('timer');
-                     panel.classList.toggle('completed');
-                 }
-             }, 1000);
-         }
-
-         function loadTimer(seconds, timerNum) {
-            seconds = seconds / 1000;
-
-            startTimer(seconds, timerNum);
-         }
-
-         </script>
-      <a href="https://github.com/clickthisnick/recipes/blob/master/README.MD">Back To Recipes</a><h1>1160 Calories</h1><h1>Vegan Recipe</h1><div class="panel" onclick="this.classList.toggle('completed')">Optional: Saute mushrooms and/or sausage in instant pot </div><div class="panel" onclick="this.classList.toggle('completed')">Add ½ cup Water </div><div class="panel" onclick="this.classList.toggle('completed')">Add 25 ounces Spaghetti Sauce </div><div class="panel" onclick="this.classList.toggle('completed')">Add 8 ounces Lentil Spaghetti </div><div class="panel" onclick="this.classList.toggle('completed')">Add ½ cup Water (Don't stir) </div><div class="panel" id="paneltimer16" onclick="this.classList.toggle('timer'); timer(600000); loadTimer(600000, 'timer16')"><span id="timer16"></span>Async 10 minutes Pressure cook on high pressure</div><div class="panel" onclick="this.classList.toggle('completed')">Release steam valve and serve </div>
+       </script>
+    <a href="https://github.com/clickthisnick/recipes/blob/master/README.MD">Back To Recipes</a><div id="options"><br><b>pasta</b><br><button onclick="this.classList.toggle('completed'); showRecipe()">whole grain</button><button onclick="this.classList.toggle('completed'); showRecipe()">lentil</button><button onclick="this.classList.toggle('completed'); showRecipe()">hemp rotators</button><br><b>meat</b><br><button onclick="this.classList.toggle('completed'); showRecipe()">sausage</button><br><b>veggie</b><br><button onclick="this.classList.toggle('completed'); showRecipe()">mushroom</button></div><br><div id="lentil" style="display: none"><h1>1160 Calories</h1><h1>Vegan Recipe</h1><div class="panel" onclick="this.classList.toggle('completed')">Add ½ cup Water </div><div class="panel" onclick="this.classList.toggle('completed')">Add 25 ounces Spaghetti Sauce </div><div class="panel" onclick="this.classList.toggle('completed')">Add 8 ounces Lentil Spaghetti </div><div class="panel" onclick="this.classList.toggle('completed')">Add ½ cup Water (Don't stir) </div><div class="panel" id="paneltimer6" onclick="this.classList.toggle('timer'); timer(600000); loadTimer(600000, 'timer6')"><span id="timer6"></span>Async 10 minutes Pressure cook on high pressure</div><div class="panel" onclick="this.classList.toggle('completed')">Release steam valve and serve </div></div><div id="whole grain" style="display: none"><h1>1160 Calories</h1><h1>Vegan Recipe</h1><div class="panel" onclick="this.classList.toggle('completed')">Add ½ cup Water </div><div class="panel" onclick="this.classList.toggle('completed')">Add 25 ounces Spaghetti Sauce </div><div class="panel" onclick="this.classList.toggle('completed')">Add 8 ounces Whole Grain Spaghetti </div><div class="panel" onclick="this.classList.toggle('completed')">Add ½ cup Water (Don't stir) </div><div class="panel" id="paneltimer7" onclick="this.classList.toggle('timer'); timer(480000); loadTimer(480000, 'timer7')"><span id="timer7"></span>Async 8 minutes Pressure cook on high pressure</div><div class="panel" onclick="this.classList.toggle('completed')">Release steam valve and serve </div></div><div id="whole grainsausage" style="display: none"><h1>? (Italian Sausage Data Missing) Calories</h1><h1>Recipe</h1><div class="panel" onclick="this.classList.toggle('completed')">Add 4 ounces Italian Sausage to instant pot </div><div class="panel" id="paneltimer8" onclick="this.classList.toggle('timer'); timer(240000); loadTimer(240000, 'timer8')"><span id="timer8"></span>Timer 4 minutes Instant pot sautee  Italian Sausage</div><div class="panel" onclick="this.classList.toggle('completed')">Remove  Italian Sausage from instant pot </div><div class="panel" onclick="this.classList.toggle('completed')">Add ½ cup Water </div><div class="panel" onclick="this.classList.toggle('completed')">Add 25 ounces Spaghetti Sauce </div><div class="panel" onclick="this.classList.toggle('completed')">Add 8 ounces Whole Grain Spaghetti </div><div class="panel" onclick="this.classList.toggle('completed')">Add ½ cup Water (Don't stir) </div><div class="panel" id="paneltimer9" onclick="this.classList.toggle('timer'); timer(480000); loadTimer(480000, 'timer9')"><span id="timer9"></span>Async 8 minutes Pressure cook on high pressure</div><div class="panel" onclick="this.classList.toggle('completed')">Release steam valve and serve </div></div>

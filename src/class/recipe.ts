@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import { Readme } from './readme';
 import { Serializer as s } from './serializer';
 import { ITimer } from './timer';
+import { HTML } from './html';
 
 // if (`${quantity}`.endsWith('.75')) {
 //     quantityString = `${quantity-.75}¾`;
@@ -26,110 +27,74 @@ function finalStepReplace(text: string) {
     return tmpText;
 }
 
-export class Recipe {
-    private headerStart = '<h1>';
-    private headerEnd = '</h1>';
-    private mobileViewport = '<meta name="viewport" content="width=device-width, initial-scale=1">';
-    private chartSet = '<meta charset="utf-8">';
-    private steps: any[] = [];
-    public ingredients: IItemObj[];
+export class RecipeContainer {
     public recipeHtml: string = '';
-    public recipeName: string;
-    public recipeId: string;
     public recipeGroup: string;
-    public vegan: boolean;
-    public timeEstimateMilliseconds: number;
-    public caloriesEstimate: number = 0;
-    public calorieDataMissing: [string] = [''];
+    public recipeName: string;
+    public recipeOptions: any;
+    // Arbitrary key.
+    // Values are added in order of keys to the recipe body html ID
+    // so just lentil spagehetti is id="lentil"
+    // lentil sausage is is id="lentilsasuage"
+    // lentil sausage mushroom is is id="lentilsasuagemushroom"
+    // This works because all recipes are precompiled
+    // this.recipeOptions = [
+    //     {'pasta': ['lentil']},
+    //     {'meat': ['sausage']},
+    //     {'veggie': ['mushroom']},
+    // ];
+
+    private generateBackToRecipes() {
+        return `<a href="https://github.com/clickthisnick/recipes/blob/master/README.MD">Back To Recipes</a>`;
+    }
+
+    public addToGroup() {
+        if (Readme.groups[this.recipeGroup] === undefined) {
+            Readme.groups[this.recipeGroup] = [];
+        }
+        Readme.groups[this.recipeGroup].push(`## [${this.recipeName.split(' ').join('')}](https://www.clickthisnick.com/recipes/dist/${this.recipeName.toLowerCase().split(' ').join('')}.html)\n\n`);
+
+    }
+    public generateRecipes(variations) {
+        // Add options
+        this.addToGroup();
+        this.recipeHtml += HTML.generateOptions(this.recipeOptions);
+
+        console.log(variations);
+
+        variations.forEach((variation) => {
+            const variationRecipe = new variation();
+            variationRecipe.generateRecipe();
+
+            this.recipeHtml += variationRecipe.recipeHtml;
+        });
+     }
 
     constructor() {
-      this.vegan = true;
-      this.timeEstimateMilliseconds = 0;
-      this.recipeHtml += this.mobileViewport;
-      this.recipeHtml += this.chartSet;
-      this.recipeHtml += `<style>
-      .completed {
-             background-color:green;
-             color: white;
-         }
+        this.recipeHtml += HTML.mobileViewport;
+        this.recipeHtml += HTML.chartSet;
+        this.recipeHtml += HTML.css;
+        this.recipeHtml += HTML.javascript;
+        this.recipeHtml += this.generateBackToRecipes();
+    }
 
-         .timer {
-                background-color:yellow;
-                color: black;
-            }
+    public writeRecipe() {
 
-         .panel {
-         border-right-style: solid;
-         border-bottom-style: solid;
-         border-left-style: solid;
-          padding: 25px;
-          border-width: 1px;
-         }
-         </style>`;
+        // Just setting to lowercase incase git isn't case sensitive (Like on osx/windows)
+        fs.writeFileSync(`${process.cwd()}/dist/${this.recipeName.toLowerCase().split(' ').join('')}.html`, this.recipeHtml);
+    }
+}
 
-         // TODO: Could add a sound but browsers won't allow it like this
-         // function beep() {
-         // tslint:disable-next-line max-line-length
-         //  var snd = new  Audio("data:audio/wav;base64,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qJrx4KOQjahZxWbcZgztj2c49nKmkId44S71j0c8eV9yDK6uPRzx5X18eDvjvQ6yKo9ZSS6l//8elePK/Lf//IInrOF/FvDoADYAGBMGb7FtErm5MXMlmPAJQVgWta7Zx2go+8xJ0UiCb8LHHdftWyLJE0QIAIsI+UbXu67dZMjmgDGCGl1H+vpF4NSDckSIkk7Vd+sxEhBQMRU8j/12UIRhzSaUdQ+rQU5kGeFxm+hb1oh6pWWmv3uvmReDl0UnvtapVaIzo1jZbf/pD6ElLqSX+rUmOQNpJFa/r+sa4e/pBlAABoAAAAA3CUgShLdGIxsY7AUABPRrgCABdDuQ5GC7DqPQCgbbJUAoRSUj+NIEig0YfyWUho1VBBBA//uQZB4ABZx5zfMakeAAAAmwAAAAF5F3P0w9GtAAACfAAAAAwLhMDmAYWMgVEG1U0FIGCBgXBXAtfMH10000EEEEEECUBYln03TTTdNBDZopopYvrTTdNa325mImNg3TTPV9q3pmY0xoO6bv3r00y+IDGid/9aaaZTGMuj9mpu9Mpio1dXrr5HERTZSmqU36A3CumzN/9Robv/Xx4v9ijkSRSNLQhAWumap82WRSBUqXStV/YcS+XVLnSS+WLDroqArFkMEsAS+eWmrUzrO0oEmE40RlMZ5+ODIkAyKAGUwZ3mVKmcamcJnMW26MRPgUw6j+LkhyHGVGYjSUUKNpuJUQoOIAyDvEyG8S5yfK6dhZc0Tx1KI/gviKL6qvvFs1+bWtaz58uUNnryq6kt5RzOCkPWlVqVX2a/EEBUdU1KrXLf40GoiiFXK///qpoiDXrOgqDR38JB0bw7SoL+ZB9o1RCkQjQ2CBYZKd/+VJxZRRZlqSkKiws0WFxUyCwsKiMy7hUVFhIaCrNQsKkTIsLivwKKigsj8XYlwt/WKi2N4d//uQRCSAAjURNIHpMZBGYiaQPSYyAAABLAAAAAAAACWAAAAApUF/Mg+0aohSIRobBAsMlO//Kk4soosy1JSFRYWaLC4qZBYWFRGZdwqKiwkNBVmoWFSJkWFxX4FFRQWR+LsS4W/rFRb/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////VEFHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAU291bmRib3kuZGUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMjAwNGh0dHA6Ly93d3cuc291bmRib3kuZGUAAAAAAAAAACU=");
-         //  snd.play();
-         // }
+export class Recipe {
+    private steps: any[] = [];
+    public recipeId: string;
+    public ingredients: IItemObj[];
+    public vegan: boolean = true;
+    public timeEstimateMilliseconds: number = 0;
+    public caloriesEstimate: number = 0;
+    public calorieDataMissing: [string] = [''];
+    public recipeHtml: string = '';
 
-         this.recipeHtml += `
-         <script>
-         function setIntervalX(callback, delay, repetitions) {
-             var x = 0;
-             var intervalID = window.setInterval(function () {
-
-                callback();
-
-                if (++x === repetitions) {
-                    window.clearInterval(intervalID);
-                }
-             }, delay);
-         }
-
-         function timer(initialWait) {
-         	setIntervalX(function () {
-         		setIntervalX(function () {
-                  var x = document.getElementById("beep");
-
-                  x.play();
-               }, 200, 10);
-           }, initialWait, 1);
-         }
-
-         function startTimer(duration, timerNum) {
-            var timerId = '#' + timerNum;
-            var display = document.querySelector(timerId);
-            var timer = duration, minutes, seconds;
-            var intervalID = window.setInterval(function () {
-                 minutes = parseInt(timer / 60, 10)
-                 seconds = parseInt(timer % 60, 10);
-
-                 minutes = minutes < 10 ? "0" + minutes : minutes;
-                 seconds = seconds < 10 ? "0" + seconds : seconds;
-
-                 display.textContent = minutes + ":" + seconds + " ";
-
-                 if (--timer < 0) {
-                     window.clearInterval(intervalID);
-                     var panelId = "#panel" + timerNum;
-                     var panel = document.querySelector(panelId);
-                     panel.classList.toggle('timer');
-                     panel.classList.toggle('completed');
-                 }
-             }, 1000);
-         }
-
-         function loadTimer(seconds, timerNum) {
-            seconds = seconds / 1000;
-
-            startTimer(seconds, timerNum);
-         }
-
-         </script>
-      `;
-      this.recipeHtml += this.generateBackToRecipes();
     //   this.recipeHtml += this.generateHeader('Clean counter space:');
     //   this.recipeHtml += this.generateStep('Empty dishwasher');
     //   this.recipeHtml += this.generateStep('Load dishwasher');
@@ -141,14 +106,9 @@ export class Recipe {
     //     Sorry. Your browser doesn't support the HTML5 audio element.
     //   </audio>
     //   `;
-   }
-
-   private generateBackToRecipes() {
-       return `<a href="https://github.com/clickthisnick/recipes/blob/master/README.MD">Back To Recipes</a>`;
-   }
 
     private generateHeader(text: string) {
-        return `${this.headerStart}${text}${this.headerEnd}`;
+        return `${HTML.headerStart}${text}${HTML.headerEnd}`;
     }
 
     private generateStep(text: string) {
@@ -167,6 +127,8 @@ export class Recipe {
     }
 
     public addIngredients(ingredients: IItemObj[]) {
+        // Opening div with id
+        this.recipeHtml += `<div id="${this.recipeId}" style="display: none">`;
         this.ingredients = ingredients;
 
         ingredients.forEach((ing) => {
@@ -177,6 +139,8 @@ export class Recipe {
                 this.calorieDataMissing.push(ing.name);
             }
         });
+
+        this.prep();
     }
 
     public get(itemObj: IItemObj): any {
@@ -280,21 +244,11 @@ export class Recipe {
             this.recipeHtml += this.generateRow(step);
         });
 
-        if (Readme.groups[this.recipeGroup] === undefined) {
-            Readme.groups[this.recipeGroup] = [];
-        }
-
-        // Spaces messes up the markdown
-
         // TODO find something better to do with seconds
-        const recipeEstimatedMinutes = Math.round(this.timeEstimateMilliseconds / 60000);
+        Math.round(this.timeEstimateMilliseconds / 60000);
 
-        Readme.groups[this.recipeGroup].push(`## [${this.recipeName.split(' ').join('')} - ${recipeEstimatedMinutes} Min.](https://www.clickthisnick.com/recipes/dist/${this.recipeName.toLowerCase().split(' ').join('')}.html)\n\n`);
-   }
-
-   public writeRecipe() {
-    // Just setting to lowercase incase git isn't case sensitive (Like on osx/windows)
-    fs.writeFileSync(`${process.cwd()}/dist/${this.recipeName.toLowerCase().split(' ').join('')}.html`, this.recipeHtml);
+        // Close beginning div
+        this.recipeHtml += '</div>';
    }
 
    public addSteps(steps: (string | ITimer | IItemObj)[][]) {

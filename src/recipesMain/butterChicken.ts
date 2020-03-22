@@ -1,15 +1,30 @@
-import { Recipe } from '../class/recipe';
+import { Recipe, RecipeContainer } from '../class/recipe';
 import { Items as i } from '../constants/items';
 import { Categories as c } from '../constants/categories';
 import { Units as u } from '../constants/units';
 import { Timer } from '../class/timer';
 import { Async } from '../class/async';
 
-export class MealRecipe extends Recipe {
+export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
         this.recipeName = 'ButterChicken';
         this.recipeGroup = c.meal;
+        this.recipeOptions = [
+           {'recipe': ['butterchicken']},
+        ];
+    }
+
+    public init() {
+        this.generateRecipes([
+            ButterChicken
+        ]);
+    }
+}
+
+class ButterChicken extends Recipe {
+    public generateRecipe() {
+        this.recipeId = 'butterchicken';
         this.addIngredients([
             i.oliveOil(1, u.tbsp),
             i.butter(1, u.tbsp),
@@ -30,10 +45,6 @@ export class MealRecipe extends Recipe {
             i.blackPepper(1, u.tsp),
             i.coconutCream(.75, u.cup),
         ]);
-    }
-
-    public generateRecipe() {
-        this.prep();
         this.addSteps([
             ['Preheat Instant Pot with Saute on low setting'],
             ['Dice', i.whiteOnion()],

@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import { Readme } from '../class/readme';
 
 // This is the path from root (package.json runs this)
-const testFolder = 'src/recipes';
+const testFolder = 'src/recipesMain';
 const cwd = process.cwd();
 
 // This creates the html files in the dist folder
@@ -10,7 +10,7 @@ function generateRecipe(file: string) {
   const MealRecipe = require(`${cwd}/${testFolder}/${file}`).MealRecipe;
   const recipe = new MealRecipe();
 
-  recipe.generateRecipe();
+  recipe.init();
   recipe.writeRecipe();
 }
 

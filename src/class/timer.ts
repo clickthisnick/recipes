@@ -61,6 +61,10 @@ export class Timer {
         return Timer.set(duration, type, `Pan sear ${this.sanitize(item)}`, async);
     }
 
+    public static instantPotSautee(duration: number, type: string, item: any, async: boolean = false): ITimer {
+        return Timer.set(duration, type, `Instant pot sautee ${this.sanitize(item)}`, async);
+    }
+
     public static panSautee(duration: number, type: string, item: any, async: boolean = false): ITimer {
         return Timer.set(duration, type, `Pan sautee ${this.sanitize(item)}`, async);
     }

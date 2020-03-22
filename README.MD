@@ -5,26 +5,7 @@
 ## [Frozen Food Portions](https://www.clickthisnick.com/recipes/frozenFood.html)
 # Recipes List
 # 1 Meal
-## [BroccoliBeef - 21 Min.](https://www.clickthisnick.com/recipes/dist/broccolibeef.html)
+## [ButterChicken](https://www.clickthisnick.com/recipes/dist/butterchicken.html)
 
-## [ButterChicken - 25 Min.](https://www.clickthisnick.com/recipes/dist/butterchicken.html)
-
-## [HamSandwich - 5 Min.](https://www.clickthisnick.com/recipes/dist/hamsandwich.html)
-
-## [LentilSpaghetti - 10 Min.](https://www.clickthisnick.com/recipes/dist/lentilspaghetti.html)
-
-## [MacaroniCheese - 7 Min.](https://www.clickthisnick.com/recipes/dist/macaronicheese.html)
-
-# Component
-## [asparagus - 12 Min.](https://www.clickthisnick.com/recipes/dist/asparagus.html)
-
-## [mushrooms - 7 Min.](https://www.clickthisnick.com/recipes/dist/mushrooms.html)
-
-## [PizzaDough - 110 Min.](https://www.clickthisnick.com/recipes/dist/pizzadough.html)
-
-## [popcorn - 5 Min.](https://www.clickthisnick.com/recipes/dist/popcorn.html)
-
-## [rice - 20 Min.](https://www.clickthisnick.com/recipes/dist/rice.html)
-
-## [TopSirloin - 156 Min.](https://www.clickthisnick.com/recipes/dist/topsirloin.html)
+## [LentilSpaghetti](https://www.clickthisnick.com/recipes/dist/lentilspaghetti.html)
 

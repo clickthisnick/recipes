@@ -17,8 +17,23 @@ export class CarbItems extends AnimalItems {
         calorie: {}
     })
 
-    public static readonly lentilSpaghetti: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly spaghettiLentil: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
         name: 'Lentil Spaghetti',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Rinse and put measuring cup in dishwasher',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        calorie: {
+            [u.ounce.name]: 100
+        }
+    })
+
+    public static readonly spaghettiWholeGrain: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+        name: 'Whole Grain Spaghetti',
         putAwayTime: 10,
         takeOutTime: 10,
         cleanSteps: 'Rinse and put measuring cup in dishwasher',

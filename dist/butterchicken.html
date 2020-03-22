@@ -1,73 +1,126 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"><meta charset="utf-8"><style>
-      .completed {
-             background-color:green;
-             color: white;
-         }
+    button {
+        display: inline-block;
+        border-radius: 4px;
+        background-color: #f4511e;
+        border: none;
+        color: #FFFFFF;
+        text-align: center;
+        font-size: 28px;
+        padding: 20px;
+        width: 200px;
+        transition: all 0.5s;
+        cursor: pointer;
+        margin: 5px;
+      }
 
-         .timer {
-                background-color:yellow;
-                color: black;
+    .completed {
+           background-color:green;
+           color: white;
+       }
+
+       .timer {
+              background-color:yellow;
+              color: black;
+          }
+
+       .panel {
+       border-right-style: solid;
+       border-bottom-style: solid;
+       border-left-style: solid;
+        padding: 25px;
+        border-width: 1px;
+       }
+       </style>
+       <script>
+       function setIntervalX(callback, delay, repetitions) {
+           var x = 0;
+           var intervalID = window.setInterval(function () {
+
+              callback();
+
+              if (++x === repetitions) {
+                  window.clearInterval(intervalID);
+              }
+           }, delay);
+       }
+
+       function timer(initialWait) {
+           setIntervalX(function () {
+               setIntervalX(function () {
+                var x = document.getElementById("beep");
+
+                x.play();
+             }, 200, 10);
+         }, initialWait, 1);
+       }
+
+       function startTimer(duration, timerNum) {
+          var timerId = '#' + timerNum;
+          var display = document.querySelector(timerId);
+          var timer = duration, minutes, seconds;
+          var intervalID = window.setInterval(function () {
+               minutes = parseInt(timer / 60, 10)
+               seconds = parseInt(timer % 60, 10);
+
+               minutes = minutes < 10 ? "0" + minutes : minutes;
+               seconds = seconds < 10 ? "0" + seconds : seconds;
+
+               display.textContent = minutes + ":" + seconds + " ";
+
+               if (--timer < 0) {
+                   window.clearInterval(intervalID);
+                   var panelId = "#panel" + timerNum;
+                   var panel = document.querySelector(panelId);
+                   panel.classList.toggle('timer');
+                   panel.classList.toggle('completed');
+               }
+           }, 1000);
+       }
+
+       function loadTimer(seconds, timerNum) {
+          seconds = seconds / 1000;
+
+          startTimer(seconds, timerNum);
+       }
+
+       var shownId = '';
+
+       function getCheckedOptions() {
+          var id = '';
+          var htmlCollection = document.getElementById('options').getElementsByTagName('button')
+
+          for (const item of htmlCollection) {
+            if (item.classList[0] == 'completed') {
+                id += item.innerHTML
+            }
+          }
+
+          return id
+       }
+
+       // Used to hide/show recipes
+       function showRecipe() {
+            var id = getCheckedOptions()
+
+            console.log('id');
+            console.log(id);
+
+            // Show
+            if (document.getElementById(id)) {
+                document.getElementById(id).style.display = 'block';
             }
 
-         .panel {
-         border-right-style: solid;
-         border-bottom-style: solid;
-         border-left-style: solid;
-          padding: 25px;
-          border-width: 1px;
-         }
-         </style>
-         <script>
-         function setIntervalX(callback, delay, repetitions) {
-             var x = 0;
-             var intervalID = window.setInterval(function () {
+            console.log('shownId');
+            console.log(shownId);
 
-                callback();
+            if (document.getElementById(shownId)) {
+                // Hide previously shown
+                document.getElementById(shownId).style.display = 'none';
+            }
 
-                if (++x === repetitions) {
-                    window.clearInterval(intervalID);
-                }
-             }, delay);
-         }
+            shownId = id;
+        }
 
-         function timer(initialWait) {
-         	setIntervalX(function () {
-         		setIntervalX(function () {
-                  var x = document.getElementById("beep");
-
-                  x.play();
-               }, 200, 10);
-           }, initialWait, 1);
-         }
-
-         function startTimer(duration, timerNum) {
-            var timerId = '#' + timerNum;
-            var display = document.querySelector(timerId);
-            var timer = duration, minutes, seconds;
-            var intervalID = window.setInterval(function () {
-                 minutes = parseInt(timer / 60, 10)
-                 seconds = parseInt(timer % 60, 10);
-
-                 minutes = minutes < 10 ? "0" + minutes : minutes;
-                 seconds = seconds < 10 ? "0" + seconds : seconds;
-
-                 display.textContent = minutes + ":" + seconds + " ";
-
-                 if (--timer < 0) {
-                     window.clearInterval(intervalID);
-                     var panelId = "#panel" + timerNum;
-                     var panel = document.querySelector(panelId);
-                     panel.classList.toggle('timer');
-                     panel.classList.toggle('completed');
-                 }
-             }, 1000);
-         }
-
-         function loadTimer(seconds, timerNum) {
-            seconds = seconds / 1000;
-
-            startTimer(seconds, timerNum);
-         }
-
-         </script>
-      <a href="https://github.com/clickthisnick/recipes/blob/master/README.MD">Back To Recipes</a><h1>? (Olive Oil/Butter/White Onion/Ground Ginger/Garlic Clove/Tomato Paste/Chicken Thigh/Gram Masala/Paprika/Sugar/Cumin/Turmeric/Salt/Black Pepper/Coconut Cream Data Missing) Calories</h1><h1>Recipe</h1><div class="panel" onclick="this.classList.toggle('completed')">Preheat Instant Pot with Saute on low setting </div><div class="panel" onclick="this.classList.toggle('completed')">Dice White Onion </div><div class="panel" onclick="this.classList.toggle('completed')">Dice 5 Garlic Cloves </div><div class="panel" onclick="this.classList.toggle('completed')">Add 1 tbsp Olive Oil and 1 tbsp Butter into instant pot </div><div class="panel" onclick="this.classList.toggle('completed')">Add White Onion and 2 tbsps Ground Ginger and all the Garlic Clove </div><div class="panel" id="paneltimer9" onclick="this.classList.toggle('timer'); timer(240000); loadTimer(240000, 'timer9')"><span id="timer9"></span>Async 4 minutes Saute in instant pot</div><div class="panel" onclick="this.classList.toggle('completed')">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp; Cut 2 pounds Chicken Thigh into 1 inch cubes </div><div class="panel" onclick="this.classList.toggle('completed')">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp; Wash knife </div><div class="panel" onclick="this.classList.toggle('completed')">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp; Wash cutting boards </div><div class="panel" onclick="this.classList.toggle('completed')">Add 6 ounces Tomato Paste </div><div class="panel" id="paneltimer10" onclick="this.classList.toggle('timer'); timer(180000); loadTimer(180000, 'timer10')"><span id="timer10"></span>Timer 3 minutes Constantly stir</div><div class="panel" onclick="this.classList.toggle('completed')">Put ½ cup Water in instant pot </div><div class="panel" onclick="this.classList.toggle('completed')">Put  Chicken Thigh in instant pot </div><div class="panel" onclick="this.classList.toggle('completed')">Add spice 1 tbsp Gram Masala </div><div class="panel" onclick="this.classList.toggle('completed')">Add spice 1 tsp Paprika </div><div class="panel" onclick="this.classList.toggle('completed')">Add spice 2 tsps Sugar </div><div class="panel" onclick="this.classList.toggle('completed')">Add spice 1 tsp Cumin </div><div class="panel" onclick="this.classList.toggle('completed')">Add spice ½ tsp Turmeric </div><div class="panel" onclick="this.classList.toggle('completed')">Add spice ½ tsp Salt </div><div class="panel" onclick="this.classList.toggle('completed')">Add spice 1 tsp Black Pepper </div><div class="panel" id="paneltimer11" onclick="this.classList.toggle('timer'); timer(300000); loadTimer(300000, 'timer11')"><span id="timer11"></span>Timer 5 minutes Pressure cook on high pressure</div><div class="panel" id="paneltimer12" onclick="this.classList.toggle('timer'); timer(600000); loadTimer(600000, 'timer12')"><span id="timer12"></span>Async 10 minutes Let it slow release</div><div class="panel" onclick="this.classList.toggle('completed')">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp; Put away spices </div><div class="panel" onclick="this.classList.toggle('completed')">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp; Wash utensils </div><div class="panel" onclick="this.classList.toggle('completed')">Stir in ¾ cup Coconut Cream </div><div class="panel" id="paneltimer13" onclick="this.classList.toggle('timer'); timer(180000); loadTimer(180000, 'timer13')"><span id="timer13"></span>Timer 3 minutes Saute on medium</div>
+       </script>
+    <a href="https://github.com/clickthisnick/recipes/blob/master/README.MD">Back To Recipes</a><div id="options"><br><b>recipe</b><br><button onclick="this.classList.toggle('completed'); showRecipe()">butterchicken</button></div><br><div id="butterchicken" style="display: none"><h1>? (Olive Oil/Butter/White Onion/Ground Ginger/Garlic Clove/Tomato Paste/Chicken Thigh/Gram Masala/Paprika/Sugar/Cumin/Turmeric/Salt/Black Pepper/Coconut Cream Data Missing) Calories</h1><h1>Recipe</h1><div class="panel" onclick="this.classList.toggle('completed')">Preheat Instant Pot with Saute on low setting </div><div class="panel" onclick="this.classList.toggle('completed')">Dice White Onion </div><div class="panel" onclick="this.classList.toggle('completed')">Dice 5 Garlic Cloves </div><div class="panel" onclick="this.classList.toggle('completed')">Add 1 tbsp Olive Oil and 1 tbsp Butter into instant pot </div><div class="panel" onclick="this.classList.toggle('completed')">Add White Onion and 2 tbsps Ground Ginger and all the Garlic Clove </div><div class="panel" id="paneltimer1" onclick="this.classList.toggle('timer'); timer(240000); loadTimer(240000, 'timer1')"><span id="timer1"></span>Async 4 minutes Saute in instant pot</div><div class="panel" onclick="this.classList.toggle('completed')">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp; Cut 2 pounds Chicken Thigh into 1 inch cubes </div><div class="panel" onclick="this.classList.toggle('completed')">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp; Wash knife </div><div class="panel" onclick="this.classList.toggle('completed')">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp; Wash cutting boards </div><div class="panel" onclick="this.classList.toggle('completed')">Add 6 ounces Tomato Paste </div><div class="panel" id="paneltimer2" onclick="this.classList.toggle('timer'); timer(180000); loadTimer(180000, 'timer2')"><span id="timer2"></span>Timer 3 minutes Constantly stir</div><div class="panel" onclick="this.classList.toggle('completed')">Put ½ cup Water in instant pot </div><div class="panel" onclick="this.classList.toggle('completed')">Put  Chicken Thigh in instant pot </div><div class="panel" onclick="this.classList.toggle('completed')">Add spice 1 tbsp Gram Masala </div><div class="panel" onclick="this.classList.toggle('completed')">Add spice 1 tsp Paprika </div><div class="panel" onclick="this.classList.toggle('completed')">Add spice 2 tsps Sugar </div><div class="panel" onclick="this.classList.toggle('completed')">Add spice 1 tsp Cumin </div><div class="panel" onclick="this.classList.toggle('completed')">Add spice ½ tsp Turmeric </div><div class="panel" onclick="this.classList.toggle('completed')">Add spice ½ tsp Salt </div><div class="panel" onclick="this.classList.toggle('completed')">Add spice 1 tsp Black Pepper </div><div class="panel" id="paneltimer3" onclick="this.classList.toggle('timer'); timer(300000); loadTimer(300000, 'timer3')"><span id="timer3"></span>Timer 5 minutes Pressure cook on high pressure</div><div class="panel" id="paneltimer4" onclick="this.classList.toggle('timer'); timer(600000); loadTimer(600000, 'timer4')"><span id="timer4"></span>Async 10 minutes Let it slow release</div><div class="panel" onclick="this.classList.toggle('completed')">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp; Put away spices </div><div class="panel" onclick="this.classList.toggle('completed')">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp; Wash utensils </div><div class="panel" onclick="this.classList.toggle('completed')">Stir in ¾ cup Coconut Cream </div><div class="panel" id="paneltimer5" onclick="this.classList.toggle('timer'); timer(180000); loadTimer(180000, 'timer5')"><span id="timer5"></span>Timer 3 minutes Saute on medium</div></div>
