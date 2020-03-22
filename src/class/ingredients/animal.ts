@@ -1,5 +1,5 @@
 import { IItem } from './item';
-import { IUnitObj } from '../../constants/units';
+import { IUnitObj, Units as u } from '../../constants/units';
 
 export class AnimalItems {
 
@@ -78,7 +78,10 @@ export class AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: true,
-        calorie: {},
+        calorie: {
+            [u.ounce.name]: 92.13625,
+            [u.pound.name]: 1474.18,
+        },
     })
 
     public static readonly mozzarellaCheese: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
