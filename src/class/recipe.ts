@@ -39,6 +39,7 @@ export class Recipe {
     public vegan: boolean;
     public timeEstimateMilliseconds: number;
     public caloriesEstimate: number = 0;
+    public calorieDataMissing: boolean = false;
 
     constructor() {
       this.vegan = true;
@@ -191,6 +192,8 @@ export class Recipe {
          // Add calories to our calculation
          if (ing.unit !== null && ing.calorie.hasOwnProperty(ing.unit.name)) {
             this.caloriesEstimate += ing.calorie[ing.unit.name] * itemObj.quantity;
+         } else {
+             this.calorieDataMissing = true;
          }
 
          // Subtracting the ingredients used from the ingredient amount
@@ -219,6 +222,12 @@ export class Recipe {
                 this.vegan = false;
             }
         });
+
+        if (this.calorieDataMissing) {
+            this.recipeHtml += this.generateHeader(`? (Data Missing) Calories`);
+        } else {
+            this.recipeHtml += this.generateHeader(`${this.caloriesEstimate} Calories`);
+        }
 
         if (this.vegan === true) {
             this.recipeHtml += this.generateHeader('Vegan Recipe');
@@ -274,7 +283,7 @@ export class Recipe {
         // TODO find something better to do with seconds
         const recipeEstimatedMinutes = Math.round(this.timeEstimateMilliseconds / 60000);
 
-        Readme.groups[this.recipeGroup].push(`## [${this.recipeName.split(' ').join('')} - ${recipeEstimatedMinutes} Min. - ${this.caloriesEstimate} Calories](https://www.clickthisnick.com/recipes/dist/${this.recipeName.toLowerCase().split(' ').join('')}.html)\n\n`);
+        Readme.groups[this.recipeGroup].push(`## [${this.recipeName.split(' ').join('')} - ${recipeEstimatedMinutes} Min.](https://www.clickthisnick.com/recipes/dist/${this.recipeName.toLowerCase().split(' ').join('')}.html)\n\n`);
    }
 
    public writeRecipe() {
