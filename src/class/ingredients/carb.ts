@@ -1,5 +1,5 @@
 import { IItem } from './item';
-import { IUnitObj } from '../../constants/units';
+import { IUnitObj, Units as u } from '../../constants/units';
 import { AnimalItems } from './animal';
 
 export class CarbItems extends AnimalItems {
@@ -27,7 +27,9 @@ export class CarbItems extends AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        calorie: {}
+        calorie: {
+            [u.ounce.name]: 100
+        }
     })
 
     public static readonly quinoa: IItem = (quantity: number = .00001, unit: IUnitObj) => ({

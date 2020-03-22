@@ -11,7 +11,7 @@
 
 ## [HamSandwich - 5 Min. - 0 Calories](https://www.clickthisnick.com/recipes/dist/hamsandwich.html)
 
-## [LentilSpaghetti - 10 Min. - 360 Calories](https://www.clickthisnick.com/recipes/dist/lentilspaghetti.html)
+## [LentilSpaghetti - 10 Min. - 1160 Calories](https://www.clickthisnick.com/recipes/dist/lentilspaghetti.html)
 
 ## [MacaroniCheese - 7 Min. - 0 Calories](https://www.clickthisnick.com/recipes/dist/macaronicheese.html)
 
