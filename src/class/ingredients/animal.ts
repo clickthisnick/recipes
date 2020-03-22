@@ -13,6 +13,7 @@ export class AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: true,
+        calorie: {},
     })
 
     public static readonly chickenDrumstickPackage: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -25,6 +26,7 @@ export class AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: true,
+        calorie: {},
     })
 
     public static readonly chickenThigh: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -37,6 +39,7 @@ export class AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: true,
+        calorie: {},
     })
 
     public static readonly salmon: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -49,6 +52,7 @@ export class AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: true,
+        calorie: {},
     })
 
     public static readonly sirloinTop: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -61,6 +65,7 @@ export class AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: true,
+        calorie: {},
     })
 
     public static readonly italianSausage: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -73,6 +78,7 @@ export class AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: true,
+        calorie: {},
     })
 
     public static readonly mozzarellaCheese: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -85,6 +91,7 @@ export class AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: true,
+        calorie: {},
     })
 
     public static readonly plainYogurt: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -97,6 +104,7 @@ export class AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: true,
+        calorie: {},
     })
 
     public static readonly parmessanCheese: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -109,6 +117,7 @@ export class AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: true,
+        calorie: {},
     })
 
     public static readonly cheddarCheese: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -121,6 +130,7 @@ export class AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: true,
+        calorie: {},
     })
 
     public static readonly pepperJackCheese: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -133,6 +143,7 @@ export class AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: true,
+        calorie: {},
     })
 
     public static readonly montereyJackCheese: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -145,6 +156,7 @@ export class AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: true,
+        calorie: {},
     })
 
     public static readonly porkRoast: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -157,6 +169,7 @@ export class AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: true,
+        calorie: {},
     })
 
     public static readonly bonelessRibClubSteak: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -169,6 +182,7 @@ export class AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: true,
+        calorie: {},
     })
 
     public static readonly egg: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -181,6 +195,7 @@ export class AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: true,
+        calorie: {},
     })
 
     public static readonly eggWhite: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -193,6 +208,7 @@ export class AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: true,
+        calorie: {},
     })
 
     public static readonly ham: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -205,6 +221,7 @@ export class AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: true,
+        calorie: {},
     })
 
     public static readonly honey: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -217,6 +234,7 @@ export class AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: true,
+        calorie: {},
     })
 
     public static readonly butter: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -229,6 +247,7 @@ export class AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: true,
+        calorie: {},
     })
 
     public static readonly eggPasta: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -241,5 +260,6 @@ export class AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: true,
+        calorie: {},
     })
 }

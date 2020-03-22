@@ -13,5 +13,6 @@ export class MeatItems extends FruitItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: true,
+        calorie: {},
     })
 }

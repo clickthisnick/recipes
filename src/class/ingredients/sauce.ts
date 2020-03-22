@@ -1,5 +1,5 @@
 import { IItem } from './item';
-import { IUnitObj } from '../../constants/units';
+import { IUnitObj, Units as u } from '../../constants/units';
 import { OilItems } from './oil';
 
 export class SauceItems extends OilItems {
@@ -13,6 +13,7 @@ export class SauceItems extends OilItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
+        calorie: {}
     })
 
     public static readonly soySauce: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -25,6 +26,7 @@ export class SauceItems extends OilItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
+        calorie: {}
     })
 
     public static readonly padThaiSauce: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -37,6 +39,7 @@ export class SauceItems extends OilItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
+        calorie: {}
     })
 
     public static readonly pizzaSauce: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -49,6 +52,7 @@ export class SauceItems extends OilItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
+        calorie: {}
     })
 
     public static readonly sirachaSauce: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -61,6 +65,7 @@ export class SauceItems extends OilItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
+        calorie: {}
     })
 
     public static readonly hoisonSauce: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -73,6 +78,7 @@ export class SauceItems extends OilItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
+        calorie: {}
     })
 
     public static readonly spaghettiSauce: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -85,5 +91,8 @@ export class SauceItems extends OilItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
+        calorie: {
+            [u.ounce.name]: 14.4
+        }
     })
 }

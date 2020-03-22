@@ -38,6 +38,7 @@ export class Recipe {
     public recipeGroup: string;
     public vegan: boolean;
     public timeEstimateMilliseconds: number;
+    public caloriesEstimate: number;
 
     constructor() {
       this.vegan = true;
@@ -174,7 +175,7 @@ export class Recipe {
           throw new Error(`Ingredient not found: ${itemObj.name}`);
       }
 
-      const ing = this.cloneObj(ingredient);
+      const ing: IItemObj = this.cloneObj(ingredient);
 
       // .00001 is a number that no one would ever use in a recipe
       // Its what we default item values to
@@ -187,11 +188,16 @@ export class Recipe {
       if (itemObj.quantity > ing.quantity) {
          throw new Error(`Not enough ${ing.name}, \nCurrent: ${ing.quantity}\nNeeded: ${itemObj.quantity}`);
       } else {
+         // Add calories to our calculation
+         if (ing.unit !== null && ing.calorie.hasOwnProperty(ing.unit.name)) {
+            this.caloriesEstimate += ing.calorie[ing.unit.name] * itemObj.quantity;
+         }
+
          // Subtracting the ingredients used from the ingredient amount
          ingredient.quantity -= itemObj.quantity;
 
          // Make the clone have the same quantity as what we used up to fullfil this step
-         ing.quantity =  itemObj.quantity;
+         ing.quantity = itemObj.quantity;
       }
 
       return ing;
@@ -268,7 +274,7 @@ export class Recipe {
         // TODO find something better to do with seconds
         const recipeEstimatedMinutes = Math.round(this.timeEstimateMilliseconds / 60000);
 
-        Readme.groups[this.recipeGroup].push(`## [${this.recipeName.split(' ').join('')} - ${recipeEstimatedMinutes} Min.](https://www.clickthisnick.com/recipes/dist/${this.recipeName.toLowerCase().split(' ').join('')}.html)\n\n`);
+        Readme.groups[this.recipeGroup].push(`## [${this.recipeName.split(' ').join('')} - ${recipeEstimatedMinutes} Min. - ${this.caloriesEstimate} Calories](https://www.clickthisnick.com/recipes/dist/${this.recipeName.toLowerCase().split(' ').join('')}.html)\n\n`);
    }
 
    public writeRecipe() {

@@ -2,6 +2,10 @@ export interface IUnitObj {
     name: string;
 }
 
+export interface ICalorieUnitObj {
+    [details: string]: number;
+}
+
 export class Units {
     public static readonly cup: IUnitObj = {
         name: 'cup'

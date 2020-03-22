@@ -13,6 +13,7 @@ export class FruitItems extends CarbItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
+        calorie: {},
     })
 
     public static readonly frozenBerries: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -25,5 +26,6 @@ export class FruitItems extends CarbItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
+        calorie: {},
     })
 }

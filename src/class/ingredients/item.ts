@@ -1,4 +1,4 @@
-import { IUnitObj } from '../../constants/units';
+import { IUnitObj, ICalorieUnitObj } from '../../constants/units';
 
 export interface IItemObj {
     name: string;
@@ -10,6 +10,7 @@ export interface IItemObj {
     wash: boolean;
     isTakoutUnitable: boolean;
     isMeatProduct: boolean;
+    calorie: ICalorieUnitObj;
 }
 
 export interface IItem {

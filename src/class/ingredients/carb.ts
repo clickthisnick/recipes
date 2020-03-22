@@ -14,6 +14,7 @@ export class CarbItems extends AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
+        calorie: {}
     })
 
     public static readonly lentilSpaghetti: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -26,6 +27,7 @@ export class CarbItems extends AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
+        calorie: {}
     })
 
     public static readonly quinoa: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -38,6 +40,7 @@ export class CarbItems extends AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
+        calorie: {}
     })
 
     public static readonly brownRice: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -50,6 +53,7 @@ export class CarbItems extends AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
+        calorie: {}
     })
 
     public static readonly frozenChickenWings: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -62,6 +66,7 @@ export class CarbItems extends AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
+        calorie: {}
     })
 
     public static readonly wildBasmatiRice: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -74,5 +79,6 @@ export class CarbItems extends AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
+        calorie: {}
     })
 }
