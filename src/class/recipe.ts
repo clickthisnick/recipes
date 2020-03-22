@@ -38,7 +38,7 @@ export class Recipe {
     public recipeGroup: string;
     public vegan: boolean;
     public timeEstimateMilliseconds: number;
-    public caloriesEstimate: number;
+    public caloriesEstimate: number = 0;
 
     constructor() {
       this.vegan = true;
