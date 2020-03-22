@@ -55,7 +55,9 @@ export class CarbItems extends AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        calorie: {}
+        calorie: {
+            [u.cup.name]: 678.96
+        }
     })
 
     public static readonly frozenChickenWings: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
