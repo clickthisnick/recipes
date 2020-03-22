@@ -39,7 +39,7 @@ export class Recipe {
     public vegan: boolean;
     public timeEstimateMilliseconds: number;
     public caloriesEstimate: number = 0;
-    public calorieDataMissing: boolean = false;
+    public calorieDataMissing: [string] = [''];
 
     constructor() {
       this.vegan = true;
@@ -167,6 +167,15 @@ export class Recipe {
 
     public addIngredients(ingredients: IItemObj[]) {
         this.ingredients = ingredients;
+
+        ingredients.forEach((ing) => {
+            // Add calories to our calculation
+            if (ing.unit !== null && ing.calorie.hasOwnProperty(ing.unit.name)) {
+                this.caloriesEstimate += ing.calorie[ing.unit.name] * ing.quantity;
+            } else {
+                this.calorieDataMissing.push(ing.name);
+            }
+        });
     }
 
     public get(itemObj: IItemObj): any {
@@ -189,13 +198,6 @@ export class Recipe {
       if (itemObj.quantity > ing.quantity) {
          throw new Error(`Not enough ${ing.name}, \nCurrent: ${ing.quantity}\nNeeded: ${itemObj.quantity}`);
       } else {
-         // Add calories to our calculation
-         if (ing.unit !== null && ing.calorie.hasOwnProperty(ing.unit.name)) {
-            this.caloriesEstimate += ing.calorie[ing.unit.name] * itemObj.quantity;
-         } else {
-             this.calorieDataMissing = true;
-         }
-
          // Subtracting the ingredients used from the ingredient amount
          ingredient.quantity -= itemObj.quantity;
 
@@ -223,10 +225,13 @@ export class Recipe {
             }
         });
 
-        if (this.calorieDataMissing) {
-            this.recipeHtml += this.generateHeader(`? (Data Missing) Calories`);
+        if (this.calorieDataMissing.length >= 2) {
+            // Remove our empty string from initialization.
+            // TODO theres probably a better way to init
+            this.calorieDataMissing.shift();
+            this.recipeHtml += this.generateHeader(`? (${this.calorieDataMissing.join('/')} Data Missing) Calories`);
         } else {
-            this.recipeHtml += this.generateHeader(`${this.caloriesEstimate} Calories`);
+            this.recipeHtml += this.generateHeader(`${Math.round(this.caloriesEstimate)} Calories`);
         }
 
         if (this.vegan === true) {

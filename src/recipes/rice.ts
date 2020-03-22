@@ -11,7 +11,6 @@ export class MealRecipe extends Recipe {
         this.recipeGroup = c.component;
         this.addIngredients([
             i.brownRice(1, u.cup),
-            i.instaPot(1),
             i.water(1.5, u.cup)
         ]);
     }
@@ -19,7 +18,7 @@ export class MealRecipe extends Recipe {
     public generateRecipe() {
         this.prep();
         this.addSteps([
-            ['Put', i.brownRice(), 'in', i.instaPot()],
+            ['Put', i.brownRice(), 'in instant pot'],
             ['Put in', i.water()],
             [Timer.pressureCook(15, 'm')],
             [Timer.set(5, 'm', 'let sit without opening steam valve')],
