@@ -4,6 +4,7 @@ import { Readme } from './readme';
 import { Serializer as s } from './serializer';
 import { ITimer } from './timer';
 import { HTML } from './html';
+import { Async } from './async';
 
 // if (`${quantity}`.endsWith('.75')) {
 //     quantityString = `${quantity-.75}¾`;
@@ -160,6 +161,8 @@ export class Recipe {
         itemObj.quantity = ingredient.quantity;
       }
 
+      console.log(itemObj.quantity);
+      console.log(ing.quantity);
       if (itemObj.quantity > ing.quantity) {
          throw new Error(`Not enough ${ing.name}, \nCurrent: ${ing.quantity}\nNeeded: ${itemObj.quantity}`);
       } else {
@@ -206,29 +209,52 @@ export class Recipe {
         }
     }
 
+    public generateStepText(steps) {
+        let stepText = '';
+
+        steps.forEach((item) => {
+            if (typeof item === 'string') {
+                stepText += item;
+            } else if (item.type === 'timer') {
+                stepText += item.text;
+            } else if (typeof item === 'object') {
+                // this.get make the recipe aware we are using the item
+                // also does some validation like item is in our ingredients and we have enough
+                stepText += s.turnIngObjIntoStr(this.get(item), true);
+            }
+            stepText += ' ';
+        });
+
+        return stepText;
+    }
+
     public generateRow(step) {
         let stepDirections;
 
-        if (step.length === 1 && typeof(step[0].type) !== 'undefined') {
+        // Add async text to next step
+        if (step[0] === Async.step) {
+
+            // Remove async
+            step.shift();
+
+            // Add to text
+            if (typeof(step[0]) === 'string') {
+                step[0] = Async.step + step[0];
+            } else {
+                step[0].text = Async.step + step[0].text;
+            }
+        }
+
+        if (step[0].type === 'timer') {
             // Incrementing the rough estimate of how long the recipe will take.
-            this.timeEstimateMilliseconds += step[0].milliseconds;
-            stepDirections = this.generateTimerStep(step[0]);
+            this.timeEstimateMilliseconds += step.milliseconds;
 
-            return stepDirections;
+            // Generate text without timer
+            // const timerStep = this.generateStepText(step[0]).trim();
 
+            return this.generateTimerStep(step[0]);
         } else {
-            let stepText = '';
-
-            step.forEach((item) => {
-                if (typeof item === 'string') {
-                    stepText += item;
-                } else if (typeof item === 'object') {
-                    // this.get make the recipe aware we are using the item
-                    // also does some validation like item is in our ingredients and we have enough
-                    stepText += s.turnIngObjIntoStr(this.get(item), true);
-                }
-                stepText += ' ';
-            });
+            const stepText = this.generateStepText(step);
 
             stepText.trim();
             stepDirections = this.generateStep(stepText);
@@ -253,5 +279,6 @@ export class Recipe {
 
    public addSteps(steps: (string | ITimer | IItemObj)[][]) {
       this.steps = steps;
+      this.printRecipe();
     }
 }

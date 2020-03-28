@@ -73,6 +73,5 @@ class ButterChicken extends Recipe {
             ['Stir in', i.coconutCream()],
             [Timer.set(3, 'm', 'Saute on medium')],
         ]);
-        this.printRecipe();
     }
 }

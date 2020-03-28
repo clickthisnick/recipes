@@ -19,6 +19,5 @@ export class Lentil extends Recipe {
             [Timer.pressureCook(10, 'm', true)],
             ['Release steam valve and serve'],
         ]);
-        this.printRecipe();
     }
 }

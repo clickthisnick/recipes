@@ -95,4 +95,17 @@ export class SauceItems extends OilItems {
             [u.ounce.name]: 14.4
         }
     })
+
+    public static readonly buffaloSauce: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+        name: 'Buffalo Sauce',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Put brown sugar back in cupboard',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        calorie: {},
+    })
 }

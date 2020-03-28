@@ -7,7 +7,7 @@ import { WholeGrainSausage } from '../recipes/spaghetti/wholegrain_sausage';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.recipeName = 'Lentil Spaghetti';
+        this.recipeName = 'Spaghetti';
         this.recipeGroup = c.meal;
         this.recipeOptions = [
             {'pasta': ['whole grain', 'lentil', 'hemp rotators']},

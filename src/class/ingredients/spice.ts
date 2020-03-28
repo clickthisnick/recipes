@@ -186,6 +186,19 @@ export class SpiceItems extends SauceItems {
         calorie: {},
     })
 
+    public static readonly curryPowder: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+        name: 'Brown Sugar',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        calorie: {},
+    })
+
     public static readonly kosherSalt: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
         name: 'Kosher Salt',
         putAwayTime: 10,

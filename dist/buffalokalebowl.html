@@ -1,0 +1,126 @@
+<meta name="viewport" content="width=device-width, initial-scale=1"><meta charset="utf-8"><style>
+    button {
+        display: inline-block;
+        border-radius: 4px;
+        background-color: #f4511e;
+        border: none;
+        color: #FFFFFF;
+        text-align: center;
+        font-size: 28px;
+        padding: 20px;
+        width: 200px;
+        transition: all 0.5s;
+        cursor: pointer;
+        margin: 5px;
+      }
+
+    .completed {
+           background-color:green;
+           color: white;
+       }
+
+       .timer {
+              background-color:yellow;
+              color: black;
+          }
+
+       .panel {
+       border-right-style: solid;
+       border-bottom-style: solid;
+       border-left-style: solid;
+        padding: 25px;
+        border-width: 1px;
+       }
+       </style>
+       <script>
+       function setIntervalX(callback, delay, repetitions) {
+           var x = 0;
+           var intervalID = window.setInterval(function () {
+
+              callback();
+
+              if (++x === repetitions) {
+                  window.clearInterval(intervalID);
+              }
+           }, delay);
+       }
+
+       function timer(initialWait) {
+           setIntervalX(function () {
+               setIntervalX(function () {
+                var x = document.getElementById("beep");
+
+                x.play();
+             }, 200, 10);
+         }, initialWait, 1);
+       }
+
+       function startTimer(duration, timerNum) {
+          var timerId = '#' + timerNum;
+          var display = document.querySelector(timerId);
+          var timer = duration, minutes, seconds;
+          var intervalID = window.setInterval(function () {
+               minutes = parseInt(timer / 60, 10)
+               seconds = parseInt(timer % 60, 10);
+
+               minutes = minutes < 10 ? "0" + minutes : minutes;
+               seconds = seconds < 10 ? "0" + seconds : seconds;
+
+               display.textContent = minutes + ":" + seconds + " ";
+
+               if (--timer < 0) {
+                   window.clearInterval(intervalID);
+                   var panelId = "#panel" + timerNum;
+                   var panel = document.querySelector(panelId);
+                   panel.classList.toggle('timer');
+                   panel.classList.toggle('completed');
+               }
+           }, 1000);
+       }
+
+       function loadTimer(seconds, timerNum) {
+          seconds = seconds / 1000;
+
+          startTimer(seconds, timerNum);
+       }
+
+       var shownId = '';
+
+       function getCheckedOptions() {
+          var id = '';
+          var htmlCollection = document.getElementById('options').getElementsByTagName('button')
+
+          for (const item of htmlCollection) {
+            if (item.classList[0] == 'completed') {
+                id += item.innerHTML
+            }
+          }
+
+          return id
+       }
+
+       // Used to hide/show recipes
+       function showRecipe() {
+            var id = getCheckedOptions()
+
+            console.log('id');
+            console.log(id);
+
+            // Show
+            if (document.getElementById(id)) {
+                document.getElementById(id).style.display = 'block';
+            }
+
+            console.log('shownId');
+            console.log(shownId);
+
+            if (document.getElementById(shownId)) {
+                // Hide previously shown
+                document.getElementById(shownId).style.display = 'none';
+            }
+
+            shownId = id;
+        }
+
+       </script>
+    <a href="https://github.com/clickthisnick/recipes/blob/master/README.MD">Back To Recipes</a><div id="options"><br><b>recipe</b><br><button onclick="this.classList.toggle('completed'); showRecipe()">default</button></div><br><div id="default" style="display: none"><h1>? (Kale/Chilli Oil/Dash Seasoning/Black Beans/Brown Sugar/Buffalo Sauce/Brown Sugar Data Missing) Calories</h1><h1>Vegan Recipe</h1><div class="panel" onclick="this.classList.toggle('completed')">Put 1 cup Brown Rice in instant pot </div><div class="panel" onclick="this.classList.toggle('completed')">Put in 1½ cups Water </div><div class="panel" id="paneltimer3" onclick="this.classList.toggle('timer'); timer(900000); loadTimer(900000, 'timer3')"><span id="timer3"></span>Async 15 minutes Pressure cook on high pressure</div><div class="panel" id="paneltimer4" onclick="this.classList.toggle('timer'); timer(600000); loadTimer(600000, 'timer4')"><span id="timer4"></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Timer 10 minutes Wait</div><div class="panel" id="paneltimer5" onclick="this.classList.toggle('timer'); timer(300000); loadTimer(300000, 'timer5')"><span id="timer5"></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Timer 5 minutes Preheat pan on heat 7</div><div class="panel" onclick="this.classList.toggle('completed')">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Put in 2 tbsps Chilli Oil in pan </div><div class="panel" onclick="this.classList.toggle('completed')">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Put in Kale in pan </div><div class="panel" id="paneltimer6" onclick="this.classList.toggle('timer'); timer(300000); loadTimer(300000, 'timer6')"><span id="timer6"></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Timer 5 minutes Pan sautee kale</div><div class="panel" id="paneltimer7" onclick="this.classList.toggle('timer'); timer(300000); loadTimer(300000, 'timer7')"><span id="timer7"></span>Timer 5 minutes let instant pot sit without opening steam valve</div><div class="panel" onclick="this.classList.toggle('completed')">Open steam valve </div><div class="panel" onclick="this.classList.toggle('completed')">Mix in 1 cup Brown Sugar into rice </div><div class="panel" onclick="this.classList.toggle('completed')">In a bowl mix 2 tbsps Black Beans  Brown Rice Kale 2 tbsps Buffalo Sauce </div></div>

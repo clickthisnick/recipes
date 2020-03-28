@@ -19,6 +19,5 @@ export class WholeGrain extends Recipe {
             [Timer.pressureCook(8, 'm', true)],
             ['Release steam valve and serve'],
         ]);
-        this.printRecipe();
     }
 }
