@@ -9,21 +9,21 @@ export class MealRecipe extends RecipeContainer {
         super();
         this.recipeName = 'asparagus';
         this.recipeGroup = c.component;
-        this.recipeOptions = [
-            {'recipe': ['asparagus']},
-         ];
      }
 
      public init() {
          this.generateRecipes([
-             Asparagus
+             {'recipe': [Asparagus]},
          ]);
      }
 }
 
 class Asparagus extends Recipe {
-    public generateRecipe() {
+    constructor() {
+        super();
         this.recipeId = 'asparagus';
+    }
+    public generateRecipe() {
         this.addIngredients([
             i.asparagus(.5, u.bunch),
             i.oliveOil(1, u.unit),

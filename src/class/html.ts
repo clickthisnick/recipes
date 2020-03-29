@@ -110,6 +110,8 @@ export class HTML {
        function showRecipe() {
             var id = getCheckedOptions()
 
+            console.log(id);
+
             // Show
             if (document.getElementById(id)) {
                 document.getElementById(id).style.display = 'block';
@@ -126,49 +128,26 @@ export class HTML {
        </script>
     `;
 
-    public static addOptions(options) {
+    public static addOptions(recipeIds: string[], onlyOneVariation) {
         // Adds each option
         // default will get set when
         let tmpHtml = '';
-        let clickedOption = false;
 
-        // Only one option
-        // Like [ { recipe: [ 'brown rice', 'jasmine rice' ] } ]
-        if (options.length === 1) {
-            // Only one option within that option
-            // Like ['brown rice', 'jasmine rice']
-            const optionValues: any = Object.values(options[0])[0];
-
-            if (optionValues.length === 1) {
-                clickedOption = true;
+        recipeIds.forEach((recipeId) => {
+            if (onlyOneVariation) {
+                // If there is only one option don't display the button
+                tmpHtml += `<button style="display: none;" onclick="this.classList.toggle('completed'); showRecipe()">${recipeId}</button>`;
+            } else {
+                tmpHtml += `<button onclick="this.classList.toggle('completed'); showRecipe()">${recipeId}</button>`;
             }
-        }
-
-        options.forEach((optionObj) => {
-            tmpHtml += `<br><b>${Object.keys(optionObj)}</b><br>`;
-            const optionValues: any = Object.values(optionObj)[0];
-            optionValues.forEach((option) => {
-                if (clickedOption) {
-                    // If there is only one option don't display the button
-                    tmpHtml += `<button style="display: none;" onclick="this.classList.toggle('completed'); showRecipe()">${option}</button>`;
-                } else {
-                    tmpHtml += `<button onclick="this.classList.toggle('completed'); showRecipe()">${option}</button>`;
-                }
-            });
         });
 
         return tmpHtml;
 
     }
 
-    public static generateOptions(options) {
-        // TODO can ids have spaces?
-        let html = '<div id="options">';
-
-        html += this.addOptions(options);
-        html += '</div><br>';
-
-        return html;
+    public static generateOptions(recipeIds: string[], onlyOneVariation) {
+        return this.addOptions(recipeIds, onlyOneVariation);
     }
          // TODO: Could add a sound but browsers won't allow it like this
          // function beep() {

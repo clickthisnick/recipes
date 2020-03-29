@@ -1,24 +1,35 @@
-import { Recipe } from '../class/recipe';
+import { Recipe, RecipeContainer } from '../class/recipe';
 import { Items as i } from '../constants/items';
 import { Categories as c } from '../constants/categories';
-import { Timer } from '../class/timer';
 import { Units as u } from '../constants/units';
+import { Timer } from '../class/timer';
 
-export class MealRecipe extends Recipe {
+export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
         this.recipeName = 'popcorn';
         this.recipeGroup = c.component;
+    }
+
+    public init() {
+        this.generateRecipes([
+            {'recipe': [Popcorn]},
+        ]);
+    }
+}
+
+class Popcorn extends Recipe {
+    constructor() {
+        super();
+        this.recipeId = 'popcorn';
+    }
+    public generateRecipe() {
         this.addIngredients([
             i.popcorn(4, u.tbsp),
             i.salt(1, u.unit),
             i.oliveOil(1, u.tbsp),
             i.dash(1, u.unit),
         ]);
-    }
-
-    public generateRecipe() {
-        this.prep();
         this.addSteps([
             ['Put', i.oliveOil(), 'in pot'],
             ['Put in 3', i.popcorn(0), 'kernels'],
@@ -28,6 +39,5 @@ export class MealRecipe extends Recipe {
             ['Cook until popped (write this down)'],
             ['Season with', i.dash(), i.salt()],
         ]);
-        this.printRecipe();
     }
 }

@@ -10,21 +10,21 @@ export class MealRecipe extends RecipeContainer {
         super();
         this.recipeName = 'Buffalo Kale Bowl';
         this.recipeGroup = c.meal;
-        this.recipeOptions = [
-            {'recipe': ['default']},
-         ];
      }
 
      public init() {
          this.generateRecipes([
-            BuffaloKaleBowl
+            {'recipe': [BuffaloKaleBowl]},
          ]);
      }
 }
 
 class BuffaloKaleBowl extends Recipe {
-    public generateRecipe() {
+    constructor() {
+        super();
         this.recipeId = 'default';
+    }
+    public generateRecipe() {
         this.addIngredients([
             i.kale(1, u.unit),
             i.chilliOil(2, u.tbsp),
@@ -38,14 +38,14 @@ class BuffaloKaleBowl extends Recipe {
             ['Put', i.brownRice(), 'in instant pot'],
             ['Put in', i.water()],
             [Timer.pressureCook(15, 'm', true)],
-            [Async.step, Timer.set(10, 'm', 'Wait', true)],
-            [Async.step, Async.step, 'Wash', i.kale()],
-            [Async.step, Async.step, 'Wash', i.blackBeans()],
-            [Async.step, Timer.preheatPan(7)],
-            [Async.step, 'Put in', i.chilliOil(), 'in pan'],
-            [Async.step, 'put', i.kale(), 'in pan'],
-            [Async.step, Timer.panSautee(5, 'm', 'kale', true)],
-            [Async.step, Async.step, 'Put kale away'],
+                [Async.step, Timer.set(10, 'm', 'Wait', true)],
+                    [Async.step, Async.step, 'Wash', i.kale()],
+                    [Async.step, Async.step, 'Wash', i.blackBeans()],
+                [Async.step, Timer.preheatPan(7)],
+                [Async.step, 'Put in', i.chilliOil(), 'in pan'],
+                [Async.step, 'put', i.kale(), 'in pan'],
+                [Async.step, Timer.panSautee(5, 'm', 'kale', true)],
+                    [Async.step, Async.step, 'Put kale away'],
             [Timer.set(5, 'm', 'let instant pot sit without opening steam valve')],
             ['Open steam valve'],
             ['Mix in', i.curryPowder(), 'into rice'],

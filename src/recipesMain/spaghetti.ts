@@ -9,18 +9,12 @@ export class MealRecipe extends RecipeContainer {
         super();
         this.recipeName = 'Spaghetti';
         this.recipeGroup = c.meal;
-        this.recipeOptions = [
-            {'pasta': ['whole grain', 'lentil', 'hemp rotators']},
-            {'meat': ['sausage']},
-            {'veggie': ['mushroom']},
-        ];
     }
 
     public init() {
         this.generateRecipes([
-            Lentil,
-            WholeGrain,
-            WholeGrainSausage
+            {'pasta': [WholeGrain, Lentil]},
+            {'meat': [WholeGrainSausage]},
         ]);
     }
 }

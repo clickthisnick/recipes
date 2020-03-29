@@ -10,21 +10,21 @@ export class MealRecipe extends RecipeContainer {
         super();
         this.recipeName = 'ButterChicken';
         this.recipeGroup = c.meal;
-        this.recipeOptions = [
-           {'recipe': ['butterchicken']},
-        ];
     }
 
     public init() {
         this.generateRecipes([
-            ButterChicken
+            {'recipe': [ButterChicken]},
         ]);
     }
 }
 
 class ButterChicken extends Recipe {
-    public generateRecipe() {
+    constructor() {
+        super();
         this.recipeId = 'butterchicken';
+    }
+    public generateRecipe() {
         this.addIngredients([
             i.oliveOil(1, u.tbsp),
             i.butter(1, u.tbsp),

@@ -4,8 +4,11 @@ import { Timer } from '../../class/timer';
 import { Units as u } from '../../constants/units';
 
 export class WholeGrain extends Recipe {
-    public generateRecipe() {
+    constructor() {
+        super();
         this.recipeId = 'whole grain';
+    }
+    public generateRecipe() {
         this.addIngredients([
             i.spaghettiWholeGrain(8, u.ounce),
             i.spaghettiSauce(25, u.ounce),

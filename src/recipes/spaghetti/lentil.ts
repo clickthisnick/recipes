@@ -4,8 +4,11 @@ import { Timer } from '../../class/timer';
 import { Units as u } from '../../constants/units';
 
 export class Lentil extends Recipe {
-    public generateRecipe() {
+    constructor() {
+        super();
         this.recipeId = 'lentil';
+    }
+    public generateRecipe() {
         this.addIngredients([
             i.spaghettiLentil(8, u.ounce),
             i.spaghettiSauce(25, u.ounce),

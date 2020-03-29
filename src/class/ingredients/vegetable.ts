@@ -43,19 +43,6 @@ export class VegetableItems extends SpiceItems {
         calorie: {},
     })
 
-    public static readonly instaPot: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
-        name: 'InstaPot',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        calorie: {},
-    })
-
     public static readonly whiteVinegar: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
         name: 'White Vinegar',
         putAwayTime: 10,

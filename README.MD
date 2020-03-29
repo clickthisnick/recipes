@@ -14,5 +14,11 @@
 # Component
 ## [asparagus](https://www.clickthisnick.com/recipes/dist/asparagus.html)
 
+## [lentils](https://www.clickthisnick.com/recipes/dist/lentils.html)
+
+## [mushrooms](https://www.clickthisnick.com/recipes/dist/mushrooms.html)
+
+## [popcorn](https://www.clickthisnick.com/recipes/dist/popcorn.html)
+
 ## [rice](https://www.clickthisnick.com/recipes/dist/rice.html)
 

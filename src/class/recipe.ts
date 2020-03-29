@@ -22,6 +22,10 @@ import { Async } from './async';
 //     quantityString = `${quantity-.125}⅛`;
 //   }
 
+export interface IVariation {
+    [details: string]: any[]; // Unititalized recipe
+}
+
 function finalStepReplace(text: string) {
     const tmpText: string = text.replace(/1\/2/g, '½');
 
@@ -32,7 +36,7 @@ export class RecipeContainer {
     public recipeHtml: string = '';
     public recipeGroup: string;
     public recipeName: string;
-    public recipeOptions: any;
+    // public recipeOptions: any;
     // Arbitrary key.
     // Values are added in order of keys to the recipe body html ID
     // so just lentil spagehetti is id="lentil"
@@ -56,26 +60,48 @@ export class RecipeContainer {
         Readme.groups[this.recipeGroup].push(`## [${this.recipeName.split(' ').join('')}](https://www.clickthisnick.com/recipes/dist/${this.recipeName.toLowerCase().split(' ').join('')}.html)\n\n`);
 
     }
-    public generateRecipes(variations: any[]) {
+    public generateRecipes(variations: IVariation[]) {
         // Add options
         this.addToGroup();
-        this.recipeHtml += HTML.generateOptions(this.recipeOptions);
 
-        // TODO NICK pass in to show automatically
+        let tmpOptionHtml = '';
+        let tmpHtml = '';
+        let defaultShowRecipe = false;
+
         if (variations.length === 1) {
-            const variationRecipe = new variations[0](true);
-            variationRecipe.generateRecipe();
+            const recipes: any[] = Object.values(variations[0])[0];
 
-            this.recipeHtml += variationRecipe.recipeHtml;
-        } else {
-            variations.forEach((variation) => {
-                const variationRecipe = new variation();
-                variationRecipe.generateRecipe();
-
-                this.recipeHtml += variationRecipe.recipeHtml;
-            });
+            if (recipes.length === 1) {
+                defaultShowRecipe = true;
+            }
         }
-     }
+
+        variations.forEach((variation) => {
+            const recipeIds: string[] = [];
+
+            // Add the key text
+            // Like "veggies"
+            tmpOptionHtml += `<br><b>${Object.keys(variation)}</b><br>`;
+
+            const recipes: any[] = Object.values(variation)[0];
+
+            recipes.forEach((recipe) => {
+                const initRecipe: Recipe = new recipe();
+
+                initRecipe.autoShow = defaultShowRecipe;
+                initRecipe.generateRecipe();
+                recipeIds.push(initRecipe.recipeId);
+                tmpHtml += initRecipe.recipeHtml;
+            });
+
+            tmpOptionHtml += HTML.generateOptions(recipeIds, defaultShowRecipe);
+        });
+
+        this.recipeHtml += '<div id="options">';
+        this.recipeHtml += tmpOptionHtml;
+        this.recipeHtml += '</div><br>';
+        this.recipeHtml += tmpHtml;
+    }
 
     constructor() {
         this.recipeHtml += HTML.mobileViewport;
@@ -95,6 +121,7 @@ export class RecipeContainer {
 export class Recipe {
     private steps: any[] = [];
     public recipeId: string;
+    public compoundRecipeId: string;
     public ingredients: IItemObj[];
     public vegan: boolean = true;
     public timeEstimateMilliseconds: number = 0;
@@ -102,13 +129,16 @@ export class Recipe {
     public calorieDataMissing: [string] = [''];
     public recipeHtml: string = '';
 
+    // This gets overloaded
+    public generateRecipe() {
+        console.log('I should never show up');
+
+        return;
+    }
+
     // Whether to auto show the recipe
     // Useful if the recipe only has one option
-    private autoShow: boolean = false;
-
-    constructor(autoShow = false) {
-        this.autoShow = autoShow;
-    }
+    public autoShow: boolean = false;
 
     //   this.recipeHtml += this.generateHeader('Clean counter space:');
     //   this.recipeHtml += this.generateStep('Empty dishwasher');
@@ -145,9 +175,17 @@ export class Recipe {
         // Opening div with id
         // If autoShow, then display the recipe
         if (this.autoShow) {
-            this.recipeHtml += `<div id="${this.recipeId}">`;
+            if (this.compoundRecipeId) {
+                this.recipeHtml += `<div id="${this.compoundRecipeId}">`;
+            } else {
+                this.recipeHtml += `<div id="${this.recipeId}">`;
+            }
         } else {
-            this.recipeHtml += `<div id="${this.recipeId}" style="display: none">`;
+            if (this.compoundRecipeId) {
+                this.recipeHtml += `<div id="${this.compoundRecipeId}" style="display: none">`;
+            } else {
+                this.recipeHtml += `<div id="${this.recipeId}" style="display: none">`;
+            }
         }
 
         this.ingredients = ingredients;
@@ -292,7 +330,6 @@ export class Recipe {
         });
 
         // This is calculated when the steps are parsed
-        console.log(this.timeEstimateMilliseconds);
         const estimatedTime = Math.round(this.timeEstimateMilliseconds / 60000);
 
         this.recipeHtml += this.generateHeader(`Estimated Time: ${estimatedTime} Minutes`);

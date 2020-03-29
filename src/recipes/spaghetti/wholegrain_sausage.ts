@@ -2,10 +2,15 @@ import { Recipe } from '../../class/recipe';
 import { Items as i } from '../../constants/items';
 import { Timer } from '../../class/timer';
 import { Units as u } from '../../constants/units';
+import { WholeGrain } from './wholegrain';
 
 export class WholeGrainSausage extends Recipe {
+    constructor() {
+        super();
+        this.recipeId = 'sausage';
+        this.compoundRecipeId = `${new WholeGrain().recipeId}${this.recipeId}`;
+    }
     public generateRecipe() {
-        this.recipeId = 'whole grainsausage';
         this.addIngredients([
             i.italianSausage(4, u.ounce),
             i.spaghettiWholeGrain(8, u.ounce),

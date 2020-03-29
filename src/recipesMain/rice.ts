@@ -9,22 +9,21 @@ export class MealRecipe extends RecipeContainer {
         super();
         this.recipeName = 'rice';
         this.recipeGroup = c.component;
-        this.recipeOptions = [
-            {'recipe': ['cup', 'half cup']},
-         ];
     }
 
     public init() {
         this.generateRecipes([
-            Rice1Cup,
-            RiceHalfCup
+            {'recipe': [Rice1Cup, RiceHalfCup]}
         ]);
     }
 }
 
 class Rice1Cup extends Recipe {
-    public generateRecipe() {
+    constructor() {
+        super();
         this.recipeId = 'cup';
+    }
+    public generateRecipe() {
         this.addIngredients([
             i.brownRice(1, u.cup),
             i.water(1.5, u.cup)
@@ -40,8 +39,11 @@ class Rice1Cup extends Recipe {
 }
 
 class RiceHalfCup extends Recipe {
-    public generateRecipe() {
+    constructor() {
+        super();
         this.recipeId = 'half cup';
+    }
+    public generateRecipe() {
         this.addIngredients([
             i.brownRice(.5, u.cup),
             i.water(1, u.cup)
