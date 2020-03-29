@@ -103,16 +103,10 @@
        function showRecipe() {
             var id = getCheckedOptions()
 
-            console.log('id');
-            console.log(id);
-
             // Show
             if (document.getElementById(id)) {
                 document.getElementById(id).style.display = 'block';
             }
-
-            console.log('shownId');
-            console.log(shownId);
 
             if (document.getElementById(shownId)) {
                 // Hide previously shown
@@ -123,4 +117,4 @@
         }
 
        </script>
-    <a href="https://github.com/clickthisnick/recipes/blob/master/README.MD">Back To Recipes</a><div id="options"><br><b>recipe</b><br><button onclick="this.classList.toggle('completed'); showRecipe()">rice</button></div><br><div id="rice" style="display: none"><h1>679 Calories</h1><h1>Vegan Recipe</h1><div class="panel" onclick="this.classList.toggle('completed')">Put 1 cup Brown Rice in instant pot </div><div class="panel" onclick="this.classList.toggle('completed')">Put in 1½ cups Water </div><div class="panel" id="paneltimer13" onclick="this.classList.toggle('timer'); timer(900000); loadTimer(900000, 'timer13')"><span id="timer13"></span>Async 15 minutes Pressure cook on high pressure</div><div class="panel" id="paneltimer14" onclick="this.classList.toggle('timer'); timer(300000); loadTimer(300000, 'timer14')"><span id="timer14"></span>Timer 5 minutes let sit without opening steam valve</div><div class="panel" onclick="this.classList.toggle('completed')">Open steam valve </div></div>
+    <a href="https://github.com/clickthisnick/recipes/blob/master/README.MD">Back To Recipes</a><div id="options"><br><b>recipe</b><br><button style="display: none;" onclick="this.classList.toggle('completed'); showRecipe()">rice</button></div><br><div id="rice"><h1>679 Calories</h1><h1>Vegan Recipe</h1><div class="panel" onclick="this.classList.toggle('completed')">Put 1 cup Brown Rice in instant pot </div><div class="panel" onclick="this.classList.toggle('completed')">Put in 1½ cups Water </div><div class="panel" id="paneltimer13" onclick="this.classList.toggle('timer'); timer(900000); loadTimer(900000, 'timer13')"><span id="timer13"></span>Async 15 minutes Pressure cook on high pressure</div><div class="panel" id="paneltimer14" onclick="this.classList.toggle('timer'); timer(300000); loadTimer(300000, 'timer14')"><span id="timer14"></span>Timer 5 minutes let sit without opening steam valve</div><div class="panel" onclick="this.classList.toggle('completed')">Open steam valve </div></div>

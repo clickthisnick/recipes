@@ -30,7 +30,6 @@ class BuffaloKaleBowl extends Recipe {
             i.chilliOil(2, u.tbsp),
             i.dash(1, u.unit),
             i.blackBeans(2, u.tbsp),
-            i.brownSugar(1, u.cup),
             i.buffaloSauce(2, u.tbsp),
             i.curryPowder(2, u.tbsp),
             i.brownRice(1, u.cup),

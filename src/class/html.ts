@@ -110,16 +110,10 @@ export class HTML {
        function showRecipe() {
             var id = getCheckedOptions()
 
-            console.log('id');
-            console.log(id);
-
             // Show
             if (document.getElementById(id)) {
                 document.getElementById(id).style.display = 'block';
             }
-
-            console.log('shownId');
-            console.log(shownId);
 
             if (document.getElementById(shownId)) {
                 // Hide previously shown
@@ -132,18 +126,46 @@ export class HTML {
        </script>
     `;
 
+    public static addOptions(options) {
+        // Adds each option
+        // default will get set when
+        let tmpHtml = '';
+        let clickedOption = false;
+
+        // Only one option
+        // Like [ { recipe: [ 'brown rice', 'jasmine rice' ] } ]
+        if (options.length === 1) {
+            // Only one option within that option
+            // Like ['brown rice', 'jasmine rice']
+            const optionValues: any = Object.values(options[0])[0];
+
+            if (optionValues.length === 1) {
+                clickedOption = true;
+            }
+        }
+
+        options.forEach((optionObj) => {
+            tmpHtml += `<br><b>${Object.keys(optionObj)}</b><br>`;
+            const optionValues: any = Object.values(optionObj)[0];
+            optionValues.forEach((option) => {
+                if (clickedOption) {
+                    // If there is only one option don't display the button
+                    tmpHtml += `<button style="display: none;" onclick="this.classList.toggle('completed'); showRecipe()">${option}</button>`;
+                } else {
+                    tmpHtml += `<button onclick="this.classList.toggle('completed'); showRecipe()">${option}</button>`;
+                }
+            });
+        });
+
+        return tmpHtml;
+
+    }
+
     public static generateOptions(options) {
         // TODO can ids have spaces?
         let html = '<div id="options">';
 
-        options.forEach((optionObj) => {
-            html += `<br><b>${Object.keys(optionObj)}</b><br>`;
-            const optionValues: any = Object.values(optionObj)[0];
-            optionValues.forEach((option) => {
-                html += `<button onclick="this.classList.toggle('completed'); showRecipe()">${option}</button>`;
-            });
-        });
-
+        html += this.addOptions(options);
         html += '</div><br>';
 
         return html;

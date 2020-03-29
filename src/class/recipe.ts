@@ -56,19 +56,25 @@ export class RecipeContainer {
         Readme.groups[this.recipeGroup].push(`## [${this.recipeName.split(' ').join('')}](https://www.clickthisnick.com/recipes/dist/${this.recipeName.toLowerCase().split(' ').join('')}.html)\n\n`);
 
     }
-    public generateRecipes(variations) {
+    public generateRecipes(variations: any[]) {
         // Add options
         this.addToGroup();
         this.recipeHtml += HTML.generateOptions(this.recipeOptions);
 
-        console.log(variations);
-
-        variations.forEach((variation) => {
-            const variationRecipe = new variation();
+        // TODO NICK pass in to show automatically
+        if (variations.length === 1) {
+            const variationRecipe = new variations[0](true);
             variationRecipe.generateRecipe();
 
             this.recipeHtml += variationRecipe.recipeHtml;
-        });
+        } else {
+            variations.forEach((variation) => {
+                const variationRecipe = new variation();
+                variationRecipe.generateRecipe();
+
+                this.recipeHtml += variationRecipe.recipeHtml;
+            });
+        }
      }
 
     constructor() {
@@ -95,6 +101,14 @@ export class Recipe {
     public caloriesEstimate: number = 0;
     public calorieDataMissing: [string] = [''];
     public recipeHtml: string = '';
+
+    // Whether to auto show the recipe
+    // Useful if the recipe only has one option
+    private autoShow: boolean = false;
+
+    constructor(autoShow = false) {
+        this.autoShow = autoShow;
+    }
 
     //   this.recipeHtml += this.generateHeader('Clean counter space:');
     //   this.recipeHtml += this.generateStep('Empty dishwasher');
@@ -129,7 +143,13 @@ export class Recipe {
 
     public addIngredients(ingredients: IItemObj[]) {
         // Opening div with id
-        this.recipeHtml += `<div id="${this.recipeId}" style="display: none">`;
+        // If autoShow, then display the recipe
+        if (this.autoShow) {
+            this.recipeHtml += `<div id="${this.recipeId}">`;
+        } else {
+            this.recipeHtml += `<div id="${this.recipeId}" style="display: none">`;
+        }
+
         this.ingredients = ingredients;
 
         ingredients.forEach((ing) => {
@@ -161,8 +181,6 @@ export class Recipe {
         itemObj.quantity = ingredient.quantity;
       }
 
-      console.log(itemObj.quantity);
-      console.log(ing.quantity);
       if (itemObj.quantity > ing.quantity) {
          throw new Error(`Not enough ${ing.name}, \nCurrent: ${ing.quantity}\nNeeded: ${itemObj.quantity}`);
       } else {
