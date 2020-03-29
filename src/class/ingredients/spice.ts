@@ -187,7 +187,7 @@ export class SpiceItems extends SauceItems {
     })
 
     public static readonly curryPowder: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
-        name: 'Brown Sugar',
+        name: 'Curry Powder',
         putAwayTime: 10,
         takeOutTime: 10,
         cleanSteps: '',

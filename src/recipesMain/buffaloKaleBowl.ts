@@ -28,7 +28,6 @@ class BuffaloKaleBowl extends Recipe {
         this.addIngredients([
             i.kale(1, u.unit),
             i.chilliOil(2, u.tbsp),
-            i.dash(1, u.unit),
             i.blackBeans(2, u.tbsp),
             i.buffaloSauce(2, u.tbsp),
             i.curryPowder(2, u.tbsp),

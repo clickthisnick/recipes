@@ -298,5 +298,12 @@ export class Recipe {
    public addSteps(steps: (string | ITimer | IItemObj)[][]) {
       this.steps = steps;
       this.printRecipe();
+
+      // Lastly make sure there are no ingredients left
+      this.ingredients.forEach((ingredient) => {
+          if (ingredient.quantity > 0) {
+              throw new Error(`${ingredient.name} still had ${ingredient.quantity} left`)
+          }
+      });
     }
 }
