@@ -8,6 +8,7 @@ export interface ITimer {
     async: boolean;
 }
 
+// TODO instant pot needs preheat like 9 min for rice before 15 min can start
 export class Timer {
     public static timerCount: number = 0;
     private static sanitize(item: any): string {

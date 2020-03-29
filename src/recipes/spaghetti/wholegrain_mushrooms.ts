@@ -3,6 +3,7 @@ import { Items as i } from '../../constants/items';
 import { Timer } from '../../class/timer';
 import { Units as u } from '../../constants/units';
 import { WholeGrain } from './wholegrain';
+import { Async } from '../../class/async';
 
 export class WholeGrainMushroom extends Recipe {
     constructor() {
@@ -17,10 +18,12 @@ export class WholeGrainMushroom extends Recipe {
             i.spaghettiSauce(25, u.ounce),
             i.chilliOil(1, u.tsp),
             i.water(1, u.cup),
+            i.dash(1, u.unit),
         ]);
         this.addSteps([
             ['Add', i.chilliOil(), i.crimniMushroom(), 'to instant pot'],
-            [Timer.instantPotSautee(5, 'm', i.crimniMushroom(0))],
+            [Timer.instantPotSautee(9, 'm', i.crimniMushroom(0), true)],
+            [Async.step, 'season with', i.dash()],
             ['Remove', i.crimniMushroom(0), 'from instant pot'],
             ['Add', i.water(.5, u.cup)],
             ['Add', i.spaghettiSauce()],
