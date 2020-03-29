@@ -249,6 +249,13 @@ export class Recipe {
     public generateRow(step) {
         let stepDirections;
 
+        // Add any timer to time here
+        // We do this before async timers because they happen in the background
+        if (step[0].type === 'timer') {
+            // Incrementing the rough estimate of how long the recipe will take.
+            this.timeEstimateMilliseconds += step[0].milliseconds;
+        }
+
         // Add async text to next step
         if (step[0] === Async.step) {
 
@@ -264,12 +271,6 @@ export class Recipe {
         }
 
         if (step[0].type === 'timer') {
-            // Incrementing the rough estimate of how long the recipe will take.
-            this.timeEstimateMilliseconds += step.milliseconds;
-
-            // Generate text without timer
-            // const timerStep = this.generateStepText(step[0]).trim();
-
             return this.generateTimerStep(step[0]);
         } else {
             const stepText = this.generateStepText(step);
@@ -284,12 +285,18 @@ export class Recipe {
     // TODO Should be a new section after recipe that says clean excess ingredients
     // Like .5 red onion we should put away the other half
    public printRecipe(): void {
+        let stepsHtml = '';
+
         this.steps.forEach((step) => {
-            this.recipeHtml += this.generateRow(step);
+            stepsHtml += this.generateRow(step);
         });
 
-        // TODO find something better to do with seconds
-        Math.round(this.timeEstimateMilliseconds / 60000);
+        // This is calculated when the steps are parsed
+        console.log(this.timeEstimateMilliseconds);
+        const estimatedTime = Math.round(this.timeEstimateMilliseconds / 60000);
+
+        this.recipeHtml += this.generateHeader(`Estimated Time: ${estimatedTime} Minutes`);
+        this.recipeHtml += stepsHtml;
 
         // Close beginning div
         this.recipeHtml += '</div>';

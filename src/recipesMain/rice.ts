@@ -10,20 +10,21 @@ export class MealRecipe extends RecipeContainer {
         this.recipeName = 'rice';
         this.recipeGroup = c.component;
         this.recipeOptions = [
-            {'recipe': ['rice']},
+            {'recipe': ['cup', 'half cup']},
          ];
     }
 
     public init() {
         this.generateRecipes([
-            Rice
+            Rice1Cup,
+            RiceHalfCup
         ]);
     }
 }
 
-class Rice extends Recipe {
+class Rice1Cup extends Recipe {
     public generateRecipe() {
-        this.recipeId = 'rice';
+        this.recipeId = 'cup';
         this.addIngredients([
             i.brownRice(1, u.cup),
             i.water(1.5, u.cup)
@@ -33,6 +34,23 @@ class Rice extends Recipe {
             ['Put in', i.water()],
             [Timer.pressureCook(15, 'm', true)],
             [Timer.set(5, 'm', 'let sit without opening steam valve')],
+            ['Open steam valve'],
+        ]);
+    }
+}
+
+class RiceHalfCup extends Recipe {
+    public generateRecipe() {
+        this.recipeId = 'half cup';
+        this.addIngredients([
+            i.brownRice(.5, u.cup),
+            i.water(1, u.cup)
+        ]);
+        this.addSteps([
+            ['Put', i.brownRice(), 'in instant pot'],
+            ['Put in', i.water()],
+            [Timer.pressureCook(7, 'm', true)],
+            [Timer.set(3, 'm', 'let sit without opening steam valve')],
             ['Open steam valve'],
         ]);
     }
