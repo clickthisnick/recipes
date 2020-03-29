@@ -14,7 +14,7 @@ export class CarbItems extends AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        calorie: {}
+        nutrition: {}
     })
 
     public static readonly spaghettiLentil: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -27,8 +27,10 @@ export class CarbItems extends AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        calorie: {
-            [u.ounce.name]: 100
+        nutrition: {
+            'calorie': {
+                [u.ounce.name]: 100,
+            }
         }
     })
 
@@ -42,8 +44,10 @@ export class CarbItems extends AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        calorie: {
-            [u.ounce.name]: 100
+        nutrition: {
+            'calorie': {
+                [u.ounce.name]: 100
+            }
         }
     })
 
@@ -57,7 +61,7 @@ export class CarbItems extends AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        calorie: {}
+        nutrition: {}
     })
 
     public static readonly brownRice: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -70,8 +74,13 @@ export class CarbItems extends AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        calorie: {
-            [u.cup.name]: 678.96
+        nutrition: {
+            'calorie': {
+                [u.cup.name]: 678.96
+            },
+            'sodium': {
+                [u.cup.name]: 9.3
+            }
         }
     })
 
@@ -85,7 +94,7 @@ export class CarbItems extends AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        calorie: {}
+        nutrition: {}
     })
 
     public static readonly wildBasmatiRice: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -98,6 +107,6 @@ export class CarbItems extends AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        calorie: {}
+        nutrition: {}
     })
 }

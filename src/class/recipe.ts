@@ -125,8 +125,11 @@ export class Recipe {
     public ingredients: IItemObj[];
     public vegan: boolean = true;
     public timeEstimateMilliseconds: number = 0;
+    // TODO expand to other metrics
     public caloriesEstimate: number = 0;
-    public calorieDataMissing: [string] = [''];
+    public caloriesDataMissing: string[] = [];
+    public sodiumEstimate: number = 0;
+    public sodiumDataMissing: string[] = [];
     public recipeHtml: string = '';
 
     // This gets overloaded
@@ -190,12 +193,30 @@ export class Recipe {
 
         this.ingredients = ingredients;
 
+        // TODO add salt aswell
         ingredients.forEach((ing) => {
             // Add calories to our calculation
-            if (ing.unit !== null && ing.calorie.hasOwnProperty(ing.unit.name)) {
-                this.caloriesEstimate += ing.calorie[ing.unit.name] * ing.quantity;
+            // TODO make metrics into an array
+            if (ing.unit !== null) {
+                if (
+                    ing.nutrition.hasOwnProperty('calorie')
+                    && ing.nutrition.calorie.hasOwnProperty(ing.unit.name)
+                ) {
+                    this.caloriesEstimate += ing.nutrition.calorie[ing.unit.name] * ing.quantity;
+                } else {
+                    this.caloriesDataMissing.push(ing.name);
+                }
+                if (
+                    ing.nutrition.hasOwnProperty('sodium')
+                    && ing.nutrition.sodium.hasOwnProperty(ing.unit.name)
+                ) {
+                    this.sodiumEstimate += ing.nutrition.sodium[ing.unit.name] * ing.quantity;
+                } else {
+                    this.sodiumDataMissing.push(ing.name);
+                }
             } else {
-                this.calorieDataMissing.push(ing.name);
+                this.caloriesDataMissing.push(ing.name);
+                this.sodiumDataMissing.push(ing.name);
             }
         });
 
@@ -249,14 +270,20 @@ export class Recipe {
             }
         });
 
-        if (this.calorieDataMissing.length >= 2) {
-            // Remove our empty string from initialization.
-            // TODO theres probably a better way to init
-            this.calorieDataMissing.shift();
-            this.recipeHtml += this.generateHeader(`? (${this.calorieDataMissing.join('/')} Data Missing) Calories`);
-        } else {
-            this.recipeHtml += this.generateHeader(`${Math.round(this.caloriesEstimate)} Calories`);
+        // TOD make array
+        let calorieText = `${Math.round(this.caloriesEstimate)} Calories`;
+
+        if (this.sodiumDataMissing.length >= 1) {
+            calorieText += ` (${this.caloriesDataMissing.join('/')} Data Missing)`;
         }
+        this.recipeHtml += this.generateHeader(calorieText);
+
+        let sodiumText = `${Math.round(this.sodiumEstimate)} mg Sodium`;
+
+        if (this.sodiumDataMissing.length >= 1) {
+            sodiumText += ` (${this.sodiumDataMissing.join('/')} Data Missing)`;
+        }
+        this.recipeHtml += this.generateHeader(sodiumText);
 
         if (this.vegan === true) {
             this.recipeHtml += this.generateHeader('Vegan Recipe');

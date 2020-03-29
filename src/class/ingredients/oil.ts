@@ -13,7 +13,7 @@ export class OilItems extends MeatItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        calorie: {}
+        nutrition: {}
     })
 
     public static readonly oliveOil: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -26,7 +26,7 @@ export class OilItems extends MeatItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        calorie: {}
+        nutrition: {}
     })
 
     public static readonly vegetableOil: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -39,6 +39,6 @@ export class OilItems extends MeatItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        calorie: {}
+        nutrition: {}
     })
 }

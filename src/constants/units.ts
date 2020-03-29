@@ -2,7 +2,7 @@ export interface IUnitObj {
     name: string;
 }
 
-export interface ICalorieUnitObj {
+export interface INutritionObj {
     [details: string]: number;
 }
 
