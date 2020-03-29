@@ -273,7 +273,7 @@ export class Recipe {
         // TOD make array
         let calorieText = `${Math.round(this.caloriesEstimate)} Calories`;
 
-        if (this.sodiumDataMissing.length >= 1) {
+        if (this.caloriesDataMissing.length >= 1) {
             calorieText += ` (${this.caloriesDataMissing.join('/')} Data Missing)`;
         }
         this.recipeHtml += this.generateHeader(calorieText);

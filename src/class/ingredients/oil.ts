@@ -1,5 +1,5 @@
 import { IItem } from './item';
-import { IUnitObj } from '../../constants/units';
+import { IUnitObj, Units as u } from '../../constants/units';
 import { MeatItems } from './meat';
 
 export class OilItems extends MeatItems {
@@ -26,7 +26,16 @@ export class OilItems extends MeatItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {}
+        nutrition: {
+            'calorie': {
+                [u.tbsp.name]: 119.34,
+                [u.tsp.name]: 39.78,
+            },
+            'sodium': {
+                [u.tbsp.name]: .3,
+                [u.tsp.name]: .1,
+            }
+        }
     })
 
     public static readonly vegetableOil: IItem = (quantity: number = .00001, unit: IUnitObj) => ({

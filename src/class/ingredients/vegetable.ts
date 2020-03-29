@@ -682,7 +682,14 @@ export class VegetableItems extends SpiceItems {
         wash: true,
         isTakoutUnitable: true,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            'calorie': {
+                [u.ounce.name]: 6.24
+            },
+            'sodium': {
+                [u.ounce.name]: 1.7
+            },
+        },
     })
 
     public static readonly zuchinni: IItem = (quantity: number = .00001, unit: IUnitObj) => ({

@@ -47,6 +47,9 @@ export class CarbItems extends AnimalItems {
         nutrition: {
             'calorie': {
                 [u.ounce.name]: 100
+            },
+            'sodium': {
+                [u.ounce.name]: 0
             }
         }
     })

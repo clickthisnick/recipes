@@ -94,6 +94,9 @@ export class SauceItems extends OilItems {
         nutrition: {
             'calorie': {
                 [u.ounce.name]: 14.4
+            },
+            'sodium': {
+                [u.ounce.name]: 98.4
             }
         }
     })
