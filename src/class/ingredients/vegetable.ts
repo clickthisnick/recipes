@@ -14,7 +14,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly coffeeGrounds: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -27,7 +30,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly bakingPowder: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -40,7 +46,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly whiteVinegar: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -53,7 +62,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly frozenStirFryVeggies: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -66,7 +78,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly almondFlour: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -79,7 +94,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly allPurposeFlour: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -92,7 +110,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly archerFlour: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -105,7 +126,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly buckwheatFlour: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -118,7 +142,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly beyondBurger: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -131,7 +158,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
 
@@ -145,7 +175,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly lentils: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -158,7 +191,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly pizzaCrust: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -171,7 +207,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly popcorn: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -184,7 +223,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly carrots: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -197,7 +239,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly frozenTatorTots: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -210,7 +255,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly almondMilk: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -223,7 +271,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly kale: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -236,7 +287,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly cookingSpray: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -249,7 +303,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly asparagus: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -262,7 +319,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly bread: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -275,7 +335,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly timer: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -288,7 +351,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly water: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -302,7 +368,7 @@ export class VegetableItems extends SpiceItems {
         isTakoutUnitable: false,
         isMeatProduct: false,
         nutrition: {
-            'calorie': {
+            calories: {
                 [u.cup.name]: 0,
                 [u.tsp.name]: 0,
                 [u.tbsp.name]: 0,
@@ -310,7 +376,7 @@ export class VegetableItems extends SpiceItems {
                 [u.pound.name]: 0,
                 [u.unit.name]: 0,
             },
-            'sodium': {
+            sodium: {
                 [u.cup.name]: 0,
                 [u.tsp.name]: 0,
                 [u.tbsp.name]: 0,
@@ -331,7 +397,42 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
+    })
+
+    public static readonly liquidSmoke: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+        name: 'Liquid Smoke',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
+    })
+
+    public static readonly appleCiderVinegar: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+        name: 'Apple Cider Vinegar',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly blackBeans: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -344,7 +445,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly avacado: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -357,7 +461,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: true,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly cauliflower: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -370,7 +477,10 @@ export class VegetableItems extends SpiceItems {
         wash: true,
         isTakoutUnitable: true,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly leek: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -383,7 +493,10 @@ export class VegetableItems extends SpiceItems {
         wash: true,
         isTakoutUnitable: true,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly lime: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -396,7 +509,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: true,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly romaTomato: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -409,7 +525,10 @@ export class VegetableItems extends SpiceItems {
         wash: true,
         isTakoutUnitable: true,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly pickleHotdogSlice: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -422,7 +541,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: true,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly groundGinger: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -435,7 +557,10 @@ export class VegetableItems extends SpiceItems {
         wash: true,
         isTakoutUnitable: true,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly shallot: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -448,7 +573,10 @@ export class VegetableItems extends SpiceItems {
         wash: true,
         isTakoutUnitable: true,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly serranoChilli: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -461,7 +589,10 @@ export class VegetableItems extends SpiceItems {
         wash: true,
         isTakoutUnitable: true,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly cilantro: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -474,7 +605,10 @@ export class VegetableItems extends SpiceItems {
         wash: true,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly spiriliazer: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -487,7 +621,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly breadFlour: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -500,7 +637,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly wheatBreadFlour: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -513,7 +653,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly dryActiveYeast: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -526,7 +669,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly brownSugar: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -539,7 +685,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly greenOnion: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -552,7 +701,10 @@ export class VegetableItems extends SpiceItems {
         wash: true,
         isTakoutUnitable: true,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly redPepperFlakes: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -565,7 +717,10 @@ export class VegetableItems extends SpiceItems {
         wash: true,
         isTakoutUnitable: true,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly whiteOnion: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -578,7 +733,10 @@ export class VegetableItems extends SpiceItems {
         wash: true,
         isTakoutUnitable: true,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly redOnion: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -591,7 +749,10 @@ export class VegetableItems extends SpiceItems {
         wash: true,
         isTakoutUnitable: true,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly scallion: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -604,7 +765,10 @@ export class VegetableItems extends SpiceItems {
         wash: true,
         isTakoutUnitable: true,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly bellPepper: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -617,7 +781,10 @@ export class VegetableItems extends SpiceItems {
         wash: true,
         isTakoutUnitable: true,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly arrowRootStarch: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -630,7 +797,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: true,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly broccoli: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -643,7 +813,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: true,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly tomatoPaste: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -656,7 +829,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: true,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly garlicClove: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -669,7 +845,10 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: true,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly crimniMushroom: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -683,10 +862,10 @@ export class VegetableItems extends SpiceItems {
         isTakoutUnitable: true,
         isMeatProduct: false,
         nutrition: {
-            'calorie': {
+            calories: {
                 [u.ounce.name]: 6.24
             },
-            'sodium': {
+            sodium: {
                 [u.ounce.name]: 1.7
             },
         },
@@ -702,6 +881,9 @@ export class VegetableItems extends SpiceItems {
         wash: true,
         isTakoutUnitable: true,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 }

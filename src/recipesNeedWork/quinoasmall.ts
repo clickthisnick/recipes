@@ -19,7 +19,7 @@ export class MealRecipe extends Recipe {
         this.addSteps([
             ['Put 1/4 cup', this.get(i.quinoa()), 'in instant pot'],
             ['Put 1/2 cups', this.get(i.water()), 'in instant pot'],
-            [Timer.pressureCook(6, 'm')],
+            [Timer.pressureCook(0, 6, 'm')],
         ]);
         this.printRecipe();
     }

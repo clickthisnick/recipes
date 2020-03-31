@@ -6,6 +6,11 @@ import { ITimer } from './timer';
 import { HTML } from './html';
 import { Async } from './async';
 
+// TODO add nutrition serving size (1, cup)
+// Then do the math roughly how many ounces are in a cup etc
+// Maybe the units will only translate to cup tbsp etc
+// ounces -> pounds not cups
+
 // if (`${quantity}`.endsWith('.75')) {
 //     quantityString = `${quantity-.75}¾`;
 //   }
@@ -193,16 +198,15 @@ export class Recipe {
 
         this.ingredients = ingredients;
 
-        // TODO add salt aswell
         ingredients.forEach((ing) => {
             // Add calories to our calculation
             // TODO make metrics into an array
             if (ing.unit !== null) {
                 if (
-                    ing.nutrition.hasOwnProperty('calorie')
-                    && ing.nutrition.calorie.hasOwnProperty(ing.unit.name)
+                    ing.nutrition.hasOwnProperty('calories')
+                    && ing.nutrition.calories.hasOwnProperty(ing.unit.name)
                 ) {
-                    this.caloriesEstimate += ing.nutrition.calorie[ing.unit.name] * ing.quantity;
+                    this.caloriesEstimate += ing.nutrition.calories[ing.unit.name] * ing.quantity;
                 } else {
                     this.caloriesDataMissing.push(ing.name);
                 }

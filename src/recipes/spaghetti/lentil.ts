@@ -19,7 +19,7 @@ export class Lentil extends Recipe {
             ['Add', i.spaghettiSauce()],
             ['Add', i.spaghettiLentil()],
             ['Add', i.water(.5, u.cup), '(Don\'t stir)'],
-            [Timer.pressureCook(10, 'm', true)],
+            [Timer.pressureCook(0, 10, 'm', true)],
             ['Release steam valve and serve'],
         ]);
     }

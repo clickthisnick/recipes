@@ -34,7 +34,6 @@ export class MealRecipe extends Recipe {
             ['Put bread maker on dough setting (menu item 9) and hit start'],
             ['Set Timer For One Hour'],
             [
-                // TODO: Currently cannot use the same ingredient more than once
                 'Mix .5 Cups brownSugar',
                 this.get(i.cinnamon()),
             ],

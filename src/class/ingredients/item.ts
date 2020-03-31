@@ -1,5 +1,10 @@
 import { IUnitObj } from '../../constants/units';
 
+interface INutrition {
+   calories: any;
+   sodium: any;
+}
+
 export interface IItemObj {
     name: string;
     putAwayTime: number;
@@ -10,7 +15,7 @@ export interface IItemObj {
     wash: boolean;
     isTakoutUnitable: boolean;
     isMeatProduct: boolean;
-    nutrition: any; // Dict
+    nutrition: INutrition;
 }
 
 export interface IItem {

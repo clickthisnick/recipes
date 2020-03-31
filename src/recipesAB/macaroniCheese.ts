@@ -26,7 +26,7 @@ export class MealRecipe extends Recipe {
             ['Put', i.water(), 'in instant pot'],
             ['Put', i.salt(), 'in instant pot'],
             ['Put', i.raoPastaElbow(), 'in instant pot'],
-            [Timer.pressureCook(2, 'm')],
+            [Timer.pressureCook(0, 2, 'm')],
             ['Grate the', i.cheddarCheese()],
             ['Release valve'],
             ['Stir in', i.almondMilk()],

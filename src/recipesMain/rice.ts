@@ -31,8 +31,8 @@ class Rice1Cup extends Recipe {
         this.addSteps([
             ['Put', i.brownRice(), 'in instant pot'],
             ['Put in', i.water()],
-            [Timer.pressureCook(15, 'm', true)],
-            [Timer.set(5, 'm', 'let sit without opening steam valve')],
+            [Timer.pressureCook(9, 15, 'm', true)],
+            [Timer.naturalPressRelease(5, 'm')],
             ['Open steam valve'],
         ]);
     }
@@ -51,7 +51,7 @@ class RiceHalfCup extends Recipe {
         this.addSteps([
             ['Put', i.brownRice(), 'in instant pot'],
             ['Put in', i.water()],
-            [Timer.pressureCook(7, 'm', true)],
+            [Timer.pressureCook(0, 7, 'm', true)],
             [Timer.set(3, 'm', 'let sit without opening steam valve')],
             ['Open steam valve'],
         ]);

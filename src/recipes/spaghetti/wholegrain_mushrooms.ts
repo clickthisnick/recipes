@@ -29,7 +29,7 @@ export class WholeGrainMushroom extends Recipe {
             ['Add', i.spaghettiSauce()],
             ['Add', i.spaghettiWholeGrain()],
             ['Add', i.water(.5, u.cup), '(Don\'t stir)'],
-            [Timer.pressureCook(8, 'm', true)],
+            [Timer.pressureCook(0, 8, 'm', true)],
             ['Release steam valve and serve'],
         ]);
     }

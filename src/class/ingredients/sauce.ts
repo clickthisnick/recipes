@@ -13,7 +13,10 @@ export class SauceItems extends OilItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {}
+        nutrition: {
+            calories: {},
+            sodium: {},
+        }
     })
 
     public static readonly soySauce: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -26,7 +29,10 @@ export class SauceItems extends OilItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {}
+        nutrition: {
+            calories: {},
+            sodium: {},
+        }
     })
 
     public static readonly padThaiSauce: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -39,7 +45,26 @@ export class SauceItems extends OilItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {}
+        nutrition: {
+            calories: {},
+            sodium: {},
+        }
+    })
+
+    public static readonly barbecueSauce: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+        name: 'Barbecue Sauce',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 
     public static readonly pizzaSauce: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -52,7 +77,10 @@ export class SauceItems extends OilItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {}
+        nutrition: {
+            calories: {},
+            sodium: {},
+        }
     })
 
     public static readonly sirachaSauce: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -65,7 +93,10 @@ export class SauceItems extends OilItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {}
+        nutrition: {
+            calories: {},
+            sodium: {},
+        }
     })
 
     public static readonly hoisonSauce: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -78,7 +109,10 @@ export class SauceItems extends OilItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {}
+        nutrition: {
+            calories: {},
+            sodium: {},
+        }
     })
 
     public static readonly spaghettiSauce: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -92,10 +126,10 @@ export class SauceItems extends OilItems {
         isTakoutUnitable: false,
         isMeatProduct: false,
         nutrition: {
-            'calorie': {
+            calories: {
                 [u.ounce.name]: 14.4
             },
-            'sodium': {
+            sodium: {
                 [u.ounce.name]: 98.4
             }
         }
@@ -112,10 +146,10 @@ export class SauceItems extends OilItems {
         isTakoutUnitable: false,
         isMeatProduct: false,
         nutrition: {
-            'calorie': {
+            calories: {
                 [u.tbsp.name]: 25,
             },
-            'sodium': {
+            sodium: {
                 [u.tbsp.name]: 280,
             },
         },
@@ -131,6 +165,9 @@ export class SauceItems extends OilItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
     })
 }

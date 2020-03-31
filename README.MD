@@ -14,6 +14,8 @@
 # Component
 ## [asparagus](https://www.clickthisnick.com/recipes/dist/asparagus.html)
 
+## [BabyBackRibs](https://www.clickthisnick.com/recipes/dist/babybackribs.html)
+
 ## [lentils](https://www.clickthisnick.com/recipes/dist/lentils.html)
 
 ## [mushrooms](https://www.clickthisnick.com/recipes/dist/mushrooms.html)

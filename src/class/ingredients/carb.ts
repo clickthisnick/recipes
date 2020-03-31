@@ -14,7 +14,10 @@ export class CarbItems extends AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {}
+        nutrition: {
+            calories: {},
+            sodium: {},
+        }
     })
 
     public static readonly spaghettiLentil: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -28,9 +31,10 @@ export class CarbItems extends AnimalItems {
         isTakoutUnitable: false,
         isMeatProduct: false,
         nutrition: {
-            'calorie': {
+            calories: {
                 [u.ounce.name]: 100,
-            }
+            },
+            sodium: {}
         }
     })
 
@@ -45,10 +49,10 @@ export class CarbItems extends AnimalItems {
         isTakoutUnitable: false,
         isMeatProduct: false,
         nutrition: {
-            'calorie': {
+            calories: {
                 [u.ounce.name]: 100
             },
-            'sodium': {
+            sodium: {
                 [u.ounce.name]: 0
             }
         }
@@ -64,7 +68,10 @@ export class CarbItems extends AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {}
+        nutrition: {
+            calories: {},
+            sodium: {},
+        }
     })
 
     public static readonly brownRice: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -78,10 +85,10 @@ export class CarbItems extends AnimalItems {
         isTakoutUnitable: false,
         isMeatProduct: false,
         nutrition: {
-            'calorie': {
+            calories: {
                 [u.cup.name]: 678.96
             },
-            'sodium': {
+            sodium: {
                 [u.cup.name]: 9.3
             }
         }
@@ -97,7 +104,10 @@ export class CarbItems extends AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {}
+        nutrition: {
+            calories: {},
+            sodium: {},
+        }
     })
 
     public static readonly wildBasmatiRice: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -110,6 +120,9 @@ export class CarbItems extends AnimalItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {}
+        nutrition: {
+            calories: {},
+            sodium: {},
+        }
     })
 }

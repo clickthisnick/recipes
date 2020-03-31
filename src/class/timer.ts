@@ -8,7 +8,6 @@ export interface ITimer {
     async: boolean;
 }
 
-// TODO instant pot needs preheat like 9 min for rice before 15 min can start
 export class Timer {
     public static timerCount: number = 0;
     private static sanitize(item: any): string {
@@ -46,8 +45,12 @@ export class Timer {
         return Timer.set(5, 'm', 'Preheat pan on heat ???');
     }
 
-    public static pressureCook(duration: number, type: string, async: boolean = false): ITimer {
-        return Timer.set(duration, type, 'Pressure cook on high pressure', async);
+    public static naturalPressRelease(duration: number, type: string, async: boolean = false): ITimer {
+        return Timer.set(duration, type, 'Let instant pot sit without opening steam valve', async);
+    }
+
+    public static pressureCook(preheat: number, duration: number, type: string, async: boolean = false): ITimer {
+        return Timer.set(preheat + duration, type, `Pressure cook on high pressure for ${duration} minutes, (Preheat takes ${preheat} min)`, async);
     }
 
     public static souVide(duration: number, type: string, item: any, degrees: number, async: boolean = false): ITimer {
