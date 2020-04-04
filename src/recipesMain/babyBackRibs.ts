@@ -26,7 +26,7 @@ class BabyBackRibs extends Recipe {
     }
     public generateRecipe() {
         this.addIngredients([
-            i.babyBackRibs(3, u.unit),
+            i.babyBackRibs(1.5, u.pound),
             i.water(1.5, u.cup),
             i.liquidSmoke(3, u.tbsp),
             i.appleCiderVinegar(.33, u.cup),
@@ -38,8 +38,8 @@ class BabyBackRibs extends Recipe {
             ['Add', i.water(), i.liquidSmoke(), i.appleCiderVinegar(), 'into instant pot'],
             ['Remove silver skin from ribs'],
             ['Rub dry rub all over', i.babyBackRibs()],
-            ['Put', i.babyBackRibs(), 'meat side down in instant pot'],
-            [Timer.pressureCook(0, 25, 'm', true)],
+            ['Put', i.babyBackRibs(), 'meat side facing outer edge of instant pot'],
+            [Timer.pressureCook(9.5, 25, 'm', true)],
             [Timer.naturalPressRelease(10, 'm', true)],
                 [Async.step, 'Preheat oven to broil on 400 degrees'],
             ['Release instant pot pressure'],

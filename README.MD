@@ -9,6 +9,8 @@
 
 ## [ButterChicken](https://www.clickthisnick.com/recipes/dist/butterchicken.html)
 
+## [FruitSmoothie](https://www.clickthisnick.com/recipes/dist/fruitsmoothie.html)
+
 ## [Spaghetti](https://www.clickthisnick.com/recipes/dist/spaghetti.html)
 
 # Component
