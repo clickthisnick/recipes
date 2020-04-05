@@ -32,7 +32,11 @@ export interface IVariation {
 }
 
 function finalStepReplace(text: string) {
-    const tmpText: string = text.replace(/1\/2/g, '½');
+    let tmpText: string = text.replace(/1\/2/g, '½');
+
+    // Reduce confusion on too many letters for these plural units
+    tmpText = tmpText.replace('tsps', 'tsp');
+    tmpText = tmpText.replace('Tbsps', 'Tbsp');
 
     return tmpText;
 }

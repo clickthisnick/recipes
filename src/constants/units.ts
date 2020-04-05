@@ -23,7 +23,7 @@ export class Units {
         name: 'tsp'
     };
     public static readonly tbsp: IUnitObj = {
-        name: 'tbsp'
+        name: 'Tbsp'
     };
     public static readonly second: IUnitObj = {
         name: 'second'
