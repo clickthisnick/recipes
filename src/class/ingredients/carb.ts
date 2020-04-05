@@ -125,4 +125,20 @@ export class CarbItems extends AnimalItems {
             sodium: {},
         }
     })
+
+    public static readonly hotdogBun: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+        name: 'Hotdog Bun',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: true,
+        isMeatProduct: false,
+        nutrition: {
+            calories: {},
+            sodium: {},
+        },
+    })
 }

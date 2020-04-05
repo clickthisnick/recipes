@@ -1,5 +1,5 @@
 import { IItem } from './item';
-import { IUnitObj } from '../../constants/units';
+import { IUnitObj, Units as u } from '../../constants/units';
 import { FruitItems } from './fruit';
 
 export class MeatItems extends FruitItems {
@@ -32,6 +32,26 @@ export class MeatItems extends FruitItems {
         nutrition: {
             calories: {},
             sodium: {},
+        },
+    })
+
+    public static readonly sausageAidellsCajun: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+        name: 'Aidells Cajun Sausage',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: true,
+        nutrition: {
+            calories: {
+                [u.unit.name]: 160,
+            },
+            sodium: {
+                [u.unit.name]: 690,
+            },
         },
     })
 }
