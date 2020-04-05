@@ -26,16 +26,16 @@ class Mushroom extends Recipe {
     }
     public generateRecipe() {
         this.addIngredients([
-            i.crimniMushroom(8, u.ounce),
+            i.babyBella(8, u.ounce),
             i.oliveOil(1, u.tbsp),
             i.dash(1, u.unit),
         ]);
         this.addSteps([
             [Timer.preheatPan(5, true)],
-                [Async.step, 'Wash', i.crimniMushroom(), 'with strainer'],
+                [Async.step, 'Wash', i.babyBella(), 'with strainer'],
             ['Put', i.oliveOil(), 'in pan'],
-            ['Put', i.crimniMushroom(0), 'in pan'],
-            [Timer.panSear(4, 'm', i.crimniMushroom(0), true)],
+            ['Put', i.babyBella(0), 'in pan'],
+            [Timer.panSear(4, 'm', i.babyBella(0), true)],
                 [Async.step, 'Wash and put away strainer'],
                 [Async.step, 'Wash and put away measuring utensil'],
             ['Season with', i.dash()],

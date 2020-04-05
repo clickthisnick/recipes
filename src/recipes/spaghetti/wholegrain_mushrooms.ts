@@ -13,7 +13,7 @@ export class WholeGrainMushroom extends Recipe {
     }
     public generateRecipe() {
         this.addIngredients([
-            i.crimniMushroom(8, u.ounce),
+            i.babyBella(8, u.ounce),
             i.spaghettiWholeGrain(8, u.ounce),
             i.spaghettiSauce(25, u.ounce),
             i.chilliOil(1, u.tsp),
@@ -21,10 +21,10 @@ export class WholeGrainMushroom extends Recipe {
             i.dash(1, u.unit),
         ]);
         this.addSteps([
-            ['Add', i.chilliOil(), i.crimniMushroom(), 'to instant pot'],
-            [Timer.instantPotSautee(9, 'm', i.crimniMushroom(0), true)],
+            ['Add', i.chilliOil(), i.babyBella(), 'to instant pot'],
+            [Timer.instantPotSautee(9, 'm', i.babyBella(0), true)],
             [Async.step, 'season with', i.dash()],
-            ['Remove', i.crimniMushroom(0), 'from instant pot'],
+            ['Remove', i.babyBella(0), 'from instant pot'],
             ['Add', i.water(.5, u.cup)],
             ['Add', i.spaghettiSauce()],
             ['Add', i.spaghettiWholeGrain()],

@@ -1,8 +1,19 @@
 import { IUnitObj } from '../../constants/units';
 
+export interface IEstimates {
+    calories?: number;
+    sodium?: number;
+    cost?: number;
+}
+
+export interface IEstimatesMissing {
+    calories: string[];
+    sodium: string[];
+    cost: string[];
+}
+
 interface INutrition {
-   calories: any;
-   sodium: any;
+   [unit: string]: IEstimates;
 }
 
 export interface IItemObj {

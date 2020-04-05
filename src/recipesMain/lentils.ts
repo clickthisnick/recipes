@@ -36,7 +36,7 @@ class LentilHalfCup extends Recipe {
             ['Put in', i.lentils(), 'in instant pot',],
             ['Put in', i.water()],
             ['Season with', i.tandoriMasalla(), i.driedOnion(), i.salt()],
-            [Timer.set(5, 'm', 'Turn on pressure cook for 5 minutes')],
+            [Timer.pressureCook(0, 5, 'm')],
         ]);
     }
 }

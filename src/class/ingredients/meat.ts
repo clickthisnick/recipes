@@ -13,10 +13,7 @@ export class MeatItems extends FruitItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: true,
-        nutrition: {
-            calories: {},
-            sodium: {},
-        },
+        nutrition: {},
     })
 
     public static readonly babyBackRibs: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -29,10 +26,7 @@ export class MeatItems extends FruitItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: true,
-        nutrition: {
-            calories: {},
-            sodium: {},
-        },
+        nutrition: {},
     })
 
     public static readonly sausageAidellsCajun: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -46,12 +40,10 @@ export class MeatItems extends FruitItems {
         isTakoutUnitable: false,
         isMeatProduct: true,
         nutrition: {
-            calories: {
-                [u.unit.name]: 160,
-            },
-            sodium: {
-                [u.unit.name]: 690,
-            },
+            [u.unit.name]: {
+                calories: 160,
+                sodium: 690,
+            }
         },
     })
 }

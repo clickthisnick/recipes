@@ -11,7 +11,7 @@ export class MealRecipe extends Recipe {
         this.recipeGroup = c.chinese;
         this.addIngredients([
             i.leek(2),
-            i.crimniMushroom(5),
+            i.babyBella(5),
             i.garlicClove(2),
             i.soySauce(1, u.tsp),
             i.sirachaSauce(.5, u.tbsp),
@@ -28,7 +28,7 @@ export class MealRecipe extends Recipe {
             ['Cut in half', this.get(i.leek())],
             ['Cut leek in strips and soak in glass bowl of water'],
             ['Chop', this.get(i.garlicClove())],
-            ['Cut', this.get(i.crimniMushroom())],
+            ['Cut', this.get(i.babyBella())],
             [Timer.set(5, 'm', 'put vegetables in pan')],
             ['Put in', this.get(i.soySauce())],
             ['Put in',this.get(i.sirachaSauce())],

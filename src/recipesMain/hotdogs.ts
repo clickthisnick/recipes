@@ -27,7 +27,7 @@ class AidellsCajunSausage extends Recipe {
     public generateRecipe() {
         this.addIngredients([
             i.sausageAidellsCajun(4, u.unit),
-            i.hotdogBun(4, u.unit),
+            i.hotdogBunPotato(4, u.unit),
             i.whiteOnion(1, u.unit),
             i.water(1, u.cup),
         ]);
@@ -37,10 +37,12 @@ class AidellsCajunSausage extends Recipe {
             [Timer.set(8, 'm', 'cook', true)],
             [Async.step, 'Cut', i.whiteOnion(), 'into slices'],
             ['Drain pan'],
-            [Timer.set(2, 'm', 'brown hotdogs', true)],
+            [Timer.set(2, 'm', 'brown hotdog bun', true)],
+            ['Flip', i.hotdogBunPotato(0)],
+            [Timer.set(2, 'm', 'brown hotdog bun', true)],
             ['Take out', i.sausageAidellsCajun(0), 'and put on plate'],
-            ['Put', i.hotdogBun(), 'in pan'],
-            [Timer.set(2, 'm', 'toast')],
+            ['Put', i.hotdogBunPotato(), 'in pan'],
+            [Timer.set(3, 'm', 'toast hotdog bun')],
             ['Assemble hotdog'],
         ]);
     }

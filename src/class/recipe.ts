@@ -1,4 +1,4 @@
-import { IItemObj } from './ingredients/item';
+import { IItemObj, IEstimates, IEstimatesMissing  } from './ingredients/item';
 import * as fs from 'fs';
 import { Readme } from './readme';
 import { Serializer as s } from './serializer';
@@ -135,10 +135,18 @@ export class Recipe {
     public vegan: boolean = true;
     public timeEstimateMilliseconds: number = 0;
     // TODO expand to other metrics
-    public caloriesEstimate: number = 0;
-    public caloriesDataMissing: string[] = [];
-    public sodiumEstimate: number = 0;
-    public sodiumDataMissing: string[] = [];
+    public estimates: IEstimates = {
+        calories: 0,
+        sodium: 0,
+        cost: 0
+    };
+
+    public estimatesMissing: IEstimatesMissing = {
+        calories: [],
+        sodium: [],
+        cost: [],
+    };
+
     public recipeHtml: string = '';
 
     // This gets overloaded
@@ -202,29 +210,25 @@ export class Recipe {
 
         this.ingredients = ingredients;
 
+        const metrics = ['calories', 'sodium', 'cost'];
+
         ingredients.forEach((ing) => {
             // Add calories to our calculation
             // TODO make metrics into an array
-            if (ing.unit !== null) {
-                if (
-                    ing.nutrition.hasOwnProperty('calories')
-                    && ing.nutrition.calories.hasOwnProperty(ing.unit.name)
-                ) {
-                    this.caloriesEstimate += ing.nutrition.calories[ing.unit.name] * ing.quantity;
-                } else {
-                    this.caloriesDataMissing.push(ing.name);
-                }
-                if (
-                    ing.nutrition.hasOwnProperty('sodium')
-                    && ing.nutrition.sodium.hasOwnProperty(ing.unit.name)
-                ) {
-                    this.sodiumEstimate += ing.nutrition.sodium[ing.unit.name] * ing.quantity;
-                } else {
-                    this.sodiumDataMissing.push(ing.name);
-                }
+            if (ing.quantity > 0 && ing.unit !== null && ing.nutrition.hasOwnProperty(ing.unit.name)) {
+                const unitName = ing.unit.name;
+
+                metrics.forEach((metric) => {
+                    if (ing.nutrition[unitName].hasOwnProperty(metric) && ing.nutrition[unitName][metric] !== null) {
+                        this.estimates[metric] += (ing.nutrition[unitName][metric] * ing.quantity);
+                    } else {
+                        this.estimatesMissing[metric].push(ing.name);
+                    }
+                });
             } else {
-                this.caloriesDataMissing.push(ing.name);
-                this.sodiumDataMissing.push(ing.name);
+                metrics.forEach((metric) => {
+                    this.estimatesMissing[metric].push(ing.name);
+                });
             }
         });
 
@@ -278,20 +282,16 @@ export class Recipe {
             }
         });
 
-        // TOD make array
-        let calorieText = `${Math.round(this.caloriesEstimate)} Calories`;
+        const metricsToShow = ['calories', 'sodium', 'cost'];
 
-        if (this.caloriesDataMissing.length >= 1) {
-            calorieText += ` (${this.caloriesDataMissing.join('/')} Data Missing)`;
-        }
-        this.recipeHtml += this.generateHeader(calorieText);
+        metricsToShow.forEach((metric) => {
+            let metricText = `${Math.round(this.estimates[metric])} ${metric}`;
 
-        let sodiumText = `${Math.round(this.sodiumEstimate)} mg Sodium`;
-
-        if (this.sodiumDataMissing.length >= 1) {
-            sodiumText += ` (${this.sodiumDataMissing.join('/')} Data Missing)`;
-        }
-        this.recipeHtml += this.generateHeader(sodiumText);
+            if (this.estimatesMissing[metric].length >= 1) {
+                metricText += ` (${this.estimatesMissing[metric].join('/')} Data Missing)`;
+            }
+            this.recipeHtml += this.generateHeader(metricText);
+        });
 
         if (this.vegan === true) {
             this.recipeHtml += this.generateHeader('Vegan Recipe');

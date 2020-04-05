@@ -13,10 +13,29 @@ export class OilItems extends MeatItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
+        nutrition: {}
+    })
+
+    public static readonly chilliOil: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+        name: 'Chilli Oil',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: true,
+        isTakoutUnitable: true,
+        isMeatProduct: false,
         nutrition: {
-            calories: {},
-            sodium: {},
-        }
+            [u.tbsp.name]: {
+                calories: 119.34,
+                sodium: .3,
+            },
+            [u.tsp.name]: {
+                calories: 39.78,
+                sodium: .1,
+            }
+        },
     })
 
     public static readonly oliveOil: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -30,13 +49,13 @@ export class OilItems extends MeatItems {
         isTakoutUnitable: false,
         isMeatProduct: false,
         nutrition: {
-            calories: {
-                [u.tbsp.name]: 119.34,
-                [u.tsp.name]: 39.78,
+            [u.tbsp.name]: {
+                calories: 119.34,
+                sodium: .3,
             },
-            sodium: {
-                [u.tbsp.name]: .3,
-                [u.tsp.name]: .1,
+            [u.tsp.name]: {
+                calories: 39.78,
+                sodium: .1,
             }
         }
     })
@@ -51,9 +70,6 @@ export class OilItems extends MeatItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {
-            calories: {},
-            sodium: {},
-        }
+        nutrition: {}
     })
 }
