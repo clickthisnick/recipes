@@ -66,7 +66,7 @@ class ButterChicken extends Recipe {
             ['Add spice', i.turmeric()],
             ['Add spice', i.salt()],
             ['Add spice', i.blackPepper()],
-            [Timer.pressureCook(0, 5, 'm')],
+            [Timer.pressureCook(3, 5, 'm')],
             [Timer.naturalPressRelease(10, 'm', true)],
                 [Async.step, 'Put away spices'],
                 [Async.step, 'Wash utensils'],
