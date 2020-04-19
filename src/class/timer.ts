@@ -45,6 +45,18 @@ export class Timer {
         return Timer.set(5, 'm', 'Preheat pan on heat ???');
     }
 
+    public static preheatOven(heat: number, async: boolean = false): ITimer {
+        const heatToMin = {
+            250:8.5,
+        };
+
+        if (heat in heatToMin) {
+            return Timer.set(heatToMin[heat], 'm', `Preheat pan on heat ${heat}`, async);
+        }
+
+        return Timer.set(15, 'm', 'Preheat pan on heat ???');
+    }
+
     public static naturalPressRelease(duration: number, type: string, async: boolean = false): ITimer {
         return Timer.set(duration, type, 'Let instant pot sit without opening steam valve', async);
     }

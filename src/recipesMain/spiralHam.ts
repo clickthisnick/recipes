@@ -25,10 +25,10 @@ class SpiralHam extends Recipe {
     }
     public generateRecipe() {
         this.addIngredients([
-            i.spiralCutHam(1, u.unit),
+            i.spiralCutHam(192, u.ounce), // 12 pounds
         ]);
         this.addSteps([
-            [Timer.set(15, 'm', 'Preheat oven to 250 degrees')],
+            [Timer.preheatOven(250)],
             ['Put', i.spiralCutHam(), 'in oven for 13 minutes per pound.'],
             ['Once cooked shave off fat'],
             ['Put portions into air tight sealed bags'],

@@ -26,7 +26,13 @@ export class MeatItems extends FruitItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: true,
-        nutrition: {},
+        nutrition: {
+            [u.ounce.name]: {
+                calories: 46.666666666666667,
+                sodium: 320,
+                cost: 0.249375,
+            }
+        },
     })
 
     public static readonly babyBackRibs: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
