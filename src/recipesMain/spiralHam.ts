@@ -29,8 +29,8 @@ class SpiralHam extends Recipe {
         ]);
         this.addSteps([
             [Timer.preheatOven(250)],
-            ['Put', i.spiralCutHam(), 'in oven for 13 minutes per pound.'],
-            ['Once cooked shave off fat'],
+            [Timer.ovenCook(156, 'm', 'Cook ham 13 minutes per pound', 250)],
+            ['Once', i.spiralCutHam(), 'is cooked shave off fat'],
             ['Put portions into air tight sealed bags'],
         ]);
     }
