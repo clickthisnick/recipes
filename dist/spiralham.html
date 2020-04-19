@@ -1,0 +1,122 @@
+<meta name="viewport" content="width=device-width, initial-scale=1"><meta charset="utf-8"><style>
+    button {
+        display: inline-block;
+        border-radius: 4px;
+        background-color: #f4511e;
+        border: none;
+        color: #FFFFFF;
+        text-align: center;
+        font-size: 28px;
+        padding: 20px;
+        width: 200px;
+        transition: all 0.5s;
+        cursor: pointer;
+        margin: 5px;
+      }
+
+    .completed {
+           background-color:green;
+           color: white;
+       }
+
+       .timer {
+              background-color:yellow;
+              color: black;
+          }
+
+       .panel {
+       border-right-style: solid;
+       border-bottom-style: solid;
+       border-left-style: solid;
+        padding: 25px;
+        border-width: 1px;
+       }
+       </style>
+       <script>
+       function setIntervalX(callback, delay, repetitions) {
+           var x = 0;
+           var intervalID = window.setInterval(function () {
+
+              callback();
+
+              if (++x === repetitions) {
+                  window.clearInterval(intervalID);
+              }
+           }, delay);
+       }
+
+       function timer(initialWait) {
+           setIntervalX(function () {
+               setIntervalX(function () {
+                var x = document.getElementById("beep");
+
+                x.play();
+             }, 200, 10);
+         }, initialWait, 1);
+       }
+
+       function startTimer(duration, timerNum) {
+          var timerId = '#' + timerNum;
+          var display = document.querySelector(timerId);
+          var timer = duration, minutes, seconds;
+          var intervalID = window.setInterval(function () {
+               minutes = parseInt(timer / 60, 10)
+               seconds = parseInt(timer % 60, 10);
+
+               minutes = minutes < 10 ? "0" + minutes : minutes;
+               seconds = seconds < 10 ? "0" + seconds : seconds;
+
+               display.textContent = minutes + ":" + seconds + " ";
+
+               if (--timer < 0) {
+                   window.clearInterval(intervalID);
+                   var panelId = "#panel" + timerNum;
+                   var panel = document.querySelector(panelId);
+                   panel.classList.toggle('timer');
+                   panel.classList.toggle('completed');
+               }
+           }, 1000);
+       }
+
+       function loadTimer(seconds, timerNum) {
+          seconds = seconds / 1000;
+
+          startTimer(seconds, timerNum);
+       }
+
+       var shownId = '';
+
+       function getCheckedOptions() {
+          var id = '';
+          var htmlCollection = document.getElementById('options').getElementsByTagName('button')
+
+          for (const item of htmlCollection) {
+            if (item.classList[0] == 'completed') {
+                id += item.innerHTML
+            }
+          }
+
+          return id
+       }
+
+       // Used to hide/show recipes
+       function showRecipe() {
+            var id = getCheckedOptions()
+
+            console.log(id);
+
+            // Show
+            if (document.getElementById(id)) {
+                document.getElementById(id).style.display = 'block';
+            }
+
+            if (document.getElementById(shownId)) {
+                // Hide previously shown
+                document.getElementById(shownId).style.display = 'none';
+            }
+
+            shownId = id;
+        }
+
+       </script>
+    <a href="https://github.com/clickthisnick/recipes/blob/master/README.MD">Back To Recipes</a><div id="options"><br><b>recipe</b><br><button style="display: none;" onclick="this.classList.toggle('completed'); showRecipe()">cup</button></div><br><div id="cup"><h1>0 calories (Spiral Cut Ham Data Missing)</h1><h1>0 sodium (Spiral Cut Ham Data Missing)</h1><h1>0 cost (Spiral Cut Ham Data Missing)</h1><h1>Recipe</h1><h1>Estimated Time: 15 Minutes</h1><div class="panel" id="paneltimer35" onclick="this.classList.toggle('timer'); timer(900000); loadTimer(900000, 'timer35')"><span id="timer35"></span>Timer 15 minutes Preheat oven to 250 degrees</div><div class="panel" onclick="this.classList.toggle('completed')">Put Spiral Cut Ham in oven for 13 minutes per pound. </div><div class="panel" onclick="this.classList.toggle('completed')">Once cooked shave off fat </div><div class="panel" onclick="this.classList.toggle('completed')">Put portions into air tight sealed bags </div></div>
