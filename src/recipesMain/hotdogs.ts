@@ -37,12 +37,13 @@ class AidellsCajunSausage extends Recipe {
             [Timer.set(8, 'm', 'cook', true)],
             [Async.step, 'Cut', i.whiteOnion(), 'into slices'],
             ['Drain pan'],
-            [Timer.set(2, 'm', 'brown hotdog bun', true)],
-            ['Flip', i.hotdogBunPotato(0)],
-            [Timer.set(2, 'm', 'brown hotdog bun', true)],
+            ['Turn heat to 7'],
+            [Timer.set(2, 'm', 'brown hotdog', true)],
+            [Timer.set(2, 'm', 'flip + brown hotdog', true)],
             ['Take out', i.sausageAidellsCajun(0), 'and put on plate'],
             ['Put', i.hotdogBunPotato(), 'in pan'],
-            [Timer.set(3, 'm', 'toast hotdog bun')],
+            [Timer.set(2, 'm', 'toast hotdog bun')],
+            [Timer.set(1, 'm', 'flip + toast hotdog bun')],
             ['Assemble hotdog'],
         ]);
     }
