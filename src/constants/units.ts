@@ -40,4 +40,7 @@ export class Units {
     public static readonly slice: IUnitObj = {
         name: 'slice'
     };
+    public static readonly scoop: IUnitObj = {
+        name: 'scoop'
+    };
 }
