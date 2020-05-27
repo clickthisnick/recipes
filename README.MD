@@ -28,6 +28,8 @@
 
 ## [popcorn](https://www.clickthisnick.com/recipes/dist/popcorn.html)
 
+## [proteinballs](https://www.clickthisnick.com/recipes/dist/proteinballs.html)
+
 ## [rice](https://www.clickthisnick.com/recipes/dist/rice.html)
 
 # Frozen

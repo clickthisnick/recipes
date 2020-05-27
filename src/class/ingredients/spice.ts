@@ -147,6 +147,19 @@ export class SpiceItems extends SauceItems {
         nutrition: {},
     })
 
+    public static readonly cacaoPowderUnsweetened: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+        name: 'Cacao Powder Unsweetened',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: true,
+        isTakoutUnitable: true,
+        isMeatProduct: false,
+        nutrition: {},
+    })
+
     public static readonly chilliPowder: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
         name: 'Chilli Powder',
         putAwayTime: 10,
