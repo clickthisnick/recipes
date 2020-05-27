@@ -2,6 +2,7 @@ import { Recipe, RecipeContainer } from '../class/recipe';
 import { Items as i } from '../constants/items';
 import { Categories as c } from '../constants/categories';
 import { Units as u } from '../constants/units';
+import { Timer } from '../class/timer';
 
 export class MealRecipe extends RecipeContainer {
     constructor() {
@@ -31,6 +32,7 @@ class ProteinBalls extends Recipe {
             i.water(4, u.tbsp),
         ]);
         this.addSteps([
+            [Timer.set(5, 'm', 'Soak dates in a bowl')],
             ['Put', i.cashewButter(), i.collagenPowder(), i.cacaoPowderUnsweetened(), i.water(), 'in blender'],
             ['Blend for 5 seconds'],
             ['Put in', i.pittedDates()],
