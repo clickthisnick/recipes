@@ -8,21 +8,20 @@ import { Async } from '../class/async';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.recipeName = 'Coffee';
         this.recipeGroup = c.meal;
+        this.variations = [
+            {'recipe': [Coffee]},
+         ]
      }
 
      public init() {
-         this.generateRecipes([
-            {'recipe': [Coffee]},
-         ]);
+         this.generateRecipes();
      }
 }
 
 class Coffee extends Recipe {
     constructor() {
         super();
-        this.recipeId = 'default';
     }
     public generateRecipe() {
         this.addIngredients([

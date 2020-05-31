@@ -6,21 +6,20 @@ import { Units as u } from '../constants/units';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.recipeName = 'Fruit Smoothie';
         this.recipeGroup = c.meal;
+        this.variations = [
+            {'recipe': [Smoothie]},
+         ]
      }
 
      public init() {
-         this.generateRecipes([
-            {'recipe': [Smoothie]},
-         ]);
+         this.generateRecipes();
      }
 }
 
 class Smoothie extends Recipe {
     constructor() {
         super();
-        this.recipeId = 'default';
     }
     public generateRecipe() {
         this.addIngredients([

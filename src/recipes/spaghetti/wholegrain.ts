@@ -6,7 +6,6 @@ import { Units as u } from '../../constants/units';
 export class WholeGrain extends Recipe {
     constructor() {
         super();
-        this.recipeId = 'whole grain';
     }
     public generateRecipe() {
         this.addIngredients([

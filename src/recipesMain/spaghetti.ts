@@ -8,15 +8,16 @@ import { WholeGrainMushroom } from '../recipes/spaghetti/wholegrain_mushrooms';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.recipeName = 'Spaghetti';
         this.recipeGroup = c.meal;
-    }
-
-    public init() {
-        this.generateRecipes([
+        this.recipeName = 'Spaghetti'
+        this.variations = [
             {'pasta': [WholeGrain, Lentil]},
             {'meat': [WholeGrainSausage]},
             {'veggie': [WholeGrainMushroom]},
-        ]);
+        ]
+    }
+
+    public init() {
+        this.generateRecipes();
     }
 }

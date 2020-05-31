@@ -2,14 +2,11 @@ import { Recipe } from '../../class/recipe';
 import { Items as i } from '../../constants/items';
 import { Timer } from '../../class/timer';
 import { Units as u } from '../../constants/units';
-import { WholeGrain } from './wholegrain';
 import { Async } from '../../class/async';
 
 export class WholeGrainMushroom extends Recipe {
     constructor() {
         super();
-        this.recipeId = 'mushrooms';
-        this.compoundRecipeId = `${new WholeGrain().recipeId}${this.recipeId}`;
     }
     public generateRecipe() {
         this.addIngredients([

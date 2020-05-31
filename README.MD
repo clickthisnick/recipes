@@ -5,33 +5,35 @@
 ## [Frozen Food Portions](https://www.clickthisnick.com/recipes/frozenFood.html)
 # Recipes List
 # 1 Meal
-## [BuffaloKaleBowl](https://www.clickthisnick.com/recipes/dist/buffalokalebowl.html)
+## [MealRecipe](https://www.clickthisnick.com/recipes/dist/mealrecipe.html)
 
-## [ButterChicken](https://www.clickthisnick.com/recipes/dist/butterchicken.html)
+## [MealRecipe](https://www.clickthisnick.com/recipes/dist/mealrecipe.html)
 
-## [Coffee](https://www.clickthisnick.com/recipes/dist/coffee.html)
+## [MealRecipe](https://www.clickthisnick.com/recipes/dist/mealrecipe.html)
 
-## [hotdog](https://www.clickthisnick.com/recipes/dist/hotdog.html)
+## [MealRecipe](https://www.clickthisnick.com/recipes/dist/mealrecipe.html)
 
-## [FruitSmoothie](https://www.clickthisnick.com/recipes/dist/fruitsmoothie.html)
+## [MealRecipe](https://www.clickthisnick.com/recipes/dist/mealrecipe.html)
 
-## [Spaghetti](https://www.clickthisnick.com/recipes/dist/spaghetti.html)
+## [MealRecipe](https://www.clickthisnick.com/recipes/dist/mealrecipe.html)
 
 # Component
-## [asparagus](https://www.clickthisnick.com/recipes/dist/asparagus.html)
+## [MealRecipe](https://www.clickthisnick.com/recipes/dist/mealrecipe.html)
 
-## [BabyBackRibs](https://www.clickthisnick.com/recipes/dist/babybackribs.html)
+## [MealRecipe](https://www.clickthisnick.com/recipes/dist/mealrecipe.html)
 
-## [lentils](https://www.clickthisnick.com/recipes/dist/lentils.html)
+## [MealRecipe](https://www.clickthisnick.com/recipes/dist/mealrecipe.html)
 
-## [mushrooms](https://www.clickthisnick.com/recipes/dist/mushrooms.html)
+## [MealRecipe](https://www.clickthisnick.com/recipes/dist/mealrecipe.html)
 
-## [popcorn](https://www.clickthisnick.com/recipes/dist/popcorn.html)
+## [MealRecipe](https://www.clickthisnick.com/recipes/dist/mealrecipe.html)
 
-## [proteinballs](https://www.clickthisnick.com/recipes/dist/proteinballs.html)
+## [MealRecipe](https://www.clickthisnick.com/recipes/dist/mealrecipe.html)
 
-## [rice](https://www.clickthisnick.com/recipes/dist/rice.html)
+## [MealRecipe](https://www.clickthisnick.com/recipes/dist/mealrecipe.html)
+
+## [MealRecipe](https://www.clickthisnick.com/recipes/dist/mealrecipe.html)
 
 # Frozen
-## [SpiralHam](https://www.clickthisnick.com/recipes/dist/spiralham.html)
+## [MealRecipe](https://www.clickthisnick.com/recipes/dist/mealrecipe.html)
 

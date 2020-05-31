@@ -7,7 +7,6 @@ import { Timer } from '../class/timer';
 export class MealRecipe extends Recipe {
     constructor() {
         super();
-        this.recipeName = 'PizzaDough';
         this.recipeGroup = c.component;
         this.addIngredients([
             i.dryActiveYeast(2.25, u.tsp),

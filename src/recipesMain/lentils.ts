@@ -7,21 +7,20 @@ import { Timer } from '../class/timer';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.recipeName = 'lentils';
         this.recipeGroup = c.component;
+        this.variations = [
+            {'recipe': [LentilHalfCup]},
+        ]
     }
 
     public init() {
-        this.generateRecipes([
-            {'recipe': [LentilHalfCup]},
-        ]);
+        this.generateRecipes();
     }
 }
 
 class LentilHalfCup extends Recipe {
     constructor() {
         super();
-        this.recipeId = 'halfcup';
     }
 
     public generateRecipe() {

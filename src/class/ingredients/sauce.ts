@@ -16,6 +16,19 @@ export class SauceItems extends OilItems {
         nutrition: {}
     })
 
+    public static readonly dijonMustard: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+        name: 'Dijon Mustard',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        nutrition: {}
+    })
+
     public static readonly soySauce: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
         name: 'Soy Sauce',
         putAwayTime: 10,

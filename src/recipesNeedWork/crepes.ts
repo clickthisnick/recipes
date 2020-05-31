@@ -6,7 +6,6 @@ import { Units as u } from '../constants/units';
 export class MealRecipe extends Recipe {
     constructor() {
         super();
-        this.recipeName = 'Crepes';
         this.recipeGroup = c.snack;
         this.addIngredients([
             i.allPurposeFlour(1, u.cup),

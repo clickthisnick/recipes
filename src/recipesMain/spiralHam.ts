@@ -7,21 +7,20 @@ import { Timer } from '../class/timer';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.recipeName = 'Spiral Ham';
         this.recipeGroup = c.frozen;
+        this.variations = [
+            {'recipe': [SpiralHam]}
+        ]
     }
 
     public init() {
-        this.generateRecipes([
-            {'recipe': [SpiralHam]}
-        ]);
+        this.generateRecipes();
     }
 }
 
 class SpiralHam extends Recipe {
     constructor() {
         super();
-        this.recipeId = 'cup';
     }
     public generateRecipe() {
         this.addIngredients([

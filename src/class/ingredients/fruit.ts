@@ -55,6 +55,19 @@ export class FruitItems extends CarbItems {
         nutrition: {},
     })
 
+    public static readonly orangeJuice: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+        name: 'Orange Juice',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Rinse and put measuring cup in dishwasher',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        nutrition: {},
+    })
+
     public static readonly frozenBerries: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
         name: 'Frozen Berries',
         putAwayTime: 10,

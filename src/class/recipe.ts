@@ -43,8 +43,9 @@ function finalStepReplace(text: string) {
 
 export class RecipeContainer {
     public recipeHtml: string = '';
+    public recipeName: string = '';
     public recipeGroup: string;
-    public recipeName: string;
+    public variations: any[];
     // public recipeOptions: any;
     // Arbitrary key.
     // Values are added in order of keys to the recipe body html ID
@@ -66,12 +67,14 @@ export class RecipeContainer {
         if (Readme.groups[this.recipeGroup] === undefined) {
             Readme.groups[this.recipeGroup] = [];
         }
-        Readme.groups[this.recipeGroup].push(`## [${this.recipeName.split(' ').join('')}](https://www.clickthisnick.com/recipes/dist/${this.recipeName.toLowerCase().split(' ').join('')}.html)\n\n`);
+        let recipeName = this.constructor.name
+        Readme.groups[this.recipeGroup].push(`## [${recipeName}](https://www.clickthisnick.com/recipes/dist/${recipeName.toLowerCase().split(' ').join('')}.html)\n\n`);
 
     }
-    public generateRecipes(variations: IVariation[]) {
+    public generateRecipes() {
         // Add options
         this.addToGroup();
+        const variations:IVariation[] = this.variations
 
         let tmpOptionHtml = '';
         let tmpHtml = '';
@@ -85,6 +88,14 @@ export class RecipeContainer {
             }
         }
 
+        // When we loop through variations we store any already used names
+        // Then subtract then more future names...
+        // So...
+        // WholeGrain
+        // WholeGrainMushroom -> Mushroom
+        // WholeGrainSausageMushroom -> Sausage
+        const recipeNamesUsed: any[] = []
+
         variations.forEach((variation) => {
             const recipeIds: string[] = [];
 
@@ -96,10 +107,18 @@ export class RecipeContainer {
 
             recipes.forEach((recipe) => {
                 const initRecipe: Recipe = new recipe();
+                let recipeName = recipe.name;
 
                 initRecipe.autoShow = defaultShowRecipe;
                 initRecipe.generateRecipe();
-                recipeIds.push(initRecipe.recipeId);
+
+                // recipe.name is the class name
+                recipeNamesUsed.forEach((used) => {
+                    recipeName = recipeName.replace(used, '')
+                });
+
+                recipeNamesUsed.push(recipeName);
+                recipeIds.push(recipeName);
                 tmpHtml += initRecipe.recipeHtml;
             });
 
@@ -121,16 +140,25 @@ export class RecipeContainer {
     }
 
     public writeRecipe() {
+        let recipeName: any = this.recipeName;
+        let values: any = Object.values(this.variations[0])
+        if (recipeName === "" && this.variations.length === 1 && values[0].length == 1) {
+            recipeName = Object.values(this.variations[0])[0]
+            // [Function SpiralHam]
+            recipeName = recipeName[0].name
+        } else {
+            if (this.recipeName === "") {
+               throw new Error(`Recipe Name must be provided for ${Object.values(this.variations[0])} if recipe has more than 1 variation`)
+            }
+        }
 
         // Just setting to lowercase incase git isn't case sensitive (Like on osx/windows)
-        fs.writeFileSync(`${process.cwd()}/dist/${this.recipeName.toLowerCase().split(' ').join('')}.html`, this.recipeHtml);
+        fs.writeFileSync(`${process.cwd()}/dist/${recipeName}.html`, this.recipeHtml);
     }
 }
 
 export class Recipe {
     private steps: any[] = [];
-    public recipeId: string;
-    public compoundRecipeId: string;
     public ingredients: IItemObj[];
     public vegan: boolean = true;
     public timeEstimateMilliseconds: number = 0;
@@ -195,17 +223,9 @@ export class Recipe {
         // Opening div with id
         // If autoShow, then display the recipe
         if (this.autoShow) {
-            if (this.compoundRecipeId) {
-                this.recipeHtml += `<div id="${this.compoundRecipeId}">`;
-            } else {
-                this.recipeHtml += `<div id="${this.recipeId}">`;
-            }
+            this.recipeHtml += `<div id="${this.constructor.name}">`;
         } else {
-            if (this.compoundRecipeId) {
-                this.recipeHtml += `<div id="${this.compoundRecipeId}" style="display: none">`;
-            } else {
-                this.recipeHtml += `<div id="${this.recipeId}" style="display: none">`;
-            }
+            this.recipeHtml += `<div id="${this.constructor.name}" style="display: none">`;
         }
 
         this.ingredients = ingredients;

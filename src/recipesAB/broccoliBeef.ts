@@ -8,7 +8,6 @@ import { Async } from '../class/async';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.recipeName = 'Broccoli Beef';
         this.recipeGroup = c.meal;
         this.addIngredients([
             i.oliveOil(1, u.tbsp),
