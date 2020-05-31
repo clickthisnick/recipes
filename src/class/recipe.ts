@@ -161,7 +161,7 @@ export class RecipeContainer {
         const recipeName = this.getRecipeName();
 
         // Just setting to lowercase incase git isn't case sensitive (Like on osx/windows)
-        fs.writeFileSync(`${process.cwd()}/dist/${recipeName}.html`, this.recipeHtml);
+        fs.writeFileSync(`${process.cwd()}/dist/${recipeName.toLowerCase()}.html`, this.recipeHtml);
     }
 }
 
