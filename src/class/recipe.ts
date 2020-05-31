@@ -67,10 +67,28 @@ export class RecipeContainer {
         if (Readme.groups[this.recipeGroup] === undefined) {
             Readme.groups[this.recipeGroup] = [];
         }
-        let recipeName = this.constructor.name
+        const recipeName = this.getRecipeName();
+
         Readme.groups[this.recipeGroup].push(`## [${recipeName}](https://www.clickthisnick.com/recipes/dist/${recipeName.toLowerCase().split(' ').join('')}.html)\n\n`);
 
     }
+
+    private getRecipeName() {
+        let recipeName: any = this.recipeName;
+        let values: any = Object.values(this.variations[0])
+        if (recipeName === "" && this.variations.length === 1 && values[0].length == 1) {
+            recipeName = Object.values(this.variations[0])[0]
+            // [Function SpiralHam]
+            recipeName = recipeName[0].name
+        } else {
+            if (this.recipeName === "") {
+               throw new Error(`Recipe Name must be provided for ${Object.values(this.variations[0])} if recipe has more than 1 variation`)
+            }
+        }
+
+        return recipeName
+    }
+
     public generateRecipes() {
         // Add options
         this.addToGroup();
@@ -140,17 +158,7 @@ export class RecipeContainer {
     }
 
     public writeRecipe() {
-        let recipeName: any = this.recipeName;
-        let values: any = Object.values(this.variations[0])
-        if (recipeName === "" && this.variations.length === 1 && values[0].length == 1) {
-            recipeName = Object.values(this.variations[0])[0]
-            // [Function SpiralHam]
-            recipeName = recipeName[0].name
-        } else {
-            if (this.recipeName === "") {
-               throw new Error(`Recipe Name must be provided for ${Object.values(this.variations[0])} if recipe has more than 1 variation`)
-            }
-        }
+        const recipeName = this.getRecipeName();
 
         // Just setting to lowercase incase git isn't case sensitive (Like on osx/windows)
         fs.writeFileSync(`${process.cwd()}/dist/${recipeName}.html`, this.recipeHtml);
