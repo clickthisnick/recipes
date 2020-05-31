@@ -11,6 +11,8 @@
 
 ## [Coffee](https://www.clickthisnick.com/recipes/dist/coffee.html)
 
+## [DijonChicken](https://www.clickthisnick.com/recipes/dist/dijonchicken.html)
+
 ## [Hotdog](https://www.clickthisnick.com/recipes/dist/hotdog.html)
 
 ## [Smoothie](https://www.clickthisnick.com/recipes/dist/smoothie.html)
@@ -21,8 +23,6 @@
 ## [Asparagus](https://www.clickthisnick.com/recipes/dist/asparagus.html)
 
 ## [BabyBackRibs](https://www.clickthisnick.com/recipes/dist/babybackribs.html)
-
-## [DijonChicken](https://www.clickthisnick.com/recipes/dist/dijonchicken.html)
 
 ## [LentilHalfCup](https://www.clickthisnick.com/recipes/dist/lentilhalfcup.html)
 

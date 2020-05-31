@@ -30,7 +30,7 @@ export class FruitItems extends CarbItems {
     })
 
     public static readonly pittedDates: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
-        name: 'Pitted Dates',
+        name: 'Pitted Date',
         putAwayTime: 10,
         takeOutTime: 10,
         cleanSteps: 'Rinse and put measuring cup in dishwasher',
