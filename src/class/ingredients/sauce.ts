@@ -26,7 +26,16 @@ export class SauceItems extends OilItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {}
+        nutrition: {
+            [u.tsp.name]: {
+                calories: 0,
+                sodium: 50,
+                cost: .044,
+                protein: 0,
+                sugar: 0,
+            }
+        },
+        link: 'https://www.amazon.com/365-Everyday-Value-Organic-Mustard/dp/B074J6RQZB?fpw=alm&s=wholefoods'
     })
 
     public static readonly soySauce: IItem = (quantity: number = .00001, unit: IUnitObj) => ({

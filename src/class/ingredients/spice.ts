@@ -1,5 +1,5 @@
 import { IItem } from './item';
-import { IUnitObj } from '../../constants/units';
+import { IUnitObj, Units as u } from '../../constants/units';
 import { SauceItems } from './sauce';
 
 export class SpiceItems extends SauceItems {
@@ -105,7 +105,9 @@ export class SpiceItems extends SauceItems {
         wash: false,
         isTakoutUnitable: false,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            
+        },
     })
 
     public static readonly pepperFlake: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
@@ -157,7 +159,16 @@ export class SpiceItems extends SauceItems {
         wash: true,
         isTakoutUnitable: true,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            [u.tbsp.name]: {
+                quantity: 38,
+                serving_size: 1,
+                calories: 15,
+                sodium: 0,
+                sugar: 0,
+                protein: 1, 
+            }
+        },
     })
 
     public static readonly chilliPowder: IItem = (quantity: number = .00001, unit: IUnitObj) => ({

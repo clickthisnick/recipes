@@ -32,7 +32,8 @@ class DijonChicken extends Recipe {
             i.chickenThigh(3, u.pound),
         ]);
         this.addSteps([
-            ['Combine everything but chicken (', i.dijonMustard(), i.orangeJuice(), i.oliveOil(), i.garlicClove(), i.salt(), ') in a bowl and mix'],
+            ['Mince the ', i.garlicClove()],
+            ['Combine everything but chicken (', i.dijonMustard(), i.orangeJuice(), i.oliveOil(), i.garlicClove(0), i.salt(), ') in a bowl and mix'],
             ['Put in', i.chickenThigh(), 'and leave marinated for 12 hours'],
             [Timer.ninjaCook(10, 'm', 'Cook Chicken, flip at 5 min mark', 500)]
         ]);

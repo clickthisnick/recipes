@@ -5,6 +5,7 @@ import { Serializer as s } from './serializer';
 import { ITimer } from './timer';
 import { HTML } from './html';
 import { Async } from './async';
+import { Units as u } from '../constants/units';
 
 // TODO add nutrition serving size (1, cup)
 // Then do the math roughly how many ounces are in a cup etc
@@ -174,12 +175,16 @@ export class Recipe {
     public estimates: IEstimates = {
         calories: 0,
         sodium: 0,
+        sugar: 0,
+        protein: 0,
         cost: 0
     };
 
     public estimatesMissing: IEstimatesMissing = {
         calories: [],
         sodium: [],
+        sugar: [],
+        protein: [],
         cost: [],
     };
 
@@ -227,6 +232,84 @@ export class Recipe {
       return JSON.parse(JSON.stringify(obj));
     }
 
+    public convertIngToNutrition(unit, nutrition) {
+        const symbol_map = {
+            "smaller": "multiply",
+            "bigger": "divide",
+        }
+
+        const conversionMap = {
+            [u.cup.name]: {
+                [u.tsp.name]: {
+                    count: 48,
+                    symbol: symbol_map['smaller']
+                },
+                [u.tbsp.name]: {
+                    count: 16,
+                    symbol: symbol_map['smaller']
+                },
+            },
+            [u.tbsp.name]: {
+                [u.cup.name]: {
+                    count: 16,
+                    symbol: symbol_map['bigger']
+                },
+                [u.tsp.name]: {
+                    count: 3,
+                    smybol: symbol_map['smaller']
+                }
+            },
+            [u.tsp.name]: {
+                [u.cup.name]: {
+                    count: 48,
+                    symbol: symbol_map['bigger']
+                },
+                [u.tbsp.name]: {
+                    count: 3,
+                    symbol: symbol_map['bigger']
+                }
+            }
+        }
+        let convertedNutrition = {}
+
+        if (nutrition === null) {
+            return null
+        }
+
+        if (nutrition.hasOwnProperty(unit)) {
+            return nutrition[unit]
+        }
+
+        // Check if we can convert this unit at all
+        if (!conversionMap.hasOwnProperty(unit)) {
+            return null
+        }
+
+        Object.keys(nutrition).forEach((key) => {
+
+            // If there is a map between our unit and anything in the nutrition info, use it.
+            if (conversionMap[unit].hasOwnProperty(key)) {
+
+                Object.keys(nutrition[key]).forEach((metric) => {
+                    const symbol = conversionMap[unit][key]['symbol']
+
+                    // TODO check that this is right
+                    if (symbol === 'divide') {
+                        convertedNutrition[metric] = nutrition[key][metric] / conversionMap[unit][key]['count']
+                    } else {
+                        convertedNutrition[metric] = nutrition[key][metric] * conversionMap[unit][key]['count']
+                    }
+                })
+            }
+        })
+
+        if (convertedNutrition === {}) {
+            return null
+        }
+
+        return convertedNutrition
+    }
+
     public addIngredients(ingredients: IItemObj[]) {
         // Opening div with id
         // If autoShow, then display the recipe
@@ -238,17 +321,24 @@ export class Recipe {
 
         this.ingredients = ingredients;
 
-        const metrics = ['calories', 'sodium', 'cost'];
+        const metrics = ['calories', 'sodium', 'cost', 'sugar', 'protein'];
 
         ingredients.forEach((ing) => {
             // Add calories to our calculation
-            // TODO make metrics into an array
-            if (ing.quantity > 0 && ing.unit !== null && ing.nutrition.hasOwnProperty(ing.unit.name)) {
+            if (ing.quantity > 0 && ing.unit !== null && this.convertIngToNutrition(ing.unit.name, ing.nutrition)) {
                 const unitName = ing.unit.name;
+                const nutritionData = this.convertIngToNutrition(unitName, ing.nutrition)
 
                 metrics.forEach((metric) => {
-                    if (ing.nutrition[unitName].hasOwnProperty(metric) && ing.nutrition[unitName][metric] !== null) {
-                        this.estimates[metric] += (ing.nutrition[unitName][metric] * ing.quantity);
+                    if (nutritionData.hasOwnProperty(metric) && nutritionData[metric] !== null) {
+                        // Only multiply by the quantity you are using
+                        // TODO in future everything should just have a serving_size
+                        if (nutritionData.hasOwnProperty('serving_size')) {
+                            this.estimates[metric] += (nutritionData[metric] * (ing.quantity / nutritionData['serving_size']));
+                        } else {
+                            this.estimates[metric] += (nutritionData[metric] * ing.quantity);
+                        }
+                        
                     } else {
                         this.estimatesMissing[metric].push(ing.name);
                     }
@@ -264,33 +354,33 @@ export class Recipe {
     }
 
     public get(itemObj: IItemObj): any {
-      const ingredient = this.ingredients.find((x) => x.name === itemObj.name);
+        const ingredient = this.ingredients.find((x) => x.name === itemObj.name);
 
-      if (ingredient === undefined) {
-          throw new Error(`Ingredient not found: ${itemObj.name}`);
-      }
+        if (ingredient === undefined) {
+            throw new Error(`Ingredient not found: ${itemObj.name}`);
+        }
 
-      const ing: IItemObj = this.cloneObj(ingredient);
+        const ing: IItemObj = this.cloneObj(ingredient);
 
-      // .00001 is a number that no one would ever use in a recipe
-      // Its what we default item values to
-      // If you just want to use an items text, you can use "0" of it in a recipe
-      // If no quantity is specified in the recipe, assume it means use all of it
-      if (itemObj.quantity === .00001) {
-        itemObj.quantity = ingredient.quantity;
-      }
+        // .00001 is a number that no one would ever use in a recipe
+        // Its what we default item values to
+        // If you just want to use an items text, you can use "0" of it in a recipe
+        // If no quantity is specified in the recipe, assume it means use all of it
+        if (itemObj.quantity === .00001) {
+            itemObj.quantity = ingredient.quantity;
+        }
 
-      if (itemObj.quantity > ing.quantity) {
-         throw new Error(`Not enough ${ing.name}, \nCurrent: ${ing.quantity}\nNeeded: ${itemObj.quantity}`);
-      } else {
-         // Subtracting the ingredients used from the ingredient amount
-         ingredient.quantity -= itemObj.quantity;
+        if (itemObj.quantity > ing.quantity) {
+            throw new Error(`Not enough ${ing.name}, \nCurrent: ${ing.quantity}\nNeeded: ${itemObj.quantity}`);
+        } else {
+            // Subtracting the ingredients used from the ingredient amount
+            ingredient.quantity -= itemObj.quantity;
 
-         // Make the clone have the same quantity as what we used up to fullfil this step
-         ing.quantity = itemObj.quantity;
-      }
+            // Make the clone have the same quantity as what we used up to fullfil this step
+            ing.quantity = itemObj.quantity;
+        }
 
-      return ing;
+        return ing;
     }
 
     public prep() {
@@ -310,7 +400,7 @@ export class Recipe {
             }
         });
 
-        const metricsToShow = ['calories', 'sodium', 'cost'];
+        const metricsToShow = ['calories', 'sodium', 'cost', 'sugar', 'protein'];
 
         metricsToShow.forEach((metric) => {
             let metricText = `${Math.round(this.estimates[metric])} ${metric}`;

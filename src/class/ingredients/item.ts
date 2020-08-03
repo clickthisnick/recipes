@@ -3,12 +3,16 @@ import { IUnitObj } from '../../constants/units';
 export interface IEstimates {
     calories?: number;
     sodium?: number;
+    sugar?: number;
+    protein?: number;
     cost?: number;
 }
 
 export interface IEstimatesMissing {
     calories: string[];
     sodium: string[];
+    protein: string[];
+    sugar: string[];
     cost: string[];
 }
 
