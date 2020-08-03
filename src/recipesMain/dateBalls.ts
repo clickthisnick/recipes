@@ -9,7 +9,7 @@ export class MealRecipe extends RecipeContainer {
         super();
         this.recipeGroup = c.component;
         this.variations = [
-            {'recipe': [ProteinBalls]},
+            {'recipe': [DateBalls]},
         ]
      }
 
@@ -18,7 +18,7 @@ export class MealRecipe extends RecipeContainer {
      }
 }
 
-class ProteinBalls extends Recipe {
+class DateBalls extends Recipe {
     constructor() {
         super();
     }

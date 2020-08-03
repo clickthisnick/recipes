@@ -24,13 +24,13 @@
 
 ## [BabyBackRibs](https://www.clickthisnick.com/recipes/dist/babybackribs.html)
 
+## [DateBalls](https://www.clickthisnick.com/recipes/dist/dateballs.html)
+
 ## [LentilHalfCup](https://www.clickthisnick.com/recipes/dist/lentilhalfcup.html)
 
 ## [Mushroom](https://www.clickthisnick.com/recipes/dist/mushroom.html)
 
 ## [Popcorn](https://www.clickthisnick.com/recipes/dist/popcorn.html)
-
-## [ProteinBalls](https://www.clickthisnick.com/recipes/dist/proteinballs.html)
 
 ## [Rice](https://www.clickthisnick.com/recipes/dist/rice.html)
 
