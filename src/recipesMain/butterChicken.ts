@@ -69,6 +69,7 @@ class ButterChicken extends Recipe {
             [Timer.naturalPressRelease(10, 'm', true)],
                 [Async.step, 'Put away spices'],
                 [Async.step, 'Wash utensils'],
+            ['Take inner instant pot bowl out and put on stove. Put away instant pot.'],
             ['Stir in', i.coconutCream()],
             [Timer.set(3, 'm', 'Saute on medium')],
         ]);

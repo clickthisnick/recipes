@@ -34,6 +34,7 @@ class Rice1Cup extends Recipe {
             [Timer.pressureCook(9, 15, 'm', true)],
             [Timer.naturalPressRelease(5, 'm')],
             ['Open steam valve'],
+            ['Take inner instant pot bowl out and put on stove. Put away instant pot.'],
         ]);
     }
 }

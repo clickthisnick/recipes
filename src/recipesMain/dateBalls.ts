@@ -3,6 +3,7 @@ import { Items as i } from '../constants/items';
 import { Categories as c } from '../constants/categories';
 import { Units as u } from '../constants/units';
 import { Timer } from '../class/timer';
+import { Async } from '../class/async';
 
 export class MealRecipe extends RecipeContainer {
     constructor() {
@@ -40,6 +41,7 @@ class DateBalls extends Recipe {
             ['Blend for 10 seconds, stir, repeat until dough like'],
             ['Take a tbsp of batter and cut on cutting board, repeat until no more batter. Makes around 30'],
             [Timer.set(20, 'm', 'Put on plastic cutting board and put into freezer')],
+                [Async.step, 'Wash blender while still able to. (Wait a day and its 200% harder to clean)'],
             ['Transfer pieces into plastic container and keep in freezer'],
         ]);
     }

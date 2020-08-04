@@ -42,6 +42,7 @@ class BabyBackRibs extends Recipe {
             [Timer.naturalPressRelease(10, 'm', true)],
                 [Async.step, 'Preheat oven to broil on 400 degrees'],
             ['Release instant pot pressure'],
+            ['Take inner instant pot bowl out and put on stove. Put away instant pot.'],
             ['Rub', i.barbecueSauce(), 'over', i.babyBackRibs(0)],
             [Timer.set(2, 'm', 'Broil ribs')]
         ]);

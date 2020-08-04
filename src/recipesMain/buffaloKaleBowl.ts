@@ -38,8 +38,9 @@ class BuffaloKaleBowl extends Recipe {
             ['Put in', i.water()],
             [Timer.pressureCook(9, 15, 'm', true)],
                 [Async.step, Timer.set(19, 'm', 'Wait', true)],
+                    [Async.step, Async.step, 'Put away', i.brownRice()],
                     [Async.step, Async.step, 'Wash', i.kale()],
-                    [Async.step, Async.step, 'Wash', i.blackBeans()],
+                    [Async.step, Async.step, 'Rinse', i.blackBeans(), 'in sink with strainer (So bean juice doesnt get on counter)'],
                 [Async.step, Timer.preheatPan(7)],
                 [Async.step, 'Put in', i.chilliOil(), 'in pan'],
                 [Async.step, 'put', i.kale(), 'in pan'],
@@ -48,7 +49,8 @@ class BuffaloKaleBowl extends Recipe {
             [Timer.naturalPressRelease(5, 'm')],
             ['Open steam valve'],
             ['Mix in', i.curryPowder(), 'into rice'],
-            ['In a bowl mix', i.blackBeans(), i.brownRice(0), i.kale(0), i.buffaloSauce()],
+            ['Take inner instant pot bowl out and put on stove. Put away instant pot.'],
+            ['In a bowl mix', i.blackBeans(), i.brownRice(), i.kale(), i.buffaloSauce()],
         ]);
     }
 }
