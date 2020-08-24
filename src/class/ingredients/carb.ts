@@ -34,6 +34,24 @@ export class CarbItems extends AnimalItems {
         }
     })
 
+    public static readonly ziti: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+        name: 'Ziti',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Rinse and put measuring cup in dishwasher',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        nutrition: {
+            [u.ounce.name]: {
+                quantity: 16,
+                cost: 1.99,
+            }
+        }
+    })
+
     public static readonly spaghettiWholeGrain: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
         name: 'Whole Grain Spaghetti',
         putAwayTime: 10,

@@ -7,27 +7,6 @@ import { HTML } from './html';
 import { Async } from './async';
 import { Units as u } from '../constants/units';
 
-// TODO add nutrition serving size (1, cup)
-// Then do the math roughly how many ounces are in a cup etc
-// Maybe the units will only translate to cup tbsp etc
-// ounces -> pounds not cups
-
-// if (`${quantity}`.endsWith('.75')) {
-//     quantityString = `${quantity-.75}¾`;
-//   }
-//   if (`${quantity}`.endsWith('.5')) {
-//     quantityString = `${quantity-.5}½`;
-//   }
-//   if (`${quantity}`.endsWith('.33')) {
-//     quantityString = `${quantity-.33}⅓`;
-//   }
-//   if (`${quantity}`.endsWith('.25')) {
-//     quantityString = `${quantity-.25}¼`;
-//   }
-//   if (`${quantity}`.endsWith('.125')) {
-//     quantityString = `${quantity-.125}⅛`;
-//   }
-
 export interface IVariation {
     [details: string]: any[]; // Unititalized recipe
 }

@@ -100,6 +100,19 @@ export class AnimalItems {
         nutrition: {},
     })
 
+    public static readonly ricottaCheese: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+        name: 'Ricotta Cheese',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: true,
+        nutrition: {},
+    })
+
     public static readonly plainYogurt: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
         name: 'Plain Yogurt',
         putAwayTime: 10,

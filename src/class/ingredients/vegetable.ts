@@ -451,6 +451,19 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
+    public static readonly limeJuice: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+        name: 'Lime',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: true,
+        isMeatProduct: false,
+        nutrition: {},
+    })
+
     public static readonly romaTomato: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
         name: 'Roma Tomato',
         putAwayTime: 10,
@@ -518,6 +531,45 @@ export class VegetableItems extends SpiceItems {
 
     public static readonly cilantro: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
         name: 'Cilantro',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: true,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        nutrition: {},
+    })
+
+    public static readonly habanero: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+        name: 'Habanero',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: true,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        nutrition: {},
+    })
+
+    public static readonly mango: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+        name: 'Mango',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: true,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        nutrition: {},
+    })
+
+    public static readonly jalapeno: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+        name: 'Jalapeno',
         putAwayTime: 10,
         takeOutTime: 10,
         cleanSteps: '',

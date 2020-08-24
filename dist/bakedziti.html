@@ -1,0 +1,122 @@
+<meta name="viewport" content="width=device-width, initial-scale=1"><meta charset="utf-8"><style>
+    button {
+        display: inline-block;
+        border-radius: 4px;
+        background-color: #f4511e;
+        border: none;
+        color: #FFFFFF;
+        text-align: center;
+        font-size: 28px;
+        padding: 20px;
+        width: 200px;
+        transition: all 0.5s;
+        cursor: pointer;
+        margin: 5px;
+      }
+
+    .completed {
+           background-color:green;
+           color: white;
+       }
+
+       .timer {
+              background-color:yellow;
+              color: black;
+          }
+
+       .panel {
+       border-right-style: solid;
+       border-bottom-style: solid;
+       border-left-style: solid;
+        padding: 25px;
+        border-width: 1px;
+       }
+       </style>
+       <script>
+       function setIntervalX(callback, delay, repetitions) {
+           var x = 0;
+           var intervalID = window.setInterval(function () {
+
+              callback();
+
+              if (++x === repetitions) {
+                  window.clearInterval(intervalID);
+              }
+           }, delay);
+       }
+
+       function timer(initialWait) {
+           setIntervalX(function () {
+               setIntervalX(function () {
+                var x = document.getElementById("beep");
+
+                x.play();
+             }, 200, 10);
+         }, initialWait, 1);
+       }
+
+       function startTimer(duration, timerNum) {
+          var timerId = '#' + timerNum;
+          var display = document.querySelector(timerId);
+          var timer = duration, minutes, seconds;
+          var intervalID = window.setInterval(function () {
+               minutes = parseInt(timer / 60, 10)
+               seconds = parseInt(timer % 60, 10);
+
+               minutes = minutes < 10 ? "0" + minutes : minutes;
+               seconds = seconds < 10 ? "0" + seconds : seconds;
+
+               display.textContent = minutes + ":" + seconds + " ";
+
+               if (--timer < 0) {
+                   window.clearInterval(intervalID);
+                   var panelId = "#panel" + timerNum;
+                   var panel = document.querySelector(panelId);
+                   panel.classList.toggle('timer');
+                   panel.classList.toggle('completed');
+               }
+           }, 1000);
+       }
+
+       function loadTimer(seconds, timerNum) {
+          seconds = seconds / 1000;
+
+          startTimer(seconds, timerNum);
+       }
+
+       var shownId = '';
+
+       function getCheckedOptions() {
+          var id = '';
+          var htmlCollection = document.getElementById('options').getElementsByTagName('button')
+
+          for (const item of htmlCollection) {
+            if (item.classList[0] == 'completed') {
+                id += item.innerHTML
+            }
+          }
+
+          return id
+       }
+
+       // Used to hide/show recipes
+       function showRecipe() {
+            var id = getCheckedOptions()
+
+            console.log(id);
+
+            // Show
+            if (document.getElementById(id)) {
+                document.getElementById(id).style.display = 'block';
+            }
+
+            if (document.getElementById(shownId)) {
+                // Hide previously shown
+                document.getElementById(shownId).style.display = 'none';
+            }
+
+            shownId = id;
+        }
+
+       </script>
+    <a href="https://github.com/clickthisnick/recipes/blob/master/README.MD">Back To Recipes</a><div id="options"><br><b>recipe</b><br><button style="display: none;" onclick="this.classList.toggle('completed'); showRecipe()">BakedZiti</button></div><br><div id="BakedZiti"><h1>230 calories (Ziti/Italian Sausage/Red Onion/Garlic Clove/Ricotta Cheese/Mozzarella Cheese/Parmessan Cheese Data Missing)</h1><h1>1574 sodium (Ziti/Italian Sausage/Red Onion/Garlic Clove/Ricotta Cheese/Mozzarella Cheese/Parmessan Cheese Data Missing)</h1><h1>32 cost (Italian Sausage/Spaghetti Sauce/Red Onion/Garlic Clove/Ricotta Cheese/Mozzarella Cheese/Parmessan Cheese Data Missing)</h1><h1>0 sugar (Ziti/Italian Sausage/Spaghetti Sauce/Red Onion/Garlic Clove/Ricotta Cheese/Mozzarella Cheese/Parmessan Cheese Data Missing)</h1><h1>0 protein (Ziti/Italian Sausage/Spaghetti Sauce/Red Onion/Garlic Clove/Ricotta Cheese/Mozzarella Cheese/Parmessan Cheese Data Missing)</h1><h1>Recipe</h1><h1>Estimated Time: 26 Minutes</h1><div class="panel" onclick="this.classList.toggle('completed')">Put 10 cups Water (2.5 quarts) in pot </div><div class="panel" id="paneltimer6" onclick="this.classList.toggle('timer'); timer(600000); loadTimer(600000, 'timer6')"><span id="timer6"></span>Timer 10 minutes Boil water on heat 7 with lid</div><div class="panel" onclick="this.classList.toggle('completed')">Put in 16 ounces Ziti in water </div><div class="panel" id="paneltimer7" onclick="this.classList.toggle('timer'); timer(180000); loadTimer(180000, 'timer7')"><span id="timer7"></span>Async 3 minutes Put sauce pan on heat 7 on another burner</div><div class="panel" onclick="this.classList.toggle('completed')">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;mince 4 Garlic Cloves Red Onion </div><div class="panel" onclick="this.classList.toggle('completed')">Put 16 ounces Italian Sausage into pan </div><div class="panel" id="paneltimer8" onclick="this.classList.toggle('timer'); timer(300000); loadTimer(300000, 'timer8')"><span id="timer8"></span>Async 5 minutes Cook sausage</div><div class="panel" onclick="this.classList.toggle('completed')">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Put in Garlic Clove and Red Onion </div><div class="panel" id="paneltimer9" onclick="this.classList.toggle('timer'); timer(300000); loadTimer(300000, 'timer9')"><span id="timer9"></span>Async 5 minutes Cook pan mixture</div><div class="panel" onclick="this.classList.toggle('completed')">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Preheat oven to 350 </div><div class="panel" onclick="this.classList.toggle('completed')">Put in italian seasoning into pan mixture </div><div class="panel" id="paneltimer10" onclick="this.classList.toggle('timer'); timer(60000); loadTimer(60000, 'timer10')"><span id="timer10"></span>Timer 1 minute Cook pan mixture</div><div class="panel" onclick="this.classList.toggle('completed')">Put 16 ounces Spaghetti Sauce into pan mixture </div><div class="panel" id="paneltimer11" onclick="this.classList.toggle('timer'); timer(120000); loadTimer(120000, 'timer11')"><span id="timer11"></span>Timer 2 minutes Cook pan mixture</div><div class="panel" onclick="this.classList.toggle('completed')">Spread a thin layer of the sauce in the bottom of a 9x13-inch casserole pan </div><div class="panel" onclick="this.classList.toggle('completed')">Dot the surface with half the 8 ounces Ricotta Cheese </div><div class="panel" onclick="this.classList.toggle('completed')">Put a spoonful of sauce into the pasta, stir, and then add the pasta into the casserole. </div><div class="panel" onclick="this.classList.toggle('completed')">Pour the rest of the sauce over the pasta, dot the remaining 7 ounces Ricotta Cheese over the pasta, and sprinkle 8 ounces Mozzarella Cheese 3 ounces Parmessan Cheese on top. </div><div class="panel" onclick="this.classList.toggle('completed')">At this point you could refrigerate or freeze, or bake </div><div class="panel" onclick="this.classList.toggle('completed')">Bake in oven until light brown and cheese is melted, about 20-25 minutes. </div></div>

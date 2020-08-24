@@ -33,14 +33,15 @@ class DateBalls extends Recipe {
         ]);
         this.addSteps([
             [Timer.set(5, 'm', 'Soak 20 dates in a bowl')],
-            ['Put into blender a full 16 ounce container of ', i.cashewButter()],
+            ['Put into blender', i.pittedDates(), 'checking that there are no pits'],
             ['Put into blender', i.collagenPowder()],
             ['Put into blender', i.cacaoPowderUnsweetened()],
             ['Put into blender', i.water()],
-            ['Put into blender', i.pittedDates()],
+            ['Blend for 30 seconds, stir, repeat until dough like'],
+            ['Put into blender a full 16 ounce container of ', i.cashewButter()],
             ['Blend for 10 seconds, stir, repeat until dough like'],
             ['Take a tbsp of batter and cut on cutting board, repeat until no more batter. Makes around 30'],
-            [Timer.set(20, 'm', 'Put on plastic cutting board and put into freezer')],
+            [Timer.set(60, 'm', 'Put on plastic cutting board and put into freezer')],
                 [Async.step, 'Wash blender while still able to. (Wait a day and its 200% harder to clean)'],
             ['Transfer pieces into plastic container and keep in freezer'],
         ]);

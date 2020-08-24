@@ -6,6 +6,8 @@
 ## [Frozen Food Portions](https://www.clickthisnick.com/recipes/frozenFood.html)
 # Recipes List
 # 1 Meal
+## [BakedZiti](https://www.clickthisnick.com/recipes/dist/bakedziti.html)
+
 ## [BuffaloKaleBowl](https://www.clickthisnick.com/recipes/dist/buffalokalebowl.html)
 
 ## [ButterChicken](https://www.clickthisnick.com/recipes/dist/butterchicken.html)
@@ -26,6 +28,8 @@
 ## [BabyBackRibs](https://www.clickthisnick.com/recipes/dist/babybackribs.html)
 
 ## [DateBalls](https://www.clickthisnick.com/recipes/dist/dateballs.html)
+
+## [Guacamole](https://www.clickthisnick.com/recipes/dist/guacamole.html)
 
 ## [LentilHalfCup](https://www.clickthisnick.com/recipes/dist/lentilhalfcup.html)
 
