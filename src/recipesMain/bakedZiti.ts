@@ -26,7 +26,7 @@ class BakedZiti extends Recipe {
     public generateRecipe() {
         this.addIngredients([
             i.ziti(16, u.ounce),
-            i.water(10, u.cup),
+            i.water(6, u.cup),
             i.italianSausage(16, u.ounce),
             i.spaghettiSauce(16, u.ounce),
             i.redOnion(1, u.unit),
@@ -34,11 +34,13 @@ class BakedZiti extends Recipe {
             i.ricottaCheese(15, u.ounce),
             i.mozzarellaCheese(8, u.ounce),
             i.parmessanCheese(3, u.ounce),
+            i.oliveOil(1, u.tbsp),
         ]);
         this.addSteps([
-            ['Put', i.water(), '(2.5 quarts) in pot'],
+            ['Put', i.water(), '(1.5 quarts) in pot'],
             [Timer.set(10, 'm', 'Boil water on heat 7 with lid')],
             ['Put in', i.ziti(), 'in water'],
+            ['Put in', i.oliveOil(), 'in water'],
             [Timer.set(3, 'm', 'Put sauce pan on heat 7 on another burner', true)],
                 [Async.step, 'mince', i.garlicClove(), i.redOnion()],
             ['Put', i.italianSausage(), 'into pan'],
@@ -49,13 +51,14 @@ class BakedZiti extends Recipe {
             ['Put in italian seasoning into pan mixture'],
             [Timer.set(1, 'm', 'Cook pan mixture')],
             ['Put', i.spaghettiSauce(), 'into pan mixture'],
-            [Timer.set(2, 'm', 'Cook pan mixture')],
+            [Timer.set(1, 'm', 'Cook pan mixture')],
+                [Async.step, 'Drain noodles'],
             ['Spread a thin layer of the sauce in the bottom of a 9x13-inch casserole pan'],
             ['Dot the surface with half the', i.ricottaCheese(8, u.ounce)],
             ['Put a spoonful of sauce into the pasta, stir, and then add the pasta into the casserole.'],
             ['Pour the rest of the sauce over the pasta, dot the remaining', i.ricottaCheese(7, u.ounce), 'over the pasta, and sprinkle', i.mozzarellaCheese(), i.parmessanCheese(), 'on top.'],
             ['At this point you could refrigerate or freeze, or bake'],
-            ['Bake in oven until light brown and cheese is melted, about 20-25 minutes.'],
+            [Timer.set(25, 'm', 'Bake in oven until light brown and cheese is melted')],
         ]);
     }
 }

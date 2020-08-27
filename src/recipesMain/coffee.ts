@@ -28,8 +28,8 @@ class Coffee extends Recipe {
             i.coffeeGrounds(5, u.scoop),
         ]);
         this.addSteps([
-            ['Fill up teapot with water'],
-            [Timer.set(10, 'm', 'Turn stove to "HIGH" (after 9) and wait for whistle')],
+            ['Fill up teapot with water, about 12 a thousand seconds'],
+            [Timer.set(8.5, 'm', 'Turn stove to "HIGH" (after 9) and wait for whistle')],
             [Async.step, 'Put', i.coffeeGrounds(), 'into french press bag'],
             [Async.step, 'Put french press bag into french press'],
             ['Once teapot whistles - pour water into french press until water level reaches silver chrome part'],
