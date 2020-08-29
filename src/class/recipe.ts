@@ -368,12 +368,15 @@ export class Recipe {
         }
 
         // Add all the unit measurers
+        this.recipeHtml += this.generateHeader('Ingredients');
+
         this.ingredients.forEach((ingredient) => {
             // Skip ingredient takeout for now
-            //const ingName = s.turnIngObjIntoStr(ingredient);
-            //const needsWashed = ingredient.wash === true ? ' and wash' : '';
+            const ingName = s.turnIngObjIntoStr(ingredient);
+            const needsWashed = ingredient.wash === true ? ' and wash' : '';
+            const iUnit: any = ingredient.unit
 
-            //this.recipeHtml += this.generateStep(`${ingName}${needsWashed}`);
+            this.recipeHtml += this.generateStep(`${ingName} ${ingredient['quantity']} ${iUnit['name']} ${needsWashed}`);
             if (ingredient.isMeatProduct === true) {
                 this.vegan = false;
             }
