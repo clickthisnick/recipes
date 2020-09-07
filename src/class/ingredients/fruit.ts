@@ -28,7 +28,7 @@ export class FruitItems extends CarbItems {
         isMeatProduct: false,
         nutrition: {
             [u.tbsp.name]: {
-                quantity: 25,
+                servings: 25,
                 serving_size: 4,
                 calories: 70,
                 sodium: 65,
@@ -50,7 +50,7 @@ export class FruitItems extends CarbItems {
         isMeatProduct: false,
         nutrition: {
             [u.unit.name]: {
-                quantity: 6,
+                servings: 6,
                 serving_size: 6,
                 calories: 110,
                 sodium: 0,
@@ -72,7 +72,7 @@ export class FruitItems extends CarbItems {
         isMeatProduct: false,
         nutrition: {
             [u.tbsp.name]: {
-                quantity: 14,
+                servings: 14,
                 serving_size: 2,
                 calories: 190,
                 sodium: 0,
@@ -94,7 +94,7 @@ export class FruitItems extends CarbItems {
         isMeatProduct: false,
         nutrition: {
             [u.fluid_ounce.name]: {
-                quantity: 8,
+                servings: 8,
                 serving_size: 7,
                 calories: 110,
                 sodium: 0,

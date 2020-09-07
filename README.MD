@@ -22,6 +22,8 @@
 
 ## [Spaghetti](https://www.clickthisnick.com/recipes/dist/spaghetti.html)
 
+## [Sushi](https://www.clickthisnick.com/recipes/dist/sushi.html)
+
 # Component
 ## [Asparagus](https://www.clickthisnick.com/recipes/dist/asparagus.html)
 

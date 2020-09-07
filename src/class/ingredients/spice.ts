@@ -161,7 +161,7 @@ export class SpiceItems extends SauceItems {
         isMeatProduct: false,
         nutrition: {
             [u.tbsp.name]: {
-                quantity: 38,
+                servings: 38,
                 serving_size: 1,
                 calories: 15,
                 sodium: 0,

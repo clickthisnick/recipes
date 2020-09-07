@@ -373,6 +373,19 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
+    public static readonly seasonedRiceVinegar: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+        name: 'Seasoned Rice Vinegar',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        nutrition: {},
+    })
+
     public static readonly appleCiderVinegar: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
         name: 'Apple Cider Vinegar',
         putAwayTime: 10,

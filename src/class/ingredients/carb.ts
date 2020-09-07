@@ -45,8 +45,8 @@ export class CarbItems extends AnimalItems {
         isTakoutUnitable: false,
         isMeatProduct: false,
         nutrition: {
-            [u.ounce.name]: {
-                quantity: 16,
+            [u.pound.name]: {
+                servings: 1,
                 cost: 1.99,
             }
         }
@@ -81,6 +81,40 @@ export class CarbItems extends AnimalItems {
         isTakoutUnitable: false,
         isMeatProduct: false,
         nutrition: {}
+    })
+
+    public static readonly seaweed: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+        name: 'Seaweed',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: true,
+        nutrition: {},
+    })
+
+    public static readonly sushiRice: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+        name: 'Sushi Rice',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Rinse and put measuring cup in dishwasher',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        nutrition: {
+            [u.cup.name]: {
+                servings: 10,
+                serving_size: .25,
+                calories: 160,
+                sodium: 10,
+                protein: 3,
+            }
+        }
     })
 
     public static readonly brownRice: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
