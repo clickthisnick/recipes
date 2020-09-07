@@ -12,6 +12,8 @@
 
 ## [ButterChicken](https://www.clickthisnick.com/recipes/dist/butterchicken.html)
 
+## [ChipotleMarinade](https://www.clickthisnick.com/recipes/dist/chipotlemarinade.html)
+
 ## [Coffee](https://www.clickthisnick.com/recipes/dist/coffee.html)
 
 ## [DijonChicken](https://www.clickthisnick.com/recipes/dist/dijonchicken.html)

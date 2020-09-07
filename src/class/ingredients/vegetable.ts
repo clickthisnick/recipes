@@ -698,6 +698,19 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
+    public static readonly yellowOnion: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+        name: 'Yellow Onion',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: true,
+        isTakoutUnitable: true,
+        isMeatProduct: false,
+        nutrition: {},
+    })
+
     public static readonly redOnion: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
         name: 'Red Onion',
         putAwayTime: 10,
@@ -765,6 +778,32 @@ export class VegetableItems extends SpiceItems {
 
     public static readonly tomatoPaste: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
         name: 'Tomato Paste',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: true,
+        isMeatProduct: false,
+        nutrition: {},
+    })
+
+    public static readonly chipotlePepperInAdoboSauce: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+        name: 'Chipotle Pepper In Adobo Sauce',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: true,
+        isMeatProduct: false,
+        nutrition: {},
+    })
+
+    public static readonly driedOregano: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+        name: 'Dried Oregano',
         putAwayTime: 10,
         takeOutTime: 10,
         cleanSteps: '',
