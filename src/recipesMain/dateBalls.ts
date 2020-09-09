@@ -29,7 +29,7 @@ class DateBalls extends Recipe {
             i.collagenPowder(1, u.cup),
             i.cacaoPowderUnsweetened(.5, u.cup),
             i.pittedDates(20, u.unit),
-            i.water(8, u.tbsp),
+            i.water(.5, u.cup),
         ]);
         this.addSteps([
             [Timer.set(5, 'm', 'Soak 20 dates in a bowl')],
