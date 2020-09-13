@@ -4,6 +4,17 @@ export class HTML {
     public static mobileViewport = '<meta name="viewport" content="width=device-width, initial-scale=1">';
     public static chartSet = '<meta charset="utf-8">';
     public static css = `<style>
+
+    html {
+        background-color: #000000;
+    }
+
+    div {
+        background-color: #000000;
+        border: none;
+        color: #FFFFFF;
+    }
+
     button {
         display: inline-block;
         border-radius: 4px;
@@ -31,9 +42,9 @@ export class HTML {
     }
 
     .panel {
-       border-right-style: solid;
-       border-bottom-style: solid;
-       border-left-style: solid;
+        border-right-style: solid;
+        border-bottom-style: solid;
+        border-left-style: solid;
         padding: 25px;
         border-width: 1px;
     }
