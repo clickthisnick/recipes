@@ -35,6 +35,20 @@ export class MeatItems extends FruitItems {
         },
     })
 
+    public static readonly topSirloin: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+        name: 'Top Sirloin',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: true,
+        nutrition: {
+        }
+    })
+
     public static readonly babyBackRibs: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
         name: 'Baby Back Ribs',
         putAwayTime: 10,
