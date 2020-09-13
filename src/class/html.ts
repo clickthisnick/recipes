@@ -17,26 +17,27 @@ export class HTML {
         transition: all 0.5s;
         cursor: pointer;
         margin: 5px;
-      }
+    }
 
     .completed {
-           background-color:green;
-           color: white;
-       }
+        background-color:green;
+        color: white;
+        display: none;
+    }
 
-       .timer {
-              background-color:yellow;
-              color: black;
-          }
+    .timer {
+        background-color:yellow;
+        color: black;
+    }
 
-       .panel {
+    .panel {
        border-right-style: solid;
        border-bottom-style: solid;
        border-left-style: solid;
         padding: 25px;
         border-width: 1px;
-       }
-       </style>`;
+    }
+    </style>`;
 
     public static javascript = `
        <script>
