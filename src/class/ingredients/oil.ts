@@ -38,6 +38,20 @@ export class OilItems extends MeatItems {
         },
     })
 
+    public static readonly topSirloin: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+        name: 'Top Sirloin',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        nutrition: {
+        }
+    })
+
     public static readonly oliveOil: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
         name: 'Olive Oil',
         putAwayTime: 10,

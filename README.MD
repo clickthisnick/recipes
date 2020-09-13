@@ -22,6 +22,8 @@
 
 ## [Smoothie](https://www.clickthisnick.com/recipes/dist/smoothie.html)
 
+## [SouvideSteak](https://www.clickthisnick.com/recipes/dist/souvidesteak.html)
+
 ## [Spaghetti](https://www.clickthisnick.com/recipes/dist/spaghetti.html)
 
 ## [Sushi](https://www.clickthisnick.com/recipes/dist/sushi.html)
