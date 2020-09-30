@@ -1,9 +1,9 @@
-import { Recipe } from '../../class/recipe';
-import { Items as i } from '../../constants/items';
-import { Timer } from '../../class/timer';
-import { Units as u } from '../../constants/units';
+import { Recipe } from '../../../class/recipe';
+import { Items as i } from '../../../constants/items';
+import { Timer } from '../../../class/timer';
+import { Units as u } from '../../../constants/units';
 
-export class WholeGrainSausage extends Recipe {
+export class WholeGrainSpaghettiSausage extends Recipe {
     constructor() {
         super();
     }

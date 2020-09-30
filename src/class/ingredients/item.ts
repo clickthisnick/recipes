@@ -4,8 +4,9 @@ export interface IEstimates {
     calories?: number;
     sodium?: number;
     sugar?: number;
+    fiber?: number;
     protein?: number;
-    cost?: number;
+    total_cost?: number;
 }
 
 export interface IEstimatesMissing {
@@ -13,7 +14,8 @@ export interface IEstimatesMissing {
     sodium: string[];
     protein: string[];
     sugar: string[];
-    cost: string[];
+    fiber: string[];
+    total_cost: string[];
 }
 
 interface INutrition {

@@ -22,4 +22,5 @@ export class Categories {
 
     // 1 so it gets on top
     public static readonly meal = '1 Meal';
+    public static readonly mealheavycleanup = 'Heavy Cleanup Meal';
 }

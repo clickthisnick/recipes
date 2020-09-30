@@ -30,7 +30,7 @@ export class SauceItems extends OilItems {
             [u.tsp.name]: {
                 calories: 0,
                 sodium: 50,
-                cost: .044,
+                total_cost: .044,
                 protein: 0,
                 sugar: 0,
             }
@@ -127,9 +127,15 @@ export class SauceItems extends OilItems {
         isTakoutUnitable: false,
         isMeatProduct: false,
         nutrition: {
-            [u.ounce.name]: {
-                calories: 14.4,
-                sodium: 98.4,
+            [u.cup.name]: {
+                servings: 6,
+                serving_size: .5,
+                calories: 70,
+                sodium: 410,
+                sugar: 4,
+                protein: 3,
+                fiber: 2,
+                total_cost: 2.29
             }
         }
     })

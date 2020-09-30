@@ -155,17 +155,22 @@ export class Recipe {
         calories: 0,
         sodium: 0,
         sugar: 0,
+        fiber: 0,
         protein: 0,
-        cost: 0
+        total_cost: 0
     };
 
     public estimatesMissing: IEstimatesMissing = {
         calories: [],
         sodium: [],
         sugar: [],
+        fiber: [],
         protein: [],
-        cost: [],
+        total_cost: [],
     };
+
+    private metricsToShow: string[] = Object.keys(this.estimatesMissing);
+    private metrics: string[] = Object.keys(this.estimatesMissing);
 
     public recipeHtml: string = '';
 
@@ -213,39 +218,49 @@ export class Recipe {
 
     public convertIngToNutrition(unit, nutrition) {
         const symbol_map = {
-            "smaller": "multiply",
-            "bigger": "divide",
+            "smallerThanOuter": "multiply",
+            "biggerThanOuter": "divide",
         }
 
         const conversionMap = {
             [u.cup.name]: {
                 [u.tsp.name]: {
                     count: 48,
-                    symbol: symbol_map['smaller']
+                    symbol: symbol_map['smallerThanOuter']
                 },
                 [u.tbsp.name]: {
                     count: 16,
-                    symbol: symbol_map['smaller']
+                    symbol: symbol_map['smallerThanOuter']
                 },
+                [u.ounce.name]: {
+                    count: 8.446808,
+                    symbol: symbol_map['smallerThanOuter']
+                }
+            },
+            [u.ounce.name]: {
+                [u.cup.name]: {
+                    count: 8.446808,
+                    symbol: symbol_map['smallerThanOuter']
+                }   
             },
             [u.tbsp.name]: {
                 [u.cup.name]: {
                     count: 16,
-                    symbol: symbol_map['bigger']
+                    symbol: symbol_map['biggerThanOuter']
                 },
                 [u.tsp.name]: {
                     count: 3,
-                    smybol: symbol_map['smaller']
+                    smybol: symbol_map['smallerThanOuter']
                 }
             },
             [u.tsp.name]: {
                 [u.cup.name]: {
                     count: 48,
-                    symbol: symbol_map['bigger']
+                    symbol: symbol_map['biggerThanOuter']
                 },
                 [u.tbsp.name]: {
                     count: 3,
-                    symbol: symbol_map['bigger']
+                    symbol: symbol_map['biggerThanOuter']
                 }
             }
         }
@@ -270,13 +285,15 @@ export class Recipe {
             if (conversionMap[unit].hasOwnProperty(key)) {
 
                 Object.keys(nutrition[key]).forEach((metric) => {
-                    const symbol = conversionMap[unit][key]['symbol']
+                    if (metric !== 'total_cost') {
+                        const symbol = conversionMap[unit][key]['symbol']
 
-                    // TODO check that this is right
-                    if (symbol === 'divide') {
-                        convertedNutrition[metric] = nutrition[key][metric] / conversionMap[unit][key]['count']
-                    } else {
-                        convertedNutrition[metric] = nutrition[key][metric] * conversionMap[unit][key]['count']
+                        // TODO check that this is right
+                        if (symbol === 'divide') {
+                            convertedNutrition[metric] = nutrition[key][metric] / conversionMap[unit][key]['count']
+                        } else {
+                            convertedNutrition[metric] = nutrition[key][metric] * conversionMap[unit][key]['count']
+                        }
                     }
                 })
             }
@@ -300,22 +317,57 @@ export class Recipe {
 
         this.ingredients = ingredients;
 
-        const metrics = ['calories', 'sodium', 'cost', 'sugar', 'protein'];
-
         ingredients.forEach((ing) => {
             // Add calories to our calculation
             if (ing.quantity > 0 && ing.unit !== null && this.convertIngToNutrition(ing.unit.name, ing.nutrition)) {
                 const unitName = ing.unit.name;
                 const nutritionData = this.convertIngToNutrition(unitName, ing.nutrition)
+                console.log(ing)
+                console.log(nutritionData)
 
-                metrics.forEach((metric) => {
+                this.metrics.forEach((metric) => {
                     if (nutritionData.hasOwnProperty(metric) && nutritionData[metric] !== null) {
                         // Only multiply by the quantity you are using
                         // TODO in future everything should just have a serving_size
                         if (nutritionData.hasOwnProperty('serving_size')) {
-                            this.estimates[metric] += (nutritionData[metric] * (ing.quantity / nutritionData['serving_size']));
+                            // total_cost is not be the serving size but the whole item
+                            if (metric === 'total_cost') {
+                                // cup: {
+                                //     servings: 6,
+                                //     serving_size: 0.5,
+                                //     calories: 70,
+                                //     sodium: 410,
+                                //     sugar: 4,
+                                //     protein: 3,
+                                //     fiber: 2,
+                                //     total_cost: 2.29
+                                //   }
+
+                                // servings: 0.7103274988611081,
+                                // serving_size: 0.05919395823842568,
+                                // calories: 8.287154153379596,
+                                // sodium: 48.53904575550906,
+                                // sugar: 0.47355166590740544,
+                                // protein: 0.35516374943055407,
+                                // fiber: 0.23677583295370272,
+                                // total_cost: 0.27110832873198965
+                                if (nutritionData.hasOwnProperty('servings') && this.estimates.hasOwnProperty('total_cost')) {
+                                    const cost = (nutritionData[metric] / nutritionData['servings']  * (ing.quantity * nutritionData['serving_size']));
+                                    if (this.estimates['total_cost']) {
+                                        this.estimates['total_cost'] += cost
+                                    } else {
+                                        this.estimates['total_cost'] = cost
+                                    }
+                                }
+                            } else {
+                                this.estimates[metric] += (nutritionData[metric] * (ing.quantity / nutritionData['serving_size']));
+                            }
                         } else {
-                            this.estimates[metric] += (nutritionData[metric] * ing.quantity);
+                            if (metric === 'total_cost') {
+                                this.estimates[metric] += nutritionData[metric];
+                            } else {
+                                this.estimates[metric] += (nutritionData[metric] * ing.quantity);
+                            }
                         }
                         
                     } else {
@@ -323,7 +375,7 @@ export class Recipe {
                     }
                 });
             } else {
-                metrics.forEach((metric) => {
+                this.metrics.forEach((metric) => {
                     this.estimatesMissing[metric].push(ing.name);
                 });
             }
@@ -382,9 +434,9 @@ export class Recipe {
             }
         });
 
-        const metricsToShow = ['calories', 'sodium', 'cost', 'sugar', 'protein'];
+        
 
-        metricsToShow.forEach((metric) => {
+        this.metricsToShow.forEach((metric) => {
             let metricText = `${Math.round(this.estimates[metric])} ${metric}`;
 
             if (this.estimatesMissing[metric].length >= 1) {

@@ -17,6 +17,30 @@ export class CarbItems extends AnimalItems {
         nutrition: {}
     })
 
+    public static readonly penneLentil: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+        name: 'Lentil Penne',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Rinse and put measuring cup in dishwasher',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        nutrition: {
+            [u.ounce.name]: {
+                servings: 2.5,
+                serving_size: 3,
+                calories: 300,
+                sodium: 0,
+                protein: 21,
+                sugar: 2,
+                fiber: 9,
+                total_cost: 2.99
+            }
+        }
+    })
+
     public static readonly spaghettiLentil: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
         name: 'Lentil Spaghetti',
         putAwayTime: 10,
@@ -47,7 +71,7 @@ export class CarbItems extends AnimalItems {
         nutrition: {
             [u.pound.name]: {
                 servings: 1,
-                cost: 1.99,
+                total_cost: 1.99,
             }
         }
     })

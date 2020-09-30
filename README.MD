@@ -6,8 +6,6 @@
 ## [Frozen Food Portions](https://www.clickthisnick.com/recipes/frozenFood.html)
 # Recipes List
 # 1 Meal
-## [BakedZiti](https://www.clickthisnick.com/recipes/dist/bakedziti.html)
-
 ## [BuffaloKaleBowl](https://www.clickthisnick.com/recipes/dist/buffalokalebowl.html)
 
 ## [ButterChicken](https://www.clickthisnick.com/recipes/dist/butterchicken.html)
@@ -20,11 +18,11 @@
 
 ## [Hotdog](https://www.clickthisnick.com/recipes/dist/hotdog.html)
 
+## [Pasta](https://www.clickthisnick.com/recipes/dist/pasta.html)
+
 ## [Smoothie](https://www.clickthisnick.com/recipes/dist/smoothie.html)
 
 ## [SouvideSteak](https://www.clickthisnick.com/recipes/dist/souvidesteak.html)
-
-## [Spaghetti](https://www.clickthisnick.com/recipes/dist/spaghetti.html)
 
 ## [Sushi](https://www.clickthisnick.com/recipes/dist/sushi.html)
 
@@ -47,4 +45,7 @@
 
 # Frozen
 ## [SpiralHam](https://www.clickthisnick.com/recipes/dist/spiralham.html)
+
+# Heavy Cleanup Meal
+## [BakedZiti](https://www.clickthisnick.com/recipes/dist/bakedziti.html)
 

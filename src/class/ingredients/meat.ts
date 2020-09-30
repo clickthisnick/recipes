@@ -30,7 +30,7 @@ export class MeatItems extends FruitItems {
             [u.ounce.name]: {
                 calories: 46.666666666666667,
                 sodium: 320,
-                cost: 0.249375,
+                total_cost: 0.249375,
             }
         },
     })
