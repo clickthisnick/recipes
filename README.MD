@@ -18,6 +18,8 @@
 
 ## [Hotdog](https://www.clickthisnick.com/recipes/dist/hotdog.html)
 
+## [NinjaChickenThings](https://www.clickthisnick.com/recipes/dist/ninjachickenthings.html)
+
 ## [Pasta](https://www.clickthisnick.com/recipes/dist/pasta.html)
 
 ## [Smoothie](https://www.clickthisnick.com/recipes/dist/smoothie.html)
