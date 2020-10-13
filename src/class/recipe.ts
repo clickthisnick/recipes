@@ -62,7 +62,7 @@ export class RecipeContainer {
             recipeName = recipeName[0].name
         } else {
             if (this.recipeName === "") {
-               throw new Error(`Recipe Name must be provided for ${Object.values(this.variations[0])} if recipe has more than 1 variation`)
+               throw new Error(`recipeName must be provided for ${Object.values(this.variations[0])} if recipe has more than 1 variation`)
             }
         }
 
