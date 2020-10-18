@@ -436,15 +436,26 @@ export class Recipe {
             }
         });
 
-        
+        this.recipeHtml += this.generateHeader('Nutrition');
 
         this.metricsToShow.forEach((metric) => {
-            let metricText = `${Math.round(this.estimates[metric])} ${metric}`;
+            let metricText = `<h4><b>${Math.round(this.estimates[metric])} ${metric}</b>`;
 
             if (this.estimatesMissing[metric].length >= 1) {
-                metricText += ` (${this.estimatesMissing[metric].join('/')} Data Missing)`;
+                let missingDataText = `${this.estimatesMissing[metric].join('/')}`;
+
+                if (missingDataText.length > 20) {
+                    // Truncate
+                    missingDataText = `${missingDataText.substring(0, 20)}...`
+                }
+                metricText += ' ('
+                metricText += missingDataText
+                metricText += 'Data Missing)'
             }
-            this.recipeHtml += this.generateHeader(metricText);
+
+            metricText += '</h4>'
+
+            this.recipeHtml += metricText;
         });
 
         if (this.vegan === true) {
