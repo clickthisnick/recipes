@@ -786,7 +786,18 @@ export class VegetableItems extends SpiceItems {
         wash: false,
         isTakoutUnitable: true,
         isMeatProduct: false,
-        nutrition: {},
+        nutrition: {
+            [u.tbsp.name]: {
+                servings: 5,
+                serving_size: 2,
+                calories: 25,
+                sodium: 0,
+                protein: 0,
+                sugar: 4,
+                fiber: 0,
+                total_cost: 0.99
+            }
+        },
     })
 
     public static readonly chipotlePepperInAdoboSauce: IItem = (quantity: number = .00001, unit: IUnitObj) => ({

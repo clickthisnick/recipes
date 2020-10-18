@@ -26,13 +26,11 @@ class PanSouvideSteak extends Recipe {
     public generateRecipe() {
         this.addIngredients([
             i.topSirloin(1, u.pound),
-            i.salt(1, u.unit),
-            i.blackPepper(1, u.unit),
+            i.thyme(1, u.unit),
         ]);
         this.addSteps([
-            ['Rub the', i.topSirloin(), 'with', i.salt(), i.blackPepper()],
-            [Timer.set(60, 'm', 'Dry brine at least an hour in the fridge')],
-            [Timer.set(60, 'm', 'Souvide steak at 133 degrees')],
+            ['Rub the', i.topSirloin(), 'with', i.thyme()],
+            [Timer.set(60, 'm', 'Souvide steak at 132 degrees')],
             [Timer.set(1, 'm', 'Pan fry steak on largest side')],
             [Timer.set(1, 'm', 'Pan fry steak on 2nd largest side')],
             [Timer.set(30, 's', 'Pan fry steak on 3rd largest side')],
@@ -49,13 +47,11 @@ class NinjaSouvideSteak extends Recipe {
     public generateRecipe() {
         this.addIngredients([
             i.topSirloin(1, u.pound),
-            i.salt(1, u.unit),
-            i.blackPepper(1, u.unit),
+            i.thyme(2, u.dash),
         ]);
         this.addSteps([
-            ['Rub the', i.topSirloin(), 'with', i.salt(), i.blackPepper()],
-            [Timer.set(60, 'm', 'Dry brine at least an hour in the fridge')],
-            [Timer.set(60, 'm', 'Souvide steak at 133 degrees')],
+            ['Rub the', i.topSirloin(), 'with', i.thyme()],
+            [Timer.set(60, 'm', 'Souvide steak at 132 degrees')],
             [Timer.ninjaCook(1.5, 'm', 'Grill steak', 500)],
             ['Flip steak'],
             [Timer.ninjaCook(1.5, 'm', 'Grill steak', 500)],

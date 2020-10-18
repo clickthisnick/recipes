@@ -428,7 +428,9 @@ export class Recipe {
             const needsWashed = ingredient.wash === true ? ' and wash' : '';
             const iUnit: any = ingredient.unit
 
-            this.recipeHtml += this.generateStep(`${ingName} ${ingredient['quantity']} ${iUnit['name']} ${needsWashed}`);
+            const unitString = s.convertUnitIntoStr(iUnit['name'], ingredient['quantity']);
+
+            this.recipeHtml += this.generateStep(`${ingName} ${unitString} ${needsWashed}`);
             if (ingredient.isMeatProduct === true) {
                 this.vegan = false;
             }
