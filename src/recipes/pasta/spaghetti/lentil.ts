@@ -8,17 +8,12 @@ export class LentilSpaghetti extends Recipe {
         super();
     }
     public generateRecipe() {
-        this.addIngredients([
-            i.spaghettiLentil(8, u.ounce),
-            i.spaghettiSauce(25, u.ounce),
-            i.water(1, u.cup),
-        ]);
         this.addSteps([
             ['Add', i.water(.5, u.cup)],
-            ['Add', i.spaghettiSauce()],
-            ['Add', i.spaghettiLentil()],
+            ['Add', i.spaghettiSauce(25, u.ounce)],
+            ['Add', i.spaghettiLentil(8, u.ounce)],
             ['Add', i.water(.5, u.cup), '(Don\'t stir)'],
-            [Timer.pressureCook(0, 10, 'm', true)],
+            [Timer.pressureCook(15, 10, 'm', true)],
             ['Release steam valve and serve'],
         ]);
     }

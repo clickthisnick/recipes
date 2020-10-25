@@ -7,7 +7,7 @@
     "prelint": "npm install",
     "lint": "",
     "precreateReadme": "npm run lint",
-    "createReadme": "./src/hydrateReadme.sh",
+    "createReadme": "./src/hydrateIndex.sh",
     "preremoveDist": "npm run createReadme",
     "removeDist": "./src/builder/removeDist.sh",
     "prebuild": "npm run removeDist",

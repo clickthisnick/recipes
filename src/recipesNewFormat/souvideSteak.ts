@@ -13,49 +13,33 @@ export class MealRecipe extends RecipeContainer {
             {'recipe': [PanSouvideSteak, NinjaSouvideSteak]},
         ]
      }
-
-     public init() {
-         this.generateRecipes()
-     }
 }
 
 class PanSouvideSteak extends Recipe {
     constructor() {
         super();
-    }
-    public generateRecipe() {
-        this.addIngredients([
-            i.topSirloin(1, u.pound),
-            i.thyme(1, u.unit),
-        ]);
-        this.addSteps([
-            ['Rub the', i.topSirloin(), 'with', i.thyme()],
+        this.steps = [
+            ['Rub the', i.topSirloin(1, u.pound), 'with', i.thyme(1, u.unit)],
             [Timer.set(60, 'm', 'Souvide steak at 132 degrees')],
             [Timer.set(1, 'm', 'Pan fry steak on largest side')],
             [Timer.set(1, 'm', 'Pan fry steak on 2nd largest side')],
             [Timer.set(30, 's', 'Pan fry steak on 3rd largest side')],
             [Timer.set(30, 's', 'Pan fry steak on 4th largest side')],
             [Timer.set(15, 'm', 'Let steak sit for at least 15 min')],
-        ]);
+        ];
     }
 }
 
 class NinjaSouvideSteak extends Recipe {
     constructor() {
         super();
-    }
-    public generateRecipe() {
-        this.addIngredients([
-            i.topSirloin(1, u.pound),
-            i.thyme(2, u.dash),
-        ]);
-        this.addSteps([
-            ['Rub the', i.topSirloin(), 'with', i.thyme()],
+        this.steps = [
+            ['Rub the', i.topSirloin(1, u.pound), 'with', i.thyme(2, u.dash)],
             [Timer.set(60, 'm', 'Souvide steak at 132 degrees')],
             [Timer.ninjaCook(1.5, 'm', 'Grill steak', 500)],
             ['Flip steak'],
             [Timer.ninjaCook(1.5, 'm', 'Grill steak', 500)],
             [Timer.set(15, 'm', 'Let steak rest')],
-        ]);
+        ];
     }
 }

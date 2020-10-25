@@ -4,7 +4,7 @@ import { SauceItems } from './sauce';
 
 export class SpiceItems extends SauceItems {
 
-    public static readonly oldBay: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly oldBay: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Old Bay Seasoning',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -17,7 +17,7 @@ export class SpiceItems extends SauceItems {
         nutrition: {},
     })
 
-    public static readonly tandoriMasalla: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly tandoriMasalla: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Tandori Masalla',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -30,7 +30,7 @@ export class SpiceItems extends SauceItems {
         nutrition: {},
     })
 
-    public static readonly paprika: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly paprika: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Paprika',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -43,7 +43,7 @@ export class SpiceItems extends SauceItems {
         nutrition: {},
     })
 
-    public static readonly sugar: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly sugar: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Sugar',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -56,7 +56,7 @@ export class SpiceItems extends SauceItems {
         nutrition: {},
     })
 
-    public static readonly cumin: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly cumin: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Cumin',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -69,7 +69,7 @@ export class SpiceItems extends SauceItems {
         nutrition: {},
     })
 
-    public static readonly turmeric: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly turmeric: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Turmeric',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -82,7 +82,7 @@ export class SpiceItems extends SauceItems {
         nutrition: {},
     })
 
-    public static readonly thyme: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly thyme: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Dried Thyme',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -95,7 +95,7 @@ export class SpiceItems extends SauceItems {
         nutrition: {},
     })
 
-    public static readonly monkFruit: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly monkFruit: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Monk Fruit',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -108,7 +108,7 @@ export class SpiceItems extends SauceItems {
         nutrition: {},
     })
 
-    public static readonly smokedPaprika: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly smokedPaprika: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Smoked Paprika',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -121,7 +121,7 @@ export class SpiceItems extends SauceItems {
         nutrition: {},
     })
 
-    public static readonly worcestershireSauce: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly worcestershireSauce: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Worcestershire Sauce',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -134,7 +134,7 @@ export class SpiceItems extends SauceItems {
         nutrition: {},
     })
 
-    public static readonly gramMasala: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly gramMasala: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Gram Masala',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -147,7 +147,7 @@ export class SpiceItems extends SauceItems {
         nutrition: {},
     })
 
-    public static readonly salt: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly salt: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Salt',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -162,7 +162,7 @@ export class SpiceItems extends SauceItems {
         },
     })
 
-    public static readonly seaSalt: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly seaSalt: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Sea Salt',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -177,7 +177,7 @@ export class SpiceItems extends SauceItems {
         },
     })
 
-    public static readonly pepperFlake: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly pepperFlake: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Pepper Flake',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -190,8 +190,8 @@ export class SpiceItems extends SauceItems {
         nutrition: {},
     })
 
-    public static readonly lawlrySaltFree: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
-        name: 'Lawlry Salk Free Seasoning',
+    public static readonly lawlrySaltFree: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'lawlry salk free seasoning',
         putAwayTime: 10,
         takeOutTime: 10,
         cleanSteps: '',
@@ -203,8 +203,8 @@ export class SpiceItems extends SauceItems {
         nutrition: {},
     })
 
-    public static readonly dash: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
-        name: 'Dash Seasoning',
+    public static readonly dash: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'dash seasoning',
         putAwayTime: 10,
         takeOutTime: 10,
         cleanSteps: '',
@@ -216,8 +216,8 @@ export class SpiceItems extends SauceItems {
         nutrition: {},
     })
 
-    public static readonly cacaoPowderUnsweetened: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
-        name: 'Cacao Powder Unsweetened',
+    public static readonly cacaoPowderUnsweetened: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'unsweetened cacao powder',
         putAwayTime: 10,
         takeOutTime: 10,
         cleanSteps: '',
@@ -238,8 +238,8 @@ export class SpiceItems extends SauceItems {
         },
     })
 
-    public static readonly chilliPowder: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
-        name: 'Chilli Powder',
+    public static readonly chilliPowder: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'chilli powder',
         putAwayTime: 10,
         takeOutTime: 10,
         cleanSteps: '',
@@ -251,8 +251,8 @@ export class SpiceItems extends SauceItems {
         nutrition: {},
     })
 
-    public static readonly cayennePepper: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
-        name: 'Cayenne Pepper',
+    public static readonly cayennePepper: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'cayenne pepper',
         putAwayTime: 10,
         takeOutTime: 10,
         cleanSteps: '',
@@ -264,8 +264,8 @@ export class SpiceItems extends SauceItems {
         nutrition: {},
     })
 
-    public static readonly blackPepper: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
-        name: 'Black Pepper',
+    public static readonly blackPepper: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'black pepper',
         putAwayTime: 10,
         takeOutTime: 10,
         cleanSteps: '',
@@ -277,8 +277,8 @@ export class SpiceItems extends SauceItems {
         nutrition: {},
     })
 
-    public static readonly curryPowder: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
-        name: 'Curry Powder',
+    public static readonly curryPowder: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'curry powder',
         putAwayTime: 10,
         takeOutTime: 10,
         cleanSteps: '',
@@ -290,8 +290,8 @@ export class SpiceItems extends SauceItems {
         nutrition: {},
     })
 
-    public static readonly kosherSalt: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
-        name: 'Kosher Salt',
+    public static readonly kosherSalt: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'kosher salt',
         putAwayTime: 10,
         takeOutTime: 10,
         cleanSteps: 'Put kosher salt back in cupboard',
@@ -303,8 +303,8 @@ export class SpiceItems extends SauceItems {
         nutrition: {},
     })
 
-    public static readonly cinnamon: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
-        name: 'Cinnamon',
+    public static readonly cinnamon: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'cinnamon',
         putAwayTime: 10,
         takeOutTime: 10,
         cleanSteps: 'Put cinnamon back in cupboard',
@@ -316,8 +316,8 @@ export class SpiceItems extends SauceItems {
         nutrition: {},
     })
 
-    public static readonly garlicPowder: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
-        name: 'Garlic Powder',
+    public static readonly garlicPowder: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'garlic powder',
         putAwayTime: 10,
         takeOutTime: 10,
         cleanSteps: '',
@@ -329,8 +329,8 @@ export class SpiceItems extends SauceItems {
         nutrition: {},
     })
 
-    public static readonly onionPowder: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
-        name: 'Onion Powder',
+    public static readonly onionPowder: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'onion powder',
         putAwayTime: 10,
         takeOutTime: 10,
         cleanSteps: '',
@@ -342,7 +342,7 @@ export class SpiceItems extends SauceItems {
         nutrition: {},
     })
 
-    public static readonly driedOnion: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly driedOnion: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Dried Onion',
         putAwayTime: 10,
         takeOutTime: 10,

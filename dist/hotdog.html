@@ -4,7 +4,7 @@
         background-color: #000000;
     }
 
-    div {
+    div, h1, h2 {
         background-color: #000000;
         border: none;
         color: #FFFFFF;
@@ -23,6 +23,10 @@
         transition: all 0.5s;
         cursor: pointer;
         margin: 5px;
+    }
+
+    #ingredients {
+        display: none;
     }
 
     .completed {
@@ -115,7 +119,7 @@
        function showRecipe() {
             var id = getCheckedOptions()
 
-            console.log(id);
+            // console.log(id);
 
             // Show
             if (document.getElementById(id)) {
@@ -131,4 +135,5 @@
         }
 
        </script>
-    <a href="https://github.com/clickthisnick/recipes/blob/master/README.MD">Back To Recipes</a><div id="options"><br><b>recipe</b><br><button style="display: none;" onclick="this.classList.toggle('completed'); showRecipe()">AidellsCajunSausage</button></div><br><div id="AidellsCajunSausage"><h1>Ingredients</h1><div class="panel" onclick="this.classList.toggle('completed')">4 Aidells Cajun Sausages 4 units </div><div class="panel" onclick="this.classList.toggle('completed')">4 Hotdog Buns 4 units </div><div class="panel" onclick="this.classList.toggle('completed')">White Onion 1 unit  and wash</div><div class="panel" onclick="this.classList.toggle('completed')"> Water 1 cup </div><h1>Nutrition</h1><h4><b>1240 calories</b> (White OnionData Missing)</h4><h4><b>3880 sodium</b> (White OnionData Missing)</h4><h4><b>0 sugar</b> (Aidells Cajun Sausag...Data Missing)</h4><h4><b>0 fiber</b> (Aidells Cajun Sausag...Data Missing)</h4><h4><b>0 protein</b> (Aidells Cajun Sausag...Data Missing)</h4><h4><b>0 total_cost</b> (Aidells Cajun Sausag...Data Missing)</h4><h1>Recipe</h1><h1>Estimated Time: 18 Minutes</h1><div class="panel" id="paneltimer31" onclick="this.classList.toggle('timer'); timer(180000); loadTimer(180000, 'timer31')"><span id="timer31"></span>Timer 3 minutes Preheat pan on heat 5</div><div class="panel" onclick="this.classList.toggle('completed')">Put in 1 cup Water and 4 Aidells Cajun Sausages </div><div class="panel" id="paneltimer32" onclick="this.classList.toggle('timer'); timer(480000); loadTimer(480000, 'timer32')"><span id="timer32"></span>Async 8 minutes cook</div><div class="panel" onclick="this.classList.toggle('completed')">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Cut White Onion into slices </div><div class="panel" onclick="this.classList.toggle('completed')">Drain pan </div><div class="panel" onclick="this.classList.toggle('completed')">Turn heat to 7 </div><div class="panel" id="paneltimer33" onclick="this.classList.toggle('timer'); timer(120000); loadTimer(120000, 'timer33')"><span id="timer33"></span>Async 2 minutes brown hotdog</div><div class="panel" id="paneltimer34" onclick="this.classList.toggle('timer'); timer(120000); loadTimer(120000, 'timer34')"><span id="timer34"></span>Async 2 minutes flip + brown hotdog</div><div class="panel" onclick="this.classList.toggle('completed')">Take out Aidells Cajun Sausage and put on plate </div><div class="panel" onclick="this.classList.toggle('completed')">Put 4 Hotdog Buns in pan </div><div class="panel" id="paneltimer35" onclick="this.classList.toggle('timer'); timer(120000); loadTimer(120000, 'timer35')"><span id="timer35"></span>Timer 2 minutes toast hotdog bun</div><div class="panel" id="paneltimer36" onclick="this.classList.toggle('timer'); timer(60000); loadTimer(60000, 'timer36')"><span id="timer36"></span>Timer 1 minute flip + toast hotdog bun</div><div class="panel" onclick="this.classList.toggle('completed')">Assemble hotdog </div></div>
+    <a href="https://github.com/clickthisnick/recipes">Back To Recipes</a><div id="options"><br><b>recipe</b><br><button style="display: none;" onclick="this.classList.toggle('completed'); showRecipe()">AidellsCajunSausage</button></div><br><div id="AidellsCajunSausage"><div id='ingredients'><h1>Get out the following ingredients:</h1><div class="panel" onclick="this.classList.toggle('completed')">water 1 cup</div><div class="panel" onclick="this.classList.toggle('completed')">aidells cajun sausage 4 unit</div><div class="panel" onclick="this.classList.toggle('completed')">white onion 1 unit</div><div class="panel" onclick="this.classList.toggle('completed')">hotdog bun 4 unit</div></div><a href="#" 
+        onclick="document.getElementById('ingredients').style.display='inline'">Show Ingrendients</a><h1>Estimated Time: 18 Minutes</h1><h1>Recipe:</h1><div class="panel" id="paneltimer24" onclick="this.classList.toggle('timer'); timer(180000); loadTimer(180000, 'timer24')"><span id="timer24"></span>Preheat pan on heat 5 (Takes 3 minutes)</div><div class="panel" onclick="this.classList.toggle('completed')">Put in 1 cup water and 4 aidells cajun sausages </div><div class="panel" id="paneltimer25" onclick="this.classList.toggle('timer'); timer(480000); loadTimer(480000, 'timer25')"><span id="timer25"></span>| cook (Takes 8 minutes)</div><div class="panel" onclick="this.classList.toggle('completed')">Cut white onion into slices </div><div class="panel" onclick="this.classList.toggle('completed')">Drain pan </div><div class="panel" onclick="this.classList.toggle('completed')">Turn heat to 7 </div><div class="panel" id="paneltimer26" onclick="this.classList.toggle('timer'); timer(120000); loadTimer(120000, 'timer26')"><span id="timer26"></span>| brown hotdog (Takes 2 minutes)</div><div class="panel" id="paneltimer27" onclick="this.classList.toggle('timer'); timer(120000); loadTimer(120000, 'timer27')"><span id="timer27"></span>| flip + brown hotdog (Takes 2 minutes)</div><div class="panel" onclick="this.classList.toggle('completed')">Take out  aidells cajun sausage and put on plate </div><div class="panel" onclick="this.classList.toggle('completed')">Put 4 hotdog buns in pan </div><div class="panel" id="paneltimer28" onclick="this.classList.toggle('timer'); timer(120000); loadTimer(120000, 'timer28')"><span id="timer28"></span>toast hotdog bun (Takes 2 minutes)</div><div class="panel" id="paneltimer29" onclick="this.classList.toggle('timer'); timer(60000); loadTimer(60000, 'timer29')"><span id="timer29"></span>flip + toast hotdog bun (Takes 1 minute)</div><div class="panel" onclick="this.classList.toggle('completed')">Assemble hotdog </div></div>

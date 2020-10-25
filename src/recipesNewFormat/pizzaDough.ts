@@ -1,28 +1,27 @@
-import { Recipe } from '../class/recipe';
+import { Recipe, RecipeContainer } from '../class/recipe';
 import { Items as i } from '../constants/items';
 import { Categories as c } from '../constants/categories';
 import { Units as u } from '../constants/units';
 import { Timer } from '../class/timer';
 
-export class MealRecipe extends Recipe {
+export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
         this.recipeGroup = c.component;
-        this.addIngredients([
-            i.dryActiveYeast(2.25, u.tsp),
-            i.archerFlour(3.5, u.cup),
-            i.sugar(.125, u.tsp),
-            i.water(12, u.ounce),
-        ]);
-    }
+        this.variations = [
+            {'recipe': [PizzaDough]},
+        ]
+     }
+}
 
-    public generateRecipe() {
-        this.prep();
-        this.addSteps([
-            ['Put warm', i.water(), 'at 110 F into bowl and stir'],
-            ['Put', i.dryActiveYeast(), 'in a bowl'],
-            ['Put', i.sugar(), 'in the bowl'],
-            ['In another bowl put', i.archerFlour()],
+class PizzaDough extends Recipe {
+    constructor() {
+        super();
+        this.steps = [
+            ['Put warm', i.water(12, u.ounce), 'at 110 F into bowl and stir'],
+            ['Put', i.dryActiveYeast(2.25, u.tsp), 'in a bowl'],
+            ['Put', i.sugar(.125, u.tsp), 'in the bowl'],
+            ['In another bowl put', i.archerFlour(3.5, u.cup)],
             [Timer.set(20, 'm', 'Wait for yeast to get cloudy')],
             ['Pour yeast mixture into flour bowl and mix'],
             ['Knead the dough about 7 times'],
@@ -30,7 +29,6 @@ export class MealRecipe extends Recipe {
             [Timer.set(1.5, 'h', 'Let dough rise')],
             ['Break the pizza dough in half again'],
             ['Either freeze the dough with olive oil around it or use it now for pizza'],
-        ]);
-        this.printRecipe();
+        ];
     }
 }

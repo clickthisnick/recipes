@@ -1,10 +1,25 @@
-import { IItem } from './item';
+import { IItem, Item } from './item';
 import { IUnitObj, Units as u } from '../../constants/units';
 
 export class AnimalItems {
 
-    public static readonly chickenBreastPackage: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
-        name: 'Chicken Breast Package',
+    public static readonly item = (name: string, quantity: number = 0, unit: any = null) => (
+        new Item(
+            name,
+            10,
+            10,
+            '',
+            quantity,
+            false,
+            false,
+            false,
+            {},
+            unit,
+        )
+    )
+
+    public static readonly chickenBreastPackage: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name:'Chicken Breast Package',
         putAwayTime: 10,
         takeOutTime: 10,
         cleanSteps: '',
@@ -16,7 +31,7 @@ export class AnimalItems {
         nutrition: {},
     })
 
-    public static readonly chickenDrumstickPackage: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly chickenDrumstickPackage: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Chicken Drumstick Package',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -29,7 +44,7 @@ export class AnimalItems {
         nutrition: {},
     })
 
-    public static readonly chickenThigh: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly chickenThigh: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Chicken Thigh',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -42,7 +57,7 @@ export class AnimalItems {
         nutrition: {},
     })
 
-    public static readonly salmon: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly salmon: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Salmon',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -55,7 +70,7 @@ export class AnimalItems {
         nutrition: {},
     })
 
-    public static readonly sirloinTop: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly sirloinTop: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Sirloin Top',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -68,7 +83,7 @@ export class AnimalItems {
         nutrition: {},
     })
 
-    public static readonly italianSausage: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly italianSausage: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Italian Sausage',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -87,7 +102,7 @@ export class AnimalItems {
         },
     })
 
-    public static readonly mozzarellaCheese: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly mozzarellaCheese: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Mozzarella Cheese',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -100,7 +115,7 @@ export class AnimalItems {
         nutrition: {},
     })
 
-    public static readonly ricottaCheese: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly ricottaCheese: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Ricotta Cheese',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -113,7 +128,7 @@ export class AnimalItems {
         nutrition: {},
     })
 
-    public static readonly plainYogurt: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly plainYogurt: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Plain Yogurt',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -126,7 +141,7 @@ export class AnimalItems {
         nutrition: {},
     })
 
-    public static readonly parmessanCheese: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly parmessanCheese: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Parmessan Cheese',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -139,7 +154,7 @@ export class AnimalItems {
         nutrition: {},
     })
 
-    public static readonly cheddarCheese: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly cheddarCheese: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Cheedar Cheese',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -152,7 +167,7 @@ export class AnimalItems {
         nutrition: {},
     })
 
-    public static readonly pepperJackCheese: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly pepperJackCheese: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Pepper Jack Cheese',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -165,7 +180,7 @@ export class AnimalItems {
         nutrition: {},
     })
 
-    public static readonly montereyJackCheese: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly montereyJackCheese: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Monterey Jack Cheese',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -178,7 +193,7 @@ export class AnimalItems {
         nutrition: {},
     })
 
-    public static readonly porkRoast: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly porkRoast: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Pork Roast',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -191,7 +206,7 @@ export class AnimalItems {
         nutrition: {},
     })
 
-    public static readonly bonelessRibClubSteak: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly bonelessRibClubSteak: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Boneless Rib Club Steak',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -204,7 +219,7 @@ export class AnimalItems {
         nutrition: {},
     })
 
-    public static readonly egg: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly egg: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Egg',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -217,7 +232,7 @@ export class AnimalItems {
         nutrition: {},
     })
 
-    public static readonly eggWhite: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly eggWhite: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Egg White',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -230,7 +245,7 @@ export class AnimalItems {
         nutrition: {},
     })
 
-    public static readonly ham: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly ham: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Ham',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -243,7 +258,7 @@ export class AnimalItems {
         nutrition: {},
     })
 
-    public static readonly honey: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly honey: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Honey',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -256,7 +271,7 @@ export class AnimalItems {
         nutrition: {},
     })
 
-    public static readonly butter: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly butter: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Butter',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -269,7 +284,7 @@ export class AnimalItems {
         nutrition: {},
     })
 
-    public static readonly eggPasta: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly eggPasta: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Egg Pasta',
         putAwayTime: 10,
         takeOutTime: 10,

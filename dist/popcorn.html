@@ -4,7 +4,7 @@
         background-color: #000000;
     }
 
-    div {
+    div, h1, h2 {
         background-color: #000000;
         border: none;
         color: #FFFFFF;
@@ -23,6 +23,10 @@
         transition: all 0.5s;
         cursor: pointer;
         margin: 5px;
+    }
+
+    #ingredients {
+        display: none;
     }
 
     .completed {
@@ -115,7 +119,7 @@
        function showRecipe() {
             var id = getCheckedOptions()
 
-            console.log(id);
+            // console.log(id);
 
             // Show
             if (document.getElementById(id)) {
@@ -131,4 +135,5 @@
         }
 
        </script>
-    <a href="https://github.com/clickthisnick/recipes/blob/master/README.MD">Back To Recipes</a><div id="options"><br><b>recipe</b><br><button style="display: none;" onclick="this.classList.toggle('completed'); showRecipe()">Popcorn</button></div><br><div id="Popcorn"><h1>Ingredients</h1><div class="panel" onclick="this.classList.toggle('completed')"> Popcorn 4 Tbsp </div><div class="panel" onclick="this.classList.toggle('completed')">Salt 1 unit </div><div class="panel" onclick="this.classList.toggle('completed')"> Olive Oil 1 Tbsp </div><div class="panel" onclick="this.classList.toggle('completed')">Dash Seasoning 1 unit </div><h1>Nutrition</h1><h4><b>119 calories</b> (Popcorn/Salt/Dash Se...Data Missing)</h4><h4><b>0 sodium</b> (Popcorn/Salt/Dash Se...Data Missing)</h4><h4><b>0 sugar</b> (Popcorn/Salt/Olive O...Data Missing)</h4><h4><b>0 fiber</b> (Popcorn/Salt/Olive O...Data Missing)</h4><h4><b>0 protein</b> (Popcorn/Salt/Olive O...Data Missing)</h4><h4><b>0 total_cost</b> (Popcorn/Salt/Olive O...Data Missing)</h4><h1>Vegan Recipe</h1><h1>Estimated Time: 5 Minutes</h1><div class="panel" onclick="this.classList.toggle('completed')">Put 1 Tbsp Olive Oil in pot </div><div class="panel" onclick="this.classList.toggle('completed')">Put in 3  Popcorn kernels </div><div class="panel" id="paneltimer48" onclick="this.classList.toggle('timer'); timer(270000); loadTimer(270000, 'timer48')"><span id="timer48"></span>Timer 4.5 minutes Turn stove to heat 5</div><div class="panel" onclick="this.classList.toggle('completed')">Once 3 kernels pop, turn stove to heat 4 </div><div class="panel" onclick="this.classList.toggle('completed')">Put in 4 Tbsp Popcorn </div><div class="panel" onclick="this.classList.toggle('completed')">Cook until popped (write this down) </div><div class="panel" onclick="this.classList.toggle('completed')">Season with Dash Seasoning Salt </div></div>
+    <a href="https://github.com/clickthisnick/recipes">Back To Recipes</a><div id="options"><br><b>recipe</b><br><button style="display: none;" onclick="this.classList.toggle('completed'); showRecipe()">Popcorn</button></div><br><div id="Popcorn"><div id='ingredients'><h1>Get out the following ingredients:</h1><div class="panel" onclick="this.classList.toggle('completed')">olive oil 1 Tbsp</div><div class="panel" onclick="this.classList.toggle('completed')">popcorn 4 Tbsp</div><div class="panel" onclick="this.classList.toggle('completed')">dash seasoning 1 unit</div><div class="panel" onclick="this.classList.toggle('completed')">salt 1 unit</div></div><a href="#" 
+        onclick="document.getElementById('ingredients').style.display='inline'">Show Ingrendients</a><h1>Estimated Time: 5 Minutes</h1><h1>Recipe:</h1><div class="panel" onclick="this.classList.toggle('completed')">Put 1 Tbsp olive oil in pot </div><div class="panel" id="paneltimer37" onclick="this.classList.toggle('timer'); timer(270000); loadTimer(270000, 'timer37')"><span id="timer37"></span>Turn stove to heat 4 (Takes 4.5 minutes)</div><div class="panel" onclick="this.classList.toggle('completed')">Put in 4 Tbsp popcorn </div><div class="panel" onclick="this.classList.toggle('completed')">Cook until popped (write this down) </div><div class="panel" onclick="this.classList.toggle('completed')">Season with dash seasoning salt </div></div>

@@ -12,30 +12,18 @@ export class MealRecipe extends RecipeContainer {
             {'recipe': [LentilHalfCup]},
         ]
     }
-
-    public init() {
-        this.generateRecipes();
-    }
 }
 
 class LentilHalfCup extends Recipe {
     constructor() {
         super();
-    }
-
-    public generateRecipe() {
-        this.addIngredients([
-            i.lentils(.50, u.cup),
-            i.water(1, u.cup),
-            i.driedOnion(2, u.dash),
-            i.tandoriMasalla(3, u.dash),
-            i.salt(1, u.dash),
-        ]);
-        this.addSteps([
-            ['Put in', i.lentils(), 'in instant pot',],
-            ['Put in', i.water()],
-            ['Season with', i.tandoriMasalla(), i.driedOnion(), i.salt()],
+        this.steps = [
+            ['Put in', i.lentils(.5, u.cup), 'in instant pot',],
+            ['Put in', i.water(1, u.cup)],
+            ['Season with', i.tandoriMasalla(3, u.dash)],
+            ['Season with', i.driedOnion(2, u.dash)],
+            ['Season with', i.salt(1, u.dash)],
             [Timer.pressureCook(0, 5, 'm')],
-        ]);
+        ]
     }
 }

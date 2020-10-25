@@ -4,7 +4,7 @@ import { AnimalItems } from './animal';
 
 export class CarbItems extends AnimalItems {
 
-    public static readonly raoPastaElbow: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly raoPastaElbow: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Rao Pasta Elbow',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -17,7 +17,7 @@ export class CarbItems extends AnimalItems {
         nutrition: {}
     })
 
-    public static readonly penneLentil: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly penneLentil: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Lentil Penne',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -41,7 +41,7 @@ export class CarbItems extends AnimalItems {
         }
     })
 
-    public static readonly spaghettiLentil: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly spaghettiLentil: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Lentil Spaghetti',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -58,7 +58,7 @@ export class CarbItems extends AnimalItems {
         }
     })
 
-    public static readonly ziti: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly ziti: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Ziti',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -76,7 +76,7 @@ export class CarbItems extends AnimalItems {
         }
     })
 
-    public static readonly spaghettiWholeGrain: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly spaghettiWholeGrain: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Whole Grain Spaghetti',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -94,7 +94,7 @@ export class CarbItems extends AnimalItems {
         }
     })
 
-    public static readonly quinoa: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly quinoa: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Quinoa',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -107,7 +107,7 @@ export class CarbItems extends AnimalItems {
         nutrition: {}
     })
 
-    public static readonly seaweed: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly seaweed: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Seaweed',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -116,11 +116,11 @@ export class CarbItems extends AnimalItems {
         unit: unit || null,
         wash: false,
         isTakoutUnitable: false,
-        isMeatProduct: true,
+        isMeatProduct: false,
         nutrition: {},
     })
 
-    public static readonly sushiRice: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly sushiRice: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Sushi Rice',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -141,7 +141,7 @@ export class CarbItems extends AnimalItems {
         }
     })
 
-    public static readonly brownRice: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly brownRice: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Brown Rice',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -159,7 +159,7 @@ export class CarbItems extends AnimalItems {
         }
     })
 
-    public static readonly frozenChickenWings: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly frozenChickenWings: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Frozen Chicken Wings',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -172,7 +172,7 @@ export class CarbItems extends AnimalItems {
         nutrition: {}
     })
 
-    public static readonly wildBasmatiRice: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly wildBasmatiRice: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Wild Basmati Rice',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -185,7 +185,7 @@ export class CarbItems extends AnimalItems {
         nutrition: {}
     })
 
-    public static readonly hotdogBunPotato: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly hotdogBunPotato: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Hotdog Bun',
         putAwayTime: 10,
         takeOutTime: 10,

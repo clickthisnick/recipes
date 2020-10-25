@@ -4,7 +4,7 @@
         background-color: #000000;
     }
 
-    div {
+    div, h1, h2 {
         background-color: #000000;
         border: none;
         color: #FFFFFF;
@@ -23,6 +23,10 @@
         transition: all 0.5s;
         cursor: pointer;
         margin: 5px;
+    }
+
+    #ingredients {
+        display: none;
     }
 
     .completed {
@@ -115,7 +119,7 @@
        function showRecipe() {
             var id = getCheckedOptions()
 
-            console.log(id);
+            // console.log(id);
 
             // Show
             if (document.getElementById(id)) {
@@ -131,4 +135,5 @@
         }
 
        </script>
-    <a href="https://github.com/clickthisnick/recipes/blob/master/README.MD">Back To Recipes</a><div id="options"><br><b>recipe</b><br><button style="display: none;" onclick="this.classList.toggle('completed'); showRecipe()">Smoothie</button></div><br><div id="Smoothie"><h1>Ingredients</h1><div class="panel" onclick="this.classList.toggle('completed')"> Almond Milk 1 cup </div><div class="panel" onclick="this.classList.toggle('completed')"> Frozen Berries 1½ cups </div><div class="panel" onclick="this.classList.toggle('completed')"> Plain Yogurt ⅓ cup </div><h1>Nutrition</h1><h4><b>0 calories</b> (Almond Milk/Frozen B...Data Missing)</h4><h4><b>0 sodium</b> (Almond Milk/Frozen B...Data Missing)</h4><h4><b>0 sugar</b> (Almond Milk/Frozen B...Data Missing)</h4><h4><b>0 fiber</b> (Almond Milk/Frozen B...Data Missing)</h4><h4><b>0 protein</b> (Almond Milk/Frozen B...Data Missing)</h4><h4><b>0 total_cost</b> (Almond Milk/Frozen B...Data Missing)</h4><h1>Recipe</h1><h1>Estimated Time: 0 Minutes</h1><div class="panel" onclick="this.classList.toggle('completed')">Get out nutribullet </div><div class="panel" onclick="this.classList.toggle('completed')">Add ⅓ cup Plain Yogurt 1½ cups Frozen Berries 1 cup Almond Milk </div><div class="panel" onclick="this.classList.toggle('completed')">Blend until berries are smooth </div></div>
+    <a href="https://github.com/clickthisnick/recipes">Back To Recipes</a><div id="options"><br><b>recipe</b><br><button style="display: none;" onclick="this.classList.toggle('completed'); showRecipe()">Smoothie</button></div><br><div id="Smoothie"><div id='ingredients'><h1>Get out the following ingredients:</h1><div class="panel" onclick="this.classList.toggle('completed')">plain yogurt 0.33 cup</div><div class="panel" onclick="this.classList.toggle('completed')">frozen berries 1.5 cup</div><div class="panel" onclick="this.classList.toggle('completed')">almond milk 1 cup</div></div><a href="#" 
+        onclick="document.getElementById('ingredients').style.display='inline'">Show Ingrendients</a><h1>Estimated Time: 0 Minutes</h1><h1>Recipe:</h1><div class="panel" onclick="this.classList.toggle('completed')">Get out nutribullet </div><div class="panel" onclick="this.classList.toggle('completed')">Add ⅓ cup plain yogurt 1½ cups frozen berries 1 cup almond milk </div><div class="panel" onclick="this.classList.toggle('completed')">Blend until berries are smooth </div></div>

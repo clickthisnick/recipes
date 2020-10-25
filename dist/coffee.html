@@ -4,7 +4,7 @@
         background-color: #000000;
     }
 
-    div {
+    div, h1, h2 {
         background-color: #000000;
         border: none;
         color: #FFFFFF;
@@ -23,6 +23,10 @@
         transition: all 0.5s;
         cursor: pointer;
         margin: 5px;
+    }
+
+    #ingredients {
+        display: none;
     }
 
     .completed {
@@ -115,7 +119,7 @@
        function showRecipe() {
             var id = getCheckedOptions()
 
-            console.log(id);
+            // console.log(id);
 
             // Show
             if (document.getElementById(id)) {
@@ -131,4 +135,5 @@
         }
 
        </script>
-    <a href="https://github.com/clickthisnick/recipes/blob/master/README.MD">Back To Recipes</a><div id="options"><br><b>recipe</b><br><button style="display: none;" onclick="this.classList.toggle('completed'); showRecipe()">Coffee</button></div><br><div id="Coffee"><h1>Ingredients</h1><div class="panel" onclick="this.classList.toggle('completed')"> Coffee Grounds 5 scoops </div><h1>Nutrition</h1><h4><b>0 calories</b> (Coffee GroundsData Missing)</h4><h4><b>0 sodium</b> (Coffee GroundsData Missing)</h4><h4><b>0 sugar</b> (Coffee GroundsData Missing)</h4><h4><b>0 fiber</b> (Coffee GroundsData Missing)</h4><h4><b>0 protein</b> (Coffee GroundsData Missing)</h4><h4><b>0 total_cost</b> (Coffee GroundsData Missing)</h4><h1>Vegan Recipe</h1><h1>Estimated Time: 13 Minutes</h1><div class="panel" onclick="this.classList.toggle('completed')">Fill up teapot with water, about 12 a thousand seconds </div><div class="panel" id="paneltimer26" onclick="this.classList.toggle('timer'); timer(510000); loadTimer(510000, 'timer26')"><span id="timer26"></span>Timer 8.5 minutes Turn stove to "HIGH" (after 9) and wait for whistle</div><div class="panel" onclick="this.classList.toggle('completed')">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Put 5 scoops Coffee Grounds into french press bag </div><div class="panel" onclick="this.classList.toggle('completed')">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;Put french press bag into french press </div><div class="panel" onclick="this.classList.toggle('completed')">Once teapot whistles - pour water into french press until water level reaches silver chrome part </div><div class="panel" id="paneltimer27" onclick="this.classList.toggle('timer'); timer(240000); loadTimer(240000, 'timer27')"><span id="timer27"></span>Timer 4 minutes Put top onto french press</div><div class="panel" onclick="this.classList.toggle('completed')">Push french press top down </div><div class="panel" onclick="this.classList.toggle('completed')">Put 1 scoop collagen into a cup </div><div class="panel" onclick="this.classList.toggle('completed')">Pour 2 inches of coffee </div><div class="panel" onclick="this.classList.toggle('completed')">Stir collagen </div><div class="panel" onclick="this.classList.toggle('completed')">If iced coffee - Fill cup with ice </div><div class="panel" onclick="this.classList.toggle('completed')">Pour coffee into cup, 1 inch from top </div><div class="panel" onclick="this.classList.toggle('completed')">Top off with creamer and stir </div></div>
+    <a href="https://github.com/clickthisnick/recipes">Back To Recipes</a><div id="options"><br><b>recipe</b><br><button style="display: none;" onclick="this.classList.toggle('completed'); showRecipe()">Coffee</button></div><br><div id="Coffee"><div id='ingredients'><h1>Get out the following ingredients:</h1><div class="panel" onclick="this.classList.toggle('completed')">water 12 thousand second counts</div><div class="panel" onclick="this.classList.toggle('completed')">coffee grounds 5 scoop</div><div class="panel" onclick="this.classList.toggle('completed')">collagen powder 1 scoop</div><div class="panel" onclick="this.classList.toggle('completed')">coffee 2 inches</div></div><a href="#" 
+        onclick="document.getElementById('ingredients').style.display='inline'">Show Ingrendients</a><h1>Estimated Time: 13 Minutes</h1><h1>Recipe:</h1><div class="panel" onclick="this.classList.toggle('completed')">Add 12 thousand second countss water to the sauce pan </div><div class="panel" id="paneltimer17" onclick="this.classList.toggle('timer'); timer(510000); loadTimer(510000, 'timer17')"><span id="timer17"></span>Turn stove to "HIGH" (after 9) and wait for whistle (Takes 8.5 minutes)</div><div class="panel" onclick="this.classList.toggle('completed')">Put 5 scoops coffee grounds into french press bag </div><div class="panel" onclick="this.classList.toggle('completed')">Put french press bag into french press </div><div class="panel" onclick="this.classList.toggle('completed')">Once sauce pan whistles - pour water into french press until water level reaches silver chrome part </div><div class="panel" id="paneltimer18" onclick="this.classList.toggle('timer'); timer(240000); loadTimer(240000, 'timer18')"><span id="timer18"></span>Put top onto french press (Takes 4 minutes)</div><div class="panel" onclick="this.classList.toggle('completed')">Push french press top down </div><div class="panel" onclick="this.classList.toggle('completed')">Add the following to a coffee cup </div><div class="panel" onclick="this.classList.toggle('completed')">  >    1 scoop collagen powder </div><div class="panel" onclick="this.classList.toggle('completed')">  >    2 inchess coffee </div><div class="panel" onclick="this.classList.toggle('completed')">Stir coffee cup </div><div class="panel" onclick="this.classList.toggle('completed')">If iced coffee - Fill cup with ice </div><div class="panel" onclick="this.classList.toggle('completed')">Pour coffee into cup, 1 inch from top </div><div class="panel" onclick="this.classList.toggle('completed')">Top off with creamer and stir </div></div>

@@ -3,6 +3,8 @@ import { Units as u } from '../constants/units';
 
 export class Serializer {
     public static turnIngObjIntoStr(ingObj: IItemObj, includeUnit = false): string {
+        // lowercase the name so it doesn't look weird
+        ingObj.name = ingObj.name.toLowerCase()
         // If unit is noUnitQuantity just display the name
         if (ingObj.unit !== null && ingObj.unit.name === u.noUnitQuantity.name) {
             return ingObj.name;

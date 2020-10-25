@@ -117,13 +117,13 @@ export class Timer {
         typeText = duration > 1 ? `${text[type]}s` : text[type];
         this.timerCount += 1;
 
-        const timerText = async ? 'Async' : 'Timer';
+        const stepText = (async) ? `| ${extraText} (Takes ${duration} ${typeText})` : `${extraText} (Takes ${duration} ${typeText})`
 
         return {
             type: 'timer',
             milliseconds: duration * multiplier,
             id: `timer${this.timerCount}`,
-            text: `${timerText} ${duration} ${typeText} ${extraText}`,
+            text: stepText,
             async: async
         };
     }

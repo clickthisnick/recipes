@@ -4,7 +4,7 @@
         background-color: #000000;
     }
 
-    div {
+    div, h1, h2 {
         background-color: #000000;
         border: none;
         color: #FFFFFF;
@@ -23,6 +23,10 @@
         transition: all 0.5s;
         cursor: pointer;
         margin: 5px;
+    }
+
+    #ingredients {
+        display: none;
     }
 
     .completed {
@@ -115,7 +119,7 @@
        function showRecipe() {
             var id = getCheckedOptions()
 
-            console.log(id);
+            // console.log(id);
 
             // Show
             if (document.getElementById(id)) {
@@ -131,4 +135,5 @@
         }
 
        </script>
-    <a href="https://github.com/clickthisnick/recipes/blob/master/README.MD">Back To Recipes</a><div id="options"><br><b>recipe</b><br><button style="display: none;" onclick="this.classList.toggle('completed'); showRecipe()">SpiralHam</button></div><br><div id="SpiralHam"><h1>Ingredients</h1><div class="panel" onclick="this.classList.toggle('completed')"> Spiral Cut Ham 192 ounces </div><h1>Nutrition</h1><h4><b>8960 calories</b></h4><h4><b>61440 sodium</b></h4><h4><b>0 sugar</b> (Spiral Cut HamData Missing)</h4><h4><b>0 fiber</b> (Spiral Cut HamData Missing)</h4><h4><b>0 protein</b> (Spiral Cut HamData Missing)</h4><h4><b>0 total_cost</b></h4><h1>Recipe</h1><h1>Estimated Time: 165 Minutes</h1><div class="panel" id="paneltimer63" onclick="this.classList.toggle('timer'); timer(510000); loadTimer(510000, 'timer63')"><span id="timer63"></span>Timer 8.5 minutes Preheat pan on heat 250</div><div class="panel" id="paneltimer64" onclick="this.classList.toggle('timer'); timer(9360000); loadTimer(9360000, 'timer64')"><span id="timer64"></span>Timer 156 minutes Cook Cook ham 13 minutes per pound in oven @ 250°</div><div class="panel" onclick="this.classList.toggle('completed')">Once 192 ounces Spiral Cut Ham is cooked shave off fat </div><div class="panel" onclick="this.classList.toggle('completed')">Put portions into air tight sealed bags </div></div>
+    <a href="https://github.com/clickthisnick/recipes">Back To Recipes</a><div id="options"><br><b>recipe</b><br><button style="display: none;" onclick="this.classList.toggle('completed'); showRecipe()">Hamburgers</button></div><br><div id="Hamburgers"><div id='ingredients'><h1>Get out the following ingredients:</h1><div class="panel" onclick="this.classList.toggle('completed')">ground beef 1 pound</div><div class="panel" onclick="this.classList.toggle('completed')">avacado oil 2 Tbsp</div><div class="panel" onclick="this.classList.toggle('completed')">smoked paprika 4 dash</div><div class="panel" onclick="this.classList.toggle('completed')">chilli powder 4 dash</div><div class="panel" onclick="this.classList.toggle('completed')">garlic powder 4 dash</div></div><a href="#" 
+        onclick="document.getElementById('ingredients').style.display='inline'">Show Ingrendients</a><h1>Estimated Time: 18 Minutes</h1><h1>Recipe:</h1><div class="panel" onclick="this.classList.toggle('completed')">Form 2, 1 inch hamburgers with 1 pound ground beef </div><div class="panel" onclick="this.classList.toggle('completed')">Add the following to the pan </div><div class="panel" onclick="this.classList.toggle('completed')">  >    2 Tbsp avacado oil </div><div class="panel" onclick="this.classList.toggle('completed')">  >    hamburgers </div><div class="panel" id="paneltimer21" onclick="this.classList.toggle('timer'); timer(360000); loadTimer(360000, 'timer21')"><span id="timer21"></span>Cook on heat 5 (Takes 6 minutes)</div><div class="panel" onclick="this.classList.toggle('completed')">Season hamburger with the following </div><div class="panel" onclick="this.classList.toggle('completed')">  >    2 dashs smoked paprika </div><div class="panel" onclick="this.classList.toggle('completed')">  >    2 dashs chilli powder </div><div class="panel" onclick="this.classList.toggle('completed')">  >    2 dashs garlic powder </div><div class="panel" onclick="this.classList.toggle('completed')">Flip hamburgers </div><div class="panel" id="paneltimer22" onclick="this.classList.toggle('timer'); timer(360000); loadTimer(360000, 'timer22')"><span id="timer22"></span>Cook on heat 5 (Takes 6 minutes)</div><div class="panel" onclick="this.classList.toggle('completed')">Season hamburger with the following </div><div class="panel" onclick="this.classList.toggle('completed')">  >    2 dashs smoked paprika </div><div class="panel" onclick="this.classList.toggle('completed')">  >    2 dashs chilli powder </div><div class="panel" onclick="this.classList.toggle('completed')">  >    2 dashs garlic powder </div><div class="panel" onclick="this.classList.toggle('completed')">Flip hamburgers </div><div class="panel" id="paneltimer23" onclick="this.classList.toggle('timer'); timer(360000); loadTimer(360000, 'timer23')"><span id="timer23"></span>Cook on heat 5 (Takes 6 minutes)</div></div>

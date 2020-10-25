@@ -1,20 +1,21 @@
 import * as fs from 'fs';
 
-export class Readme {
+export class Index {
     public static groups = {};
+    public static equipment = [];
 
-    public static makeReadme() {
+    public static generate() {
         let text = '';
         const groups = Object.keys(this.groups).sort();
         for (const group of groups) {
-            text += `# ${group}\n`;
+            text += `<h1>${group}</h1>`;
             text += this.groups[group].join('');
         }
 
-        this.appendReadme(text);
+        this.append(text);
     }
 
-    public static appendReadme(text) {
-        fs.appendFileSync(`${process.cwd()}/README.md`, text);
+    public static append(text) {
+        fs.appendFileSync(`${process.cwd()}/index.html`, text);
     }
 }

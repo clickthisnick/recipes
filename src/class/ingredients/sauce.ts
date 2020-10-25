@@ -3,7 +3,7 @@ import { IUnitObj, Units as u } from '../../constants/units';
 import { OilItems } from './oil';
 
 export class SauceItems extends OilItems {
-    public static readonly coconutCream: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly coconutCream: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Coconut Cream',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -16,7 +16,7 @@ export class SauceItems extends OilItems {
         nutrition: {}
     })
 
-    public static readonly dijonMustard: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly dijonMustard: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Dijon Mustard',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -38,7 +38,7 @@ export class SauceItems extends OilItems {
         link: 'https://www.amazon.com/365-Everyday-Value-Organic-Mustard/dp/B074J6RQZB?fpw=alm&s=wholefoods'
     })
 
-    public static readonly soySauce: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly soySauce: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Soy Sauce',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -51,7 +51,7 @@ export class SauceItems extends OilItems {
         nutrition: {}
     })
 
-    public static readonly padThaiSauce: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly padThaiSauce: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Pad Thai Sauce',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -64,7 +64,7 @@ export class SauceItems extends OilItems {
         nutrition: {}
     })
 
-    public static readonly barbecueSauce: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly barbecueSauce: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Barbecue Sauce',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -77,7 +77,7 @@ export class SauceItems extends OilItems {
         nutrition: {},
     })
 
-    public static readonly pizzaSauce: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly pizzaSauce: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Pizza Sauce',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -90,7 +90,7 @@ export class SauceItems extends OilItems {
         nutrition: {}
     })
 
-    public static readonly sirachaSauce: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly sirachaSauce: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Siracha Sauce',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -103,7 +103,7 @@ export class SauceItems extends OilItems {
         nutrition: {}
     })
 
-    public static readonly hoisonSauce: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly hoisonSauce: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Hoison Sauce',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -116,7 +116,7 @@ export class SauceItems extends OilItems {
         nutrition: {}
     })
 
-    public static readonly spaghettiSauce: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly spaghettiSauce: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Spaghetti Sauce',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -140,7 +140,7 @@ export class SauceItems extends OilItems {
         }
     })
 
-    public static readonly wingTimeMediumBuffaloSauce: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly wingTimeMediumBuffaloSauce: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Buffalo Sauce',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -158,7 +158,7 @@ export class SauceItems extends OilItems {
         },
     })
 
-    public static readonly buffaloSauce: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly buffaloSauce: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Buffalo Sauce',
         putAwayTime: 10,
         takeOutTime: 10,

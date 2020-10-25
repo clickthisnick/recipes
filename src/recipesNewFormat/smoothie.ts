@@ -11,29 +11,16 @@ export class MealRecipe extends RecipeContainer {
             {'recipe': [Smoothie]},
          ]
      }
-
-     public init() {
-         this.generateRecipes();
-     }
 }
 
 class Smoothie extends Recipe {
     constructor() {
         super();
-    }
-    public generateRecipe() {
-        this.addIngredients([
-            i.almondMilk(1, u.cup),
-            i.frozenBerries(1.5, u.cup),
-            // Change to a better measurement
-            i.plainYogurt(.33, u.cup),
-        ]);
-
-        this.addSteps([
+        this.steps = [
             ['Get out nutribullet'],
-            ['Add', i.plainYogurt(), i.frozenBerries(), i.almondMilk()],
+            ['Add', i.plainYogurt(.33, u.cup), i.frozenBerries(1.5, u.cup), i.almondMilk(1, u.cup)],
             // TODO add measurement
             ['Blend until berries are smooth'],
-        ]);
+        ]
     }
 }

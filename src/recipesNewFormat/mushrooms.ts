@@ -13,31 +13,20 @@ export class MealRecipe extends RecipeContainer {
             {'recipe': [Mushroom]},
         ]
     }
-
-    public init() {
-        this.generateRecipes();
-    }
 }
 
 class Mushroom extends Recipe {
     constructor() {
         super();
-    }
-    public generateRecipe() {
-        this.addIngredients([
-            i.babyBella(8, u.ounce),
-            i.oliveOil(1, u.tbsp),
-            i.dash(1, u.unit),
-        ]);
-        this.addSteps([
+        this.steps = [
             [Timer.preheatPan(5, true)],
-                [Async.step, 'Wash', i.babyBella(), 'with strainer'],
-            ['Put', i.oliveOil(), 'in pan'],
-            ['Put', i.babyBella(0), 'in pan'],
-            [Timer.panSear(4, 'm', i.babyBella(0), true)],
+                [Async.step, 'Wash', i.babyBella(8, u.ounce), 'with strainer'],
+            ['Put', i.oliveOil(1, u.tbsp), 'in pan'],
+            ['Put', i.babyBella(), 'in pan'],
+            [Timer.panSear(4, 'm', i.babyBella(), true)],
                 [Async.step, 'Wash and put away strainer'],
                 [Async.step, 'Wash and put away measuring utensil'],
-            ['Season with', i.dash()],
-        ]);
+            ['Season with', i.dash(1, u.unit)],
+        ]
     }
 }

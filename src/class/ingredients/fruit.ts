@@ -3,7 +3,7 @@ import { IUnitObj, Units as u } from '../../constants/units';
 import { CarbItems } from './carb';
 
 export class FruitItems extends CarbItems {
-    public static readonly apple: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly apple: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Apple',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -16,7 +16,7 @@ export class FruitItems extends CarbItems {
         nutrition: {},
     })
 
-    public static readonly collagenPowder: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly collagenPowder: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Collagen Powder',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -38,7 +38,7 @@ export class FruitItems extends CarbItems {
         },
     })
 
-    public static readonly pittedDates: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly pittedDates: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Pitted Date',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -60,7 +60,7 @@ export class FruitItems extends CarbItems {
         },
     })
 
-    public static readonly cashewButter: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly cashewButter: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Cashew Butter',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -82,7 +82,7 @@ export class FruitItems extends CarbItems {
         },
     })
 
-    public static readonly orangeJuice: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly orangeJuice: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Orange Juice',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -105,7 +105,7 @@ export class FruitItems extends CarbItems {
         link: 'https://www.amazon.com/gp/product/B074H6QW3S/ref=afx_dp_ingress?ie=UTF8&almBrandId=VUZHIFdob2xlIEZvb2Rz&fpw=alm'
     })
 
-    public static readonly frozenBerries: IItem = (quantity: number = .00001, unit: IUnitObj) => ({
+    public static readonly frozenBerries: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Frozen Berries',
         putAwayTime: 10,
         takeOutTime: 10,

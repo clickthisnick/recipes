@@ -2,6 +2,7 @@ import { Recipe, RecipeContainer } from '../class/recipe';
 import { Items as i } from '../constants/items';
 import { Categories as c } from '../constants/categories';
 import { Units as u } from '../constants/units';
+import { Equipment as e } from '../constants/equipment';
 import { Timer } from '../class/timer';
 
 export class MealRecipe extends RecipeContainer {
@@ -13,47 +14,30 @@ export class MealRecipe extends RecipeContainer {
             {'recipe': [Rice1Cup, RiceHalfCup]}
         ]
     }
-
-    public init() {
-        this.generateRecipes();
-    }
 }
 
 class Rice1Cup extends Recipe {
     constructor() {
         super();
-    }
-    public generateRecipe() {
-        this.addIngredients([
-            i.brownRice(1, u.cup),
-            i.water(1.5, u.cup)
-        ]);
-        this.addSteps([
-            ['Put', i.brownRice(), 'in instant pot'],
-            ['Put in', i.water()],
+        this.steps = [
+            ['Put', i.brownRice(1, u.cup), 'in', e.instantPot()],
+            ['Put in', i.water(1.5, u.cup)],
             [Timer.pressureCook(9, 15, 'm', true)],
             [Timer.naturalPressRelease(5, 'm')],
             ['Open steam valve'],
-            ['Take inner instant pot bowl out and put on stove. Put away instant pot.'],
-        ]);
+        ];
     }
 }
 
 class RiceHalfCup extends Recipe {
     constructor() {
         super();
-    }
-    public generateRecipe() {
-        this.addIngredients([
-            i.brownRice(.5, u.cup),
-            i.water(1, u.cup)
-        ]);
-        this.addSteps([
-            ['Put', i.brownRice(), 'in instant pot'],
-            ['Put in', i.water()],
+        this.steps = [
+            ['Put', i.brownRice(.5, u.cup), 'in', e.instantPot()],
+            ['Put in', i.water(1, u.cup)],
             [Timer.pressureCook(0, 7, 'm', true)],
-            [Timer.set(3, 'm', 'let sit without opening steam valve')],
+            [Timer.naturalPressRelease(3, 'm')],
             ['Open steam valve'],
-        ]);
+        ];
     }
 }

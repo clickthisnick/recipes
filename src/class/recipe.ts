@@ -1,11 +1,12 @@
-import { IItemObj, IEstimates, IEstimatesMissing  } from './ingredients/item';
+import { IItemObj, IEstimates, IEstimatesMissing } from './ingredients/item';
 import * as fs from 'fs';
-import { Readme } from './readme';
+import { Index } from '.';
 import { Serializer as s } from './serializer';
 import { ITimer } from './timer';
 import { HTML } from './html';
 import { Async } from './async';
-import { Units as u } from '../constants/units';
+import { IAllIngredientUnits, Units } from '../constants/units';
+import { IEquipmentObj, IAllEquipment, Equipment } from '../constants/equipment';
 
 export interface IVariation {
     [details: string]: any[]; // Unititalized recipe
@@ -40,16 +41,16 @@ export class RecipeContainer {
     // ];
 
     private generateBackToRecipes() {
-        return `<a href="https://github.com/clickthisnick/recipes/blob/master/README.MD">Back To Recipes</a>`;
+        return `<a href="https://github.com/clickthisnick/recipes">Back To Recipes</a>`;
     }
 
     public addToGroup() {
-        if (Readme.groups[this.recipeGroup] === undefined) {
-            Readme.groups[this.recipeGroup] = [];
+        if (Index.groups[this.recipeGroup] === undefined) {
+            Index.groups[this.recipeGroup] = [];
         }
         const recipeName = this.getRecipeName();
 
-        Readme.groups[this.recipeGroup].push(`## [${recipeName}](https://www.clickthisnick.com/recipes/dist/${recipeName.toLowerCase().split(' ').join('')}.html)\n\n`);
+        Index.groups[this.recipeGroup].push(`<h2><a href="https://www.clickthisnick.com/recipes/dist/${recipeName.toLowerCase().split(' ').join('')}.html">${recipeName}</a>\n\n`);
 
     }
 
@@ -62,7 +63,7 @@ export class RecipeContainer {
             recipeName = recipeName[0].name
         } else {
             if (this.recipeName === "") {
-               throw new Error(`recipeName must be provided for ${Object.values(this.variations[0])} if recipe has more than 1 variation`)
+                throw new Error(`recipeName must be provided for ${Object.values(this.variations[0])} if recipe has more than 1 variation`)
             }
         }
 
@@ -72,7 +73,7 @@ export class RecipeContainer {
     public generateRecipes() {
         // Add options
         this.addToGroup();
-        const variations:IVariation[] = this.variations
+        const variations: IVariation[] = this.variations
 
         let tmpOptionHtml = '';
         let tmpHtml = '';
@@ -108,7 +109,7 @@ export class RecipeContainer {
                 let recipeName = recipe.name;
 
                 initRecipe.autoShow = defaultShowRecipe;
-                initRecipe.generateRecipe();
+                initRecipe.printRecipe();
 
                 // recipe.name is the class name
                 recipeNamesUsed.forEach((used) => {
@@ -146,8 +147,9 @@ export class RecipeContainer {
 }
 
 export class Recipe {
-    private steps: any[] = [];
-    public ingredients: IItemObj[];
+    public steps: (string | ITimer | IItemObj | IEquipmentObj)[][] = [];
+    public ingredients: IAllIngredientUnits = {};
+    public equipment: IAllEquipment = {};
     public vegan: boolean = true;
     public timeEstimateMilliseconds: number = 0;
     // TODO expand to other metrics
@@ -169,17 +171,10 @@ export class Recipe {
         total_cost: [],
     };
 
-    private metricsToShow: string[] = Object.keys(this.estimatesMissing);
-    private metrics: string[] = Object.keys(this.estimatesMissing);
+    //private metricsToShow: string[] = Object.keys(this.estimatesMissing);
+    //private metrics: string[] = Object.keys(this.estimatesMissing);
 
     public recipeHtml: string = '';
-
-    // This gets overloaded
-    public generateRecipe() {
-        console.log('I should never show up');
-
-        return;
-    }
 
     // Whether to auto show the recipe
     // Useful if the recipe only has one option
@@ -202,7 +197,7 @@ export class Recipe {
     }
 
     private generateStep(text: string) {
-        const tmpText =  finalStepReplace(text);
+        const tmpText = finalStepReplace(text);
 
         return `<div class="panel" onclick="this.classList.toggle('completed')">${tmpText}</div>`;
     }
@@ -212,271 +207,242 @@ export class Recipe {
         return `<div class="panel" id="panel${timer.id}" onclick="this.classList.toggle('timer'); timer(${timer.milliseconds}); loadTimer(${timer.milliseconds}, '${timer.id}')"><span id="${timer.id}"></span>${timer.text}</div>`;
     }
 
-    private cloneObj(obj: {} | undefined | null) {
-      return JSON.parse(JSON.stringify(obj));
-    }
+    // public convertIngToNutrition(unit, nutrition) {
+    //     const symbol_map = {
+    //         "smallerThanOuter": "multiply",
+    //         "biggerThanOuter": "divide",
+    //     }
 
-    public convertIngToNutrition(unit, nutrition) {
-        const symbol_map = {
-            "smallerThanOuter": "multiply",
-            "biggerThanOuter": "divide",
-        }
+    //     const conversionMap = {
+    //         [u.cup.name]: {
+    //             [u.tsp.name]: {
+    //                 count: 48,
+    //                 symbol: symbol_map['smallerThanOuter']
+    //             },
+    //             [u.tbsp.name]: {
+    //                 count: 16,
+    //                 symbol: symbol_map['smallerThanOuter']
+    //             },
+    //             [u.ounce.name]: {
+    //                 count: 8.446808,
+    //                 symbol: symbol_map['smallerThanOuter']
+    //             }
+    //         },
+    //         [u.ounce.name]: {
+    //             [u.cup.name]: {
+    //                 count: 8.446808,
+    //                 symbol: symbol_map['smallerThanOuter']
+    //             }
+    //         },
+    //         [u.tbsp.name]: {
+    //             [u.cup.name]: {
+    //                 count: 16,
+    //                 symbol: symbol_map['biggerThanOuter']
+    //             },
+    //             [u.tsp.name]: {
+    //                 count: 3,
+    //                 smybol: symbol_map['smallerThanOuter']
+    //             }
+    //         },
+    //         [u.tsp.name]: {
+    //             [u.cup.name]: {
+    //                 count: 48,
+    //                 symbol: symbol_map['biggerThanOuter']
+    //             },
+    //             [u.tbsp.name]: {
+    //                 count: 3,
+    //                 symbol: symbol_map['biggerThanOuter']
+    //             }
+    //         }
+    //     }
+    //     let convertedNutrition = {}
 
-        const conversionMap = {
-            [u.cup.name]: {
-                [u.tsp.name]: {
-                    count: 48,
-                    symbol: symbol_map['smallerThanOuter']
-                },
-                [u.tbsp.name]: {
-                    count: 16,
-                    symbol: symbol_map['smallerThanOuter']
-                },
-                [u.ounce.name]: {
-                    count: 8.446808,
-                    symbol: symbol_map['smallerThanOuter']
-                }
-            },
-            [u.ounce.name]: {
-                [u.cup.name]: {
-                    count: 8.446808,
-                    symbol: symbol_map['smallerThanOuter']
-                }   
-            },
-            [u.tbsp.name]: {
-                [u.cup.name]: {
-                    count: 16,
-                    symbol: symbol_map['biggerThanOuter']
-                },
-                [u.tsp.name]: {
-                    count: 3,
-                    smybol: symbol_map['smallerThanOuter']
-                }
-            },
-            [u.tsp.name]: {
-                [u.cup.name]: {
-                    count: 48,
-                    symbol: symbol_map['biggerThanOuter']
-                },
-                [u.tbsp.name]: {
-                    count: 3,
-                    symbol: symbol_map['biggerThanOuter']
-                }
-            }
-        }
-        let convertedNutrition = {}
+    //     if (nutrition === null) {
+    //         return null
+    //     }
 
-        if (nutrition === null) {
-            return null
-        }
+    //     if (nutrition.hasOwnProperty(unit)) {
+    //         return nutrition[unit]
+    //     }
 
-        if (nutrition.hasOwnProperty(unit)) {
-            return nutrition[unit]
-        }
+    //     // Check if we can convert this unit at all
+    //     if (!conversionMap.hasOwnProperty(unit)) {
+    //         return null
+    //     }
 
-        // Check if we can convert this unit at all
-        if (!conversionMap.hasOwnProperty(unit)) {
-            return null
-        }
+    //     Object.keys(nutrition).forEach((key) => {
 
-        Object.keys(nutrition).forEach((key) => {
+    //         // If there is a map between our unit and anything in the nutrition info, use it.
+    //         if (conversionMap[unit].hasOwnProperty(key)) {
 
-            // If there is a map between our unit and anything in the nutrition info, use it.
-            if (conversionMap[unit].hasOwnProperty(key)) {
+    //             Object.keys(nutrition[key]).forEach((metric) => {
+    //                 if (metric !== 'total_cost') {
+    //                     const symbol = conversionMap[unit][key]['symbol']
 
-                Object.keys(nutrition[key]).forEach((metric) => {
-                    if (metric !== 'total_cost') {
-                        const symbol = conversionMap[unit][key]['symbol']
+    //                     // TODO check that this is right
+    //                     if (symbol === 'divide') {
+    //                         convertedNutrition[metric] = nutrition[key][metric] / conversionMap[unit][key]['count']
+    //                     } else {
+    //                         convertedNutrition[metric] = nutrition[key][metric] * conversionMap[unit][key]['count']
+    //                     }
+    //                 }
+    //             })
+    //         }
+    //     })
 
-                        // TODO check that this is right
-                        if (symbol === 'divide') {
-                            convertedNutrition[metric] = nutrition[key][metric] / conversionMap[unit][key]['count']
-                        } else {
-                            convertedNutrition[metric] = nutrition[key][metric] * conversionMap[unit][key]['count']
-                        }
-                    }
-                })
-            }
-        })
+    //     if (convertedNutrition === {}) {
+    //         return null
+    //     }
 
-        if (convertedNutrition === {}) {
-            return null
-        }
+    //     return convertedNutrition
+    // }
 
-        return convertedNutrition
-    }
+    // public addIngredientsz(ingredients: IItemObj[]) {
+    //     // Opening div with id
+    //     // If autoShow, then display the recipe
+    //     if (this.autoShow) {
+    //         this.recipeHtml += `<div id="${this.constructor.name}">`;
+    //     } else {
+    //         this.recipeHtml += `<div id="${this.constructor.name}" style="display: none">`;
+    //     }
 
-    public addIngredients(ingredients: IItemObj[]) {
-        // Opening div with id
-        // If autoShow, then display the recipe
-        if (this.autoShow) {
-            this.recipeHtml += `<div id="${this.constructor.name}">`;
-        } else {
-            this.recipeHtml += `<div id="${this.constructor.name}" style="display: none">`;
-        }
+    //     this.ingredients = ingredients;
 
-        this.ingredients = ingredients;
+    //     ingredients.forEach((ing) => {
+    //         // Add calories to our calculation
+    //         if (ing.quantity > 0 && ing.unit !== null && this.convertIngToNutrition(ing.unit.name, ing.nutrition)) {
+    //             const unitName = ing.unit.name;
+    //             const nutritionData = this.convertIngToNutrition(unitName, ing.nutrition)
+    //             // console.log(ing)
+    //             // console.log(nutritionData)
 
-        ingredients.forEach((ing) => {
-            // Add calories to our calculation
-            if (ing.quantity > 0 && ing.unit !== null && this.convertIngToNutrition(ing.unit.name, ing.nutrition)) {
-                const unitName = ing.unit.name;
-                const nutritionData = this.convertIngToNutrition(unitName, ing.nutrition)
-                console.log(ing)
-                console.log(nutritionData)
+    //             this.metrics.forEach((metric) => {
+    //                 if (nutritionData.hasOwnProperty(metric) && nutritionData[metric] !== null) {
+    //                     // Only multiply by the quantity you are using
+    //                     // TODO in future everything should just have a serving_size
+    //                     if (nutritionData.hasOwnProperty('serving_size')) {
+    //                         // total_cost is not be the serving size but the whole item
+    //                         if (metric === 'total_cost') {
+    //                             // cup: {
+    //                             //     servings: 6,
+    //                             //     serving_size: 0.5,
+    //                             //     calories: 70,
+    //                             //     sodium: 410,
+    //                             //     sugar: 4,
+    //                             //     protein: 3,
+    //                             //     fiber: 2,
+    //                             //     total_cost: 2.29
+    //                             //   }
 
-                this.metrics.forEach((metric) => {
-                    if (nutritionData.hasOwnProperty(metric) && nutritionData[metric] !== null) {
-                        // Only multiply by the quantity you are using
-                        // TODO in future everything should just have a serving_size
-                        if (nutritionData.hasOwnProperty('serving_size')) {
-                            // total_cost is not be the serving size but the whole item
-                            if (metric === 'total_cost') {
-                                // cup: {
-                                //     servings: 6,
-                                //     serving_size: 0.5,
-                                //     calories: 70,
-                                //     sodium: 410,
-                                //     sugar: 4,
-                                //     protein: 3,
-                                //     fiber: 2,
-                                //     total_cost: 2.29
-                                //   }
+    //                             // servings: 0.7103274988611081,
+    //                             // serving_size: 0.05919395823842568,
+    //                             // calories: 8.287154153379596,
+    //                             // sodium: 48.53904575550906,
+    //                             // sugar: 0.47355166590740544,
+    //                             // protein: 0.35516374943055407,
+    //                             // fiber: 0.23677583295370272,
+    //                             // total_cost: 0.27110832873198965
+    //                             if (nutritionData.hasOwnProperty('servings') && this.estimates.hasOwnProperty('total_cost')) {
+    //                                 const cost = (nutritionData[metric] / nutritionData['servings'] * (ing.quantity * nutritionData['serving_size']));
+    //                                 if (this.estimates['total_cost']) {
+    //                                     this.estimates['total_cost'] += cost
+    //                                 } else {
+    //                                     this.estimates['total_cost'] = cost
+    //                                 }
+    //                             }
+    //                         } else {
+    //                             this.estimates[metric] += (nutritionData[metric] * (ing.quantity / nutritionData['serving_size']));
+    //                         }
+    //                     } else {
+    //                         if (metric === 'total_cost') {
+    //                             this.estimates[metric] += nutritionData[metric];
+    //                         } else {
+    //                             this.estimates[metric] += (nutritionData[metric] * ing.quantity);
+    //                         }
+    //                     }
 
-                                // servings: 0.7103274988611081,
-                                // serving_size: 0.05919395823842568,
-                                // calories: 8.287154153379596,
-                                // sodium: 48.53904575550906,
-                                // sugar: 0.47355166590740544,
-                                // protein: 0.35516374943055407,
-                                // fiber: 0.23677583295370272,
-                                // total_cost: 0.27110832873198965
-                                if (nutritionData.hasOwnProperty('servings') && this.estimates.hasOwnProperty('total_cost')) {
-                                    const cost = (nutritionData[metric] / nutritionData['servings']  * (ing.quantity * nutritionData['serving_size']));
-                                    if (this.estimates['total_cost']) {
-                                        this.estimates['total_cost'] += cost
-                                    } else {
-                                        this.estimates['total_cost'] = cost
-                                    }
-                                }
-                            } else {
-                                this.estimates[metric] += (nutritionData[metric] * (ing.quantity / nutritionData['serving_size']));
-                            }
-                        } else {
-                            if (metric === 'total_cost') {
-                                this.estimates[metric] += nutritionData[metric];
-                            } else {
-                                this.estimates[metric] += (nutritionData[metric] * ing.quantity);
-                            }
-                        }
-                        
-                    } else {
-                        this.estimatesMissing[metric].push(ing.name);
-                    }
-                });
-            } else {
-                this.metrics.forEach((metric) => {
-                    this.estimatesMissing[metric].push(ing.name);
-                });
-            }
-        });
+    //                 } else {
+    //                     this.estimatesMissing[metric].push(ing.name);
+    //                 }
+    //             });
+    //         } else {
+    //             this.metrics.forEach((metric) => {
+    //                 this.estimatesMissing[metric].push(ing.name);
+    //             });
+    //         }
+    //     });
 
-        this.prep();
-    }
+    //     this.prep();
+    // }
 
-    public get(itemObj: IItemObj): any {
-        const ingredient = this.ingredients.find((x) => x.name === itemObj.name);
+    // public prep() {
+    //     if (this.ingredients.length === 0) {
+    //         throw new Error('This recipe has no ingredients');
+    //     }
 
-        if (ingredient === undefined) {
-            throw new Error(`Ingredient not found: ${itemObj.name}`);
-        }
+    //     // Add all the unit measurers
+    //     this.recipeHtml += this.generateHeader('Ingredients');
 
-        const ing: IItemObj = this.cloneObj(ingredient);
+    //     this.ingredients.forEach((ingredient) => {
+    //         // Skip ingredient takeout for now
+    //         const ingName = s.turnIngObjIntoStr(ingredient);
+    //         const needsWashed = ingredient.wash === true ? ' and wash' : '';
+    //         const iUnit: any = ingredient.unit
 
-        // .00001 is a number that no one would ever use in a recipe
-        // Its what we default item values to
-        // If you just want to use an items text, you can use "0" of it in a recipe
-        // If no quantity is specified in the recipe, assume it means use all of it
-        if (itemObj.quantity === .00001) {
-            itemObj.quantity = ingredient.quantity;
-        }
+    //         const unitString = s.convertUnitIntoStr(iUnit['name'], ingredient['quantity']);
 
-        if (itemObj.quantity > ing.quantity) {
-            throw new Error(`Not enough ${ing.name}, \nCurrent: ${ing.quantity}\nNeeded: ${itemObj.quantity}`);
-        } else {
-            // Subtracting the ingredients used from the ingredient amount
-            ingredient.quantity -= itemObj.quantity;
+    //         this.recipeHtml += this.generateStep(`${ingName} ${unitString} ${needsWashed}`);
+    //         if (ingredient.isMeatProduct === true) {
+    //             this.vegan = false;
+    //         }
+    //     });
 
-            // Make the clone have the same quantity as what we used up to fullfil this step
-            ing.quantity = itemObj.quantity;
-        }
+    //     this.recipeHtml += this.generateHeader('Nutrition');
 
-        return ing;
-    }
+    //     this.metricsToShow.forEach((metric) => {
+    //         let metricText = `<h4><b>${Math.round(this.estimates[metric])} ${metric}</b>`;
 
-    public prep() {
-        if (this.ingredients.length === 0) {
-            throw new Error('This recipe has no ingredients');
-        }
+    //         if (this.estimatesMissing[metric].length >= 1) {
+    //             let missingDataText = `${this.estimatesMissing[metric].join('/')}`;
 
-        // Add all the unit measurers
-        this.recipeHtml += this.generateHeader('Ingredients');
+    //             if (missingDataText.length > 20) {
+    //                 // Truncate
+    //                 missingDataText = `${missingDataText.substring(0, 20)}...`
+    //             }
+    //             metricText += ' ('
+    //             metricText += missingDataText
+    //             metricText += 'Data Missing)'
+    //         }
 
-        this.ingredients.forEach((ingredient) => {
-            // Skip ingredient takeout for now
-            const ingName = s.turnIngObjIntoStr(ingredient);
-            const needsWashed = ingredient.wash === true ? ' and wash' : '';
-            const iUnit: any = ingredient.unit
+    //         metricText += '</h4>'
 
-            const unitString = s.convertUnitIntoStr(iUnit['name'], ingredient['quantity']);
+    //         this.recipeHtml += metricText;
+    //     });
 
-            this.recipeHtml += this.generateStep(`${ingName} ${unitString} ${needsWashed}`);
-            if (ingredient.isMeatProduct === true) {
-                this.vegan = false;
-            }
-        });
-
-        this.recipeHtml += this.generateHeader('Nutrition');
-
-        this.metricsToShow.forEach((metric) => {
-            let metricText = `<h4><b>${Math.round(this.estimates[metric])} ${metric}</b>`;
-
-            if (this.estimatesMissing[metric].length >= 1) {
-                let missingDataText = `${this.estimatesMissing[metric].join('/')}`;
-
-                if (missingDataText.length > 20) {
-                    // Truncate
-                    missingDataText = `${missingDataText.substring(0, 20)}...`
-                }
-                metricText += ' ('
-                metricText += missingDataText
-                metricText += 'Data Missing)'
-            }
-
-            metricText += '</h4>'
-
-            this.recipeHtml += metricText;
-        });
-
-        if (this.vegan === true) {
-            this.recipeHtml += this.generateHeader('Vegan Recipe');
-        } else {
-            this.recipeHtml += this.generateHeader('Recipe');
-        }
-    }
+    //     if (this.vegan === true) {
+    //         this.recipeHtml += this.generateHeader('Vegan Recipe');
+    //     } else {
+    //         this.recipeHtml += this.generateHeader('Recipe');
+    //     }
+    // }
 
     public generateStepText(steps) {
         let stepText = '';
 
         steps.forEach((item) => {
+            // How do we get more fine grain
+            // Example object == IItemObj
             if (typeof item === 'string') {
                 stepText += item;
             } else if (item.type === 'timer') {
                 stepText += item.text;
             } else if (typeof item === 'object') {
-                // this.get make the recipe aware we are using the item
-                // also does some validation like item is in our ingredients and we have enough
-                stepText += s.turnIngObjIntoStr(this.get(item), true);
+                if (item.hasOwnProperty('quantity')) {
+                    stepText += s.turnIngObjIntoStr(item, true);
+                } else {
+                    // Equipment
+                    stepText += item.name
+                }
             }
             stepText += ' ';
         });
@@ -484,8 +450,34 @@ export class Recipe {
         return stepText;
     }
 
+    private addAsyncText(step, asyncText) {
+        step.forEach(istep => {
+            // istep is either not an array or an array
+            // If array we need to flatten
+            // If not an array we just need to unshift the text
+            if (Array.isArray(istep[0])) {
+                istep = this.addAsyncText(istep, asyncText)
+            } else if (Array.isArray(istep)) {
+                istep.unshift(asyncText)
+            } else {
+                istep = `${asyncText}${istep}`
+            }
+        });
+
+        return step
+    }
+
     public generateRow(step) {
-        let stepDirections;
+        console.log(step)
+        let stepDirections = '';
+
+        // Flatten any [[], []] arrays)
+        if (Array.isArray(step[0])) {
+            step.forEach((istep) => {
+                stepDirections += this.generateRow(istep)
+            })
+            return stepDirections
+        }
 
         // Add any timer to time here
         // We do this before async timers because they happen in the background
@@ -496,16 +488,22 @@ export class Recipe {
 
         // Add async text to next step
         if (step[0] === Async.step) {
+            let asyncText = '';
 
-            // Remove async
-            step.shift();
-
-            // Add to text
-            if (typeof(step[0]) === 'string') {
-                step[0] = Async.step + step[0];
-            } else {
-                step[0].text = Async.step + step[0].text;
+            while (step[0] === Async.step) {    
+                step.shift()
+                asyncText = `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${asyncText}`
             }
+
+            if (asyncText == '') {
+                asyncText = '|'
+            } else {
+                asyncText += '|- '
+            }
+
+            step = this.addAsyncText(step, asyncText)
+
+            return this.generateRow(step)
         }
 
         if (step[0].type === 'timer') {
@@ -520,34 +518,116 @@ export class Recipe {
         }
     }
 
+    public addEquipmentFromRow(step) {
+        step.forEach(element => {
+
+            // IEquipment
+            if (element.hasOwnProperty('id')) {
+
+                // Init for this equipment
+                if (this.equipment.hasOwnProperty(element.name) == false) {
+                    this.equipment[element.name] = 0;
+                }
+
+                this.equipment[element.name] += 1
+            }
+
+        });
+    }
+
+    public addIngredientFromRow(step) {
+        step.forEach(element => {
+
+            // Flatten any [[], []] arrays)
+            if (Array.isArray(element)) {
+                return this.addIngredientFromRow(element)
+            }
+
+
+            // IItem
+            if (element.hasOwnProperty('quantity')) {
+
+                // Dont need to add any ingredients that have no qunatities
+                if (element.quantity === 0 && element.unit === null ) {
+                    return;
+                }
+
+                // Init for this ingredient
+                if (this.ingredients.hasOwnProperty(element.name) == false) {
+                    this.ingredients[element.name] = [];
+                }
+
+                // Add to the array of all qunatites and units provided for the ingredient
+                this.ingredients[element.name].push({
+                    "quantity": element.quantity,
+                    "unit": element.unit.name
+                })
+            }
+
+        });
+    }
+
+    private generateVisibilityToggles() {
+        this.recipeHtml += `<a href="#" 
+        onclick="document.getElementById('ingredients').style.display='inline'">Show Ingrendients</a>`
+    }
+
+    private generateIngredientListHtml() {
+        let ingredientsOnlyOneUnit = Units.greatCommonDenominator(this.ingredients)
+        this.recipeHtml += "<div id='ingredients'>"
+        this.recipeHtml += this.generateHeader('Get out the following ingredients:');
+
+        Object.keys(ingredientsOnlyOneUnit).forEach(ingredient => {
+            let ingredientAmount = ingredientsOnlyOneUnit[ingredient][0]
+            this.recipeHtml += this.generateStep(`${ingredient} ${ingredientAmount.quantity} ${ingredientAmount.unit}`)
+        });
+        this.recipeHtml += "</div>"
+    }
+
     // TODO Should be a new section after recipe that says clean excess ingredients
     // Like .5 red onion we should put away the other half
-   public printRecipe(): void {
+    public printRecipe(): void {
         let stepsHtml = '';
+        
+        // If autoShow, then display the recipe
+        if (this.autoShow) {
+            this.recipeHtml += `<div id="${this.constructor.name}">`;
+        } else {
+            this.recipeHtml += `<div id="${this.constructor.name}" style="display: none">`;
+        }
 
         this.steps.forEach((step) => {
             stepsHtml += this.generateRow(step);
+
+            this.addIngredientFromRow(step);
+            this.addEquipmentFromRow(step);
         });
 
-        // This is calculated when the steps are parsed
+        this.generateIngredientListHtml()
+        this.generateVisibilityToggles()
+
+        // // This is calculated when the steps are parsed
         const estimatedTime = Math.round(this.timeEstimateMilliseconds / 60000);
 
         this.recipeHtml += this.generateHeader(`Estimated Time: ${estimatedTime} Minutes`);
-        this.recipeHtml += stepsHtml;
+        this.recipeHtml += this.generateHeader('Recipe:')
 
-        // Close beginning div
-        this.recipeHtml += '</div>';
-   }
+        // Equipment Cleanup TODO Make more robust
+        if (this.equipment.hasOwnProperty(Equipment.instantPot().name)) {
+            stepsHtml += this.generateRow(['Put inner instant pot liner on stove']);
+        }
 
-   public addSteps(steps: (string | ITimer | IItemObj)[][]) {
-      this.steps = steps;
-      this.printRecipe();
+        this.recipeHtml += stepsHtml
 
-      // Lastly make sure there are no ingredients left
-      this.ingredients.forEach((ingredient) => {
-          if (ingredient.quantity > 0) {
-              throw new Error(`${ingredient.name} still had ${ingredient.quantity} left`)
-          }
-      });
+        // Close the recipe container div
+        this.recipeHtml += "</div>"
+
+        return
+    }
+
+    public addSteps(steps: (string | ITimer | IItemObj | IEquipmentObj)[][]) {
+        this.steps = steps;
+
+        this.printRecipe();
     }
 }

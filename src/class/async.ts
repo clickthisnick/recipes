@@ -1,3 +1,3 @@
 export class Async {
-    public static step = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;';
+    public static step = 'async-step-placeholder';
 }
