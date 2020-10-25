@@ -450,19 +450,28 @@ export class Recipe {
         return stepText;
     }
 
-    private addAsyncText(step, asyncText) {
-        step.forEach(istep => {
-            // istep is either not an array or an array
-            // If array we need to flatten
-            // If not an array we just need to unshift the text
-            if (Array.isArray(istep[0])) {
-                istep = this.addAsyncText(istep, asyncText)
-            } else if (Array.isArray(istep)) {
-                istep.unshift(asyncText)
-            } else {
-                istep = `${asyncText}${istep}`
+    private addAsyncText(step, asyncText, foundArray = false) {
+        // console.log('----')
+        // console.log(step)
+        // console.log(asyncText)
+        // console.log('----')
+
+        // We only need to look at the first object because we are prepending the text
+        if (step[0].type === 'timer') {
+            // Prepend asyncText to any timers
+            step[0].text = `${asyncText}${step[0].text}`
+        } else if (step[0].hasOwnProperty('quantity')) {
+            // If object add an element in the beginning
+            step.unshift(asyncText)
+        } else if ((typeof step[0] === 'string' || step[0] instanceof String)) {
+            // If string just prepend string
+            step[0]  = `${asyncText}${step[0] }`
+        } else if (Array.isArray(step[0]) && foundArray === false) {
+            // If array need to add to each array, can only be one level of nestedness
+            for (let i = 0; i < step[0].length; i++) {
+                step[0][i] = this.addAsyncText(step[0][i], asyncText, true)
             }
-        });
+        }
 
         return step
     }
@@ -495,12 +504,7 @@ export class Recipe {
                 asyncText = `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${asyncText}`
             }
 
-            if (asyncText == '') {
-                asyncText = '|'
-            } else {
-                asyncText += '|- '
-            }
-
+            asyncText += '|- '
             step = this.addAsyncText(step, asyncText)
 
             return this.generateRow(step)
