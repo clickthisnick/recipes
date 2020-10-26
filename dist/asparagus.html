@@ -26,7 +26,7 @@
     }
 
     #ingredients {
-        display: none;
+        
     }
 
     .completed {
@@ -49,6 +49,7 @@
     }
     </style>
        <script>
+
        function setIntervalX(callback, delay, repetitions) {
            var x = 0;
            var intervalID = window.setInterval(function () {
@@ -59,6 +60,12 @@
                   window.clearInterval(intervalID);
               }
            }, delay);
+       }
+
+       function showAllIngredients() {
+           let ingredientDiv = document.getElementById('ingredients');
+
+           ingredientDiv.style.display='inline'
        }
 
        function showAllSteps() {
@@ -74,13 +81,30 @@
             document.getElementById("panel-" + idxToShow).style.display = 'block';
        }
 
+       var timerClicks = {};
+
        function startTimer(duration, timerNum, timerStepIdx, stepIdxToShow, async) {
-           let timerElement = document.getElementById("panel-" + timerStepIdx);
+           let timerPanelId = "panel-" + timerStepIdx
+           let timerElement = document.getElementById(timerPanelId);
+           if (timerClicks.hasOwnProperty(timerPanelId)) {
+            timerClicks[timerPanelId] += 1
+           } else {
+            timerClicks[timerPanelId] = 0
+           }
 
            if (timerElement.getAttribute('class').includes('timer')) {
+               <!-- If you click block 2 times after timer started, then you can skip -->
+               if (timerClicks[timerPanelId] >= 2) { 
+                   <!-- Only show next element if not an async timer -->
+                  if (async == false) { 
+                    document.getElementById("panel-" + stepIdxToShow).style.display = 'block';
+                  }
+                  document.getElementById(timerPanelId).style.display = 'none';
+               }
+
                return
            } else {
-            document.getElementById("panel-" + timerStepIdx).classList.toggle('timer')
+            document.getElementById(timerPanelId).classList.toggle('timer')
            }
 
            if (async) {
@@ -104,6 +128,7 @@
                    timerElement.classList.toggle('timer');
                    timerElement.classList.toggle('completed');
                    if (async == false) { 
+                      document.getElementById(timerPanelId).style.display = 'none';
                       document.getElementById("panel-" + stepIdxToShow).style.display = 'block';
                    }
                }
@@ -151,6 +176,6 @@
         }
 
        </script>
-    <a href="https://github.com/clickthisnick/recipes">Back To Recipes</a><div id="options"><br><b>recipe</b><br><button style="display: none;" onclick="this.classList.toggle('completed'); showRecipe()">Asparagus</button></div><br><div id="Asparagus"><div id='ingredients'><h1>Get out the following ingredients:</h1><div id="panel-6" class="panel" style="display: none" onclick="setStepVisibility(7, 6)">asparagus 0.5 bunch</div><div id="panel-7" class="panel" style="display: none" onclick="setStepVisibility(8, 7)">olive oil 1 tsp</div><div id="panel-8" class="panel" style="display: none" onclick="setStepVisibility(9, 8)">dash seasoning 1 unit</div></div><a href="#" 
-        onclick="document.getElementById('ingredients').style.display='inline'">Show Ingrendients</a><a href="#" 
+    <a href="https://github.com/clickthisnick/recipes">Back To Recipes</a><div id="options"><br><b>recipe</b><br><button style="display: none;" onclick="this.classList.toggle('completed'); showRecipe()">Asparagus</button></div><br><div id="Asparagus"><div id='ingredients' style='display: none' ><h1>Get out the following ingredients:</h1><div id="panel-6" class="panel" style="" onclick="setStepVisibility(7, 6)">asparagus 0.5 bunch</div><div id="panel-7" class="panel" style="" onclick="setStepVisibility(8, 7)">olive oil 1 tsp</div><div id="panel-8" class="panel" style="" onclick="setStepVisibility(9, 8)">dash seasoning 1 unit</div></div><a href="#" 
+        onclick="document.getElementById('ingredients').style.display='inline'">Show Ingrendients</a>	<a href="#" 
         onclick="showAllSteps()">Show All Steps</a><h1>Estimated Time: 12 Minutes</h1><h1>Recipe:</h1><div id="panel-0" class="panel" style="" id="paneltimer1" onclick="loadTimer(480000, 'timer1', 0, 1, false)"><span id="timer1"></span>Preheat ninja to 500° (Takes 8 minutes)</div><div id="panel-1" class="panel" style="display: none" onclick="setStepVisibility(2, 1)">Add ½ bunch asparagus to a ninja </div><div id="panel-2" class="panel" style="display: none" onclick="setStepVisibility(3, 2)">Brush  asparagus with 1 tsp olive oil </div><div id="panel-3" class="panel" style="display: none" id="paneltimer2" onclick="loadTimer(240000, 'timer2', 3, 4, false)"><span id="timer2"></span>Cook  asparagus in ninja @ 500° (Takes 4 minutes)</div><div id="panel-4" class="panel" style="display: none" onclick="setStepVisibility(5, 4)">Season asparagus with dash seasoning </div><div id="panel-5" class="panel" style="display: none" onclick="setStepVisibility(6, 5)">FINISHED </div></div>

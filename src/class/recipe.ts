@@ -41,7 +41,7 @@ export class RecipeContainer {
     // ];
 
     private generateBackToRecipes() {
-        return `<a href="https://github.com/clickthisnick/recipes">Back To Recipes</a>`;
+        return `<a href="https://www.clickthisnick.com/recipes">Back To Recipes</a>`;
     }
 
     public addToGroup() {
@@ -197,12 +197,12 @@ export class Recipe {
         return `${HTML.headerStart}${text}${HTML.headerEnd}`;
     }
 
-    private generateStep(text: string) {
+    private generateStep(text: string, ingredient=false) {
         const tmpText = finalStepReplace(text);
         let style = ''
  
         // Show the first step
-        if (this.generatedStepIdx != 0) {
+        if (this.generatedStepIdx != 0 && ingredient === false) {
             style += 'display: none'
         }
         this.generatedStepIdx += 1
@@ -610,18 +610,19 @@ export class Recipe {
     private generateVisibilityToggles() {
         this.recipeHtml += `<a href="#" 
         onclick="document.getElementById('ingredients').style.display='inline'">Show Ingrendients</a>`
+        this.recipeHtml += '\t'
         this.recipeHtml += `<a href="#" 
         onclick="showAllSteps()">Show All Steps</a>`
     }
 
     private generateIngredientListHtml() {
         let ingredientsOnlyOneUnit = Units.greatCommonDenominator(this.ingredients)
-        this.recipeHtml += "<div id='ingredients'>"
+        this.recipeHtml += "<div id='ingredients' style='display: none' >"
         this.recipeHtml += this.generateHeader('Get out the following ingredients:');
 
         Object.keys(ingredientsOnlyOneUnit).forEach(ingredient => {
             let ingredientAmount = ingredientsOnlyOneUnit[ingredient][0]
-            this.recipeHtml += this.generateStep(`${ingredient} ${ingredientAmount.quantity} ${ingredientAmount.unit}`)
+            this.recipeHtml += this.generateStep(`${ingredient} ${ingredientAmount.quantity} ${ingredientAmount.unit}`, true)
         });
         this.recipeHtml += "</div>"
     }

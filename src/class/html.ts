@@ -31,7 +31,7 @@ export class HTML {
     }
 
     #ingredients {
-        display: none;
+        
     }
 
     .completed {
@@ -56,6 +56,7 @@ export class HTML {
 
     public static javascript = `
        <script>
+
        function setIntervalX(callback, delay, repetitions) {
            var x = 0;
            var intervalID = window.setInterval(function () {
@@ -66,6 +67,12 @@ export class HTML {
                   window.clearInterval(intervalID);
               }
            }, delay);
+       }
+
+       function showAllIngredients() {
+           let ingredientDiv = document.getElementById('ingredients');
+
+           ingredientDiv.style.display='inline'
        }
 
        function showAllSteps() {
@@ -81,13 +88,30 @@ export class HTML {
             document.getElementById("panel-" + idxToShow).style.display = 'block';
        }
 
+       var timerClicks = {};
+
        function startTimer(duration, timerNum, timerStepIdx, stepIdxToShow, async) {
-           let timerElement = document.getElementById("panel-" + timerStepIdx);
+           let timerPanelId = "panel-" + timerStepIdx
+           let timerElement = document.getElementById(timerPanelId);
+           if (timerClicks.hasOwnProperty(timerPanelId)) {
+            timerClicks[timerPanelId] += 1
+           } else {
+            timerClicks[timerPanelId] = 0
+           }
 
            if (timerElement.getAttribute('class').includes('timer')) {
+               <!-- If you click block 2 times after timer started, then you can skip -->
+               if (timerClicks[timerPanelId] >= 2) { 
+                   <!-- Only show next element if not an async timer -->
+                  if (async == false) { 
+                    document.getElementById("panel-" + stepIdxToShow).style.display = 'block';
+                  }
+                  document.getElementById(timerPanelId).style.display = 'none';
+               }
+
                return
            } else {
-            document.getElementById("panel-" + timerStepIdx).classList.toggle('timer')
+            document.getElementById(timerPanelId).classList.toggle('timer')
            }
 
            if (async) {
@@ -111,6 +135,7 @@ export class HTML {
                    timerElement.classList.toggle('timer');
                    timerElement.classList.toggle('completed');
                    if (async == false) { 
+                      document.getElementById(timerPanelId).style.display = 'none';
                       document.getElementById("panel-" + stepIdxToShow).style.display = 'block';
                    }
                }

@@ -26,7 +26,7 @@
     }
 
     #ingredients {
-        display: none;
+        
     }
 
     .completed {
@@ -49,6 +49,7 @@
     }
     </style>
        <script>
+
        function setIntervalX(callback, delay, repetitions) {
            var x = 0;
            var intervalID = window.setInterval(function () {
@@ -59,6 +60,12 @@
                   window.clearInterval(intervalID);
               }
            }, delay);
+       }
+
+       function showAllIngredients() {
+           let ingredientDiv = document.getElementById('ingredients');
+
+           ingredientDiv.style.display='inline'
        }
 
        function showAllSteps() {
@@ -74,13 +81,30 @@
             document.getElementById("panel-" + idxToShow).style.display = 'block';
        }
 
+       var timerClicks = {};
+
        function startTimer(duration, timerNum, timerStepIdx, stepIdxToShow, async) {
-           let timerElement = document.getElementById("panel-" + timerStepIdx);
+           let timerPanelId = "panel-" + timerStepIdx
+           let timerElement = document.getElementById(timerPanelId);
+           if (timerClicks.hasOwnProperty(timerPanelId)) {
+            timerClicks[timerPanelId] += 1
+           } else {
+            timerClicks[timerPanelId] = 0
+           }
 
            if (timerElement.getAttribute('class').includes('timer')) {
+               <!-- If you click block 2 times after timer started, then you can skip -->
+               if (timerClicks[timerPanelId] >= 2) { 
+                   <!-- Only show next element if not an async timer -->
+                  if (async == false) { 
+                    document.getElementById("panel-" + stepIdxToShow).style.display = 'block';
+                  }
+                  document.getElementById(timerPanelId).style.display = 'none';
+               }
+
                return
            } else {
-            document.getElementById("panel-" + timerStepIdx).classList.toggle('timer')
+            document.getElementById(timerPanelId).classList.toggle('timer')
            }
 
            if (async) {
@@ -104,6 +128,7 @@
                    timerElement.classList.toggle('timer');
                    timerElement.classList.toggle('completed');
                    if (async == false) { 
+                      document.getElementById(timerPanelId).style.display = 'none';
                       document.getElementById("panel-" + stepIdxToShow).style.display = 'block';
                    }
                }
@@ -151,6 +176,6 @@
         }
 
        </script>
-    <a href="https://github.com/clickthisnick/recipes">Back To Recipes</a><div id="options"><br><b>recipe</b><br><button style="display: none;" onclick="this.classList.toggle('completed'); showRecipe()">Sushi</button></div><br><div id="Sushi"><div id='ingredients'><h1>Get out the following ingredients:</h1><div id="panel-20" class="panel" style="display: none" onclick="setStepVisibility(21, 20)">sushi rice 0.5 cup</div><div id="panel-21" class="panel" style="display: none" onclick="setStepVisibility(22, 21)">water 0.5 cup</div><div id="panel-22" class="panel" style="display: none" onclick="setStepVisibility(23, 22)">apple cider vinegar 1 Tbsp</div><div id="panel-23" class="panel" style="display: none" onclick="setStepVisibility(24, 23)">seasoned rice vinegar 1 Tbsp</div><div id="panel-24" class="panel" style="display: none" onclick="setStepVisibility(25, 24)">salmon 0.25 pound</div><div id="panel-25" class="panel" style="display: none" onclick="setStepVisibility(26, 25)">seaweed 1 unit</div><div id="panel-26" class="panel" style="display: none" onclick="setStepVisibility(27, 26)">avacado 1 unit</div><div id="panel-27" class="panel" style="display: none" onclick="setStepVisibility(28, 27)">soy sauce 1 unit</div></div><a href="#" 
-        onclick="document.getElementById('ingredients').style.display='inline'">Show Ingrendients</a><a href="#" 
+    <a href="https://github.com/clickthisnick/recipes">Back To Recipes</a><div id="options"><br><b>recipe</b><br><button style="display: none;" onclick="this.classList.toggle('completed'); showRecipe()">Sushi</button></div><br><div id="Sushi"><div id='ingredients' style='display: none' ><h1>Get out the following ingredients:</h1><div id="panel-20" class="panel" style="" onclick="setStepVisibility(21, 20)">sushi rice 0.5 cup</div><div id="panel-21" class="panel" style="" onclick="setStepVisibility(22, 21)">water 0.5 cup</div><div id="panel-22" class="panel" style="" onclick="setStepVisibility(23, 22)">apple cider vinegar 1 Tbsp</div><div id="panel-23" class="panel" style="" onclick="setStepVisibility(24, 23)">seasoned rice vinegar 1 Tbsp</div><div id="panel-24" class="panel" style="" onclick="setStepVisibility(25, 24)">salmon 0.25 pound</div><div id="panel-25" class="panel" style="" onclick="setStepVisibility(26, 25)">seaweed 1 unit</div><div id="panel-26" class="panel" style="" onclick="setStepVisibility(27, 26)">avacado 1 unit</div><div id="panel-27" class="panel" style="" onclick="setStepVisibility(28, 27)">soy sauce 1 unit</div></div><a href="#" 
+        onclick="document.getElementById('ingredients').style.display='inline'">Show Ingrendients</a>	<a href="#" 
         onclick="showAllSteps()">Show All Steps</a><h1>Estimated Time: 52 Minutes</h1><h1>Recipe:</h1><div id="panel-0" class="panel" style="" onclick="setStepVisibility(1, 0)">This recipe makes 2 rolls worth of rice </div><div id="panel-1" class="panel" style="display: none" onclick="setStepVisibility(2, 1)">Rinse  ½ cup sushi rice under water for 2 minutes </div><div id="panel-2" class="panel" style="display: none" onclick="setStepVisibility(3, 2)">Put  sushi rice in instantpot </div><div id="panel-3" class="panel" style="display: none" onclick="setStepVisibility(4, 3)">Put ½ cup water in instantpot </div><div id="panel-4" class="panel" style="display: none" id="paneltimer52" onclick="loadTimer(720000, 'timer52', 4, 5, false)"><span id="timer52"></span>Cook rice in instant pot on low pressure (Takes 12 minutes)</div><div id="panel-5" class="panel" style="display: none" id="paneltimer53" onclick="loadTimer(600000, 'timer53', 5, 6, false)"><span id="timer53"></span>Let instant pot sit without opening steam valve (Takes 10 minutes)</div><div id="panel-6" class="panel" style="display: none" onclick="setStepVisibility(7, 6)">Unplug instant pot heat </div><div id="panel-7" class="panel" style="display: none" onclick="setStepVisibility(8, 7)">Put 1 Tbsp apple cider vinegar in instant pot </div><div id="panel-8" class="panel" style="display: none" onclick="setStepVisibility(9, 8)">Put 1 Tbsp seasoned rice vinegar in instant pot </div><div id="panel-9" class="panel" style="display: none" onclick="setStepVisibility(10, 9)">Stir instant pot mixture </div><div id="panel-10" class="panel" style="display: none" id="paneltimer54" onclick="loadTimer(1800000, 'timer54', 10, 11, false)"><span id="timer54"></span>Cover instant pot in tinfoil with poked holes and set in fridge (Takes 30 minutes)</div><div id="panel-11" class="panel" style="display: none" onclick="setStepVisibility(12, 11)">Cook ¼ pound salmon on all sides briefly, about 2 min </div><div id="panel-12" class="panel" style="display: none" onclick="setStepVisibility(13, 12)">Spoon  sushi rice on seaweed leaving about an inch of  seaweed uncovered </div><div id="panel-13" class="panel" style="display: none" onclick="setStepVisibility(14, 13)">Spread out rice with spoon </div><div id="panel-14" class="panel" style="display: none" onclick="setStepVisibility(15, 14)">Put avacado and  salmon in the middle of the  sushi rice </div><div id="panel-15" class="panel" style="display: none" onclick="setStepVisibility(16, 15)">Tightly wrap and wet the uncovered inch of  seaweed and overlap the roll </div><div id="panel-16" class="panel" style="display: none" onclick="setStepVisibility(17, 16)">Put water on the outside of the uncovered  seaweed aswell so it sticks </div><div id="panel-17" class="panel" style="display: none" onclick="setStepVisibility(18, 17)">Optionally, if the  sushi rice is still warm, put rolls into freezer for 5 min </div><div id="panel-18" class="panel" style="display: none" onclick="setStepVisibility(19, 18)">Dip in  soy sauce </div><div id="panel-19" class="panel" style="display: none" onclick="setStepVisibility(20, 19)">FINISHED </div></div>

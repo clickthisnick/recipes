@@ -26,7 +26,7 @@
     }
 
     #ingredients {
-        display: none;
+        
     }
 
     .completed {
@@ -49,6 +49,7 @@
     }
     </style>
        <script>
+
        function setIntervalX(callback, delay, repetitions) {
            var x = 0;
            var intervalID = window.setInterval(function () {
@@ -59,6 +60,12 @@
                   window.clearInterval(intervalID);
               }
            }, delay);
+       }
+
+       function showAllIngredients() {
+           let ingredientDiv = document.getElementById('ingredients');
+
+           ingredientDiv.style.display='inline'
        }
 
        function showAllSteps() {
@@ -74,13 +81,30 @@
             document.getElementById("panel-" + idxToShow).style.display = 'block';
        }
 
+       var timerClicks = {};
+
        function startTimer(duration, timerNum, timerStepIdx, stepIdxToShow, async) {
-           let timerElement = document.getElementById("panel-" + timerStepIdx);
+           let timerPanelId = "panel-" + timerStepIdx
+           let timerElement = document.getElementById(timerPanelId);
+           if (timerClicks.hasOwnProperty(timerPanelId)) {
+            timerClicks[timerPanelId] += 1
+           } else {
+            timerClicks[timerPanelId] = 0
+           }
 
            if (timerElement.getAttribute('class').includes('timer')) {
+               <!-- If you click block 2 times after timer started, then you can skip -->
+               if (timerClicks[timerPanelId] >= 2) { 
+                   <!-- Only show next element if not an async timer -->
+                  if (async == false) { 
+                    document.getElementById("panel-" + stepIdxToShow).style.display = 'block';
+                  }
+                  document.getElementById(timerPanelId).style.display = 'none';
+               }
+
                return
            } else {
-            document.getElementById("panel-" + timerStepIdx).classList.toggle('timer')
+            document.getElementById(timerPanelId).classList.toggle('timer')
            }
 
            if (async) {
@@ -104,6 +128,7 @@
                    timerElement.classList.toggle('timer');
                    timerElement.classList.toggle('completed');
                    if (async == false) { 
+                      document.getElementById(timerPanelId).style.display = 'none';
                       document.getElementById("panel-" + stepIdxToShow).style.display = 'block';
                    }
                }
@@ -151,8 +176,8 @@
         }
 
        </script>
-    <a href="https://github.com/clickthisnick/recipes">Back To Recipes</a><div id="options"><br><b>recipe</b><br><button onclick="this.classList.toggle('completed'); showRecipe()">WholeFoodsLentilPenne</button><button onclick="this.classList.toggle('completed'); showRecipe()">ModernBrandLentilPenne</button></div><br><div id="WholeFoodsLentilPenne" style="display: none"><div id='ingredients'><h1>Get out the following ingredients:</h1><div id="panel-9" class="panel" style="display: none" onclick="setStepVisibility(10, 9)">spaghetti sauce 25 ounce</div><div id="panel-10" class="panel" style="display: none" onclick="setStepVisibility(11, 10)">water 1 cup</div><div id="panel-11" class="panel" style="display: none" onclick="setStepVisibility(12, 11)">lentil penne 8 ounce</div><div id="panel-12" class="panel" style="display: none" onclick="setStepVisibility(13, 12)">olive oil 1 ounce</div></div><a href="#" 
-        onclick="document.getElementById('ingredients').style.display='inline'">Show Ingrendients</a><a href="#" 
-        onclick="showAllSteps()">Show All Steps</a><h1>Estimated Time: 26 Minutes</h1><h1>Recipe:</h1><div id="panel-0" class="panel" style="" onclick="setStepVisibility(1, 0)">Add the following to the instant pot </div><div id="panel-1" class="panel" style="display: none" onclick="setStepVisibility(2, 1)">• 25 ounces spaghetti sauce </div><div id="panel-2" class="panel" style="display: none" onclick="setStepVisibility(3, 2)">• 1 cup water </div><div id="panel-3" class="panel" style="display: none" onclick="setStepVisibility(4, 3)">• 8 ounces lentil penne </div><div id="panel-4" class="panel" style="display: none" onclick="setStepVisibility(5, 4)">• 1 ounce olive oil </div><div id="panel-5" class="panel" style="display: none" onclick="setStepVisibility(6, 5)">Stir instant pot </div><div id="panel-6" class="panel" style="display: none" id="paneltimer30" onclick="loadTimer(1560000, 'timer30', 6, 7, true)"><span id="timer30"></span>Pressure cook on high pressure for 11 minutes, (Preheat takes 15 min) (Takes 26 minutes)</div><div id="panel-7" class="panel" style="display: none" onclick="setStepVisibility(8, 7)">Release steam valve and serve </div><div id="panel-8" class="panel" style="display: none" onclick="setStepVisibility(9, 8)">FINISHED </div></div><div id="ModernBrandLentilPenne" style="display: none"><div id='ingredients'><h1>Get out the following ingredients:</h1><div id="panel-9" class="panel" style="display: none" onclick="setStepVisibility(10, 9)">spaghetti sauce 25 ounce</div><div id="panel-10" class="panel" style="display: none" onclick="setStepVisibility(11, 10)">water 1 cup</div><div id="panel-11" class="panel" style="display: none" onclick="setStepVisibility(12, 11)">lentil penne 8 ounce</div><div id="panel-12" class="panel" style="display: none" onclick="setStepVisibility(13, 12)">olive oil 1 ounce</div></div><a href="#" 
-        onclick="document.getElementById('ingredients').style.display='inline'">Show Ingrendients</a><a href="#" 
+    <a href="https://github.com/clickthisnick/recipes">Back To Recipes</a><div id="options"><br><b>recipe</b><br><button onclick="this.classList.toggle('completed'); showRecipe()">WholeFoodsLentilPenne</button><button onclick="this.classList.toggle('completed'); showRecipe()">ModernBrandLentilPenne</button></div><br><div id="WholeFoodsLentilPenne" style="display: none"><div id='ingredients' style='display: none' ><h1>Get out the following ingredients:</h1><div id="panel-9" class="panel" style="" onclick="setStepVisibility(10, 9)">spaghetti sauce 25 ounce</div><div id="panel-10" class="panel" style="" onclick="setStepVisibility(11, 10)">water 1 cup</div><div id="panel-11" class="panel" style="" onclick="setStepVisibility(12, 11)">lentil penne 8 ounce</div><div id="panel-12" class="panel" style="" onclick="setStepVisibility(13, 12)">olive oil 1 ounce</div></div><a href="#" 
+        onclick="document.getElementById('ingredients').style.display='inline'">Show Ingrendients</a>	<a href="#" 
+        onclick="showAllSteps()">Show All Steps</a><h1>Estimated Time: 26 Minutes</h1><h1>Recipe:</h1><div id="panel-0" class="panel" style="" onclick="setStepVisibility(1, 0)">Add the following to the instant pot </div><div id="panel-1" class="panel" style="display: none" onclick="setStepVisibility(2, 1)">• 25 ounces spaghetti sauce </div><div id="panel-2" class="panel" style="display: none" onclick="setStepVisibility(3, 2)">• 1 cup water </div><div id="panel-3" class="panel" style="display: none" onclick="setStepVisibility(4, 3)">• 8 ounces lentil penne </div><div id="panel-4" class="panel" style="display: none" onclick="setStepVisibility(5, 4)">• 1 ounce olive oil </div><div id="panel-5" class="panel" style="display: none" onclick="setStepVisibility(6, 5)">Stir instant pot </div><div id="panel-6" class="panel" style="display: none" id="paneltimer30" onclick="loadTimer(1560000, 'timer30', 6, 7, true)"><span id="timer30"></span>Pressure cook on high pressure for 11 minutes, (Preheat takes 15 min) (Takes 26 minutes)</div><div id="panel-7" class="panel" style="display: none" onclick="setStepVisibility(8, 7)">Release steam valve and serve </div><div id="panel-8" class="panel" style="display: none" onclick="setStepVisibility(9, 8)">FINISHED </div></div><div id="ModernBrandLentilPenne" style="display: none"><div id='ingredients' style='display: none' ><h1>Get out the following ingredients:</h1><div id="panel-9" class="panel" style="" onclick="setStepVisibility(10, 9)">spaghetti sauce 25 ounce</div><div id="panel-10" class="panel" style="" onclick="setStepVisibility(11, 10)">water 1 cup</div><div id="panel-11" class="panel" style="" onclick="setStepVisibility(12, 11)">lentil penne 8 ounce</div><div id="panel-12" class="panel" style="" onclick="setStepVisibility(13, 12)">olive oil 1 ounce</div></div><a href="#" 
+        onclick="document.getElementById('ingredients').style.display='inline'">Show Ingrendients</a>	<a href="#" 
         onclick="showAllSteps()">Show All Steps</a><h1>Estimated Time: 22 Minutes</h1><h1>Recipe:</h1><div id="panel-0" class="panel" style="" onclick="setStepVisibility(1, 0)">Add the following to the instant pot </div><div id="panel-1" class="panel" style="display: none" onclick="setStepVisibility(2, 1)">• 25 ounces spaghetti sauce </div><div id="panel-2" class="panel" style="display: none" onclick="setStepVisibility(3, 2)">• 1 cup water </div><div id="panel-3" class="panel" style="display: none" onclick="setStepVisibility(4, 3)">• 8 ounces lentil penne </div><div id="panel-4" class="panel" style="display: none" onclick="setStepVisibility(5, 4)">• 1 ounce olive oil </div><div id="panel-5" class="panel" style="display: none" onclick="setStepVisibility(6, 5)">Stir instant pot </div><div id="panel-6" class="panel" style="display: none" id="paneltimer31" onclick="loadTimer(1320000, 'timer31', 6, 7, true)"><span id="timer31"></span>Pressure cook on high pressure for 7 minutes, (Preheat takes 15 min) (Takes 22 minutes)</div><div id="panel-7" class="panel" style="display: none" onclick="setStepVisibility(8, 7)">Release steam valve and serve </div><div id="panel-8" class="panel" style="display: none" onclick="setStepVisibility(9, 8)">FINISHED </div></div>

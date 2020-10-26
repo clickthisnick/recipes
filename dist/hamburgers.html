@@ -26,7 +26,7 @@
     }
 
     #ingredients {
-        display: none;
+        
     }
 
     .completed {
@@ -49,6 +49,7 @@
     }
     </style>
        <script>
+
        function setIntervalX(callback, delay, repetitions) {
            var x = 0;
            var intervalID = window.setInterval(function () {
@@ -59,6 +60,12 @@
                   window.clearInterval(intervalID);
               }
            }, delay);
+       }
+
+       function showAllIngredients() {
+           let ingredientDiv = document.getElementById('ingredients');
+
+           ingredientDiv.style.display='inline'
        }
 
        function showAllSteps() {
@@ -74,13 +81,30 @@
             document.getElementById("panel-" + idxToShow).style.display = 'block';
        }
 
+       var timerClicks = {};
+
        function startTimer(duration, timerNum, timerStepIdx, stepIdxToShow, async) {
-           let timerElement = document.getElementById("panel-" + timerStepIdx);
+           let timerPanelId = "panel-" + timerStepIdx
+           let timerElement = document.getElementById(timerPanelId);
+           if (timerClicks.hasOwnProperty(timerPanelId)) {
+            timerClicks[timerPanelId] += 1
+           } else {
+            timerClicks[timerPanelId] = 0
+           }
 
            if (timerElement.getAttribute('class').includes('timer')) {
+               <!-- If you click block 2 times after timer started, then you can skip -->
+               if (timerClicks[timerPanelId] >= 2) { 
+                   <!-- Only show next element if not an async timer -->
+                  if (async == false) { 
+                    document.getElementById("panel-" + stepIdxToShow).style.display = 'block';
+                  }
+                  document.getElementById(timerPanelId).style.display = 'none';
+               }
+
                return
            } else {
-            document.getElementById("panel-" + timerStepIdx).classList.toggle('timer')
+            document.getElementById(timerPanelId).classList.toggle('timer')
            }
 
            if (async) {
@@ -104,6 +128,7 @@
                    timerElement.classList.toggle('timer');
                    timerElement.classList.toggle('completed');
                    if (async == false) { 
+                      document.getElementById(timerPanelId).style.display = 'none';
                       document.getElementById("panel-" + stepIdxToShow).style.display = 'block';
                    }
                }
@@ -151,6 +176,6 @@
         }
 
        </script>
-    <a href="https://github.com/clickthisnick/recipes">Back To Recipes</a><div id="options"><br><b>recipe</b><br><button style="display: none;" onclick="this.classList.toggle('completed'); showRecipe()">Hamburgers</button></div><br><div id="Hamburgers"><div id='ingredients'><h1>Get out the following ingredients:</h1><div id="panel-18" class="panel" style="display: none" onclick="setStepVisibility(19, 18)">ground beef 1 pound</div><div id="panel-19" class="panel" style="display: none" onclick="setStepVisibility(20, 19)">avacado oil 2 Tbsp</div><div id="panel-20" class="panel" style="display: none" onclick="setStepVisibility(21, 20)">smoked paprika 4 dash</div><div id="panel-21" class="panel" style="display: none" onclick="setStepVisibility(22, 21)">chilli powder 4 dash</div><div id="panel-22" class="panel" style="display: none" onclick="setStepVisibility(23, 22)">garlic powder 4 dash</div></div><a href="#" 
-        onclick="document.getElementById('ingredients').style.display='inline'">Show Ingrendients</a><a href="#" 
+    <a href="https://github.com/clickthisnick/recipes">Back To Recipes</a><div id="options"><br><b>recipe</b><br><button style="display: none;" onclick="this.classList.toggle('completed'); showRecipe()">Hamburgers</button></div><br><div id="Hamburgers"><div id='ingredients' style='display: none' ><h1>Get out the following ingredients:</h1><div id="panel-18" class="panel" style="" onclick="setStepVisibility(19, 18)">ground beef 1 pound</div><div id="panel-19" class="panel" style="" onclick="setStepVisibility(20, 19)">avacado oil 2 Tbsp</div><div id="panel-20" class="panel" style="" onclick="setStepVisibility(21, 20)">smoked paprika 4 dash</div><div id="panel-21" class="panel" style="" onclick="setStepVisibility(22, 21)">chilli powder 4 dash</div><div id="panel-22" class="panel" style="" onclick="setStepVisibility(23, 22)">garlic powder 4 dash</div></div><a href="#" 
+        onclick="document.getElementById('ingredients').style.display='inline'">Show Ingrendients</a>	<a href="#" 
         onclick="showAllSteps()">Show All Steps</a><h1>Estimated Time: 18 Minutes</h1><h1>Recipe:</h1><div id="panel-0" class="panel" style="" onclick="setStepVisibility(1, 0)">Form 2, 1 inch hamburgers with 1 pound ground beef </div><div id="panel-1" class="panel" style="display: none" onclick="setStepVisibility(2, 1)">Add the following to the pan </div><div id="panel-2" class="panel" style="display: none" onclick="setStepVisibility(3, 2)">• 2 Tbsp avacado oil </div><div id="panel-3" class="panel" style="display: none" onclick="setStepVisibility(4, 3)">• hamburgers </div><div id="panel-4" class="panel" style="display: none" id="paneltimer21" onclick="loadTimer(360000, 'timer21', 4, 5, false)"><span id="timer21"></span>Cook on heat 5 (Takes 6 minutes)</div><div id="panel-5" class="panel" style="display: none" onclick="setStepVisibility(6, 5)">Season hamburger with the following </div><div id="panel-6" class="panel" style="display: none" onclick="setStepVisibility(7, 6)">  >    2 dashs smoked paprika </div><div id="panel-7" class="panel" style="display: none" onclick="setStepVisibility(8, 7)">  >    2 dashs chilli powder </div><div id="panel-8" class="panel" style="display: none" onclick="setStepVisibility(9, 8)">  >    2 dashs garlic powder </div><div id="panel-9" class="panel" style="display: none" onclick="setStepVisibility(10, 9)">Flip hamburgers </div><div id="panel-10" class="panel" style="display: none" id="paneltimer22" onclick="loadTimer(360000, 'timer22', 10, 11, false)"><span id="timer22"></span>Cook on heat 5 (Takes 6 minutes)</div><div id="panel-11" class="panel" style="display: none" onclick="setStepVisibility(12, 11)">Season hamburger with the following </div><div id="panel-12" class="panel" style="display: none" onclick="setStepVisibility(13, 12)">  >    2 dashs smoked paprika </div><div id="panel-13" class="panel" style="display: none" onclick="setStepVisibility(14, 13)">  >    2 dashs chilli powder </div><div id="panel-14" class="panel" style="display: none" onclick="setStepVisibility(15, 14)">  >    2 dashs garlic powder </div><div id="panel-15" class="panel" style="display: none" onclick="setStepVisibility(16, 15)">Flip hamburgers </div><div id="panel-16" class="panel" style="display: none" id="paneltimer23" onclick="loadTimer(360000, 'timer23', 16, 17, false)"><span id="timer23"></span>Cook on heat 5 (Takes 6 minutes)</div><div id="panel-17" class="panel" style="display: none" onclick="setStepVisibility(18, 17)">FINISHED </div></div>
