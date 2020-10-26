@@ -68,17 +68,32 @@ export class HTML {
            }, delay);
        }
 
-       function timer(initialWait) {
-           setIntervalX(function () {
-               setIntervalX(function () {
-                var x = document.getElementById("beep");
+       function showAllSteps() {
+            let elements = document.getElementsByClassName('panel');
 
-                x.play();
-             }, 200, 10);
-         }, initialWait, 1);
+            for (let i = 0; i < elements.length; i++) {
+                elements[i].style.display = 'block';
+            }
        }
 
-       function startTimer(duration, timerNum) {
+       function setStepVisibility(idxToShow, idxToHide) {
+            document.getElementById("panel-" + idxToHide).style.display = 'none';
+            document.getElementById("panel-" + idxToShow).style.display = 'block';
+       }
+
+       function startTimer(duration, timerNum, timerStepIdx, stepIdxToShow, async) {
+           let timerElement = document.getElementById("panel-" + timerStepIdx);
+
+           if (timerElement.getAttribute('class').includes('timer')) {
+               return
+           } else {
+            document.getElementById("panel-" + timerStepIdx).classList.toggle('timer')
+           }
+
+           if (async) {
+              document.getElementById("panel-" + stepIdxToShow).style.display = 'block';
+           }
+
           var timerId = '#' + timerNum;
           var display = document.querySelector(timerId);
           var timer = duration, minutes, seconds;
@@ -93,18 +108,19 @@ export class HTML {
 
                if (--timer < 0) {
                    window.clearInterval(intervalID);
-                   var panelId = "#panel" + timerNum;
-                   var panel = document.querySelector(panelId);
-                   panel.classList.toggle('timer');
-                   panel.classList.toggle('completed');
+                   timerElement.classList.toggle('timer');
+                   timerElement.classList.toggle('completed');
+                   if (async == false) { 
+                      document.getElementById("panel-" + stepIdxToShow).style.display = 'block';
+                   }
                }
            }, 1000);
        }
 
-       function loadTimer(seconds, timerNum) {
+       function loadTimer(seconds, timerNum, timerStepIdx, stepIdxToShow, async) {
           seconds = seconds / 1000;
 
-          startTimer(seconds, timerNum);
+          startTimer(seconds, timerNum, timerStepIdx, stepIdxToShow, async);
        }
 
        var shownId = '';

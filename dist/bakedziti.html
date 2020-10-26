@@ -1,0 +1,156 @@
+<meta name="viewport" content="width=device-width, initial-scale=1"><meta charset="utf-8"><style>
+
+    html {
+        background-color: #000000;
+    }
+
+    div, h1, h2 {
+        background-color: #000000;
+        border: none;
+        color: #FFFFFF;
+    }
+
+    button {
+        display: inline-block;
+        border-radius: 4px;
+        background-color: #f4511e;
+        border: none;
+        color: #FFFFFF;
+        text-align: center;
+        font-size: 28px;
+        padding: 20px;
+        width: 200px;
+        transition: all 0.5s;
+        cursor: pointer;
+        margin: 5px;
+    }
+
+    #ingredients {
+        display: none;
+    }
+
+    .completed {
+        background-color:green;
+        color: white;
+        display: none;
+    }
+
+    .timer {
+        background-color:yellow;
+        color: black;
+    }
+
+    .panel {
+        border-right-style: solid;
+        border-bottom-style: solid;
+        border-left-style: solid;
+        padding: 25px;
+        border-width: 1px;
+    }
+    </style>
+       <script>
+       function setIntervalX(callback, delay, repetitions) {
+           var x = 0;
+           var intervalID = window.setInterval(function () {
+
+              callback();
+
+              if (++x === repetitions) {
+                  window.clearInterval(intervalID);
+              }
+           }, delay);
+       }
+
+       function showAllSteps() {
+            let elements = document.getElementsByClassName('panel');
+
+            for (let i = 0; i < elements.length; i++) {
+                elements[i].style.display = 'block';
+            }
+       }
+
+       function setStepVisibility(idxToShow, idxToHide) {
+            document.getElementById("panel-" + idxToHide).style.display = 'none';
+            document.getElementById("panel-" + idxToShow).style.display = 'block';
+       }
+
+       function startTimer(duration, timerNum, timerStepIdx, stepIdxToShow, async) {
+           let timerElement = document.getElementById("panel-" + timerStepIdx);
+
+           if (timerElement.getAttribute('class').includes('timer')) {
+               return
+           } else {
+            document.getElementById("panel-" + timerStepIdx).classList.toggle('timer')
+           }
+
+           if (async) {
+              document.getElementById("panel-" + stepIdxToShow).style.display = 'block';
+           }
+
+          var timerId = '#' + timerNum;
+          var display = document.querySelector(timerId);
+          var timer = duration, minutes, seconds;
+          var intervalID = window.setInterval(function () {
+               minutes = parseInt(timer / 60, 10)
+               seconds = parseInt(timer % 60, 10);
+
+               minutes = minutes < 10 ? "0" + minutes : minutes;
+               seconds = seconds < 10 ? "0" + seconds : seconds;
+
+               display.textContent = minutes + ":" + seconds + " ";
+
+               if (--timer < 0) {
+                   window.clearInterval(intervalID);
+                   timerElement.classList.toggle('timer');
+                   timerElement.classList.toggle('completed');
+                   if (async == false) { 
+                      document.getElementById("panel-" + stepIdxToShow).style.display = 'block';
+                   }
+               }
+           }, 1000);
+       }
+
+       function loadTimer(seconds, timerNum, timerStepIdx, stepIdxToShow, async) {
+          seconds = seconds / 1000;
+
+          startTimer(seconds, timerNum, timerStepIdx, stepIdxToShow, async);
+       }
+
+       var shownId = '';
+
+       function getCheckedOptions() {
+          var id = '';
+          var htmlCollection = document.getElementById('options').getElementsByTagName('button')
+
+          for (const item of htmlCollection) {
+            if (item.classList[0] == 'completed') {
+                id += item.innerHTML
+            }
+          }
+
+          return id
+       }
+
+       // Used to hide/show recipes
+       function showRecipe() {
+            var id = getCheckedOptions()
+
+            // console.log(id);
+
+            // Show
+            if (document.getElementById(id)) {
+                document.getElementById(id).style.display = 'block';
+            }
+
+            if (document.getElementById(shownId)) {
+                // Hide previously shown
+                document.getElementById(shownId).style.display = 'none';
+            }
+
+            shownId = id;
+        }
+
+       </script>
+    <a href="https://github.com/clickthisnick/recipes">Back To Recipes</a><div id="options"><br><b>recipe</b><br><button style="display: none;" onclick="this.classList.toggle('completed'); showRecipe()">BakedZiti</button></div><br><div id="BakedZiti"><div id='ingredients'><h1>Get out the following ingredients:</h1><div id="panel-23" class="panel" style="display: none" onclick="setStepVisibility(24, 23)">water 6 cup</div><div id="panel-24" class="panel" style="display: none" onclick="setStepVisibility(25, 24)">ziti 16 ounce</div><div id="panel-25" class="panel" style="display: none" onclick="setStepVisibility(26, 25)">olive oil 1 Tbsp</div><div id="panel-26" class="panel" style="display: none" onclick="setStepVisibility(27, 26)">garlic clove 4 unit</div><div id="panel-27" class="panel" style="display: none" onclick="setStepVisibility(28, 27)">red onion 1 unit</div><div id="panel-28" class="panel" style="display: none" onclick="setStepVisibility(29, 28)">italian sausage 16 ounce</div><div id="panel-29" class="panel" style="display: none" onclick="setStepVisibility(30, 29)">spaghetti sauce 16 ounce</div><div id="panel-30" class="panel" style="display: none" onclick="setStepVisibility(31, 30)">ricotta cheese 15 ounce</div><div id="panel-31" class="panel" style="display: none" onclick="setStepVisibility(32, 31)">mozzarella cheese 8 ounce</div><div id="panel-32" class="panel" style="display: none" onclick="setStepVisibility(33, 32)">parmessan cheese 3 ounce</div></div><a href="#" 
+        onclick="document.getElementById('ingredients').style.display='inline'">Show Ingrendients</a><a href="#" 
+        onclick="showAllSteps()">Show All Steps</a><h1>Estimated Time: 50 Minutes</h1><h1>Recipe:</h1><div id="panel-0" class="panel" style="" onclick="setStepVisibility(1, 0)">Put 6 cups water (1.5 quarts) in pot </div><div id="panel-1" class="panel" style="display: none" id="paneltimer3" onclick="loadTimer(600000, 'timer3', 1, 2, false)"><span id="timer3"></span>Boil water on heat 7 with lid (Takes 10 minutes)</div><div id="panel-2" class="panel" style="display: none" onclick="setStepVisibility(3, 2)">Put in 16 ounces ziti in water </div><div id="panel-3" class="panel" style="display: none" onclick="setStepVisibility(4, 3)">Put in 1 Tbsp olive oil in water </div><div id="panel-4" class="panel" style="display: none" id="paneltimer4" onclick="loadTimer(180000, 'timer4', 4, 5, true)"><span id="timer4"></span>Put sauce pan on heat 7 on another burner (Takes 3 minutes)</div><div id="panel-5" class="panel" style="display: none" onclick="setStepVisibility(6, 5)">mince 4 garlic cloves red onion </div><div id="panel-6" class="panel" style="display: none" onclick="setStepVisibility(7, 6)">Put 16 ounces italian sausage into pan </div><div id="panel-7" class="panel" style="display: none" id="paneltimer5" onclick="loadTimer(300000, 'timer5', 7, 8, true)"><span id="timer5"></span>Cook sausage (Takes 5 minutes)</div><div id="panel-8" class="panel" style="display: none" onclick="setStepVisibility(9, 8)">Put in  garlic clove and  red onion </div><div id="panel-9" class="panel" style="display: none" id="paneltimer6" onclick="loadTimer(300000, 'timer6', 9, 10, true)"><span id="timer6"></span>Cook pan mixture (Takes 5 minutes)</div><div id="panel-10" class="panel" style="display: none" onclick="setStepVisibility(11, 10)">Preheat oven to 350 </div><div id="panel-11" class="panel" style="display: none" onclick="setStepVisibility(12, 11)">Put in italian seasoning into pan mixture </div><div id="panel-12" class="panel" style="display: none" id="paneltimer7" onclick="loadTimer(60000, 'timer7', 12, 13, false)"><span id="timer7"></span>Cook pan mixture (Takes 1 minute)</div><div id="panel-13" class="panel" style="display: none" onclick="setStepVisibility(14, 13)">Put 16 ounces spaghetti sauce into pan mixture </div><div id="panel-14" class="panel" style="display: none" id="paneltimer8" onclick="loadTimer(60000, 'timer8', 14, 15, false)"><span id="timer8"></span>Cook pan mixture (Takes 1 minute)</div><div id="panel-15" class="panel" style="display: none" onclick="setStepVisibility(16, 15)">Drain noodles </div><div id="panel-16" class="panel" style="display: none" onclick="setStepVisibility(17, 16)">Spread a thin layer of the sauce in the bottom of a 9x13-inch casserole pan </div><div id="panel-17" class="panel" style="display: none" onclick="setStepVisibility(18, 17)">Dot the surface with half the 8 ounces ricotta cheese </div><div id="panel-18" class="panel" style="display: none" onclick="setStepVisibility(19, 18)">Put a spoonful of sauce into the pasta, stir, and then add the pasta into the casserole. </div><div id="panel-19" class="panel" style="display: none" onclick="setStepVisibility(20, 19)">Pour the rest of the sauce over the pasta, dot the remaining 7 ounces ricotta cheese over the pasta, and sprinkle 8 ounces mozzarella cheese 3 ounces parmessan cheese on top. </div><div id="panel-20" class="panel" style="display: none" onclick="setStepVisibility(21, 20)">At this point you could refrigerate or freeze, or bake </div><div id="panel-21" class="panel" style="display: none" id="paneltimer9" onclick="loadTimer(1500000, 'timer9', 21, 22, false)"><span id="timer9"></span>Bake in oven until light brown and cheese is melted (Takes 25 minutes)</div><div id="panel-22" class="panel" style="display: none" onclick="setStepVisibility(23, 22)">FINISHED </div></div>

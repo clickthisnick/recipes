@@ -2,8 +2,8 @@ import * as fs from 'fs';
 import { Index } from '../class/index';
 
 // This is the path from root (package.json runs this)
-const testFolder = 'src/recipeDebug';
-//const testFolder = 'src/recipesNewFormat';
+//const testFolder = 'src/recipeDebug';
+const testFolder = 'src/recipesNewFormat';
 const cwd = process.cwd();
 
 // This creates the html files in the dist folder

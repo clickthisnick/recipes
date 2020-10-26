@@ -70,7 +70,7 @@ class Container {
             finalArray.push(['Add the following to', bindingWord, this.name])
 
             ingredients.forEach((ingredient) => {
-                finalArray.push(['  >   ', ingredient])
+                finalArray.push(['•', ingredient])
             })
 
             return finalArray

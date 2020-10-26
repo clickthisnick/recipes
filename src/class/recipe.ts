@@ -161,6 +161,7 @@ export class Recipe {
         protein: 0,
         total_cost: 0
     };
+    private generatedStepIdx = 0;
 
     public estimatesMissing: IEstimatesMissing = {
         calories: [],
@@ -198,13 +199,46 @@ export class Recipe {
 
     private generateStep(text: string) {
         const tmpText = finalStepReplace(text);
+        let style = ''
+ 
+        // Show the first step
+        if (this.generatedStepIdx != 0) {
+            style += 'display: none'
+        }
+        this.generatedStepIdx += 1
+ 
+        let html = `<div id="panel-${this.generatedStepIdx - 1}" class="panel" style="${style}" onclick="setStepVisibility(${this.generatedStepIdx}, ${this.generatedStepIdx-1})">${tmpText}</div>`;
 
-        return `<div class="panel" onclick="this.classList.toggle('completed')">${tmpText}</div>`;
+        // If you want to toggle do this
+        // return `<div class="panel" onclick="this.classList.toggle('completed')">${tmpText}</div>`;
+
+        return html
     }
 
     private generateTimerStep(timer: any) {
         // tslint:disable-next-line max-line-length
-        return `<div class="panel" id="panel${timer.id}" onclick="this.classList.toggle('timer'); timer(${timer.milliseconds}); loadTimer(${timer.milliseconds}, '${timer.id}')"><span id="${timer.id}"></span>${timer.text}</div>`;
+        // If you want to toggle do this
+        // let html = `<div class="panel" id="panel${timer.id}" onclick="this.classList.toggle('timer'); loadTimer(${timer.milliseconds}, '${timer.id}')"><span id="${timer.id}"></span>${timer.text}</div>`;
+
+        let style = ''
+ 
+        // Show the first step
+        if (this.generatedStepIdx != 0) {
+            style += 'display: none'
+        }
+
+        this.generatedStepIdx += 1
+
+        let html = ''
+        if (timer.async) {
+            // Show the next element
+            html = `<div id="panel-${this.generatedStepIdx - 1}" class="panel" style="${style}" id="panel${timer.id}" onclick="loadTimer(${timer.milliseconds}, '${timer.id}', ${this.generatedStepIdx-1}, ${this.generatedStepIdx}, true)"><span id="${timer.id}"></span>${timer.text}</div>`;
+        } else {
+            // Otherwise dont and wait for the timer
+            html = `<div id="panel-${this.generatedStepIdx - 1}" class="panel" style="${style}" id="panel${timer.id}" onclick="loadTimer(${timer.milliseconds}, '${timer.id}', ${this.generatedStepIdx-1}, ${this.generatedStepIdx}, false)"><span id="${timer.id}"></span>${timer.text}</div>`;
+        }
+
+        return html
     }
 
     // public convertIngToNutrition(unit, nutrition) {
@@ -450,34 +484,33 @@ export class Recipe {
         return stepText;
     }
 
-    private addAsyncText(step, asyncText, foundArray = false) {
-        // console.log('----')
-        // console.log(step)
-        // console.log(asyncText)
-        // console.log('----')
+    // private addAsyncText(step, asyncText, foundArray = false) {
+    //     // console.log('----')
+    //     // console.log(step)
+    //     // console.log(asyncText)
+    //     // console.log('----')
 
-        // We only need to look at the first object because we are prepending the text
-        if (step[0].type === 'timer') {
-            // Prepend asyncText to any timers
-            step[0].text = `${asyncText}${step[0].text}`
-        } else if (step[0].hasOwnProperty('quantity')) {
-            // If object add an element in the beginning
-            step.unshift(asyncText)
-        } else if ((typeof step[0] === 'string' || step[0] instanceof String)) {
-            // If string just prepend string
-            step[0]  = `${asyncText}${step[0] }`
-        } else if (Array.isArray(step[0]) && foundArray === false) {
-            // If array need to add to each array, can only be one level of nestedness
-            for (let i = 0; i < step[0].length; i++) {
-                step[0][i] = this.addAsyncText(step[0][i], asyncText, true)
-            }
-        }
+    //     // We only need to look at the first object because we are prepending the text
+    //     if (step[0].type === 'timer') {
+    //         // Prepend asyncText to any timers
+    //         step[0].text = `${asyncText}${step[0].text}`
+    //     } else if (step[0].hasOwnProperty('quantity')) {
+    //         // If object add an element in the beginning
+    //         step.unshift(asyncText)
+    //     } else if ((typeof step[0] === 'string' || step[0] instanceof String)) {
+    //         // If string just prepend string
+    //         step[0]  = `${asyncText}${step[0] }`
+    //     } else if (Array.isArray(step[0]) && foundArray === false) {
+    //         // If array need to add to each array, can only be one level of nestedness
+    //         for (let i = 0; i < step[0].length; i++) {
+    //             step[0][i] = this.addAsyncText(step[0][i], asyncText, true)
+    //         }
+    //     }
 
-        return step
-    }
+    //     return step
+    // }
 
     public generateRow(step) {
-        console.log(step)
         let stepDirections = '';
 
         // Flatten any [[], []] arrays)
@@ -498,14 +531,17 @@ export class Recipe {
         // Add async text to next step
         if (step[0] === Async.step) {
             let asyncText = '';
+            let count = ''
 
             while (step[0] === Async.step) {    
                 step.shift()
-                asyncText = `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${asyncText}`
+                count += '-'
             }
 
-            asyncText += '|- '
-            step = this.addAsyncText(step, asyncText)
+            asyncText = `${count}> ${asyncText}`
+
+            // Add back if you want to show an indicator for async, rather than just have people click this recipe
+            // step = this.addAsyncText(step, asyncText)
 
             return this.generateRow(step)
         }
@@ -574,6 +610,8 @@ export class Recipe {
     private generateVisibilityToggles() {
         this.recipeHtml += `<a href="#" 
         onclick="document.getElementById('ingredients').style.display='inline'">Show Ingrendients</a>`
+        this.recipeHtml += `<a href="#" 
+        onclick="showAllSteps()">Show All Steps</a>`
     }
 
     private generateIngredientListHtml() {
@@ -592,6 +630,7 @@ export class Recipe {
     // Like .5 red onion we should put away the other half
     public printRecipe(): void {
         let stepsHtml = '';
+        this.steps.push(["FINISHED"])
         
         // If autoShow, then display the recipe
         if (this.autoShow) {
@@ -627,11 +666,5 @@ export class Recipe {
         this.recipeHtml += "</div>"
 
         return
-    }
-
-    public addSteps(steps: (string | ITimer | IItemObj | IEquipmentObj)[][]) {
-        this.steps = steps;
-
-        this.printRecipe();
     }
 }

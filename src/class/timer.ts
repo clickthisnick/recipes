@@ -117,7 +117,7 @@ export class Timer {
         typeText = duration > 1 ? `${text[type]}s` : text[type];
         this.timerCount += 1;
 
-        const stepText = (async) ? `| ${extraText} (Takes ${duration} ${typeText})` : `${extraText} (Takes ${duration} ${typeText})`
+        const stepText = (async) ? `${extraText} (Takes ${duration} ${typeText})` : `${extraText} (Takes ${duration} ${typeText})`
 
         return {
             type: 'timer',
