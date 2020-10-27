@@ -8,44 +8,30 @@ export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
         this.recipeGroup = c.meal;
-        this.recipeName = "Ninja Chicken"
+        this.recipeName = "NinjaChicken"
         this.variations = [
-            {'recipe': [NinjaChickenThighs, NinjaChickenDrumsticks]},
+            {'recipe': [NinjaChickenDrumsticks, NinjaChickenThighs]},
         ]
-     }
-
-     public init() {
-         this.generateRecipes();
      }
 }
 
 class NinjaChickenThighs extends Recipe {
     constructor() {
         super();
-    }
-    public generateRecipe() {
-        this.addIngredients([
-            i.chickenThigh(1, u.pound),
-        ]);
-        this.addSteps([
-            ['Season dry rub', i.chickenThigh()],
+        this.steps = [
+            ['Season dry rub', i.chickenThigh(1, u.pound),],
             [Timer.ninjaCook(10, 'm', 'Cook Chicken, flip at 5 min mark', 400)]
-        ]);
+        ]
     }
 }
 
 class NinjaChickenDrumsticks extends Recipe {
     constructor() {
         super();
-    }
-    public generateRecipe() {
-        this.addIngredients([
-            i.chickenDrumstickPackage(1, u.pound),
-        ]);
-        this.addSteps([
-            ['(optional) Season dry rub', i.chickenDrumstickPackage()],
+        this.steps = [
+            ['(optional) Season dry rub', i.chickenDrumstickPackage(1, u.pound)],
             [Timer.ninjaCook(18, 'm', 'Cook Chicken, flip at 9 min mark', 450)],
             ['(optional) Add drumsticks + sauce in a container and shake']
-        ]);
+        ]
     }
 }
