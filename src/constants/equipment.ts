@@ -65,12 +65,31 @@ class Container {
         this.firstAction = false;
 
         if (Array.isArray(ingredients)) {
+            // If you are just adding one element which happens to be an ingredient with text
+            if (ingredients.length == 1) {
+                let finalArray: any = []
+                finalArray.push('Add')
+                ingredients[0].forEach(element => {
+                    finalArray.push(element); 
+                });
+                finalArray.push('to')
+                finalArray.push(this.name)
+
+                return finalArray
+            }
+
             let finalArray: any = [];
 
             finalArray.push(['Add the following to', bindingWord, this.name])
 
             ingredients.forEach((ingredient) => {
-                finalArray.push(['•', ingredient])
+                // Ingredient could be an array
+                if (Array.isArray(ingredient)) {
+                    ingredient.unshift('•')
+                    finalArray.push(ingredient)
+                } else {
+                    finalArray.push(['•', ingredient])
+                }
             })
 
             return finalArray
@@ -176,6 +195,12 @@ class CoffeeCup extends Container {
     }
 }
 
+class Blender extends Container {
+    constructor(id: number) {
+        super("blender", id)
+    }
+}
+
 export class Equipment {
     // 99 is just an identifer that doesn't start with 0/1/2
     // By default we assume that equipment is reused throughout the recipe
@@ -195,6 +220,10 @@ export class Equipment {
     public static readonly coffeecup = (id: number = 99) => (
         new CoffeeCup(id)
     );
+
+    public static readonly blender = (id: number = 99) => (
+        new Blender(id)
+    )
 
     public static readonly teapot = (id: number = 99) => (
         new Teapot(id)
