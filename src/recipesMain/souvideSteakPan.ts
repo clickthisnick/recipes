@@ -10,7 +10,7 @@ export class MealRecipe extends RecipeContainer {
         this.recipeName = 'SouvideSteak'
         this.recipeGroup = c.meal;
         this.variations = [
-            {'recipe': [PanSouvideSteak, NinjaSouvideSteak]},
+            {'recipe': [PanSouvideSteak]},
         ]
      }
 }
@@ -26,20 +26,6 @@ class PanSouvideSteak extends Recipe {
             [Timer.set(30, 's', 'Pan fry steak on 3rd largest side')],
             [Timer.set(30, 's', 'Pan fry steak on 4th largest side')],
             [Timer.set(15, 'm', 'Let steak sit for at least 15 min')],
-        ];
-    }
-}
-
-class NinjaSouvideSteak extends Recipe {
-    constructor() {
-        super();
-        this.steps = [
-            ['Rub the', i.topSirloin(1, u.pound), 'with', i.thyme(2, u.dash)],
-            [Timer.set(60, 'm', 'Souvide steak at 132 degrees')],
-            [Timer.ninjaCook(1.5, 'm', 'Grill steak', 500)],
-            ['Flip steak'],
-            [Timer.ninjaCook(1.5, 'm', 'Grill steak', 500)],
-            [Timer.set(15, 'm', 'Let steak rest')],
         ];
     }
 }

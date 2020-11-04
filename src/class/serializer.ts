@@ -1,17 +1,17 @@
-import { IItemObj } from './ingredients/item';
+import { IItemObj, Item } from './ingredients/item';
 import { Units as u } from '../constants/units';
 
 export class Serializer {
-    public static turnIngObjIntoStr(ingObj: IItemObj, includeUnit = false): string {
+    public static turnIngObjIntoStr(ingObj: IItemObj | Item, includeUnit = false): string {
         // lowercase the name so it doesn't look weird
         ingObj.name = ingObj.name.toLowerCase()
         // If unit is noUnitQuantity just display the name
-        if (ingObj.unit !== null && ingObj.unit.name === u.noUnitQuantity.name) {
+        if (ingObj.unit && ingObj.unit.name === u.noUnitQuantity.name) {
             return ingObj.name;
         }
 
         // Return the name if unit is "unit"
-        if (ingObj.unit !== null) {
+        if (ingObj.unit) {
           if (ingObj.unit.name === u.unit.name) {
             if (ingObj.quantity > 1) {
                 return `${ingObj.quantity} ${ingObj.name}s`;
@@ -28,7 +28,7 @@ export class Serializer {
 
         // Return the correct unit
         let unitQuantity: String = '';
-        if (includeUnit && ingObj.unit !== null) {
+        if (includeUnit && ingObj.unit) {
           unitQuantity = this.convertUnitIntoStr(ingObj.unit.name, ingObj.quantity);
         }
 

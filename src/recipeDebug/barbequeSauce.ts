@@ -1,6 +1,6 @@
 import { Recipe, RecipeContainer } from '../class/recipe';
 import { Items as i } from '../constants/items';
-import { Equipment as e } from '../constants/equipment';
+import { Equipment as e } from '../class/equipment';
 import { Categories as c } from '../constants/categories';
 import { Timer } from '../class/timer';
 import { Units as u } from '../constants/units';
@@ -33,9 +33,9 @@ class BarbequeSauce extends Recipe {
                 i.monkFruit(1/8, u.tsp),
                 i.water(1.5, u.cup),
             ]),
-            ['Stir with', e.woodenSpoon()],
-            [Timer.set(5, 'm', 'Put sauce pan on heat 5 until boil')],
-            [Timer.set(20, 'm', 'Put sauce pan on heat 3 with lid')],
+            e.saucePan().stir(),
+            Timer.set(5, 'm', 'Put sauce pan on heat 5 until boil'),
+            Timer.set(20, 'm', 'Put sauce pan on heat 3 with lid'),
         ];
     }
 }

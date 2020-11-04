@@ -1,8 +1,9 @@
 import { Recipe, RecipeContainer } from '../class/recipe';
 import { Items as i } from '../constants/items';
-import { Equipment as e } from '../constants/equipment';
+import { Equipment as e } from '../class/equipment';
 import { Categories as c } from '../constants/categories';
 import { Units as u } from '../constants/units';
+import { Text as text} from '../class/text';
 
 export class MealRecipe extends RecipeContainer {
     constructor() {
@@ -18,25 +19,22 @@ class Hamburgers extends Recipe {
     constructor() {
         super();
         this.steps = [
-            ['Form 2, 1 inch hamburgers with', i.groundBeef(1, u.pound)],
-            e.pan().add([
-                i.avacadoOil(2, u.tbsp),
-                'hamburgers',
-            ]),
+            text.set(['Form 2, 1 inch hamburgers with', i.groundBeef(1, u.pound)]),
+            e.pan().add(i.item('hamburgers')),
             e.pan().cook(6, 'm', 5),
             i.item('hamburger').season([
                 i.smokedPaprika(2, u.dash),
                 i.chilliPowder(2, u.dash),
                 i.garlicPowder(2, u.dash)
             ]),
-            ['Flip hamburgers'],
+            text.set(['Flip hamburgers']),
             e.pan().cook(6, 'm', 5),
             i.item('hamburger').season([
                 i.smokedPaprika(2, u.dash),
                 i.chilliPowder(2, u.dash),
                 i.garlicPowder(2, u.dash)
             ]),
-            ['Flip hamburgers'],
+            text.set(['Flip hamburgers']),
             e.pan().cook(6, 'm', 5),
         ];
     }

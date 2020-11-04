@@ -1,10 +1,29 @@
 import * as fs from 'fs';
-import { Index } from '../class/index';
+import { HTML } from '../class/html';
+//import { Index } from '../class/index';
+//import { IStep } from '../class/step';
 
 // This is the path from root (package.json runs this)
-//const testFolder = 'src/recipeDebug';
-const testFolder = 'src/recipesNewFormat';
+const testFolder = 'src/recipeDebug';
+// const testFolder = 'src/recipesNewFormat';
 const cwd = process.cwd();
+
+let pageHtml = ''
+pageHtml += HTML.mobileViewport;
+pageHtml += HTML.chartSet;
+pageHtml += HTML.css;
+pageHtml += HTML.javascript;
+// Shopping mode allows you to select recipes and get all the ingredients needed for all recipes
+// Cooking mode allows you to select recipes and optimizes the cooking
+pageHtml += `<button id="shoppingButton" onclick="selectMode('shopping')">Shopping Mode</button><button id="cookingButton" onclick="selectMode('cooking')">Cooking Mode</button><br>`
+pageHtml += '<div id="shopping" style="display: none;">Shopping List</div><br>'
+pageHtml += '<div id="cooking" style="display: none;">Cooking List</div><br>'
+
+
+
+pageHtml += '<div id="select" style="display: none;">Select Recipes<br>'
+// add all recipes to javascript variable
+pageHtml += `<button onclick="doneSelectingRecipes()">Done Selecting</button><br>`
 
 // This creates the html files in the dist folder
 function generateRecipe(file: string) {
@@ -12,7 +31,7 @@ function generateRecipe(file: string) {
   const recipe = new MealRecipe();
 
   recipe.generateRecipes();
-  recipe.writeRecipe();
+  pageHtml += recipe.recipeHtml
 }
 
 function run() {
@@ -23,8 +42,16 @@ function run() {
     generateRecipe(file);
   }
 
+  const recipeName = 'main';
+
+  // Close the select div
+  pageHtml += '</div><br>'
+
+  // Just setting to lowercase incase git isn't case sensitive (Like on osx/windows)
+  fs.writeFileSync(`${process.cwd()}/dist/${recipeName.toLowerCase()}.html`, pageHtml);
+
   // This creates the index
-  Index.generate();
+  // Index.generate();
 }
 
 run();

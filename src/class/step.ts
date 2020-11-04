@@ -1,0 +1,30 @@
+export interface IStep {
+    id: number;
+    time: number; // In seconds
+    text: string;
+    ingredients: any[]
+    equipment: any[]
+    children: IStep[]
+    disappearWhen: string
+    showTimer: boolean
+}
+
+let id = 0
+
+function getIStepId() {
+    id += 1
+    return id
+}
+
+export function istep(): IStep {
+    return {
+        id: getIStepId(),
+        time: 0,
+        text: '',
+        ingredients: [],
+        equipment: [],
+        children: [],
+        disappearWhen: 'clicked',
+        showTimer: false,
+    }
+}

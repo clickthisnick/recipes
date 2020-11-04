@@ -1,26 +1,137 @@
-import { IItemObj, IEstimates, IEstimatesMissing } from './ingredients/item';
-import * as fs from 'fs';
+// import { IItemObj, IEstimates, IEstimatesMissing } from './ingredients/item';
+import { IEstimates, IEstimatesMissing } from './ingredients/item';
+//import * as fs from 'fs';
 import { Index } from '.';
-import { Serializer as s } from './serializer';
-import { ITimer } from './timer';
-import { HTML } from './html';
-import { Async } from './async';
-import { IAllIngredientUnits, Units } from '../constants/units';
-import { IEquipmentObj, IAllEquipment, Equipment } from '../constants/equipment';
+//import { Serializer as s } from './serializer';
+//import { ITimer } from './timer';
+//import { HTML } from './html';
+// import { Async } from './async';
+// import { IAllIngredientUnits, Units } from '../constants/units';
+import { IAllIngredientUnits } from '../constants/units';
+import { IStep } from './step';
+// import { IEquipmentObj, IAllEquipment, Equipment } from '../constants/equipment';
+// import { IAllEquipment } from './equipment';
+
+// function generateBackToRecipes() {
+//     return `<a href="https://www.clickthisnick.com/recipes">Back To Recipes</a>`;
+// }
 
 export interface IVariation {
     [details: string]: any[]; // Unititalized recipe
 }
 
-function finalStepReplace(text: string) {
-    let tmpText: string = text.replace(/1\/2/g, '½');
+// function finalStepReplace(text: string) {
+//     let tmpText: string = text.replace(/1\/2/g, '½');
 
-    // Reduce confusion on too many letters for these plural units
-    tmpText = tmpText.replace('tsps', 'tsp');
-    tmpText = tmpText.replace('Tbsps', 'Tbsp');
+//     // Reduce confusion on too many letters for these plural units
+//     tmpText = tmpText.replace('tsps', 'tsp');
+//     tmpText = tmpText.replace('Tbsps', 'Tbsp');
 
-    return tmpText;
-}
+//     return tmpText;
+// }
+
+// class Step {
+//     time: number; // In seconds
+//     raw: string[]; // The raw input from our recipes
+//     text: string[];
+//     ingredients: any = {}
+//     equipment: any = {}
+
+//     constructor(step: string[]) {
+//         this.raw = step;
+//     }
+
+//     public processRaw(raw: any) {
+//         if (Array.isArray(raw)) {
+//             raw.forEach(iraw => {
+//                 this.processRaw(iraw)
+//             })
+//         }
+
+//         console.log(typeof raw);
+//         console.log(raw)
+
+//         // This is an ingredient if has nutrition
+//         if (raw.hasOwnProperty('nutrition')) {
+//             // Dont need to add any ingredients that have no qunatities
+//             if (raw.quantity === 0 && raw.unit === null ) {
+//                 return;
+//             }
+
+//             // Init for this ingredient
+//             if (this.ingredients.hasOwnProperty(raw.name) == false) {
+//                 this.ingredients[raw.name] = [];
+//             }
+
+//             // Add to the array of all quantities and units provided for the ingredient
+//             this.ingredients[raw.name].push({
+//                 "quantity": raw.quantity,
+//                 "unit": raw.unit.name
+//             })
+//         }
+//     }
+
+//     public process() {
+//         // The goal is to get the the individual pieces of the step
+//         this.processRaw(this.raw)
+
+//         // if (typeof this.raw == 'object') {
+//         //     console.log(this.raw.constructor.name)
+//         // }
+//     }
+
+//     public processString() {
+
+//     }
+
+//     // public generateHtml() {
+//     //     let stepDirections = '';
+
+//     //     // Flatten any [[], []] arrays)
+//     //     if (Array.isArray(this.raw[0])) {
+//     //         this.raw.forEach((istep) => {
+//     //             stepDirections += this.generateHtml(istep)
+//     //         })
+//     //         return stepDirections
+//     //     }
+
+//         // Add any timer to time here
+//         // // We do this before async timers because they happen in the background
+//         // if (step[0].type === 'timer') {
+//         //     // Incrementing the rough estimate of how long the recipe will take.
+//         //     this.timeEstimateMilliseconds += step[0].milliseconds;
+//         // }
+
+//         // // Add async text to next step
+//         // if (step[0] === Async.step) {
+//         //     let asyncText = '';
+//         //     let count = ''
+
+//         //     while (step[0] === Async.step) {    
+//         //         step.shift()
+//         //         count += '-'
+//         //     }
+
+//         //     asyncText = `${count}> ${asyncText}`
+
+//         //     // Add back if you want to show an indicator for async, rather than just have people click this recipe
+//         //     // step = this.addAsyncText(step, asyncText)
+
+//         //     return this.generateRow(step)
+//         // }
+
+//         // if (step[0].type === 'timer') {
+//         //     return this.generateTimerStep(step[0]);
+//         // } else {
+//         //     const stepText = this.generateStepText(step);
+
+//         //     stepText.trim();
+//         //     stepDirections = this.generateStep(stepText);
+
+//         //     return stepDirections;
+//         // }
+//     //}
+// }
 
 export class RecipeContainer {
     public recipeHtml: string = '';
@@ -39,10 +150,6 @@ export class RecipeContainer {
     //     {'meat': ['sausage']},
     //     {'veggie': ['mushroom']},
     // ];
-
-    private generateBackToRecipes() {
-        return `<a href="https://www.clickthisnick.com/recipes">Back To Recipes</a>`;
-    }
 
     public addToGroup() {
         if (Index.groups[this.recipeGroup] === undefined) {
@@ -71,85 +178,91 @@ export class RecipeContainer {
     }
 
     public generateRecipes() {
-        // Add options
-        this.addToGroup();
-        const variations: IVariation[] = this.variations
 
-        let tmpOptionHtml = '';
-        let tmpHtml = '';
-        let defaultShowRecipe = false;
-
-        if (variations.length === 1) {
-            const recipes: any[] = Object.values(variations[0])[0];
-
-            if (recipes.length === 1) {
-                defaultShowRecipe = true;
-            }
-        }
-
-        // When we loop through variations we store any already used names
-        // Then subtract then more future names...
-        // So...
-        // WholeGrain
-        // WholeGrainMushroom -> Mushroom
-        // WholeGrainSausageMushroom -> Sausage
-        const recipeNamesUsed: any[] = []
-
-        variations.forEach((variation) => {
-            const recipeIds: string[] = [];
-
-            // Add the key text
-            // Like "veggies"
-            tmpOptionHtml += `<br><b>${Object.keys(variation)}</b><br>`;
-
-            const recipes: any[] = Object.values(variation)[0];
-
+        this.variations.forEach(variation => {
+            const recipes: any = Object.values(variation)[0];
             recipes.forEach((recipe) => {
                 const initRecipe: Recipe = new recipe();
-                let recipeName = recipe.name;
+                let recipeName = recipe.name; 
 
-                initRecipe.autoShow = defaultShowRecipe;
-                initRecipe.printRecipe();
+                // Adds the recipe to the javascript variable
+                this.recipeHtml += initRecipe.printRecipe(recipeName)
+                this.recipeHtml += `<button onclick="selectRecipe('${recipeName}')">${recipeName}</button><br>`
+            })
+        })
+       
+        // Add options
+        // this.addToGroup();
+        // const variations: IVariation[] = this.variations
 
-                // recipe.name is the class name
-                recipeNamesUsed.forEach((used) => {
-                    recipeName = recipeName.replace(used, '')
-                });
+        // let tmpOptionHtml = '';
+        // let tmpHtml = '';
+        // let defaultShowRecipe = false;
 
-                recipeNamesUsed.push(recipeName);
-                recipeIds.push(recipeName);
-                tmpHtml += initRecipe.recipeHtml;
-            });
+        // if (variations.length === 1) {
+        //     const recipes: any[] = Object.values(variations[0])[0];
 
-            tmpOptionHtml += HTML.generateOptions(recipeIds, defaultShowRecipe);
-        });
+        //     if (recipes.length === 1) {
+        //         defaultShowRecipe = true;
+        //     }
+        // }
 
-        this.recipeHtml += '<div id="options">';
-        this.recipeHtml += tmpOptionHtml;
-        this.recipeHtml += '</div><br>';
-        this.recipeHtml += tmpHtml;
+        // // When we loop through variations we store any already used names
+        // // Then subtract then more future names...
+        // // So...
+        // // WholeGrain
+        // // WholeGrainMushroom -> Mushroom
+        // // WholeGrainSausageMushroom -> Sausage
+        // const recipeNamesUsed: any[] = []
+
+        // variations.forEach((variation) => {
+        //     const recipeIds: string[] = [];
+
+        //     // Add the key text
+        //     // Like "veggies"
+        //     tmpOptionHtml += `<br><b>${Object.keys(variation)}</b><br>`;
+
+        //     const recipes: any[] = Object.values(variation)[0];
+
+        //     recipes.forEach((recipe) => {
+        //         const initRecipe: Recipe = new recipe();
+        //         let recipeName = recipe.name;
+
+        //         initRecipe.autoShow = defaultShowRecipe;
+        //         initRecipe.printRecipe(recipe.name);
+
+        //         // recipe.name is the class name
+        //         recipeNamesUsed.forEach((used) => {
+        //             recipeName = recipeName.replace(used, '')
+        //         });
+
+        //         recipeNamesUsed.push(recipeName);
+        //         recipeIds.push(recipeName);
+        //         tmpHtml += initRecipe.recipeHtml;
+        //     });
+
+        this.recipeHtml += '<div id="root">'
+        this.recipeHtml += '</div id="root">'
+            // this.recipeHtml += `<script>generateHtml()</script>`
+
+            // tmpOptionHtml += HTML.generateOptions(recipeIds, defaultShowRecipe);
+        // });
+
+        // this.recipeHtml += '<div id="options">';
+        // this.recipeHtml += tmpOptionHtml;
+        // this.recipeHtml += '</div><br>';
+        // this.recipeHtml += tmpHtml;
     }
 
     constructor() {
-        this.recipeHtml += HTML.mobileViewport;
-        this.recipeHtml += HTML.chartSet;
-        this.recipeHtml += HTML.css;
-        this.recipeHtml += HTML.javascript;
-        this.recipeHtml += this.generateBackToRecipes();
-    }
-
-    public writeRecipe() {
-        const recipeName = this.getRecipeName();
-
-        // Just setting to lowercase incase git isn't case sensitive (Like on osx/windows)
-        fs.writeFileSync(`${process.cwd()}/dist/${recipeName.toLowerCase()}.html`, this.recipeHtml);
+        // this.recipeHtml += generateBackToRecipes();
     }
 }
 
 export class Recipe {
-    public steps: (string | ITimer | IItemObj | IEquipmentObj)[][] = [];
+    public steps: IStep[] = [];
     public ingredients: IAllIngredientUnits = {};
-    public equipment: IAllEquipment = {};
+    // public equipment: IAllEquipment = {};
     public vegan: boolean = true;
     public timeEstimateMilliseconds: number = 0;
     // TODO expand to other metrics
@@ -161,7 +274,7 @@ export class Recipe {
         protein: 0,
         total_cost: 0
     };
-    private generatedStepIdx = 0;
+    // private generatedStepIdx = 0;
 
     public estimatesMissing: IEstimatesMissing = {
         calories: [],
@@ -193,146 +306,138 @@ export class Recipe {
     //   </audio>
     //   `;
 
-    private generateHeader(text: string) {
-        return `${HTML.headerStart}${text}${HTML.headerEnd}`;
-    }
-
-    private generateStep(text: string, ingredient=false) {
-        const tmpText = finalStepReplace(text);
-        let style = ''
- 
-        // Show the first step
-        if (this.generatedStepIdx != 0 && ingredient === false) {
-            style += 'display: none'
-        }
-        this.generatedStepIdx += 1
- 
-        let html = `<div id="panel-${this.generatedStepIdx - 1}" class="panel" style="${style}" onclick="setStepVisibility(${this.generatedStepIdx}, ${this.generatedStepIdx-1})">${tmpText}</div>`;
-
-        // If you want to toggle do this
-        // return `<div class="panel" onclick="this.classList.toggle('completed')">${tmpText}</div>`;
-
-        return html
-    }
-
-    private generateTimerStep(timer: any) {
-        // tslint:disable-next-line max-line-length
-        // If you want to toggle do this
-        // let html = `<div class="panel" id="panel${timer.id}" onclick="this.classList.toggle('timer'); loadTimer(${timer.milliseconds}, '${timer.id}')"><span id="${timer.id}"></span>${timer.text}</div>`;
-
-        let style = ''
- 
-        // Show the first step
-        if (this.generatedStepIdx != 0) {
-            style += 'display: none'
-        }
-
-        this.generatedStepIdx += 1
-
-        let html = ''
-        if (timer.async) {
-            // Show the next element
-            html = `<div id="panel-${this.generatedStepIdx - 1}" class="panel" style="${style}" id="panel${timer.id}" onclick="loadTimer(${timer.milliseconds}, '${timer.id}', ${this.generatedStepIdx-1}, ${this.generatedStepIdx}, true)"><span id="${timer.id}"></span>${timer.text}</div>`;
-        } else {
-            // Otherwise dont and wait for the timer
-            html = `<div id="panel-${this.generatedStepIdx - 1}" class="panel" style="${style}" id="panel${timer.id}" onclick="loadTimer(${timer.milliseconds}, '${timer.id}', ${this.generatedStepIdx-1}, ${this.generatedStepIdx}, false)"><span id="${timer.id}"></span>${timer.text}</div>`;
-        }
-
-        return html
-    }
-
-    // public convertIngToNutrition(unit, nutrition) {
-    //     const symbol_map = {
-    //         "smallerThanOuter": "multiply",
-    //         "biggerThanOuter": "divide",
-    //     }
-
-    //     const conversionMap = {
-    //         [u.cup.name]: {
-    //             [u.tsp.name]: {
-    //                 count: 48,
-    //                 symbol: symbol_map['smallerThanOuter']
-    //             },
-    //             [u.tbsp.name]: {
-    //                 count: 16,
-    //                 symbol: symbol_map['smallerThanOuter']
-    //             },
-    //             [u.ounce.name]: {
-    //                 count: 8.446808,
-    //                 symbol: symbol_map['smallerThanOuter']
-    //             }
-    //         },
-    //         [u.ounce.name]: {
-    //             [u.cup.name]: {
-    //                 count: 8.446808,
-    //                 symbol: symbol_map['smallerThanOuter']
-    //             }
-    //         },
-    //         [u.tbsp.name]: {
-    //             [u.cup.name]: {
-    //                 count: 16,
-    //                 symbol: symbol_map['biggerThanOuter']
-    //             },
-    //             [u.tsp.name]: {
-    //                 count: 3,
-    //                 smybol: symbol_map['smallerThanOuter']
-    //             }
-    //         },
-    //         [u.tsp.name]: {
-    //             [u.cup.name]: {
-    //                 count: 48,
-    //                 symbol: symbol_map['biggerThanOuter']
-    //             },
-    //             [u.tbsp.name]: {
-    //                 count: 3,
-    //                 symbol: symbol_map['biggerThanOuter']
-    //             }
-    //         }
-    //     }
-    //     let convertedNutrition = {}
-
-    //     if (nutrition === null) {
-    //         return null
-    //     }
-
-    //     if (nutrition.hasOwnProperty(unit)) {
-    //         return nutrition[unit]
-    //     }
-
-    //     // Check if we can convert this unit at all
-    //     if (!conversionMap.hasOwnProperty(unit)) {
-    //         return null
-    //     }
-
-    //     Object.keys(nutrition).forEach((key) => {
-
-    //         // If there is a map between our unit and anything in the nutrition info, use it.
-    //         if (conversionMap[unit].hasOwnProperty(key)) {
-
-    //             Object.keys(nutrition[key]).forEach((metric) => {
-    //                 if (metric !== 'total_cost') {
-    //                     const symbol = conversionMap[unit][key]['symbol']
-
-    //                     // TODO check that this is right
-    //                     if (symbol === 'divide') {
-    //                         convertedNutrition[metric] = nutrition[key][metric] / conversionMap[unit][key]['count']
-    //                     } else {
-    //                         convertedNutrition[metric] = nutrition[key][metric] * conversionMap[unit][key]['count']
-    //                     }
-    //                 }
-    //             })
-    //         }
-    //     })
-
-    //     if (convertedNutrition === {}) {
-    //         return null
-    //     }
-
-    //     return convertedNutrition
+    // private generateHeader(text: string) {
+    //     return `${HTML.headerStart}${text}${HTML.headerEnd}`;
     // }
 
-    // public addIngredientsz(ingredients: IItemObj[]) {
-    //     // Opening div with id
+    // private generateStep(text: string, ingredient=false) {
+    //     const tmpText = finalStepReplace(text);
+    //     let style = ''
+ 
+    //     // Show the first step
+    //     if (this.generatedStepIdx != 0 && ingredient === false) {
+    //         style += 'display: none'
+    //     }
+    //     this.generatedStepIdx += 1
+ 
+    //     let html = `<div id="panel-${this.generatedStepIdx - 1}" class="panel" style="${style}" onclick="setStepVisibility(${this.generatedStepIdx}, ${this.generatedStepIdx-1})">${tmpText}</div>`;
+
+    //     // If you want to toggle do this
+    //     // return `<div class="panel" onclick="this.classList.toggle('completed')">${tmpText}</div>`;
+
+    //     return html
+    // }
+
+    // private generateTimerStep(timer: any) {
+    //     // tslint:disable-next-line max-line-length
+    //     // If you want to toggle do this
+    //     // let html = `<div class="panel" id="panel${timer.id}" onclick="this.classList.toggle('timer'); loadTimer(${timer.milliseconds}, '${timer.id}')"><span id="${timer.id}"></span>${timer.text}</div>`;
+
+    //     let style = ''
+ 
+    //     // Show the first step
+    //     if (this.generatedStepIdx != 0) {
+    //         style += 'display: none'
+    //     }
+
+    //     this.generatedStepIdx += 1
+
+    //     let html = ''
+    //     if (timer.async) {
+    //         // Show the next element
+    //         html = `<div id="panel-${this.generatedStepIdx - 1}" class="panel" style="${style}" id="panel${timer.id}" onclick="loadTimer(${timer.milliseconds}, '${timer.id}', ${this.generatedStepIdx-1}, ${this.generatedStepIdx}, true)"><span id="${timer.id}"></span>${timer.text}</div>`;
+    //     } else {
+    //         // Otherwise dont and wait for the timer
+    //         html = `<div id="panel-${this.generatedStepIdx - 1}" class="panel" style="${style}" id="panel${timer.id}" onclick="loadTimer(${timer.milliseconds}, '${timer.id}', ${this.generatedStepIdx-1}, ${this.generatedStepIdx}, false)"><span id="${timer.id}"></span>${timer.text}</div>`;
+    //     }
+
+    //     return html
+    // }
+
+            // How do we get more fine grain
+            // Example object == IItemObj
+            // if (typeof item === 'string') {
+            //     stepText += item;
+            // } else if (item.type === 'timer') {
+            //     stepText += item.text;
+            // } else if (typeof item === 'object') {
+            //     if (item.hasOwnProperty('quantity')) {
+            //         stepText += s.turnIngObjIntoStr(item, true);
+            //     } else {
+            //         // Equipment
+            //         stepText += item.name
+            //     }
+            // }
+            // stepText += ' ';
+    // public addEquipmentFromRow(step) {
+    //     step.forEach(element => {
+
+    //         // Flatten any [[], []] arrays)
+    //         if (Array.isArray(element)) {
+    //             return this.addEquipmentFromRow(element)
+    //         }
+
+    //         // IEquipment
+    //         if (typeof(element) == 'object') {
+    //             // Init for this equipment
+    //             if (this.equipment.hasOwnProperty(element.constructor.name) == false) {
+    //                 this.equipment[element.constructor.name] = 0;
+    //             }
+
+    //             this.equipment[element.constructor.name] += 1
+    //         }
+
+    //     });
+    // }
+
+    // private generateVisibilityToggles() {
+    //     this.recipeHtml += `<a href="#" 
+    //     onclick="document.getElementById('ingredients').style.display='inline'">Show Ingrendients</a>`
+    //     this.recipeHtml += '\t'
+    //     this.recipeHtml += `<a href="#" 
+    //     onclick="showAllSteps()">Show All Steps</a>`
+    // }
+
+    // private generateIngredientListHtml() {
+    //     let ingredientsOnlyOneUnit = Units.greatCommonDenominator(this.ingredients)
+    //     this.recipeHtml += "<div id='ingredients' style='display: none' >"
+    //     this.recipeHtml += this.generateHeader('Get out the following ingredients:');
+
+    //     Object.keys(ingredientsOnlyOneUnit).forEach(ingredient => {
+    //         let ingredientAmount = ingredientsOnlyOneUnit[ingredient][0]
+    //         this.recipeHtml += this.generateStep(`${ingredient} ${ingredientAmount.quantity} ${ingredientAmount.unit}`, true)
+    //     });
+    //     this.recipeHtml += "</div>"
+    // }
+
+    // TODO Should be a new section after recipe that says clean excess ingredients
+    // Like .5 red onion we should put away the other half
+
+
+    private print(step: IStep) {
+        this.recipeHtml += ''
+
+        if (step.children) {
+            step.children.forEach(istepchild => {
+                this.print(istepchild)
+            })
+        }
+    }
+
+    public printRecipe(recipeName): string {
+        let html = ''
+
+        // Turn the human readable inputted steps into a formatted step which is easy to manipulate
+        // this.steps.forEach((item) => {
+        //     this.print(item)
+        // });
+        this.steps.forEach(stepz => {
+            html += `<script>setSteps('${recipeName}', ${JSON.stringify(stepz)})</script>`
+        })    
+        return html    
+
+    //     let stepsHtml = '';
+        
     //     // If autoShow, then display the recipe
     //     if (this.autoShow) {
     //         this.recipeHtml += `<div id="${this.constructor.name}">`;
@@ -340,332 +445,35 @@ export class Recipe {
     //         this.recipeHtml += `<div id="${this.constructor.name}" style="display: none">`;
     //     }
 
-    //     this.ingredients = ingredients;
+    //     this.steps.forEach((step) => {
+    //         this.addIngredientFromRow(step);
+    //         this.addEquipmentFromRow(step);
 
-    //     ingredients.forEach((ing) => {
-    //         // Add calories to our calculation
-    //         if (ing.quantity > 0 && ing.unit !== null && this.convertIngToNutrition(ing.unit.name, ing.nutrition)) {
-    //             const unitName = ing.unit.name;
-    //             const nutritionData = this.convertIngToNutrition(unitName, ing.nutrition)
-    //             // console.log(ing)
-    //             // console.log(nutritionData)
-
-    //             this.metrics.forEach((metric) => {
-    //                 if (nutritionData.hasOwnProperty(metric) && nutritionData[metric] !== null) {
-    //                     // Only multiply by the quantity you are using
-    //                     // TODO in future everything should just have a serving_size
-    //                     if (nutritionData.hasOwnProperty('serving_size')) {
-    //                         // total_cost is not be the serving size but the whole item
-    //                         if (metric === 'total_cost') {
-    //                             // cup: {
-    //                             //     servings: 6,
-    //                             //     serving_size: 0.5,
-    //                             //     calories: 70,
-    //                             //     sodium: 410,
-    //                             //     sugar: 4,
-    //                             //     protein: 3,
-    //                             //     fiber: 2,
-    //                             //     total_cost: 2.29
-    //                             //   }
-
-    //                             // servings: 0.7103274988611081,
-    //                             // serving_size: 0.05919395823842568,
-    //                             // calories: 8.287154153379596,
-    //                             // sodium: 48.53904575550906,
-    //                             // sugar: 0.47355166590740544,
-    //                             // protein: 0.35516374943055407,
-    //                             // fiber: 0.23677583295370272,
-    //                             // total_cost: 0.27110832873198965
-    //                             if (nutritionData.hasOwnProperty('servings') && this.estimates.hasOwnProperty('total_cost')) {
-    //                                 const cost = (nutritionData[metric] / nutritionData['servings'] * (ing.quantity * nutritionData['serving_size']));
-    //                                 if (this.estimates['total_cost']) {
-    //                                     this.estimates['total_cost'] += cost
-    //                                 } else {
-    //                                     this.estimates['total_cost'] = cost
-    //                                 }
-    //                             }
-    //                         } else {
-    //                             this.estimates[metric] += (nutritionData[metric] * (ing.quantity / nutritionData['serving_size']));
-    //                         }
-    //                     } else {
-    //                         if (metric === 'total_cost') {
-    //                             this.estimates[metric] += nutritionData[metric];
-    //                         } else {
-    //                             this.estimates[metric] += (nutritionData[metric] * ing.quantity);
-    //                         }
-    //                     }
-
-    //                 } else {
-    //                     this.estimatesMissing[metric].push(ing.name);
-    //                 }
-    //             });
-    //         } else {
-    //             this.metrics.forEach((metric) => {
-    //                 this.estimatesMissing[metric].push(ing.name);
-    //             });
-    //         }
+    //         stepsHtml += this.generateRow(step);
     //     });
 
-    //     this.prep();
-    // }
+    //     this.generateIngredientListHtml()
+    //     this.generateVisibilityToggles()
 
-    // public prep() {
-    //     if (this.ingredients.length === 0) {
-    //         throw new Error('This recipe has no ingredients');
+    //     // // This is calculated when the steps are parsed
+    //     const estimatedTime = Math.round(this.timeEstimateMilliseconds / 60000);
+
+    //     this.recipeHtml += this.generateHeader(`Estimated Time: ${estimatedTime} Minutes`);
+    //     this.recipeHtml += this.generateHeader('Recipe:')
+
+    //     // Equipment Cleanup TODO Make more robust
+    //     let instantPot = Equipment.instantPot()
+    //     if (this.equipment.hasOwnProperty(instantPot.constructor.name)) {
+    //         stepsHtml += this.generateRow(['Take inner instant pot bowl out and put on stove.']);
+    //         stepsHtml += this.generateRow(['Wipe inner instant pot rim']);
     //     }
 
-    //     // Add all the unit measurers
-    //     this.recipeHtml += this.generateHeader('Ingredients');
+    //     stepsHtml += this.generateRow(['FINISHED.']);
+    //     this.recipeHtml += stepsHtml
 
-    //     this.ingredients.forEach((ingredient) => {
-    //         // Skip ingredient takeout for now
-    //         const ingName = s.turnIngObjIntoStr(ingredient);
-    //         const needsWashed = ingredient.wash === true ? ' and wash' : '';
-    //         const iUnit: any = ingredient.unit
+    //     // Close the recipe container div
+    //     this.recipeHtml += "</div>"
 
-    //         const unitString = s.convertUnitIntoStr(iUnit['name'], ingredient['quantity']);
-
-    //         this.recipeHtml += this.generateStep(`${ingName} ${unitString} ${needsWashed}`);
-    //         if (ingredient.isMeatProduct === true) {
-    //             this.vegan = false;
-    //         }
-    //     });
-
-    //     this.recipeHtml += this.generateHeader('Nutrition');
-
-    //     this.metricsToShow.forEach((metric) => {
-    //         let metricText = `<h4><b>${Math.round(this.estimates[metric])} ${metric}</b>`;
-
-    //         if (this.estimatesMissing[metric].length >= 1) {
-    //             let missingDataText = `${this.estimatesMissing[metric].join('/')}`;
-
-    //             if (missingDataText.length > 20) {
-    //                 // Truncate
-    //                 missingDataText = `${missingDataText.substring(0, 20)}...`
-    //             }
-    //             metricText += ' ('
-    //             metricText += missingDataText
-    //             metricText += 'Data Missing)'
-    //         }
-
-    //         metricText += '</h4>'
-
-    //         this.recipeHtml += metricText;
-    //     });
-
-    //     if (this.vegan === true) {
-    //         this.recipeHtml += this.generateHeader('Vegan Recipe');
-    //     } else {
-    //         this.recipeHtml += this.generateHeader('Recipe');
-    //     }
-    // }
-
-    public generateStepText(steps) {
-        let stepText = '';
-
-        steps.forEach((item) => {
-            // How do we get more fine grain
-            // Example object == IItemObj
-            if (typeof item === 'string') {
-                stepText += item;
-            } else if (item.type === 'timer') {
-                stepText += item.text;
-            } else if (typeof item === 'object') {
-                if (item.hasOwnProperty('quantity')) {
-                    stepText += s.turnIngObjIntoStr(item, true);
-                } else {
-                    // Equipment
-                    stepText += item.name
-                }
-            }
-            stepText += ' ';
-        });
-
-        return stepText;
-    }
-
-    // private addAsyncText(step, asyncText, foundArray = false) {
-    //     // console.log('----')
-    //     // console.log(step)
-    //     // console.log(asyncText)
-    //     // console.log('----')
-
-    //     // We only need to look at the first object because we are prepending the text
-    //     if (step[0].type === 'timer') {
-    //         // Prepend asyncText to any timers
-    //         step[0].text = `${asyncText}${step[0].text}`
-    //     } else if (step[0].hasOwnProperty('quantity')) {
-    //         // If object add an element in the beginning
-    //         step.unshift(asyncText)
-    //     } else if ((typeof step[0] === 'string' || step[0] instanceof String)) {
-    //         // If string just prepend string
-    //         step[0]  = `${asyncText}${step[0] }`
-    //     } else if (Array.isArray(step[0]) && foundArray === false) {
-    //         // If array need to add to each array, can only be one level of nestedness
-    //         for (let i = 0; i < step[0].length; i++) {
-    //             step[0][i] = this.addAsyncText(step[0][i], asyncText, true)
-    //         }
-    //     }
-
-    //     return step
-    // }
-
-    public generateRow(step) {
-        let stepDirections = '';
-
-        // Flatten any [[], []] arrays)
-        if (Array.isArray(step[0])) {
-            step.forEach((istep) => {
-                stepDirections += this.generateRow(istep)
-            })
-            return stepDirections
-        }
-
-        // Add any timer to time here
-        // We do this before async timers because they happen in the background
-        if (step[0].type === 'timer') {
-            // Incrementing the rough estimate of how long the recipe will take.
-            this.timeEstimateMilliseconds += step[0].milliseconds;
-        }
-
-        // Add async text to next step
-        if (step[0] === Async.step) {
-            let asyncText = '';
-            let count = ''
-
-            while (step[0] === Async.step) {    
-                step.shift()
-                count += '-'
-            }
-
-            asyncText = `${count}> ${asyncText}`
-
-            // Add back if you want to show an indicator for async, rather than just have people click this recipe
-            // step = this.addAsyncText(step, asyncText)
-
-            return this.generateRow(step)
-        }
-
-        if (step[0].type === 'timer') {
-            return this.generateTimerStep(step[0]);
-        } else {
-            const stepText = this.generateStepText(step);
-
-            stepText.trim();
-            stepDirections = this.generateStep(stepText);
-
-            return stepDirections;
-        }
-    }
-
-    public addEquipmentFromRow(step) {
-        step.forEach(element => {
-
-            // IEquipment
-            if (element.hasOwnProperty('id')) {
-
-                // Init for this equipment
-                if (this.equipment.hasOwnProperty(element.name) == false) {
-                    this.equipment[element.name] = 0;
-                }
-
-                this.equipment[element.name] += 1
-            }
-
-        });
-    }
-
-    public addIngredientFromRow(step) {
-        step.forEach(element => {
-
-            // Flatten any [[], []] arrays)
-            if (Array.isArray(element)) {
-                return this.addIngredientFromRow(element)
-            }
-
-
-            // IItem
-            if (element.hasOwnProperty('quantity')) {
-
-                // Dont need to add any ingredients that have no qunatities
-                if (element.quantity === 0 && element.unit === null ) {
-                    return;
-                }
-
-                // Init for this ingredient
-                if (this.ingredients.hasOwnProperty(element.name) == false) {
-                    this.ingredients[element.name] = [];
-                }
-
-                // Add to the array of all qunatites and units provided for the ingredient
-                this.ingredients[element.name].push({
-                    "quantity": element.quantity,
-                    "unit": element.unit.name
-                })
-            }
-
-        });
-    }
-
-    private generateVisibilityToggles() {
-        this.recipeHtml += `<a href="#" 
-        onclick="document.getElementById('ingredients').style.display='inline'">Show Ingrendients</a>`
-        this.recipeHtml += '\t'
-        this.recipeHtml += `<a href="#" 
-        onclick="showAllSteps()">Show All Steps</a>`
-    }
-
-    private generateIngredientListHtml() {
-        let ingredientsOnlyOneUnit = Units.greatCommonDenominator(this.ingredients)
-        this.recipeHtml += "<div id='ingredients' style='display: none' >"
-        this.recipeHtml += this.generateHeader('Get out the following ingredients:');
-
-        Object.keys(ingredientsOnlyOneUnit).forEach(ingredient => {
-            let ingredientAmount = ingredientsOnlyOneUnit[ingredient][0]
-            this.recipeHtml += this.generateStep(`${ingredient} ${ingredientAmount.quantity} ${ingredientAmount.unit}`, true)
-        });
-        this.recipeHtml += "</div>"
-    }
-
-    // TODO Should be a new section after recipe that says clean excess ingredients
-    // Like .5 red onion we should put away the other half
-    public printRecipe(): void {
-        let stepsHtml = '';
-        this.steps.push(["FINISHED"])
-        
-        // If autoShow, then display the recipe
-        if (this.autoShow) {
-            this.recipeHtml += `<div id="${this.constructor.name}">`;
-        } else {
-            this.recipeHtml += `<div id="${this.constructor.name}" style="display: none">`;
-        }
-
-        this.steps.forEach((step) => {
-            stepsHtml += this.generateRow(step);
-
-            this.addIngredientFromRow(step);
-            this.addEquipmentFromRow(step);
-        });
-
-        this.generateIngredientListHtml()
-        this.generateVisibilityToggles()
-
-        // // This is calculated when the steps are parsed
-        const estimatedTime = Math.round(this.timeEstimateMilliseconds / 60000);
-
-        this.recipeHtml += this.generateHeader(`Estimated Time: ${estimatedTime} Minutes`);
-        this.recipeHtml += this.generateHeader('Recipe:')
-
-        // Equipment Cleanup TODO Make more robust
-        if (this.equipment.hasOwnProperty(Equipment.instantPot().name)) {
-            stepsHtml += this.generateRow(['Put inner instant pot liner on stove']);
-        }
-
-        this.recipeHtml += stepsHtml
-
-        // Close the recipe container div
-        this.recipeHtml += "</div>"
-
-        return
+    //     return
     }
 }

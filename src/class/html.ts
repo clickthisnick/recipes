@@ -24,7 +24,7 @@ export class HTML {
         text-align: center;
         font-size: 28px;
         padding: 20px;
-        width: 200px;
+        width: 400px;
         transition: all 0.5s;
         cursor: pointer;
         margin: 5px;
@@ -56,6 +56,132 @@ export class HTML {
 
     public static javascript = `
        <script>
+          let recipeSteps = {}
+          let selectedRecipes = []
+          let selectedRecipeNames = []
+          let ingredients = {}
+          let mode = ''
+
+          function setSteps(recipeName, steps) {
+              if (recipeSteps.hasOwnProperty(recipeName) === false) {
+                recipeSteps[recipeName] = []
+              }
+              recipeSteps[recipeName].push(steps)
+          }
+
+          function generateHtml() {
+              // Reset root incase we are dynamically doing things
+              let root = document.getElementById('root')
+              root.innerHTML = ''
+
+            // recipeSteps.forEach(step => {
+            //     root.innerHTML += step.text
+            //     root.innerHTML += '<br>'
+            // })
+          }
+
+          function selectMode(id) {
+            showElement(id)
+            showElement('select')
+            mode = id
+
+              hideElement('cookingButton')
+              hideElement('shoppingButton')
+          }
+
+          function selectRecipe(recipeName) {
+                selectedRecipeNames.push(recipeName)
+                selectedRecipes.push(recipeSteps[recipeName])
+          }
+
+          function addIngredient(istep) {
+                istep.ingredients.forEach(ingredient => {
+                    if (ingredients.hasOwnProperty(ingredient.name) === false) {
+                        ingredients[ingredient.name] = {}
+                    }
+    
+                    // Unit could be null
+                    if (ingredient.unit !== null && ingredient.quantity > 0) {
+                        if (ingredients[ingredient.name].hasOwnProperty(ingredient.unit.name) === false) {
+                            ingredients[ingredient.name][ingredient.unit.name] = 0
+                        }
+    
+                        ingredients[ingredient.name][ingredient.unit.name] += ingredient.quantity
+                    }
+                })
+
+                if (istep.children.length > 0) {
+                    istep.children.forEach(child => {
+                        addIngredient(child);
+                    })
+                }  
+          }
+
+          function addStep(istep) {
+                if (istep.showTimer) {
+                    document.getElementById('cooking').innerHTML += '<div class="panel" id="panel-' + istep.id + '" onclick="this.classList.toggle(' + "'timer'" + '); loadTimer(' + istep.duration * 1000 + ', ' + istep.id + ')"><span id="' + istep.id + '"></span>' + istep.text + '</div>';
+                } else {
+                    document.getElementById('cooking').innerHTML += '<div id="panel-0" class="panel" style="" onclick="this.classList.toggle(' + "'completed'" + ')" >' + istep.text + '</div>'
+                }
+
+                if (istep.children.length > 0) {
+                    istep.children.forEach(child => {
+                        addStep(child);
+                    })
+                }  
+          }
+
+        function doneSelectingRecipes() {
+            hideElement('select')
+
+            if (mode === 'shopping') {
+                // Get all ingredients across all recipes
+                selectedRecipes.forEach(recipe => {
+                    recipe.forEach(istep => {
+                        addIngredient(istep);
+                    })
+                })
+    
+                // Show ingredients to the user
+                document.getElementById('shopping').innerHTML += '<br>'
+                document.getElementById('shopping').innerHTML += selectedRecipeNames
+                document.getElementById('shopping').innerHTML += '<br>'
+
+                Object.keys(ingredients).forEach(ingredient => {
+                    Object.keys(ingredients[ingredient]).forEach(unit => {
+                        document.getElementById('shopping').innerHTML += '<div id="panel-0" class="panel" style="" onclick="this.classList.toggle(' + "'completed'" + ')" >' + ingredient + ' ' + ingredients[ingredient][unit] + ' ' + unit + '</div>'
+                    })
+                })
+            } else {
+                selectedRecipes.forEach(recipe => {
+                    recipe.forEach(istep => {
+                        addStep(istep)
+                    })
+                })
+            }
+        }
+
+          function showElement(id) {
+            document.getElementById(id).style.display="inline"
+          }
+
+          function hideElement(id) {
+            document.getElementById(id).style.display="none"
+          }
+        
+
+
+
+
+
+
+
+
+
+
+
+
+       // This is where my new recipe app ends
 
        function setIntervalX(callback, delay, repetitions) {
            var x = 0;

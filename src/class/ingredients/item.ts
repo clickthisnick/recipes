@@ -1,4 +1,6 @@
 import { IUnitObj } from '../../constants/units';
+import { IStep, istep } from '../step';
+import { Serializer as s } from '../serializer';
 
 export interface IEstimates {
     calories?: number;
@@ -76,20 +78,26 @@ export class Item {
         this.unit = unit
     }
 
-    public season(ingredients: any): any {
-        if (Array.isArray(ingredients)) {
-            let finalArray: any = [];
-            
-            finalArray.push(['Season', this.name, 'with the following'])
+    public season(ingredients: any): IStep {
+        let addIStep = istep()
 
+        if (Array.isArray(ingredients)) {
+            addIStep.text = ['Season', this.name, 'with the following'].join(' ')
+            addIStep.disappearWhen = 'childrenGone'
             ingredients.forEach((ingredient) => {
-                finalArray.push(['  >   ', ingredient])
+                let addIngredient = istep()
+                addIngredient.text = ['•', s.turnIngObjIntoStr(ingredient, true)].join(' ')
+                addIngredient.ingredients.push(ingredient)
+                addIngredient.time += ingredient.takeOutTime
+                addIStep.children.push(addIngredient)
             })
 
-            return finalArray
+            return addIStep
         }
 
-        return ['Season', this.name, 'with', ingredients]
+        addIStep.text = ['Season', this.name, 'with', s.turnIngObjIntoStr(ingredients)].join(' ')
+        addIStep.ingredients.push(ingredients)
+        return addIStep
     }
 
     public mixIn(ingredients: any): any {
