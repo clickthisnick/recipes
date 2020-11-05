@@ -433,7 +433,7 @@ export class Recipe {
         // });
         this.steps.forEach(stepz => {
             html += `<script>setSteps('${recipeName}', ${JSON.stringify(stepz)})</script>`
-        })    
+        })
         return html    
 
     //     let stepsHtml = '';

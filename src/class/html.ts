@@ -61,6 +61,27 @@ export class HTML {
           let selectedRecipeNames = []
           let ingredients = {}
           let mode = ''
+          
+          const parseParams = (querystring) => {
+
+                // parse query string
+                const params = new URLSearchParams(querystring);
+            
+                const obj = {};
+            
+                // iterate over all keys
+                for (const key of params.keys()) {
+                    if (params.getAll(key).length > 1) {
+                        obj[key] = params.getAll(key);
+                    } else {
+                        obj[key] = params.get(key);
+                    }
+                }
+            
+                return obj;
+            };
+
+          let queryString = parseParams(window.location.search)
 
           function setSteps(recipeName, steps) {
               if (recipeSteps.hasOwnProperty(recipeName) === false) {
@@ -119,9 +140,9 @@ export class HTML {
 
           function addStep(istep) {
                 if (istep.showTimer) {
-                    document.getElementById('cooking').innerHTML += '<div class="panel" id="panel-' + istep.id + '" onclick="this.classList.toggle(' + "'timer'" + '); loadTimer(' + istep.duration * 1000 + ', ' + istep.id + ')"><span id="' + istep.id + '"></span>' + istep.text + '</div>';
+                    document.getElementById('cooking').innerHTML += '<div class="panel" id="panel-' + istep.id + '" onclick="this.classList.toggle(' + "'timer'" + '); loadTimer(' + istep.duration * 1000 + ', ' + istep.id + '); document.getElementById("panel-' + istep.id + '").remove();"><span id="' + istep.id + '"></span>' + istep.text + '</div>';
                 } else {
-                    document.getElementById('cooking').innerHTML += '<div id="panel-0" class="panel" style="" onclick="this.classList.toggle(' + "'completed'" + ')" >' + istep.text + '</div>'
+                    document.getElementById('cooking').innerHTML += '<div id="panel-0" class="panel" style="" onclick="this.classList.toggle(' + "'completed'" + '); document.getElementById("panel-' + istep.id + '").remove();" >' + istep.text + '</div>'
                 }
 
                 if (istep.children.length > 0) {
@@ -130,6 +151,19 @@ export class HTML {
                     })
                 }  
           }
+
+          function saveShoppingUrl() {
+              <!-- Converts ingredients to a url with query parameters -->
+              <!-- query parameters = ?mode=shopping&asparagus=["tsb",%201] -->
+              <!-- ingredients = {asparagus: {tsb: 1}} -->
+              let queryParamter = document.location.href.split('?')[0] + '?mode=shopping' + '&recipes=' + selectedRecipeNames
+              Object.keys(ingredients).forEach(ingredient => {
+                  let unit = Object.keys(ingredients[ingredient])[0]
+                  queryParamter += '&' + ingredient + '=["' + unit + '", %20' + ingredients[ingredient][unit] + ']'
+              })
+              document.getElementById('shoppingUrl').innerHTML = queryParamter + "<br>"
+          }
+
 
         function doneSelectingRecipes() {
             hideElement('select')
@@ -149,7 +183,9 @@ export class HTML {
 
                 Object.keys(ingredients).forEach(ingredient => {
                     Object.keys(ingredients[ingredient]).forEach(unit => {
-                        document.getElementById('shopping').innerHTML += '<div id="panel-0" class="panel" style="" onclick="this.classList.toggle(' + "'completed'" + ')" >' + ingredient + ' ' + ingredients[ingredient][unit] + ' ' + unit + '</div>'
+                        <!-- On click it deletes the ingredient from the array of ingredients -->
+                        <!-- TODO once you delete an ingredient it remove all types from the ingredient list -->
+                        document.getElementById('shopping').innerHTML += '<div id="shopping-' + ingredient + '" class="panel" style="" onclick="this.classList.toggle(' + "'completed'" + "); document.getElementById('shopping-" + ingredient + "').remove(); delete ingredients['" + ingredient + "'" + '];" >' + ingredient + ' ' + ingredients[ingredient][unit] + ' ' + unit + '</div>'
                     })
                 })
             } else {
@@ -169,10 +205,6 @@ export class HTML {
             document.getElementById(id).style.display="none"
           }
         
-
-
-
-
 
 
 
