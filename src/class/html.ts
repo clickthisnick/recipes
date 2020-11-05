@@ -116,13 +116,13 @@ export class HTML {
           }
 
           function addIngredient(istep) {
-                istep.ingredients.forEach(ingredient => {
-                    if (ingredients.hasOwnProperty(ingredient.name) === false) {
-                        ingredients[ingredient.name] = {}
-                    }
-    
-                    // Unit could be null
+                istep.ingredients.forEach(ingredient => {    
+                    // Unit could be null, dont add ingredient whose unit is null - item('hamburger') is an example of that
                     if (ingredient.unit !== null && ingredient.quantity > 0) {
+                        if (ingredients.hasOwnProperty(ingredient.name) === false) {
+                            ingredients[ingredient.name] = {}
+                        }
+
                         if (ingredients[ingredient.name].hasOwnProperty(ingredient.unit.name) === false) {
                             ingredients[ingredient.name][ingredient.unit.name] = 0
                         }
@@ -159,8 +159,11 @@ export class HTML {
               let queryParamter = document.location.href.split('?')[0] + '?mode=shopping' + '&recipes=' + selectedRecipeNames
               Object.keys(ingredients).forEach(ingredient => {
                   let unit = Object.keys(ingredients[ingredient])[0]
-                  queryParamter += '&' + ingredient + '=["' + unit + '", %20' + ingredients[ingredient][unit] + ']'
+                  <!-- url encode - example - replace any spaces with %20 -->
+                  queryParamter += '&' + encodeURI(ingredient) + '=["' + unit + '", %20' + ingredients[ingredient][unit] + ']'
               })
+
+              
               document.getElementById('shoppingUrl').innerHTML = queryParamter + "<br>"
           }
 
