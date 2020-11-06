@@ -21,7 +21,11 @@ class NinjaSouvideSteak extends Recipe {
     constructor() {
         super();
         this.steps = [
-            text.set(['Rub the', i.topSirloin(1, u.pound), 'with', i.thyme(2, u.dash)]),
+            i.topSirloin(1, u.pound).season([
+                i.thyme(2, u.dash),
+                i.seaSalt(2, u.dash),
+                i.blackPepper(2, u.dash),
+            ]),
             Timer.set(60, 'm', 'Souvide steak at 132 degrees'),
             e.ninja().preheat(500),
             e.ninja().add(i.topSirloin()),
@@ -29,6 +33,7 @@ class NinjaSouvideSteak extends Recipe {
             text.set(['Flip steak']),
             e.ninja().cook(1.5, 'm', 500),
             Timer.set(15, 'm', 'Let steak rest'),
+            i.topSirloin().season(i.steakSauce(1, u.unit))
         ];
     }
 }

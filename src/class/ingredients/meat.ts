@@ -1,4 +1,4 @@
-import { IItem } from './item';
+import { IItem, Item } from './item';
 import { IUnitObj, Units as u } from '../../constants/units';
 import { FruitItems } from './fruit';
 
@@ -48,19 +48,20 @@ export class MeatItems extends FruitItems {
         },
     })
 
-    public static readonly topSirloin: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Top Sirloin',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: true,
-        nutrition: {
-        }
-    })
+    public static readonly topSirloin = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'top sirloin', // Name
+            10, // Put away time
+            10, // Take out time
+            '', // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakeoutunitable
+            true, // isMeatProduct
+            {}, // Nutrition
+            unit, // Unit
+        )
+    )
 
     public static readonly babyBackRibs: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Baby Back Ribs',

@@ -82,7 +82,8 @@ export class Item {
         let addIStep = istep()
 
         if (Array.isArray(ingredients)) {
-            addIStep.text = ['Season', this.name, 'with the following'].join(' ')
+            addIStep.text = ['Season', s.turnIngObjIntoStr(this, true), 'with the following'].join(' ')
+            addIStep.ingredients.push(this)
             addIStep.disappearWhen = 'childrenGone'
             ingredients.forEach((ingredient) => {
                 let addIngredient = istep()
