@@ -10,7 +10,7 @@ export class MealRecipe extends Recipe {
         this.recipeGroup = c.pasta;
         this.addIngredients([
             i.zuchinni(2),
-            i.babyBella(3),
+            i.babyBellaMushroom(3),
             i.garlicClove(2),
             i.parmessanCheese(.25, u.cup),
             i.vegetableOil(2, u.second),
@@ -26,7 +26,7 @@ export class MealRecipe extends Recipe {
             ['Put', this.get(i.vegetableOil()), 'in pantelligent on 4'],
             ['Chop', this.get(i.garlicClove())],
             [Timer.set(5, 's', 'for pan to be hot')],
-            ['Put in', this.get(i.babyBella()), 'and', this.get(i.garlicClove())],
+            ['Put in', this.get(i.babyBellaMushroom()), 'and', this.get(i.garlicClove())],
             [Timer.set(3, 'm', 'for vegetables to be cooked')],
             [this.get(i.spiriliazer()), this.get(i.zuchinni())],
             ['Put zuchinni in pan'],

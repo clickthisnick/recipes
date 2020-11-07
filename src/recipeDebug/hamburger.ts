@@ -4,6 +4,7 @@ import { Equipment as e } from '../class/equipment';
 import { Categories as c } from '../constants/categories';
 import { Units as u } from '../constants/units';
 import { Text as text} from '../class/text';
+import { Timer } from '../class/timer';
 
 export class MealRecipe extends RecipeContainer {
     constructor() {
@@ -28,14 +29,19 @@ class Hamburgers extends Recipe {
                 i.garlicPowder(2, u.dash)
             ]),
             text.set(['Flip hamburgers']),
-            e.pan().cook(6, 'm', 5),
+            e.pan().add([
+                i.babyBellaMushroom(5, u.slice),
+                i.redOnion(5, u.slice),
+            ]),
+            e.pan().cook(7, 'm', 5),
             i.item('hamburger').season([
                 i.smokedPaprika(2, u.dash),
                 i.chilliPowder(2, u.dash),
                 i.garlicPowder(2, u.dash)
             ]),
             text.set(['Flip hamburgers']),
-            e.pan().cook(6, 'm', 5),
+            e.pan().cook(7, 'm', 5),
+            Timer.set(5, 'm', 'Let food rest')
         ];
     }
 }

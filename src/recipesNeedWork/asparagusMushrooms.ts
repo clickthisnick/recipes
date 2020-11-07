@@ -8,7 +8,7 @@ export class MealRecipe extends Recipe {
         this.recipeGroup = c.vegetables;
         this.addIngredients([
             i.asparagus(),
-            i.babyBella(),
+            i.babyBellaMushroom(),
             i.garlicClove(),
         ]);
     }
@@ -18,7 +18,7 @@ export class MealRecipe extends Recipe {
         this.addSteps([
             ['Cut ends of the', this.get(i.asparagus())],
             ['Mince the', this.get(i.garlicClove())],
-            ['Wash the', this.get(i.babyBella())],
+            ['Wash the', this.get(i.babyBellaMushroom())],
             ['Put everything in pan and season with salt free seasoning'],
             ['Cook 5 minutes of heat 5 with lid'],
             ['Season with salt'],

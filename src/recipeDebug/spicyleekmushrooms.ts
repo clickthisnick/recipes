@@ -26,11 +26,11 @@ class LeekMushroom extends Recipe {
             text.set(['Cut in half', i.leek(2, u.unit)]),
             text.set(['Cut leek in strips and soak in glass bowl of water']),
             text.set(['Chop', i.garlicClove(2, u.unit)]),
-            text.set(['Cut', i.babyBella(5, u.unit)]),
+            text.set(['Cut', i.babyBellaMushroom(5, u.unit)]),
             e.pan().add([
                 i.leek(),
                 i.garlicClove(),
-                i.babyBella(),
+                i.babyBellaMushroom(),
             ]),
             e.pan().cook(5, 'm'),
             e.pan().add([

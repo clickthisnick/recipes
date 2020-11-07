@@ -841,8 +841,8 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly babyBella: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Baby Bella',
+    public static readonly babyBellaMushroom: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'Baby Bella Mushroom',
         putAwayTime: 10,
         takeOutTime: 10,
         cleanSteps: '',
