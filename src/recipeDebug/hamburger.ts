@@ -20,7 +20,7 @@ class Hamburgers extends Recipe {
     constructor() {
         super();
         this.steps = [
-            text.set(['Form 2, 1 inch hamburgers with', i.groundBeef(1, u.pound)]),
+            text.set(['Form 2, 1 inch hamburgers with', i.groundBeef8020(1, u.pound)]),
             e.pan().add(i.item('hamburgers')),
             e.pan().cook(6, 'm', 5),
             i.item('hamburger').season([
