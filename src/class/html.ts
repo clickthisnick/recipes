@@ -140,9 +140,44 @@ export class HTML {
 
           function addStep(istep) {
                 if (istep.showTimer) {
-                    document.getElementById('cooking').innerHTML += '<div class="panel" id="panel-' + istep.id + '" onclick="this.classList.toggle(' + "'timer'" + '); loadTimer(' + istep.duration * 1000 + ', ' + istep.id + '); document.getElementById("panel-' + istep.id + '").remove();"><span id="' + istep.id + '"></span>' + istep.text + '</div>';
+                    <!-- Only double quote should be around the onclick -->
+                    let divStep = ''
+                    divStep += "<div class='panel' id='panel-"
+                    divStep += istep.id + "' "
+                    divStep += 'onclick="this.classList.toggle('
+                    divStep += "'timer'"
+                    divStep += "); loadTimer("
+                    divStep += istep.duration * 1000
+                    divStep += ", "
+                    divStep += istep.id
+                    divStep += "); document.getElementById('panel-"
+                    divStep += istep.id
+                    divStep += "').remove();"
+                    divStep += '"><span id='
+                    divStep += "'"
+                    divStep += istep.id
+                    divStep += "'></span>"
+                    divStep += istep.text
+                    divStep += "</div>";
+                    document.getElementById('cooking').innerHTML += divStep
                 } else {
-                    document.getElementById('cooking').innerHTML += '<div id="panel-0" class="panel" style="" onclick="this.classList.toggle(' + "'completed'" + '); document.getElementById("panel-' + istep.id + '").remove();" >' + istep.text + '</div>'
+                    document.getElementById('cooking').innerHTML += "";
+                    <!-- Only double quote should be around the onclick -->
+                    let divStep = ''
+                    divStep += "<div class='panel' id='panel-"
+                    divStep += istep.id + "' "
+                    divStep += 'onclick="this.classList.toggle('
+                    divStep += "'timer'"
+                    divStep += "); document.getElementById('panel-"
+                    divStep += istep.id
+                    divStep += "').remove();"
+                    divStep += '"><span id='
+                    divStep += "'"
+                    divStep += istep.id
+                    divStep += "'></span>"
+                    divStep += istep.text
+                    divStep += "</div>";
+                    document.getElementById('cooking').innerHTML += divStep
                 }
 
                 if (istep.children.length > 0) {

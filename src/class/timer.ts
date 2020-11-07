@@ -17,7 +17,7 @@ export class Timer {
         let step = istep()
         step.time = Time.convert(duration, type),
         step.showTimer = true
-        step.text = text
+        step.text = text + `(${Time.convert(duration, type)})`
         step.disappearWhen = 'timesUp'
         return step
     }
