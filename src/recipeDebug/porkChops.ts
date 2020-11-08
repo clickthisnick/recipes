@@ -21,6 +21,12 @@ class PorkChops extends Recipe {
         super();
         this.steps = [
             e.ninja().preheat(500),
+            i.porkChops(4, u.unit).season([
+                i.smokedPaprika(2, u.dash),
+                i.onionGranules(2, u.dash),
+                i.garlicPowder(2, u.dash),
+                i.chilliPowder(2, u.dash),
+            ]),
             Timer.end(),
             e.ninja().add(i.porkRoast(4, u.unit)),
             e.ninja().cook(8, 'm', 500),

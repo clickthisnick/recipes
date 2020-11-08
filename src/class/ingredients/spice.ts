@@ -342,6 +342,19 @@ export class SpiceItems extends SauceItems {
         nutrition: {},
     })
 
+    public static readonly onionGranules: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'onion granules',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: true,
+        isMeatProduct: false,
+        nutrition: {},
+    })
+
     public static readonly driedOnion: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Dried Onion',
         putAwayTime: 10,

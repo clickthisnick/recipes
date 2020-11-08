@@ -193,18 +193,20 @@ export class AnimalItems {
         nutrition: {},
     })
 
-    public static readonly porkChops: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Pork Chops',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: true,
-        nutrition: {},
-    })
+    public static readonly porkChops = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Pork Chops', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            true, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+        )
+    )
 
     public static readonly bonelessRibClubSteak: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Boneless Rib Club Steak',

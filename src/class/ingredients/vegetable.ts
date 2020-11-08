@@ -254,16 +254,16 @@ export class VegetableItems extends SpiceItems {
 
     public static readonly asparagus = (quantity: number = 0, unit: IUnitObj | null = null) => (
         new Item(
-            'asparagus',
-            10,
-            10,
-            '',
-            quantity,
-            false,
-            false,
-            false,
-            {},
-            unit,
+            'asparagus', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
         )
     )
 
