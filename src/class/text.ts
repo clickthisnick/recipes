@@ -11,7 +11,7 @@ export class Text {
 
         texts.forEach(text => {
             if (typeof text === 'object') {
-                textArray.push(s.turnIngObjIntoStr(text, false))
+                textArray.push(s.turnIngObjIntoStr(text, true))
                 ingredientsArray.push(text)
                 
             } else {

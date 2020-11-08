@@ -82,7 +82,6 @@ class Container {
                 let addIngredient = istep()
                 if (Array.isArray(ingredient)) {
                     ingredient.forEach((ingredientNText) => {
-                        console.log(ingredientNText)
                         if (typeof(ingredientNText) === 'object') {
                             addIngredient.text = ['•', s.turnIngObjIntoStr(ingredientNText, true)].join(' ')
                             addIngredient.ingredients.push(ingredientNText)
