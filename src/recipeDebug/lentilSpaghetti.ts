@@ -28,6 +28,7 @@ export class WholeFoodsLentilPenne extends Recipe {
             ]),
             text.set(['Stir instant pot and break up pasta']),
             e.instantPot().pressureCook(15, 11, 'm'),
+            text.set(['Top with', i.parmessanCheese(8, u.ounce)]),
         ];
     }
 }
