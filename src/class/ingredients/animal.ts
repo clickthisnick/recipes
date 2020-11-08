@@ -194,7 +194,7 @@ export class AnimalItems {
     })
 
     public static readonly porkChops: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Pork Roast',
+        name: 'Pork Chops',
         putAwayTime: 10,
         takeOutTime: 10,
         cleanSteps: '',
