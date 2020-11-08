@@ -23,7 +23,6 @@ class NinjaSouvideSteak extends Recipe {
         this.steps = [
             i.topSirloin(1, u.pound).season([
                 i.thyme(2, u.dash),
-                i.seaSalt(2, u.dash),
                 i.blackPepper(2, u.dash),
             ]),
             Timer.set(60, 'm', 'Souvide steak at 132 degrees'),
