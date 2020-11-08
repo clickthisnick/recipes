@@ -24,7 +24,7 @@ class ButterChicken extends Recipe {
         super();
     }
     public generateRecipe() {
-        this.addIngredients([
+        this.addIngredients([ 
             i.oliveOil(1, u.tbsp),
             i.butter(1, u.tbsp),
             i.whiteOnion(1, u.unit),

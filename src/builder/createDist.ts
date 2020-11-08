@@ -12,7 +12,7 @@ let pageHtml = ''
 pageHtml += HTML.mobileViewport;
 pageHtml += HTML.chartSet;
 pageHtml += HTML.css;
-pageHtml += HTML.javascript;
+pageHtml += HTML.javascript();
 // Shopping mode allows you to select recipes and get all the ingredients needed for all recipes
 // Cooking mode allows you to select recipes and optimizes the cooking
 pageHtml += `<button id="shoppingButton" onclick="selectMode('shopping')">Shopping Mode</button><button id="cookingButton" onclick="selectMode('cooking')">Cooking Mode</button><br>`

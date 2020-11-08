@@ -41,7 +41,8 @@ class Hamburgers extends Recipe {
             ]),
             text.set(['Flip hamburgers']),
             e.pan().cook(7, 'm', 5),
-            Timer.set(5, 'm', 'Let food rest')
+            text.set(['Flip hamburgers']),
+            Timer.set(5, 'm', 'Turn off heat and let food rest in pan')
         ];
     }
 }

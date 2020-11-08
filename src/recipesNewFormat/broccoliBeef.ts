@@ -1,6 +1,6 @@
 import { Recipe, RecipeContainer } from '../class/recipe';
 import { Items as i } from '../constants/items';
-import { Equipment as e } from '../constants/equipment';
+import { Equipment as e } from '../class/equipment';
 import { Categories as c } from '../constants/categories';
 import { Timer } from '../class/timer';
 import { Units as u } from '../constants/units';
