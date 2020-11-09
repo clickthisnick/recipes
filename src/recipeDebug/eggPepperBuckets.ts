@@ -20,7 +20,7 @@ class EggPepperBuckets extends Recipe {
     constructor() {
         super();
         this.steps = [
-            e.pan().add(i.avacadoOil(2, u.second)),
+            e.pan().add(i.avacadoOil(1, u.second)),
             e.pan().preheat(6, 2),
             text.set(['Cut into 4 horitzontal buckets the', i.bellPepper(1, u.unit)]),
             Timer.end(),
@@ -30,6 +30,24 @@ class EggPepperBuckets extends Recipe {
             text.set(['Flip', i.bellPepper()]),
             text.set(['Crack', i.egg(4, u.unit), 'and put into the horizontal slices of', i.bellPepper()]),
             e.pan().cook(3, 'm'),
+            i.item('egg').season([
+                i.smokedPaprika(1, u.dash),
+                i.chilliPowder(1, u.dash),
+                i.blackPepper(1, u.dash),
+                i.seaSalt(1, u.dash),
+            ]),
+            Timer.end(),
+            text.set(['Flip', i.bellPepper()]),
+            i.item('egg').season([
+                i.smokedPaprika(1, u.dash),
+                i.chilliPowder(1, u.dash),
+                i.blackPepper(1, u.dash),
+                i.seaSalt(1, u.dash),
+            ]),
+            e.pan().cook(1, 'm'),
+            Timer.end(),
+            Timer.set(1, 'm', 'For runny serve immediatly, otherwise let rest a minute'),
+            Timer.end(),
         ];
     }
 }
