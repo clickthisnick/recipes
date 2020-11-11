@@ -26,12 +26,17 @@ class NinjaSouvideSteak extends Recipe {
                 i.blackPepper(2, u.dash),
             ]),
             Timer.set(60, 'm', 'Souvide steak at 132 degrees'),
+            Timer.end(),
             e.ninja().preheat(500),
+            Timer.end(),
             e.ninja().add(i.topSirloin()),
             e.ninja().cook(1.5, 'm', 500),
+            Timer.end(),
             text.set(['Flip steak']),
             e.ninja().cook(1.5, 'm', 500),
+            Timer.end(),
             Timer.set(15, 'm', 'Let steak rest'),
+            Timer.end(),
             i.topSirloin().season(i.steakSauce(1, u.unit))
         ];
     }

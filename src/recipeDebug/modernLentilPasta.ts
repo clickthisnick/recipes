@@ -4,6 +4,7 @@ import { Equipment as e } from '../class/equipment';
 import { Categories as c } from '../constants/categories';
 import { Units as u } from '../constants/units';
 import { Text as text } from '../class/text';
+import { Timer } from '../class/timer';
 
 export class MealRecipe extends RecipeContainer {
     constructor() {
@@ -28,6 +29,7 @@ export class ModernBrandLentilPenne extends Recipe {
             ]),
             text.set(['Stir instant pot and break up pasta']),
             e.instantPot().pressureCook(15, 7, 'm'),
+            Timer.end(),
         ];
     }
 }

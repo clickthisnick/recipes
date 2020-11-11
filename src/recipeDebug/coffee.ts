@@ -24,8 +24,10 @@ class Coffee extends Recipe {
             Timer.set(8.5, 'm', 'Turn stove to "HIGH" (after 9) and wait for whistle'),
             text.set(['Put', i.coffeeGrounds(5, u.scoop), 'into french press bag']),
             text.set(['Put french press bag into french press']),
+            Timer.end(),
             text.set(['Once', e.teapot(), 'whistles - pour water into french press until water level reaches silver chrome part']),
             Timer.set(4, 'm', 'Put top onto french press'),
+            Timer.end(),
             text.set(['Push french press top down']),
             e.coffeecup().add([
                 i.collagenPowder(1, u.scoop),

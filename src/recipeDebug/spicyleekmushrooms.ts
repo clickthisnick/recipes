@@ -4,6 +4,7 @@ import { Categories as c } from '../constants/categories';
 import { Units as u } from '../constants/units';
 import { Equipment as e } from '../class/equipment';
 import { Text as text } from '../class/text';
+import { Timer } from '../class/timer';
 
 export class MealRecipe extends RecipeContainer {
     constructor() {
@@ -27,12 +28,14 @@ class LeekMushroom extends Recipe {
             text.set(['Cut leek in strips and soak in glass bowl of water']),
             text.set(['Chop', i.garlicClove(2, u.unit)]),
             text.set(['Cut', i.babyBellaMushroom(5, u.unit)]),
+            Timer.end(),
             e.pan().add([
                 i.leek(),
                 i.garlicClove(),
                 i.babyBellaMushroom(),
             ]),
             e.pan().cook(5, 'm'),
+            Timer.end(),
             e.pan().add([
                 i.soySauce(1, u.tsp),
                 i.sirachaSauce(.5, u.tbsp),
@@ -40,6 +43,7 @@ class LeekMushroom extends Recipe {
                 i.hoisonSauce(1, u.tsp),
             ]),
             e.pan().cook(2, 'm'),
+            Timer.end(),
         ];
     }
 }

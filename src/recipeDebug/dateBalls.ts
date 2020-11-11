@@ -22,6 +22,7 @@ class DateBalls extends Recipe {
         this.steps = [
             // Technically cashew butter should be 4 cups (64 tbsp) but this is easier since it's 2 full containers
             Timer.set(5, 'm', 'Soak 40 dates in a bowl'), 
+            Timer.end(),
             e.blender().add([
                 [i.pittedDates(40, u.unit), 'checking that there are no pits'],
                 i.cacaoPowderUnsweetened(1, u.cup),
@@ -35,6 +36,7 @@ class DateBalls extends Recipe {
             text.set(['Blend for 10 seconds, stir, repeat until dough like']),
             text.set(['Take a tbsp of batter and cut on cutting board, repeat until no more batter. Makes around 60']),
             Timer.set(60, 'm', 'Put on plastic cutting board and put into freezer'),
+            Timer.end(),
             text.set(['Wash blender while still able to. (Wait a day and its 200% harder to clean)']),
             text.set(['Transfer pieces into plastic container and keep in freezer']),
         ];

@@ -27,7 +27,9 @@ class Sushi extends Recipe {
                 i.water(.5, u.cup)
             ]),
             Timer.set(12, 'm', 'Cook rice in instant pot on low pressure'),
+            Timer.end(),
             Timer.set(10, 'm', 'Let instant pot natural relase'),
+            Timer.end(),
             text.set(['Unplug instant pot heat']),
             e.instantPot().add([
                 i.appleCiderVinegar(1, u.tbsp),
@@ -35,6 +37,7 @@ class Sushi extends Recipe {
             ]),
             e.instantPot().stir(),
             Timer.set(30, 'm', 'Cover instant pot in tinfoil with poked holes and set in fridge'),
+            Timer.end(),
             text.set(['Cook', i.salmon(.25, u.pound), 'on all sides briefly, about 2 min']),
             text.set(['Spoon', i.sushiRice(), 'on', i.seaweed(1, u.unit), 'leaving about an inch of', i.seaweed(), 'uncovered']),
             text.set(['Spread out rice with spoon']),

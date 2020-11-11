@@ -9,6 +9,7 @@ import { Index } from '.';
 // import { IAllIngredientUnits, Units } from '../constants/units';
 import { IAllIngredientUnits } from '../constants/units';
 import { IStep } from './step';
+import { exception } from 'console';
 // import { IEquipmentObj, IAllEquipment, Equipment } from '../constants/equipment';
 // import { IAllEquipment } from './equipment';
 
@@ -184,6 +185,9 @@ export class RecipeContainer {
             recipes.forEach((recipe) => {
                 const initRecipe: Recipe = new recipe();
                 let recipeName = recipe.name; 
+
+                // Ensure the recipe is valid
+                initRecipe.validate(recipeName)
 
                 // Adds the recipe to the javascript variable
                 this.recipeHtml += initRecipe.printRecipe(recipeName)
@@ -421,6 +425,23 @@ export class Recipe {
             step.children.forEach(istepchild => {
                 this.print(istepchild)
             })
+        }
+    }
+
+    public validate(recipeName) {
+        let timers: any[] = []
+        this.steps.forEach(stepz => {
+            if (stepz.showTimer) {
+                timers.push(stepz.text);
+            } else if (stepz.disappearWhen === 'timerIsUp') {
+                timers.shift()
+            }
+        })
+
+        if (timers.length > 0) {
+            console.log(recipeName)
+            console.log(timers)
+            throw new exception('Timers left open');
         }
     }
 

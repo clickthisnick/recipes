@@ -3,7 +3,7 @@ import { Items as i } from '../constants/items';
 import { Categories as c } from '../constants/categories';
 import { Units as u } from '../constants/units';
 import { Equipment as e } from '../class/equipment';
-import { Timer as timer} from '../class/timer';
+import { Timer, Timer as timer} from '../class/timer';
 import { Text as text} from '../class/text';
 // import { time as t } from '../class/time';
 
@@ -26,7 +26,9 @@ class BuffaloKaleBowl extends Recipe {
                 i.water(1.5, u.cup)
             ]),
             e.instantPot().pressureCook(9, 15, 'm'),
+            Timer.end(),
             timer.set(19, 'm', 'Wait'),
+            Timer.end(),
             e.pan().preheat(7),
             text.set(['Put away', i.brownRice()]),
             text.set(['Wash', i.kale(1, u.unit)]),

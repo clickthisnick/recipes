@@ -35,7 +35,9 @@ class BarbequeSauce extends Recipe {
             ]),
             e.saucePan().stir(),
             Timer.set(5, 'm', 'Put sauce pan on heat 5 until boil'),
+            Timer.end(),
             Timer.set(20, 'm', 'Put sauce pan on heat 3 with lid'),
+            Timer.end(),
         ];
     }
 }
