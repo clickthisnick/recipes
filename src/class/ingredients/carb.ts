@@ -198,6 +198,19 @@ export class CarbItems extends AnimalItems {
         nutrition: {}
     })
 
+    public static readonly flaxSeedCereal: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'Flax seed cereal',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Rinse and put measuring cup in dishwasher',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        nutrition: {}
+    })
+
     public static readonly hotdogBunPotato: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Hotdog Bun',
         putAwayTime: 10,
