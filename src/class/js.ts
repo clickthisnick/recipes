@@ -4,6 +4,11 @@ let selectedRecipeNames = []
 let ingredients = {}
 let mode = ''
 
+function playSound(url) {
+    const audio = new Audio(url);
+    audio.play();
+}
+
 function generateHtml() {
     // Reset root incase we are dynamically doing things
     let root = document.getElementById('root')
@@ -278,6 +283,7 @@ function startTimer(duration, stepId, stepIdxToShow, async) {
                 document.getElementById(timerPanelId).style.display = 'none';
                 document.getElementById("panel-" + stepIdxToShow).style.display = 'block';
             }
+            playSound("../src/sounds/pager-beep.mp3")
         }
     }, 1000);
 }
