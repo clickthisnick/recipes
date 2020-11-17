@@ -289,21 +289,25 @@ var timerClicks = {};
 function startTimer(duration, stepId, stepIdxToShow, async) {
     let timerPanelId = "panel-" + stepId
     let timerElement = document.getElementById(timerPanelId);
-    // if (timerClicks.hasOwnProperty(timerPanelId)) {
-    //     timerClicks[timerPanelId] += 1
-    // } else {
-    //     timerClicks[timerPanelId] = 0
-    // }
+    if (timerClicks.hasOwnProperty(timerPanelId)) {
+        timerClicks[timerPanelId] += 1
+    } else {
+        timerClicks[timerPanelId] = 0
+    }
 
-    // if (timerElement.getAttribute('class').includes('timer')) {
-    //     // <!--If you click block 2 times after timer started, then you can skip-- >
-    //     if (timerClicks[timerPanelId] >= 2) {
-    //         //<!--Only show next element if not an async timer-- >
-    //         if (async == false) {
-    //             document.getElementById("panel-" + stepIdxToShow).style.display = 'block';
-    //         }
-    //         document.getElementById(timerPanelId).style.display = 'none';
-    //     }
+    if (timerElement && timerElement.getAttribute('class')) {
+        let timerClass = timerElement.getAttribute('class');
+        if (timerClass && timerClass.includes('timer')) {
+            // <!--If you click block 2 times after timer started, then you can skip-- >
+            if (timerClicks[timerPanelId] >= 2) {
+                //<!--Only show next element if not an async timer-- >
+                // if (async == false) {
+                //     document.getElementById("panel-" + stepIdxToShow).style.display = 'block';
+                // }
+                document.getElementById(timerPanelId).style.display = 'none';
+            }
+        }
+    }
 
     //     return
     // } else {
@@ -332,7 +336,10 @@ function startTimer(duration, stepId, stepIdxToShow, async) {
                 document.getElementById(timerPanelId).style.display = 'none';
                 document.getElementById("panel-" + stepIdxToShow).style.display = 'block';
             }
-            playSound("../src/sounds/pager-beep.mp3")
+
+            if (document.getElementById(timerPanelId).style.display != 'none') {
+                playSound("../src/sounds/pager-beep.mp3")
+            }
         }
     }, 1000);
 }
