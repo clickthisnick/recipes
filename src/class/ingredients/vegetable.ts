@@ -82,6 +82,19 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
+    public static readonly pankoBreadCrumbs: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'Panko Bread Crumbs',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        nutrition: {},
+    })
+
     public static readonly allPurposeFlour: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Flour (All Purpose) Flour',
         putAwayTime: 10,
@@ -200,6 +213,19 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
+    public static readonly celery: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'Celery',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        nutrition: {},
+    })
+    
     public static readonly frozenTatorTots: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Frozen Tator Tots',
         putAwayTime: 10,

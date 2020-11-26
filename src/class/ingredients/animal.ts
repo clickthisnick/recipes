@@ -57,6 +57,32 @@ export class AnimalItems {
         nutrition: {},
     })
 
+    public static readonly chickenStock: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'Chicken Stock',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: true,
+        nutrition: {},
+    })
+
+    public static readonly pepperedSalami: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'Peppered Salami',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: true,
+        nutrition: {},
+    })
+
     public static readonly salmon: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Salmon',
         putAwayTime: 10,

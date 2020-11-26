@@ -277,6 +277,19 @@ export class SpiceItems extends SauceItems {
         nutrition: {},
     })
 
+    public static readonly parsley: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'Parsley',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        nutrition: {},
+    })
+
     public static readonly curryPowder: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'curry powder',
         putAwayTime: 10,

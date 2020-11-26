@@ -141,6 +141,24 @@ export class CarbItems extends AnimalItems {
         }
     })
 
+    public static readonly whiteRice: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'White Rice',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Rinse and put measuring cup in dishwasher',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        nutrition: {
+            [u.cup.name]: {
+                calories: 678.96,
+                sodium: 9.3,
+            }
+        }
+    })
+
     public static readonly brownRice: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Brown Rice',
         putAwayTime: 10,
