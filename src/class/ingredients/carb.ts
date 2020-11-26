@@ -141,6 +141,45 @@ export class CarbItems extends AnimalItems {
         }
     })
 
+    public static readonly fudgeStripedCookie: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'Fudge Stripped Cookie',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: true,
+        isTakoutUnitable: true,
+        isMeatProduct: false,
+        nutrition: {},
+    })
+
+    public static readonly miniaturePeanutButterCups: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'Miniature Peanut Butter Cups',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: true,
+        isTakoutUnitable: true,
+        isMeatProduct: false,
+        nutrition: {},
+    })
+
+    public static readonly orangeFrosting: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'Orange Frosting',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: true,
+        isTakoutUnitable: true,
+        isMeatProduct: false,
+        nutrition: {},
+    })
+
     public static readonly whiteRice: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'White Rice',
         putAwayTime: 10,
