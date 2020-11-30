@@ -3,28 +3,29 @@ import { Items as i } from '../constants/items';
 import { Categories as c } from '../constants/categories';
 import { Units as u } from '../constants/units';
 import { Equipment as e } from '../class/equipment';
-import { Text as text} from '../class/text';
+import { Text as text } from '../class/text';
 import { Timer } from '../class/timer';
 
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
         this.recipeGroup = c.component;
-        this.variations = [Asparagus];
+        this.variations = [
+            LondonBroil
+        ]
     }
 }
 
-class Asparagus extends Recipe {
+class LondonBroil extends Recipe {
     constructor() {
         super();
         this.steps = [
+            text.set(['Marinate meat']),
             e.ninja().preheat(500),
             Timer.end(),
-            e.ninja().add(i.asparagus(.5, u.bunch)),
-            text.set(['Brush', i.asparagus(), 'with', i.oliveOil(1, u.tsp)]),
-            e.ninja().cook(4, 'm', 500),
-            Timer.end(),
-            i.asparagus().season(i.dash(1, u.unit))
+            e.ninja().add([
+                i.londonBroil(1, u.pound),
+            ])
         ];
     }
 }

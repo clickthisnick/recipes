@@ -190,6 +190,15 @@ function showElement(id) {
     document.getElementById(id).style.display = "inline"
 }
 
+function showElementsByClassName(className) {
+    var elements = document.getElementsByClassName(className);
+
+    for (let i = 0; i < elements.length; i++) {
+        let element = elements[i];
+        element.style.display = "inline";    
+    }    
+}
+
 function hideElement(id) {
     document.getElementById(id).style.display = "none"
 }

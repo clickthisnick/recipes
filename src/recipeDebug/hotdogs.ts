@@ -12,7 +12,7 @@ export class MealRecipe extends RecipeContainer {
         this.recipeGroup = c.meal;
         this.recipeName = 'Hotdog'
         this.variations = [
-            {'recipe': [AidellsCajunSausage]},
+            AidellsCajunSausage
         ]
      }
 }

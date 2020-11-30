@@ -11,7 +11,7 @@ export class MealRecipe extends RecipeContainer {
         this.recipeGroup = c.meal;
         this.recipeName = 'LentilPasta'
         this.variations = [
-            {'recipe': [WholeFoodsLentilPenne]},
+            WholeFoodsLentilPenne
         ]
      }
 }

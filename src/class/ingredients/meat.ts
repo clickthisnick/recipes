@@ -42,6 +42,19 @@ export class MeatItems extends FruitItems {
         nutrition: {},
     })
 
+    public static readonly londonBroil: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'London Broil',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Rinse and put measuring cup in dishwasher',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: true,
+        nutrition: {},
+    })
+
     public static readonly spiralCutHam: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Spiral Cut Ham',
         putAwayTime: 10,

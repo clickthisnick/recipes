@@ -10,11 +10,12 @@ export class MealRecipe extends RecipeContainer {
         this.recipeGroup = c.meal;
         this.recipeName = 'LentilPasta'
         this.variations = [
-            {'recipe': [MozzarellaSticks]},
+            MozzarellaSticks
         ]
      }
 }
 
+// https://showmetheyummy.com/air-fryer-mozzarella-sticks-recipe/
 export class MozzarellaSticks extends Recipe {
     constructor() {
         super();

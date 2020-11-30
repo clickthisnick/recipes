@@ -178,84 +178,44 @@ export class RecipeContainer {
         return recipeName
     }
 
+    private generateRecipeVariation(recipeClass, includeInVariation=false) {
+        const initRecipe: Recipe = new recipeClass();
+        const recipeName = recipeClass.name; 
+
+        // Ensure the recipe is valid
+        initRecipe.validate(recipeName)
+
+        // Adds the recipe to the javascript variable
+        this.recipeHtml += initRecipe.printRecipe(recipeName)
+
+        if (includeInVariation) {
+            this.recipeHtml += `<button class="${this.recipeName}-group" style="display: none" `            
+        } else {
+            this.recipeHtml += `<button `
+        }
+
+        this.recipeHtml += `onclick="selectRecipe('${recipeName}')">${recipeName}</button>`
+    }
+
     public generateRecipes() {
+        let hideUnderRecipeGroup = false;
+
+        const recipeGroupName = this.recipeName;
+
+        if (this.variations.length > 1) {
+            // TODO something should check this is unique;
+            this.recipeHtml += `<div id='${recipeGroupName}-main'><button onclick="showElementsByClassName('${recipeGroupName}-group'); hideElement('${recipeGroupName}-main');">${recipeGroupName} ⇩</button></div>`
+
+            hideUnderRecipeGroup = true
+        }
 
         this.variations.forEach(variation => {
-            const recipes: any = Object.values(variation)[0];
-            recipes.forEach((recipe) => {
-                const initRecipe: Recipe = new recipe();
-                let recipeName = recipe.name; 
-
-                // Ensure the recipe is valid
-                initRecipe.validate(recipeName)
-
-                // Adds the recipe to the javascript variable
-                this.recipeHtml += initRecipe.printRecipe(recipeName)
-                this.recipeHtml += `<button onclick="selectRecipe('${recipeName}')">${recipeName}</button><br>`
-            })
+            this.generateRecipeVariation(variation, hideUnderRecipeGroup)
         })
-       
-        // Add options
-        // this.addToGroup();
-        // const variations: IVariation[] = this.variations
 
-        // let tmpOptionHtml = '';
-        // let tmpHtml = '';
-        // let defaultShowRecipe = false;
-
-        // if (variations.length === 1) {
-        //     const recipes: any[] = Object.values(variations[0])[0];
-
-        //     if (recipes.length === 1) {
-        //         defaultShowRecipe = true;
-        //     }
-        // }
-
-        // // When we loop through variations we store any already used names
-        // // Then subtract then more future names...
-        // // So...
-        // // WholeGrain
-        // // WholeGrainMushroom -> Mushroom
-        // // WholeGrainSausageMushroom -> Sausage
-        // const recipeNamesUsed: any[] = []
-
-        // variations.forEach((variation) => {
-        //     const recipeIds: string[] = [];
-
-        //     // Add the key text
-        //     // Like "veggies"
-        //     tmpOptionHtml += `<br><b>${Object.keys(variation)}</b><br>`;
-
-        //     const recipes: any[] = Object.values(variation)[0];
-
-        //     recipes.forEach((recipe) => {
-        //         const initRecipe: Recipe = new recipe();
-        //         let recipeName = recipe.name;
-
-        //         initRecipe.autoShow = defaultShowRecipe;
-        //         initRecipe.printRecipe(recipe.name);
-
-        //         // recipe.name is the class name
-        //         recipeNamesUsed.forEach((used) => {
-        //             recipeName = recipeName.replace(used, '')
-        //         });
-
-        //         recipeNamesUsed.push(recipeName);
-        //         recipeIds.push(recipeName);
-        //         tmpHtml += initRecipe.recipeHtml;
-        //     });
-
+        // this.recipeHtml += '<br>'
         this.recipeHtml += '<div id="root">'
         this.recipeHtml += '</div id="root">'
-            // this.recipeHtml += `<script>generateHtml()</script>`
-
-            // tmpOptionHtml += HTML.generateOptions(recipeIds, defaultShowRecipe);
-        // });
-
-        // this.recipeHtml += '<div id="options">';
-        // this.recipeHtml += tmpOptionHtml;
-        // this.recipeHtml += '</div><br>';
-        // this.recipeHtml += tmpHtml;
     }
 
     constructor() {

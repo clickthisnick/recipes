@@ -12,7 +12,7 @@ export class MealRecipe extends RecipeContainer {
         super();
         this.recipeGroup = c.meal;
         this.variations = [
-            {'recipe': [BuffaloKaleBowl]},
+            BuffaloKaleBowl
         ]
     }
 }

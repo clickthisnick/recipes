@@ -11,7 +11,7 @@ export class MealRecipe extends RecipeContainer {
         super();
         this.recipeGroup = c.component;
         this.variations = [
-            {'recipe': [EggPepperBuckets]},
+            EggPepperBuckets
         ]
     }
 }
