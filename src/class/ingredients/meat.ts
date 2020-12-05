@@ -28,6 +28,19 @@ export class MeatItems extends FruitItems {
         isMeatProduct: true,
         nutrition: {},
     })
+    
+    public static readonly BeefEyeRoundSteak: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'Beef Eye Round Steak',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Rinse and put measuring cup in dishwasher',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: true,
+        nutrition: {},
+    })
 
     public static readonly groundBeef8020: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Ground Beef 80/20',

@@ -11,7 +11,7 @@ export class MealRecipe extends RecipeContainer {
         super();
         this.recipeGroup = c.component;
         this.variations = [
-            GroundBeefTaco
+            GroundBeefTaco, BeefEyeRoundSteakTaco,
         ]
     }
 }
@@ -34,6 +34,32 @@ class GroundBeefTaco extends Recipe {
             e.pan().stir(),
             e.pan().cook(4, 'm', 6),
             Timer.end(),
+            i.item('taco').season([
+                i.softTortillaShell(4, u.unit),
+                i.mozzarellaCheese(1, u.unit),
+                i.salsa(1, u.unit),
+                i.hotSauce(1, u.unit),
+                i.sourCream(1, u.unit),
+                i.redOnion(),
+            ])
+        ];
+    }
+}
+
+class BeefEyeRoundSteakTaco extends Recipe {
+    constructor() {
+        super();
+        this.steps = [
+            e.ninja().add(i.BeefEyeRoundSteak(1, u.pound)),
+            e.ninja().cook(2.5, 'm', 450),
+            text.set(['Dice', i.redOnion(.5, u.unit)]),
+            Timer.end(),
+            text.set(['Flip']),
+            e.ninja().cook(2.5, 'm', 450),
+            Timer.end(),
+            Timer.set(10, 'm', 'Let beef rest'),
+            Timer.end(),
+            text.set(['Cut up BeefEyeRoundSteak']),
             i.item('taco').season([
                 i.softTortillaShell(4, u.unit),
                 i.mozzarellaCheese(1, u.unit),
