@@ -10,6 +10,7 @@ export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
         this.recipeGroup = c.component;
+        this.recipeName = 'Taco'
         this.variations = [
             GroundBeefTaco, BeefEyeRoundSteakTaco,
         ]

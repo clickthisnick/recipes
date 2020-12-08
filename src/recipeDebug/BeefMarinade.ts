@@ -29,7 +29,7 @@ export class TwoLbBeefMarinade extends Recipe {
                 i.blackPepper(2, u.tsp),
                 i.onionPowder(1, u.tsp),
                 i.paprika(1, u.tsp),
-                i.seaSalt(.5, u.tsp),
+                //i.seaSalt(.5, u.tsp),
             ]),
         ];
     }
@@ -48,7 +48,7 @@ export class OneLbBeefMarinade extends Recipe {
                 i.blackPepper(1, u.tsp),
                 i.onionPowder(.5, u.tsp),
                 i.paprika(.5, u.tsp),
-                i.seaSalt(.25, u.tsp),
+                //i.seaSalt(.25, u.tsp),
             ]),
         ];
     }

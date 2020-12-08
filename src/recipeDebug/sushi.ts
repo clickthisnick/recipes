@@ -10,10 +10,36 @@ export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
         this.recipeGroup = c.meal;
+        this.recipeName = 'Sushi';
         this.variations = [
-            Sushi
+            Sushi, SushiRice4Rolls
         ]
      }
+}
+
+class SushiRice4Rolls extends Recipe {
+    constructor() {
+        super();
+        this.steps = [
+            text.set(['Rinse ', i.sushiRice(1, u.cup), 'under water for 2 minutes']),
+            e.instantPot().add([
+                i.sushiRice(),
+                i.water(1, u.cup)
+            ]),
+            Timer.set(15, 'm', 'Cook rice in instant pot on low pressure'),
+            Timer.end(),
+            Timer.set(10, 'm', 'Let instant pot natural relase'),
+            Timer.end(),
+            text.set(['Unplug instant pot heat']),
+            e.instantPot().add([
+                i.appleCiderVinegar(2, u.tbsp),
+                i.seasonedRiceVinegar(2, u.tbsp)
+            ]),
+            e.instantPot().stir(),
+            Timer.set(30, 'm', 'Cover instant pot in tinfoil with poked holes and set in fridge'),
+            Timer.end(),
+        ];
+    }
 }
 
 class Sushi extends Recipe {

@@ -10,14 +10,31 @@ export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
         this.recipeGroup = c.meal;
-        this.recipeName = 'LentilPasta'
+        this.recipeName = 'Pasta'
         this.variations = [
-            ModernBrandLentilPenne
+            WholeFoodsLentilPenne, DontUseModernBrandLentilPenne
         ]
-     }
+    }
 }
 
-export class ModernBrandLentilPenne extends Recipe {
+export class WholeFoodsLentilPenne extends Recipe {
+    constructor() {
+        super();
+        this.steps = [
+            e.instantPot().add([
+                i.spaghettiSauce(25, u.ounce),
+                i.water(1, u.cup),
+                i.penneLentil(8, u.ounce),
+                i.oliveOil(1, u.ounce)
+            ]),
+            text.set(['Stir instant pot and break up pasta']),
+            e.instantPot().pressureCook(15, 11, 'm'),
+            text.set(['Top with', i.parmessanCheese(8, u.ounce)]),
+        ];
+    }
+}
+
+export class DontUseModernBrandLentilPenne extends Recipe {
     constructor() {
         super();
         this.steps = [
@@ -33,4 +50,3 @@ export class ModernBrandLentilPenne extends Recipe {
         ];
     }
 }
-
