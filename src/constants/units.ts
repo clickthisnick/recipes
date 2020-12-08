@@ -14,7 +14,10 @@ export interface IAllIngredientUnits {
 export class Units {
     public static readonly cup: IUnitObj = {
         name: 'cup'
-    };
+    };    
+    public static readonly spoon: IUnitObj = {
+        name: 'spoon'
+    };    
     public static readonly bunch: IUnitObj = {
         name: 'bunch'
     };

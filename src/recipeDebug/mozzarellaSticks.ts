@@ -21,22 +21,22 @@ export class MozzarellaSticks extends Recipe {
     constructor() {
         super();
         this.steps = [
-            text.set(['Cut up', i.mozzarellaCheese(1, u.pound), 'into strips']),
-            text.set(['Put', i.mozzarellaCheese(), 'and', i.allPurposeFlour(1/8, u.cup), 'into a ziplock bag']),
+            text.set(['Cut up', i.mozzarellaCheese(8, u.ounce), 'into strips']),
+            text.set(['Put', i.mozzarellaCheese(), 'and', i.allPurposeFlour(.5, u.spoon), 'into a ziplock bag']),
             Timer.set(20, 'm', 'Put ziplock bag in the freezer'),
             Timer.end(),
             e.bowl().add([
-                i.pankoBreadCrumbs(1, u.cup),
+                i.pankoBreadCrumbs(.5, u.cup),
                 i.onionGranules(.5, u.tsp),
                 i.garlicPowder(.5, u.tsp),
                 i.smokedPaprika(.5, u.tsp),
-                i.salt(.5, u.tsp),
+                i.salt(.25, u.tsp),
             ]),
             e.bowl().stir(),
-            text.set(['Whisk', i.egg(2, u.unit)]),
+            text.set(['Whisk', i.egg(1, u.unit)]),
             text.set(['Dip in egg mixture']),
             text.set(['Roll dipped cheese in', i.item('seasoned panko')]),
-            Timer.set(20, 'm', 'Freeze'),
+            Timer.set(60, 'm', 'Freeze'),
             Timer.end(),
             e.ninja().add([
                 i.item('cheese sticks')

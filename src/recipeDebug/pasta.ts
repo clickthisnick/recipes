@@ -12,12 +12,12 @@ export class MealRecipe extends RecipeContainer {
         this.recipeGroup = c.meal;
         this.recipeName = 'Pasta'
         this.variations = [
-            WholeFoodsLentilPenne, DontUseModernBrandLentilPenne
+            WholeFoodsLentilSpaghetti, DontUseModernBrandLentilPenne
         ]
     }
 }
 
-export class WholeFoodsLentilPenne extends Recipe {
+export class WholeFoodsLentilSpaghetti extends Recipe {
     constructor() {
         super();
         this.steps = [
@@ -28,7 +28,7 @@ export class WholeFoodsLentilPenne extends Recipe {
                 i.oliveOil(1, u.ounce)
             ]),
             text.set(['Stir instant pot and break up pasta']),
-            e.instantPot().pressureCook(15, 11, 'm'),
+            e.instantPot().pressureCook(15, 13, 'm'),
             text.set(['Top with', i.parmessanCheese(8, u.ounce)]),
         ];
     }
