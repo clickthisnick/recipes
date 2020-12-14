@@ -43,6 +43,19 @@ export class SpiceItems extends SauceItems {
         nutrition: {},
     })
 
+    public static readonly vanillaExtract: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'Vanilla Extract',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        nutrition: {},
+    })
+
     public static readonly hotPaprika: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Hot Paprika',
         putAwayTime: 10,
@@ -338,6 +351,45 @@ export class SpiceItems extends SauceItems {
         unit: unit || null,
         wash: false,
         isTakoutUnitable: false,
+        isMeatProduct: false,
+        nutrition: {},
+    })
+
+    public static readonly wholeFennelSeeds: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'Whole Fennel Seeds',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: true,
+        isMeatProduct: false,
+        nutrition: {},
+    })
+
+    public static readonly italianSeasoning: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'Italian Seasoning',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: true,
+        isMeatProduct: false,
+        nutrition: {},
+    })
+
+    public static readonly powderedSugar: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'Powdered Sugar',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: true,
         isMeatProduct: false,
         nutrition: {},
     })

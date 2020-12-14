@@ -129,6 +129,15 @@ class Bowl extends Container {
     }
 }
 
+
+class KitchenAidMixingBowl extends Container {
+    // Containers are a singleton
+    constructor(id: number) {
+        super('KitchenAid Mixing Bowl', id)
+    }
+}
+
+
 class CookingContainer extends Container {
     // Containers are a singleton
     constructor(name: string, id: number) {
@@ -288,6 +297,10 @@ export class Equipment {
 
     public static readonly pan = (id: number = 99) => (
         new Pan(id)
+    );
+
+    public static readonly kitchenAidMixingBowl = (id: number = 99) => (
+        new KitchenAidMixingBowl(id)
     );
 
     public static readonly bowl = (id: number = 99) => (

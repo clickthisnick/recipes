@@ -19,6 +19,7 @@ export class Categories {
     public static readonly smoothies = 'Smoothies';
     public static readonly misc = 'Miscellaneous';
     public static readonly frozen = 'Frozen';
+    public static readonly seasoning = 'Seasoning';
 
     // 1 so it gets on top
     public static readonly meal = '1 Meal';
