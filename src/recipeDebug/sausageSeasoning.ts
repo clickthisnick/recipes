@@ -29,7 +29,7 @@ export class Sausage extends Recipe {
                 i.paprika(.5, u.tsp),
                 i.redPepperFlakes(1, u.tsp),
                 // i.salt(2, u.tsp),
-                i.salt(1, u.tsp),
+                i.salt(.5, u.tsp),
                 i.garlicClove(1, u.tsp),
                 i.onionGranules(1, u.tsp),
             ]),
