@@ -23,7 +23,8 @@ export class Sausage extends Recipe {
             text.set(['Seasoning for 1 lb of pork']),
             e.bowl().add([
                 i.parsley(2, u.tsp),
-                i.italianSeasoning(2, u.tsp),
+                //i.italianSeasoning(2, u.tsp),
+                i.marjoram(1, u.tsp),
                 i.blackPepper(1.5, u.tsp),
                 i.wholeFennelSeeds(.5, u.tsp),
                 i.paprika(.5, u.tsp),
