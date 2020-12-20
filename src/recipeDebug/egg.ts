@@ -9,7 +9,7 @@ import { Timer } from '../class/timer';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.recipeGroup = c.snack;
+        this.recipeGroup = c.meal;
         this.recipeName = 'Eggs'
         this.variations = [
             ThawedHomemadeSausageEggs
