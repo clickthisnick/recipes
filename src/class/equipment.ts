@@ -122,6 +122,13 @@ class Container {
     }
 }
 
+class StandMixer extends Container {
+    // Containers are a singleton
+    constructor(id: number) {
+        super('stand mixer', id)
+    }
+}
+
 class Bowl extends Container {
     // Containers are a singleton
     constructor(id: number) {
@@ -305,6 +312,10 @@ export class Equipment {
 
     public static readonly bowl = (id: number = 99) => (
         new Bowl(id)
+    );
+
+    public static readonly standMixer = (id: number = 99) => (
+        new StandMixer(id)
     );
 
     public static readonly coffeecup = (id: number = 99) => (
