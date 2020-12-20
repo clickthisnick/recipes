@@ -96,6 +96,19 @@ export class AnimalItems {
         nutrition: {},
     })
 
+    public static readonly homemadeItalianSausage: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'Homemade Italian Sausage',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: true,
+        nutrition: {},
+    })
+
     public static readonly italianSausage: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Italian Sausage',
         putAwayTime: 10,
