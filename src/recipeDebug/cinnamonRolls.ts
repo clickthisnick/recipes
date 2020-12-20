@@ -25,7 +25,7 @@ export class CinnamonRolls extends Recipe {
                 i.almondMilk(1, u.cup),
                 i.butter(3, u.tbsp),
             ]),
-            Timer.set(30, 's', 'Microwave milk mixture'),
+            Timer.set(60, 's', 'Microwave milk mixture'),
             Timer.end(),
             e.bowl().add([
                 i.dryActiveYeast(2.25, u.tsp),
@@ -44,6 +44,24 @@ export class CinnamonRolls extends Recipe {
             text.set(['Coat original bowl with avacado oil']),
             text.set(['Put dough in bowl']),
             Timer.set(1, 'h', 'Cover bowl'),
+            Timer.end(),
+            text.set(['Get out another clean bowl']),
+            e.bowl().add([
+                i.butter(3, u.tbsp),
+                i.sugar(.25, u.cup),
+                i.cinnamon(1, u.tbsp),
+            ]),
+            Timer.set(70, 's', 'Microwave filling mixture'),
+            text.set(['Butter a glass baking pan']),
+            Timer.end(),
+            text.set(['Flatten dough into a rectangle about 1/4 inch think']),
+            text.set(['Spread filling mixture on dough']),
+            text.set(['Roll up dough']),
+            text.set(['Cut into individual rolls and place on baking sheet']),
+            Timer.set(8, 'm', 'Preheat oven to 350'),
+            text.set(['Put baking sheet above oven']),
+            Timer.end(),
+            Timer.set(25, 'm', 'Cook cinnamon rolls'),
             Timer.end(),
         ];
     }
