@@ -51,6 +51,19 @@ export class OilItems extends MeatItems {
         },
     })
 
+    public static readonly coconutOil: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'Coconut Oil',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Put soy sauce back in refridgerator',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        nutrition: {}
+    })
+
     public static readonly oliveOil: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Olive Oil',
         putAwayTime: 10,

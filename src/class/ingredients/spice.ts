@@ -69,6 +69,19 @@ export class SpiceItems extends SauceItems {
         nutrition: {},
     })
 
+    public static readonly coconutSugar: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'Coconut Sugar',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Put soy sauce back in refridgerator',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        nutrition: {}
+    })
+
     public static readonly sugar: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Sugar',
         putAwayTime: 10,

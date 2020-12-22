@@ -306,6 +306,19 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
+    public static readonly appleSauce: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'Apple Sauce',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        nutrition: {},
+    })
+
     public static readonly timer: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Timer',
         putAwayTime: 10,
