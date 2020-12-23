@@ -25,7 +25,7 @@ export class CinnamonRolls extends Recipe {
                 i.water(1, u.cup),
                 i.appleSauce(4, u.tbsp),
             ]),
-            Timer.set(60, 's', 'Microwave milk mixture'),
+            Timer.set(40, 's', 'Microwave milk mixture'),
             Timer.end(),
             e.bowl().add([
                 i.dryActiveYeast(2.25, u.tsp),
