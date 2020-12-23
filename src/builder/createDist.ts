@@ -30,6 +30,12 @@ function generateRecipe(file: string) {
   const MealRecipe = require(`${cwd}/${testFolder}/${file}`).MealRecipe;
   const recipe = new MealRecipe();
 
+  if (recipe.variations.length > 1) {
+    if (recipe.recipeName === "") {
+      throw new Error(`No recipe name for many variations ${recipe.variations}`)
+    }
+  }
+
   recipe.generateRecipes();
   pageHtml += recipe.recipeHtml
 }

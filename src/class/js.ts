@@ -328,8 +328,6 @@ function getCheckedOptions() {
 function showRecipe() {
      var id = getCheckedOptions()
 
-     // console.log(id);
-
      // Show
      if (document.getElementById(id)) {
          document.getElementById(id).style.display = 'block';
