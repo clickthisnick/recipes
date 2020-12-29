@@ -57,6 +57,13 @@ class Container {
         return stirStep
     }
 
+    public mix(): IStep {
+        this.firstAction = false;
+        let mixStep = istep()
+        mixStep.text = `Mix ${this.name}`
+        return mixStep
+    }
+
     // change to IItemObj | Item  once all ingredients are items
     public add(ingredients: any[] | any | any[][]): IStep {
         let addIStep = istep()
