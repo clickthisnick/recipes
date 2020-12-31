@@ -22,9 +22,12 @@ class AvacadoToast2People extends Recipe {
             e.bowl().add([
                 i.avacado(2, u.unit),
                 i.limeJuice(2, u.tbsp),
+                i.garlicPowder(2, u.tsp),
+                i.onionGranules(2, u.tsp),
+                i.salt(4, u.cracks),
             ]),
             e.bowl().stir(),
-            text.set(['Toast', i.bread(2, u.unit)]),
+            text.set(['Toast', i.bread(2, u.unit), 'on 5']),
             text.set(['Spread avacado mixture on toast']),
         ];
     }

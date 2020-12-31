@@ -54,6 +54,9 @@ export class Units {
     public static readonly scoop: IUnitObj = {
         name: 'scoop'
     };
+    public static readonly cracks: IUnitObj = {
+        name: 'cracks'
+    };
 
     public static readonly inches: IUnitObj = {
         name: 'inches'
