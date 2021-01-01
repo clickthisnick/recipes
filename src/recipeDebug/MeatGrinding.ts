@@ -8,8 +8,8 @@ import { Text as text } from '../class/text';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.recipeGroup = c.snack;
-        this.recipeName = 'Sausage Seasoning'
+        this.recipeGroup = c.meal;
+        this.recipeName = 'Eggs'
         this.variations = [
             Sausage
         ]
@@ -34,6 +34,7 @@ export class Sausage extends Recipe {
                 i.garlicClove(1, u.tsp),
                 i.onionGranules(1, u.tsp),
             ]),
+            text.set(['Air tight 8 ounces into freezer safe bags'])
         ];
     }
 }

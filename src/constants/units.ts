@@ -24,6 +24,9 @@ export class Units {
     public static readonly dash: IUnitObj = {
         name: 'dash'
     };
+    public static readonly clove: IUnitObj = {
+        name: 'clove'
+    };
     public static readonly noUnitQuantity: IUnitObj = {
         name: ''
     };
@@ -32,6 +35,9 @@ export class Units {
     };
     public static readonly tbsp: IUnitObj = {
         name: 'Tbsp'
+    };
+    public static readonly stick: IUnitObj = {
+        name: 'stick'
     };
     public static readonly second: IUnitObj = {
         name: 'second'
@@ -54,8 +60,8 @@ export class Units {
     public static readonly scoop: IUnitObj = {
         name: 'scoop'
     };
-    public static readonly cracks: IUnitObj = {
-        name: 'cracks'
+    public static readonly crack: IUnitObj = {
+        name: 'crack'
     };
 
     public static readonly inches: IUnitObj = {

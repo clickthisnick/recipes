@@ -453,6 +453,19 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
+    public static readonly avacadoLarge: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'Large Avacado',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: true,
+        isMeatProduct: false,
+        nutrition: {},
+    })
+
     public static readonly avacado: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Avacado',
         putAwayTime: 10,
@@ -767,6 +780,19 @@ export class VegetableItems extends SpiceItems {
 
     public static readonly scallion: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Scallion',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: true,
+        isTakoutUnitable: true,
+        isMeatProduct: false,
+        nutrition: {},
+    })
+
+    public static readonly cannedHotCherryPepper: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'Canned Hot Cherry Pepper',
         putAwayTime: 10,
         takeOutTime: 10,
         cleanSteps: '',

@@ -20,15 +20,16 @@ class AvacadoToast2People extends Recipe {
         super();
         this.steps = [
             e.bowl().add([
-                i.avacado(2, u.unit),
+                i.avacadoLarge(1, u.unit),
                 i.limeJuice(2, u.tbsp),
-                i.garlicPowder(2, u.tsp),
-                i.onionGranules(2, u.tsp),
-                i.salt(4, u.cracks),
+                i.garlicPowder(1, u.tsp),
+                i.onionGranules(1, u.tsp),
+                i.salt(4, u.crack),
             ]),
             e.bowl().stir(),
             text.set(['Toast', i.bread(2, u.unit), 'on 5']),
             text.set(['Spread avacado mixture on toast']),
+            text.set(['Sprinkle on', i.smokedPaprika(2, u.dash)])
         ];
     }
 }

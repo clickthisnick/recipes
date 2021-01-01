@@ -180,6 +180,19 @@ export class CarbItems extends AnimalItems {
         nutrition: {},
     })
 
+    public static readonly wholeWheatFlour: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'Whole Wheat',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: true,
+        isMeatProduct: false,
+        nutrition: {},
+    })
+
     public static readonly whiteRice: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'White Rice',
         putAwayTime: 10,
