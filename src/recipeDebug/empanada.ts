@@ -28,7 +28,7 @@ class Empanada extends Recipe {
             e.kitchenAidMixingBowl().add([
                 i.butter(1.5, u.stick),
                 i.egg(1, u.unit),
-                i.water(4, u.tbsp),
+                i.water(7, u.tbsp),
             ]),
             e.kitchenAidMixingBowl().stir(),
             text.set(['Roll dough flat between 2 pieces of parchment paper']),
@@ -49,6 +49,7 @@ class Empanada extends Recipe {
                 i.groundBeef8020(1, u.pound),
             ]),
             e.pan().cook(5, 'm', 4),
+            text.set(['Mince', i.cannedHotCherryPepper(.5, u.cup),]),
             Timer.end(),
             e.pan().add([
                 i.tomatoPaste(1, u.tbsp),
@@ -57,13 +58,15 @@ class Empanada extends Recipe {
                 i.paprika(.5, u.tsp),
                 i.blackPepper(5, u.crack),
                 i.salt(5, u.crack),
-                i.cannedHotCherryPepper(.5, u.cup),
+                i.cannedHotCherryPepper(),
+                i.item('1/4 canned hot cherry pepper water')
             ]),
             e.pan().cook(3, 'm', 4),
             Timer.end(),
             Timer.end(),
             text.set(['Add filling to empanada']),
             text.set(['Add cheese']),
+            text.set(['Air fry in ninja for 7 min']),
         ];
     }
 }
