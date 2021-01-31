@@ -223,7 +223,12 @@ class Pan extends CookingContainer {
 
         if (heat === 5) {
             // Return how long preheating pan takes
-            return Timer.set(5, 'm', `Preheat ${this.name} on heat ${heat}`);
+            return Timer.set(2, 'm', `Preheat ${this.name} on heat ${heat}`);
+        }
+
+        if (heat === 7) {
+            // Return how long preheating pan takes
+            return Timer.set(4, 'm', `Preheat ${this.name} on heat ${heat}`);
         }
 
         return Timer.set(minutes, 'm', `Preheat ${this.name} on heat ${heat}`);
