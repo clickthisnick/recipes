@@ -24,7 +24,7 @@ class WhiteRice1Cup extends Recipe {
                 i.whiteRice(1, u.cup),
                 i.water(1.5, u.cup)
             ]),
-            e.instantPot().pressureCook(9, 12, 'm'),
+            e.instantPot().pressureCook(9, 5, 'm'),
             Timer.set(5, 'm', 'let pressure release'),
             Timer.end()
         ];
