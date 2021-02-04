@@ -1,6 +1,7 @@
 import { IUnitObj } from '../../constants/units';
 import { IStep, istep } from '../step';
 import { Serializer as s } from '../serializer';
+import { Text as text} from '../text';
 
 export interface IEstimates {
     calories?: number;
@@ -102,6 +103,6 @@ export class Item {
     }
 
     public mixIn(ingredients: any): any {
-        return ['Mix in', ingredients, 'with', this.name]
+        return text.set(['Mix in', ingredients, 'with', this.name])
     }
 }

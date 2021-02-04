@@ -1,4 +1,4 @@
-import { IItem } from './item';
+import { IItem, Item } from './item';
 import { IUnitObj, Units as u } from '../../constants/units';
 import { AnimalItems } from './animal';
 
@@ -193,23 +193,25 @@ export class CarbItems extends AnimalItems {
         nutrition: {},
     })
 
-    public static readonly whiteRice: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'White Rice',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Rinse and put measuring cup in dishwasher',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {
-            [u.cup.name]: {
-                calories: 678.96,
-                sodium: 9.3,
-            }
-        }
-    })
+    public static readonly whiteRice = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'White Rice', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            'Rinse and put away measuring cup',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            true, // isMeatProduct
+            {
+                [u.cup.name]: {
+                    calories: 678.96,
+                    sodium: 9.3,
+                }
+            }, // nutrition
+            unit, // unit
+        )
+    )
 
     public static readonly brownRice: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Brown Rice',

@@ -38,14 +38,16 @@ class BuffaloKaleBowlBrownRice extends Recipe {
                 i.chilliOil(2, u.tbsp),
                 i.kale(),
             ]),
-            Timer.set(5, 'm', 'Sautee kale'),
+            Timer.set(2.5, 'm', 'Sautee kale'),
             text.set(['Put kale away']),
+            Timer.end(),
+            Timer.set(2.5, 'm', 'Stir and keep sauteeing kale'),
             Timer.end(),
             Timer.set(5, 'm', 'release instant pot pressure'),
             Timer.end(),
             text.set(['Open steam valve']),
-            i.item('rice').mixIn(i.curryPowder(.5, u.tbsp)),
-            ['In a bowl mix', i.blackBeans(), i.brownRice(), i.kale(), i.wingTimeMediumBuffaloSauce(1.5, u.tbsp)],
+            i.whiteRice().mixIn(i.curryPowder(.5, u.tbsp)),
+            text.set(['In a bowl mix', i.blackBeans(), i.brownRice(), i.kale(), i.wingTimeMediumBuffaloSauce(1.5, u.tbsp)]),
         ]
     }
 }
@@ -71,14 +73,16 @@ class BuffaloKaleBowlWhiteRice extends Recipe {
                 i.chilliOil(2, u.tbsp),
                 i.kale(),
             ]),
-            Timer.set(5, 'm', 'Sautee kale'),
+            Timer.set(2.5, 'm', 'Sautee kale'),
             text.set(['Put kale away']),
+            Timer.end(),
+            Timer.set(2.5, 'm', 'Stir and keep sauteeing kale'),
             Timer.end(),
             Timer.set(5, 'm', 'release instant pot pressure'),
             Timer.end(),
             text.set(['Open steam valve']),
-            i.item('rice').mixIn(i.curryPowder(.5, u.tbsp)),
-            ['In a bowl mix', i.blackBeans(), i.brownRice(), i.kale(), i.wingTimeMediumBuffaloSauce(1.5, u.tbsp)],
+            i.whiteRice().mixIn(i.curryPowder(.5, u.tbsp)),
+            text.set(['In a bowl mix', i.blackBeans(), i.brownRice(), i.kale(), i.wingTimeMediumBuffaloSauce(1.5, u.tbsp)]),
         ]
     }
 }
