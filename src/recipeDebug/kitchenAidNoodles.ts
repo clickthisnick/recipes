@@ -10,7 +10,7 @@ export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
         this.recipeGroup = c.meal;
-        this.recipeName = 'Pasta'
+        this.recipeName = 'HomemadePasta'
         this.variations = [
             KitchenAidNoodles1Lb, KitchenAidNoodles2Lb
         ]
