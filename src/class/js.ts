@@ -173,10 +173,10 @@ function doneSelectingRecipes() {
         shoppingDiv.innerHTML += '<br>'
 
         Object.keys(ingredients).forEach(ingredient => {
-            Object.keys(ingredients[ingredient]).forEach(unit => {
+            Object.keys(ingredients[ingredient]['units']).forEach(unit => {
                 // <!--On click it deletes the ingredient from the array of ingredients-- >
                 // <!--TODO once you delete an ingredient it remove all types from the ingredient list-- >
-                shoppingDiv.innerHTML += '<div id="shopping-' + ingredient + '" class="panel" style="" onclick="this.classList.toggle(' + "'completed'" + "); document.getElementById('shopping-" + ingredient + "').remove(); delete ingredients['" + ingredient + "'" + '];" >' + ingredient + ' ' + ingredients[ingredient][unit] + ' ' + unit + '</div>'
+                shoppingDiv.innerHTML += '<div id="shopping-' + ingredient + '" class="panel" style="" onclick="this.classList.toggle(' + "'completed'" + "); document.getElementById('shopping-" + ingredient + "').remove(); delete ingredients['" + ingredient + "'" + '];" >' + ingredient + ' ' + ingredients[ingredient]['units'][unit] + ' ' + unit + '</div>'
             })
         })
     } else {
