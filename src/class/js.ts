@@ -67,7 +67,12 @@ function addIngredient(istep) {
             if (ingredients.hasOwnProperty(ingredient.name) === false) {
                 ingredients[ingredient.name] = {}
                 ingredients[ingredient.name]['units'] = {}
-                ingredients[ingredient.name]['purchaseLinks'] = {}
+
+                if (ingredient.purchaseLinks) {
+                    ingredients[ingredient.name]['purchaseLinks'] = ingredient.purchaseLinks
+                } else {
+                    ingredients[ingredient.name]['purchaseLinks'] = {}
+                }
             }
 
             if (ingredients[ingredient.name]['units'].hasOwnProperty(ingredient.unit.name) === false) {
@@ -173,10 +178,25 @@ function doneSelectingRecipes() {
         shoppingDiv.innerHTML += '<br>'
 
         Object.keys(ingredients).forEach(ingredient => {
+            let links = ''
+            // When you click a saved url we don't include the purchaseLinks
+            if (ingredients[ingredient].hasOwnProperty('purchaseLinks')) {
+                let purchaseLinkInit = true;
+                Object.keys(ingredients[ingredient]['purchaseLinks']).forEach(store => {
+                    // Only write the link ingredient if there are links
+                    // TODO change to len or array size w/e
+                    if (purchaseLinkInit) {
+                        links += ingredient + ': '
+                        purchaseLinkInit = false;
+                    }
+                    let link = ingredients[ingredient]['purchaseLinks'][store];
+                    links += `<a href="${link}" target="_blank">${store}</a>&nbsp;`
+                })
+            }
             Object.keys(ingredients[ingredient]['units']).forEach(unit => {
                 // <!--On click it deletes the ingredient from the array of ingredients-- >
                 // <!--TODO once you delete an ingredient it remove all types from the ingredient list-- >
-                shoppingDiv.innerHTML += '<div id="shopping-' + ingredient + '" class="panel" style="" onclick="this.classList.toggle(' + "'completed'" + "); document.getElementById('shopping-" + ingredient + "').remove(); delete ingredients['" + ingredient + "'" + '];" >' + ingredient + ' ' + ingredients[ingredient]['units'][unit] + ' ' + unit + '</div>'
+                shoppingDiv.innerHTML += links + '<div id="shopping-' + ingredient + '" class="panel" style="" onclick="this.classList.toggle(' + "'completed'" + "); document.getElementById('shopping-" + ingredient + "').remove(); delete ingredients['" + ingredient + "'" + '];" >' + ingredient + ' ' + ingredients[ingredient]['units'][unit] + ' ' + unit + '</div>'
             })
         })
     } else {
