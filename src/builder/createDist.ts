@@ -74,7 +74,12 @@ function run() {
             let item = JSON.parse(queryString[key]);
 
             ingredients[key] = {}
-            ingredients[key][item[0]] = item[1]
+
+            // Put the units and values in the correct spot
+            // The assumption here is if you are clicking the link you are going somewhere to buy
+            // Whereas when you originally generate the link you get the online purchase options
+            ingredients[key]['units'] = {}
+            ingredients[key]['units'][item[0]] = item[1]
             
           })
         }

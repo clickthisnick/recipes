@@ -210,6 +210,9 @@ export class CarbItems extends AnimalItems {
                 }
             }, // nutrition
             unit, // unit
+            {
+                'wholefoods': 'https://www.amazon.com/365-Whole-Foods-Market-Organic/dp/B084NJHWTQ'
+            }, // purchaseLinks
         )
     )
 

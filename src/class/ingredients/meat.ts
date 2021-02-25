@@ -99,6 +99,7 @@ export class MeatItems extends FruitItems {
             true, // isMeatProduct
             {}, // Nutrition
             unit, // Unit
+            {}, // purchaseLinks
         )
     )
 

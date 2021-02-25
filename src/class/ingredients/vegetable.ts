@@ -290,6 +290,10 @@ export class VegetableItems extends SpiceItems {
             false, // isMeatProduct
             {}, // nutrition
             unit, // unit
+            {
+                'wholeFoods': 'https://www.amazon.com/Asparagus-Green-Conventional-Whole-Guarantee/dp/B0787Y51DM',
+                'amazonFresh': 'https://www.amazon.com/produce-aisle-176899-Asparagus-bunch/dp/B078ZG3THS',
+            }, // purchaseLinks
         )
     )
 

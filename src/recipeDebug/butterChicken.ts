@@ -21,7 +21,7 @@ class ButterChicken extends Recipe {
     constructor() {
         super();
         this.steps = [
-            text.set(['Preheat Instant Pot with Saute on low setting']),
+            text.set(['Preheat Medium Instant Pot with Saute on low setting']),
             text.set(['Dice', i.whiteOnion(1, u.unit)]),
             text.set(['Dice', i.garlicClove(5, u.unit)]),
             e.instantPot().add([
@@ -52,7 +52,7 @@ class ButterChicken extends Recipe {
                 i.salt(1, u.tsp), // .5 for healthier
                 i.blackPepper(1, u.tsp),
             ]),
-            Timer.set(3, 'm', 'Pressure cook instant pot on heat 5'),
+            Timer.set(15, 'm', 'Pressure cook.'),
             Timer.end(),
             Timer.set(10, 'm', 'Let instant pot pressure release'),
             text.set(['Put away spices']),

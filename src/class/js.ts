@@ -66,13 +66,15 @@ function addIngredient(istep) {
         if (ingredient.unit !== null && ingredient.quantity > 0) {
             if (ingredients.hasOwnProperty(ingredient.name) === false) {
                 ingredients[ingredient.name] = {}
+                ingredients[ingredient.name]['units'] = {}
+                ingredients[ingredient.name]['purchaseLinks'] = {}
             }
 
-            if (ingredients[ingredient.name].hasOwnProperty(ingredient.unit.name) === false) {
-                ingredients[ingredient.name][ingredient.unit.name] = 0
+            if (ingredients[ingredient.name]['units'].hasOwnProperty(ingredient.unit.name) === false) {
+                ingredients[ingredient.name]['units'][ingredient.unit.name] = 0
             }
 
-            ingredients[ingredient.name][ingredient.unit.name] += ingredient.quantity
+            ingredients[ingredient.name]['units'][ingredient.unit.name] += ingredient.quantity
         }
     })
 
@@ -143,9 +145,9 @@ function saveShoppingUrl() {
     //        <!--ingredients = { asparagus: { tsb: 1 } } -->
     let queryParamter = document.location.href.split('?')[0] + '?mode=shopping' + '&recipes=' + selectedRecipeNames
     Object.keys(ingredients).forEach(ingredient => {
-        let unit = Object.keys(ingredients[ingredient])[0]
+        let unit = Object.keys(ingredients[ingredient]['units'])[0]
         // < !--url encode - example - replace any spaces with % 20 -- >
-        queryParamter += '&' + encodeURI(ingredient) + '=["' + unit + '", %20' + ingredients[ingredient][unit] + ']'
+        queryParamter += '&' + encodeURI(ingredient) + '=["' + unit + '", %20' + ingredients[ingredient]['units'][unit] + ']'
     })
 
 

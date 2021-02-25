@@ -25,6 +25,10 @@ interface INutrition {
    [unit: string]: IEstimates;
 }
 
+interface IPurchaseLink {
+    [store: string]: string,
+}
+
 export interface IItemObj {
     name: string;
     putAwayTime: number;
@@ -53,6 +57,7 @@ export class Item {
     isTakoutUnitable: boolean
     isMeatProduct: boolean
     nutrition: any
+    purchaseLinks?: IPurchaseLink
 
     // Containers are a singleton
     constructor(
@@ -66,6 +71,7 @@ export class Item {
         isMeatProduct: boolean,
         nutrition: any,
         unit?: IUnitObj | null,
+        purchaseLinks?: IPurchaseLink,
     ) {
         this.name = name 
         this.putAwayTime = putAwayTime 
@@ -77,6 +83,7 @@ export class Item {
         this.isMeatProduct = isMeatProduct
         this.nutrition = nutrition
         this.unit = unit
+        this.purchaseLinks = purchaseLinks
     }
 
     public season(ingredients: any): IStep {

@@ -3,7 +3,8 @@ import { IUnitObj, Units as u } from '../../constants/units';
 
 export class AnimalItems {
 
-    public static readonly item = (name: string, quantity: number = 0, unit: any = null) => (
+    // This is used in recipes i.item('yeast mixture') - when you want an item, but there's not a specific one defined that fits
+    public static readonly item = (name: string, quantity: number = 0, unit: any = null, purchaseLinks: any = {}) => (
         new Item(
             name,
             10,
@@ -15,6 +16,7 @@ export class AnimalItems {
             false,
             {},
             unit,
+            purchaseLinks
         )
     )
 
@@ -244,6 +246,7 @@ export class AnimalItems {
             true, // isMeatProduct
             {}, // nutrition
             unit, // unit
+            {}, // purchase links
         )
     )
 
