@@ -95,45 +95,6 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly allPurposeFlour: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Flour (All Purpose) Flour',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
-
-    public static readonly archerFlour: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Archer Flour',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
-
-    public static readonly buckwheatFlour: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Buckwheat Flour',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
-
     public static readonly beyondBurger: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Beyond Burger',
         putAwayTime: 10,
@@ -252,18 +213,23 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly kale: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Kale',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly kale = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Kale', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+                'wholeFoods': ['https://www.amazon.com/365-Everyday-Value-Organic-Chopped/dp/B078J13FYR/'],
+            }, // purchaseLinks
+        )
+    )
 
     public static readonly cookingSpray: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Cooking Spray',
@@ -291,37 +257,52 @@ export class VegetableItems extends SpiceItems {
             {}, // nutrition
             unit, // unit
             {
-                'wholeFoods': 'https://www.amazon.com/Asparagus-Green-Conventional-Whole-Guarantee/dp/B0787Y51DM',
-                'amazonFresh': 'https://www.amazon.com/produce-aisle-176899-Asparagus-bunch/dp/B078ZG3THS',
+                'wholeFoods': ['https://www.amazon.com/Asparagus-Green-Conventional-Whole-Guarantee/dp/B0787Y51DM'],
+                'amazonFresh': ['https://www.amazon.com/produce-aisle-176899-Asparagus-bunch/dp/B078ZG3THS'],
             }, // purchaseLinks
         )
     )
 
-    public static readonly bread: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Bread',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly brusselSprouts = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Brussel Sprouts', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+                'wholeFoods': [
+                    'https://www.amazon.com/Brussels-Sprout-Conventional-1-Bag/dp/B07813LYD6',
+                    'https://www.amazon.com/Taylor-Farms-Trimmed-Brussels-Sprouts/dp/B077L4BGYN'
+                ],
+            }, // purchaseLinks
+        )
+    )
 
-    public static readonly appleSauce: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Apple Sauce',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly appleSauce = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Apple Sauce', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+                'wholeFoods': [
+                    'https://www.amazon.com/365-Everyday-Value-Organic-Cinnamon/dp/B074H5CNFD',
+                ],
+            }, // purchaseLinks
+        )
+    )
 
     public static readonly timer: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Timer',
@@ -444,31 +425,43 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly blackBeans: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Black Beans',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly blackBeans = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Black Beans', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+                'wholeFoods': ['https://www.amazon.com/365-Everyday-Value-Organic-Black/dp/B074H6QVKY']
+            }, // purchase links
+        )
+    )
 
-    public static readonly avacadoLarge: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Large Avacado',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: true,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly avacadoLarge = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Large Avacado', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+
+            }, // nutrition
+            unit, // unit
+            {
+                'wholeFoods': ['https://www.amazon.com/Avocado-Hass-Large-Organic-Each/dp/B0785WJ3LT']
+            }, // purchaseLinks
+        )
+    )
 
     public static readonly avacado: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Avacado',
@@ -522,18 +515,25 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly limeJuice: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Lime',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: true,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly limeJuice = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Lime Juice', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+                'wholeFoods': [
+                    'https://www.amazon.com/365-Everyday-Value-Organic-Concentrate/dp/B074H8KLVL',
+                ],
+            }, // purchaseLinks
+        )
+    )
 
     public static readonly romaTomato: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Roma Tomato',
@@ -743,18 +743,43 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly whiteOnion: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'White Onion',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: true,
-        isTakoutUnitable: true,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly spicyHummus = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Spicy Hummus', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+                'amazonFresh': ['https://www.amazon.com/Sabra-Supremely-Spicy-Hummus-17/dp/B00LME9DTM'],
+            }, // purchaseLinks
+        )
+    )
+
+    public static readonly whiteOnion = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'White Onion', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+                'wholeFoods': ['https://www.amazon.com/White-Onion-Organic-1-Each/dp/B0787Z3T3B'],
+            }, // purchaseLinks
+        )
+    )
 
     public static readonly yellowOnion: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Yellow Onion',
@@ -847,29 +872,34 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly tomatoPaste: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Tomato Paste',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: true,
-        isMeatProduct: false,
-        nutrition: {
-            [u.tbsp.name]: {
-                servings: 5,
-                serving_size: 2,
-                calories: 25,
-                sodium: 0,
-                protein: 0,
-                sugar: 4,
-                fiber: 0,
-                total_cost: 0.99
-            }
-        },
-    })
+    public static readonly tomatoPaste = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Tomato Paste', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            true, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+                [u.tbsp.name]: {
+                    servings: 5,
+                    serving_size: 2,
+                    calories: 25,
+                    sodium: 0,
+                    protein: 0,
+                    sugar: 4,
+                    fiber: 0,
+                    total_cost: 0.99
+                }
+            }, // nutrition
+            unit, // unit
+            {
+                'wholeFoods': ['https://www.amazon.com/365-Everyday-Value-Organic-Tomato/dp/B074H5HH2H'],
+            }, // purchaseLinks
+        )
+    )
 
     public static readonly chipotlePepperInAdoboSauce: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Chipotle Pepper In Adobo Sauce',
@@ -897,18 +927,26 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly garlicClove: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Garlic Clove',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: true,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly garlicClove = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Garlic Clove', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            true, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+
+            }, // nutrition
+            unit, // unit
+            {
+                'wholeFoods': ['https://www.amazon.com/Garlic-Organic-1-Each/dp/B0788FLWK1'],
+                'amazonFresh': ['https://www.amazon.com/produce-aisle-mburring-Organic-Garlic/dp/B0035APRLO']
+            }, // purchaseLinks
+        )
+    )
 
     public static readonly babyBellaMushroom: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Baby Bella Mushroom',

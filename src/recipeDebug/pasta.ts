@@ -24,12 +24,12 @@ export class WholeFoodsLentilSpaghetti extends Recipe {
             e.instantPot().add([
                 i.spaghettiSauce(25, u.ounce),
                 i.water(1, u.cup),
-                i.penneLentil(8, u.ounce),
+                i.lentilSpaghetti(8, u.ounce),
                 i.oliveOil(1, u.ounce)
             ]),
             text.set(['Stir instant pot and break up pasta']),
             e.instantPot().pressureCook(15, 13, 'm'),
-            text.set(['Top with', i.parmessanCheese(8, u.ounce)]),
+            text.set(['Top with', i.parmesanCheese(8, u.ounce)]),
         ];
     }
 }

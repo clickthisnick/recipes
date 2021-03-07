@@ -26,7 +26,7 @@ interface INutrition {
 }
 
 interface IPurchaseLink {
-    [store: string]: string,
+    [store: string]: string[],
 }
 
 export interface IItemObj {
@@ -111,5 +111,9 @@ export class Item {
 
     public mixIn(ingredients: any): any {
         return text.set(['Mix in', ingredients, 'with', this.name])
+    }
+
+    public cutInHalf(): any {
+        return text.set(['Cut the', this.name, 'in half'])
     }
 }

@@ -179,24 +179,23 @@ function doneSelectingRecipes() {
 
         Object.keys(ingredients).forEach(ingredient => {
             let links = ''
+
             // When you click a saved url we don't include the purchaseLinks
             if (ingredients[ingredient].hasOwnProperty('purchaseLinks')) {
-                let purchaseLinkInit = true;
                 Object.keys(ingredients[ingredient]['purchaseLinks']).forEach(store => {
-                    // Only write the link ingredient if there are links
-                    // TODO change to len or array size w/e
-                    if (purchaseLinkInit) {
-                        links += ingredient + ': '
-                        purchaseLinkInit = false;
-                    }
-                    let link = ingredients[ingredient]['purchaseLinks'][store];
-                    links += `<a href="${link}" target="_blank">${store}</a>&nbsp;`
+                    const storeLinks = ingredients[ingredient]['purchaseLinks'][store];
+
+                    console.log(storeLinks);
+                    storeLinks.forEach(storeLink => {
+                        links += `&nbsp;<a href="${storeLink}" target="_blank">${store}</a>`
+                    })
                 })
             }
+
             Object.keys(ingredients[ingredient]['units']).forEach(unit => {
                 // <!--On click it deletes the ingredient from the array of ingredients-- >
                 // <!--TODO once you delete an ingredient it remove all types from the ingredient list-- >
-                shoppingDiv.innerHTML += links + '<div id="shopping-' + ingredient + '" class="panel" style="" onclick="this.classList.toggle(' + "'completed'" + "); document.getElementById('shopping-" + ingredient + "').remove(); delete ingredients['" + ingredient + "'" + '];" >' + ingredient + ' ' + ingredients[ingredient]['units'][unit] + ' ' + unit + '</div>'
+                shoppingDiv.innerHTML += '<div id="shopping-' + ingredient + '" class="panel" style="">' + '<span onclick="this.classList.toggle(' + "'completed'" + "); document.getElementById('shopping-" + ingredient + "').remove(); delete ingredients['" + ingredient + "'" + '];" >' + ingredient + ' ' + ingredients[ingredient]['units'][unit] + ' ' + unit + '</span>' + links + '</div>'
             })
         })
     } else {

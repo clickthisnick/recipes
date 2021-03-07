@@ -1,20 +1,28 @@
-import { IItem } from './item';
+import { IItem, Item } from './item';
 import { IUnitObj, Units as u } from '../../constants/units';
 import { OilItems } from './oil';
 
 export class SauceItems extends OilItems {
-    public static readonly coconutCream: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Coconut Cream',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Put soy sauce back in refridgerator',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {}
-    })
+
+    public static readonly coconutCream = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Coconut Cream', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+
+            }, // nutrition
+            unit, // unit
+            {
+                'wholeFoods': ['https://www.amazon.com/Native-Forest-Coconut-Cream-organic/dp/B07893W8C1'],
+            }, // purchaseLinks
+        )
+    )
 
     public static readonly coconutMilk: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Coconut Milk',
@@ -207,47 +215,63 @@ export class SauceItems extends OilItems {
         nutrition: {}
     })
 
-    public static readonly spaghettiSauce: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Spaghetti Sauce',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {
-            [u.cup.name]: {
-                servings: 6,
-                serving_size: .5,
-                calories: 70,
-                sodium: 410,
-                sugar: 4,
-                protein: 3,
-                fiber: 2,
-                total_cost: 2.29
-            }
-        }
-    })
+    public static readonly spaghettiSauce = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Spaghetti Sauce', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+                [u.cup.name]: {
+                    servings: 6,
+                    serving_size: .5,
+                    calories: 70,
+                    sodium: 410,
+                    sugar: 4,
+                    protein: 3,
+                    fiber: 2,
+                    total_cost: 2.29
+                }
+            }, // nutrition
+            unit, // unit
+            {
+                'wholeFoods': [
+                    'https://www.amazon.com/365-Everyday-Value-Organic-Cheese/dp/B074H66176',
+                    'https://www.amazon.com/365-Everyday-Value-Portobello-Mushroom/dp/B074J6YB78'
+                ]
+            }, // purchase links
+        )
+    )
 
-    public static readonly wingTimeMediumBuffaloSauce: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Buffalo Sauce',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Put brown sugar back in cupboard',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {
-            [u.tbsp.name]: {
-                calories: 25,
-                sodium: 280,
-            }
-        },
-    })
+    public static readonly wingTimeMediumBuffaloSauce = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Buffalo Sauce', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            'Rinse and put away measuring cup',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+                [u.tbsp.name]: {
+                    calories: 25,
+                    sodium: 280,
+                }
+            }, // nutrition
+            unit, // unit
+            {
+                'wholefoods': [
+                    'https://www.amazon.com/Wing-Time-Buffalo-Sauce-Ounce/dp/B003S2N5XG',
+                    'https://www.amazon.com/WING-TIME-SAUCE-BUFFALO-MED/dp/B003S2QZVK'
+                ]
+            }, // purchaseLinks
+        )
+    )
 
     public static readonly buffaloSauce: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Buffalo Sauce',

@@ -12,7 +12,7 @@ export class MealRecipe extends Recipe {
             i.zuchinni(2),
             i.babyBellaMushroom(3),
             i.garlicClove(2),
-            i.parmessanCheese(.25, u.cup),
+            i.parmesanCheese(.25, u.cup),
             i.vegetableOil(2, u.second),
             i.spiriliazer(),
             i.blackPepper(),
@@ -35,7 +35,7 @@ export class MealRecipe extends Recipe {
             ['Put in',this.get(i.pepperFlake(.25))],
             [Timer.set(2, 'm')],
             ['Top with', this.get(i.butter())],
-            ['Top with', this.get(i.parmessanCheese(.25))],
+            ['Top with', this.get(i.parmesanCheese(.25))],
             ['Season with', this.get(i.blackPepper()), 'and', this.get(i.salt(.25))],
         ]);
         this.printRecipe();

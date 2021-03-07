@@ -46,18 +46,27 @@ export class AnimalItems {
         nutrition: {},
     })
 
-    public static readonly chickenThigh: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Chicken Thigh',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: true,
-        nutrition: {},
-    })
+    public static readonly chickenThigh = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Chicken Thigh', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            true, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+                'wholeFoods': [
+                    'https://www.amazon.com/365-Everyday-Value-Boneless-Skinless-Pre-Packaged/dp/B07813VZHR',
+                    'https://www.amazon.com/Bell-Evans-Chicken-Boneless-Skinless/dp/B07881BQT9'
+                ]
+            }, // purchaseLinks
+        )
+    )
 
     public static readonly chickenStock: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Chicken Stock',
@@ -169,18 +178,23 @@ export class AnimalItems {
         nutrition: {},
     })
 
-    public static readonly parmessanCheese: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Parmessan Cheese',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Put parmessan cheese back in refridgerator',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: true,
-        nutrition: {},
-    })
+    public static readonly parmesanCheese = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Parmesan Cheese', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            true, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+                'wholeFoods': ['https://www.amazon.com/365-Everyday-Value-Shredded-Parmesan/dp/B074H51Q58']
+            }, // purchase links
+        )
+    )
 
     public static readonly cheddarCheese: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Cheedar Cheese',
@@ -315,18 +329,25 @@ export class AnimalItems {
         nutrition: {},
     })
 
-    public static readonly butter: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Butter',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Put butter back on right of sink',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: true,
-        nutrition: {},
-    })
+    public static readonly butter = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Butter', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            'Put butter back on right of sink',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            true, // isMeatProduct
+            {
+
+            }, // nutrition
+            unit, // unit
+            {
+                'wholeFoods': ['https://www.amazon.com/365-Everyday-Value-Unsalted-Butter/dp/B074VDJ7KZ']
+            }, // purchaseLinks
+        )
+    )
 
     public static readonly eggPasta: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Egg Pasta',

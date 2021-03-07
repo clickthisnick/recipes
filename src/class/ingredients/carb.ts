@@ -17,6 +17,27 @@ export class CarbItems extends AnimalItems {
         nutrition: {}
     })
 
+    public static readonly lentilSpaghetti = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Lentil Spaghetti', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+                'wholeFoods': [
+                    'https://www.amazon.com/Whole-Foods-Market-Organic-Spaghetti/dp/B07FX14M71',
+                ]
+            }, // purchaseLinks
+        )
+    )
+
     public static readonly penneLentil: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Lentil Penne',
         putAwayTime: 10,
@@ -40,6 +61,47 @@ export class CarbItems extends AnimalItems {
             }
         }
     })
+
+    public static readonly pretzelChips = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Pretzel Chips', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+                'amazonFresh': [
+                    'https://www.amazon.com/Snack-Factory-Pretzel-Crisps-Everything/dp/B013OUXDM4',
+                    'https://www.amazon.com/Snack-Factory-Pretzel-Crisps-Original/dp/B01M63ZHKX',
+                ],
+            }, // purchaseLinks
+        )
+    )
+
+    public static readonly bread = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Bread', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+                'wholeFoods': [
+                    'https://www.amazon.com/Daves-Killer-Bread-Grains-Organic/dp/B001F79MMY',
+                ],
+            }, // purchaseLinks
+        )
+    )
 
     public static readonly spaghettiLentil: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Lentil Spaghetti',
@@ -180,15 +242,59 @@ export class CarbItems extends AnimalItems {
         nutrition: {},
     })
 
-    public static readonly wholeWheatFlour: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Whole Wheat',
+    public static readonly wholeWheatFlour = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Whole Wheat Flour', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+                'wholeFoods': ['https://www.amazon.com/365-Everyday-Value-Organic-Pastry/dp/B074VD2ZKF'],
+            }, // purchaseLinks
+        )
+    )
+
+    public static readonly allPurposeFlour: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'Flour (All Purpose) Flour',
         putAwayTime: 10,
         takeOutTime: 10,
         cleanSteps: '',
         quantity: quantity,
         unit: unit || null,
         wash: false,
-        isTakoutUnitable: true,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        nutrition: {},
+    })
+
+    public static readonly archerFlour: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'Archer Flour',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        nutrition: {},
+    })
+
+    public static readonly buckwheatFlour: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'Buckwheat Flour',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
         isMeatProduct: false,
         nutrition: {},
     })
@@ -202,7 +308,7 @@ export class CarbItems extends AnimalItems {
             quantity, // quantity
             false, // wash
             false, // isTakoutUnitable
-            true, // isMeatProduct
+            false, // isMeatProduct
             {
                 [u.cup.name]: {
                     calories: 678.96,
@@ -211,7 +317,7 @@ export class CarbItems extends AnimalItems {
             }, // nutrition
             unit, // unit
             {
-                'wholefoods': 'https://www.amazon.com/365-Whole-Foods-Market-Organic/dp/B084NJHWTQ'
+                'wholefoods': ['https://www.amazon.com/365-Whole-Foods-Market-Organic/dp/B084NJHWTQ']
             }, // purchaseLinks
         )
     )

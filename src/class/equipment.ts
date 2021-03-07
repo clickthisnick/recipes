@@ -184,6 +184,10 @@ class Ninja extends CookingContainer {
         return Timer.set(5, 'm', `Preheat ${this.name} on heat ${heat}`);
     }
 
+    public preheatAirFry(minutes: number): IStep {
+        return Timer.set(5, 'm', `Turn ${this.name} airfry setting to ${minutes} minutes`);
+    }
+
     public cook(duration: number, type: string, degrees: number): IStep {
         return Timer.set(duration, type, `Cook ${this.name} @ ${degrees}°`);
     }

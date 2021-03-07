@@ -44,7 +44,7 @@ class BakedZiti extends Recipe {
             text.set(['Spread a thin layer of the sauce in the bottom of a 9x13-inch casserole pan']),
             text.set(['Dot the surface with half the', i.ricottaCheese(8, u.ounce)]),
             text.set(['Put a spoonful of sauce into the pasta, stir, and then add the pasta into the casserole.']),
-            text.set(['Pour the rest of the sauce over the pasta, dot the remaining', i.ricottaCheese(7, u.ounce), 'over the pasta, and sprinkle', i.mozzarellaCheese(8, u.ounce), i.parmessanCheese(3, u.ounce), 'on top.']),
+            text.set(['Pour the rest of the sauce over the pasta, dot the remaining', i.ricottaCheese(7, u.ounce), 'over the pasta, and sprinkle', i.mozzarellaCheese(8, u.ounce), i.parmesanCheese(3, u.ounce), 'on top.']),
             text.set(['At this point you could refrigerate or freeze, or bake']),
             Timer.set(25, 'm', 'Bake in oven until light brown and cheese is melted'),
             Timer.end()

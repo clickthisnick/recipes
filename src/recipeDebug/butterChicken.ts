@@ -46,7 +46,7 @@ class ButterChicken extends Recipe {
                 i.chickenThigh(),
                 i.gramMasala(1, u.tbsp),
                 i.paprika(1, u.tsp),
-                i.sugar(2, u.tsp),
+                i.coconutSugar(2, u.tsp),
                 i.cumin(1, u.tsp),
                 i.turmeric(.5, u.tsp),
                 i.salt(1, u.tsp), // .5 for healthier

@@ -15,6 +15,12 @@ export class Units {
     public static readonly cup: IUnitObj = {
         name: 'cup'
     };    
+    public static readonly bag: IUnitObj = {
+        name: 'bag'
+    };    
+    public static readonly container: IUnitObj = {
+        name: 'container'
+    };    
     public static readonly spoon: IUnitObj = {
         name: 'spoon'
     };    
