@@ -3,6 +3,7 @@ let selectedRecipes = []
 let selectedRecipeNames = []
 let ingredients = {}
 let mode = ''
+let perishableItems = {}
 
 function playSound(url) {
     const audio = new Audio(url);
@@ -77,6 +78,10 @@ function addIngredient(istep) {
 
             if (ingredients[ingredient.name]['units'].hasOwnProperty(ingredient.unit.name) === false) {
                 ingredients[ingredient.name]['units'][ingredient.unit.name] = 0
+            }
+
+            if (ingredient.perishableLimit) {
+                perishableItems[ingredient.name] = ingredient.perishableLimit
             }
 
             ingredients[ingredient.name]['units'][ingredient.unit.name] += ingredient.quantity
@@ -155,10 +160,8 @@ function saveShoppingUrl() {
         queryParamter += '&' + encodeURI(ingredient) + '=["' + unit + '", %20' + ingredients[ingredient]['units'][unit] + ']'
     })
 
-
     document.getElementById('shoppingUrl').innerHTML = queryParamter + "<br>"
 }
-
 
 function doneSelectingRecipes() {
     hideElement('select')
@@ -175,6 +178,8 @@ function doneSelectingRecipes() {
         // Show ingredients to the user
         shoppingDiv.innerHTML += '<br>'
         shoppingDiv.innerHTML += selectedRecipeNames
+        shoppingDiv.innerHTML += '<br> Perishable Items: '
+        shoppingDiv.innerHTML += JSON.stringify(perishableItems)
         shoppingDiv.innerHTML += '<br>'
 
         Object.keys(ingredients).forEach(ingredient => {
@@ -329,7 +334,6 @@ function loadTimer(seconds, stepId, stepIdxToShow, async) {
     startTimer(seconds, stepId, stepIdxToShow, async);
 }
 
-
 var shownId = '';
 
 function getCheckedOptions() {
@@ -347,17 +351,17 @@ function getCheckedOptions() {
 
 // Used to hide/show recipes
 function showRecipe() {
-     var id = getCheckedOptions()
+    var id = getCheckedOptions()
 
-     // Show
-     if (document.getElementById(id)) {
-         document.getElementById(id).style.display = 'block';
-     }
+    // Show
+    if (document.getElementById(id)) {
+        document.getElementById(id).style.display = 'block';
+    }
 
-     if (document.getElementById(shownId)) {
-         // Hide previously shown
-         document.getElementById(shownId).style.display = 'none';
-     }
+    if (document.getElementById(shownId)) {
+        // Hide previously shown
+        document.getElementById(shownId).style.display = 'none';
+    }
 
-     shownId = id;
- }
+    shownId = id;
+}

@@ -228,6 +228,7 @@ export class VegetableItems extends SpiceItems {
             {
                 'wholeFoods': ['https://www.amazon.com/365-Everyday-Value-Organic-Chopped/dp/B078J13FYR/'],
             }, // purchaseLinks
+            7, // perishableLimit
         )
     )
 
@@ -260,6 +261,7 @@ export class VegetableItems extends SpiceItems {
                 'wholeFoods': ['https://www.amazon.com/Asparagus-Green-Conventional-Whole-Guarantee/dp/B0787Y51DM'],
                 'amazonFresh': ['https://www.amazon.com/produce-aisle-176899-Asparagus-bunch/dp/B078ZG3THS'],
             }, // purchaseLinks
+            7, // perishableLimit
         )
     )
 
@@ -281,6 +283,7 @@ export class VegetableItems extends SpiceItems {
                     'https://www.amazon.com/Taylor-Farms-Trimmed-Brussels-Sprouts/dp/B077L4BGYN'
                 ],
             }, // purchaseLinks
+            7, // perishableLimit
         )
     )
 
@@ -460,6 +463,7 @@ export class VegetableItems extends SpiceItems {
             {
                 'wholeFoods': ['https://www.amazon.com/Avocado-Hass-Large-Organic-Each/dp/B0785WJ3LT']
             }, // purchaseLinks
+            5, // perishableLimit
         )
     )
 
@@ -794,18 +798,26 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly redOnion: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Red Onion',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: true,
-        isTakoutUnitable: true,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly redOnion = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Red Onion', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+                'wholeFoods': [
+                    'https://www.amazon.com/Onion-Red-Organic-1-Each/dp/B0787Y45SB',
+                ],
+            }, // purchaseLinks
+            10, // perishableLimit
+        )
+    )
 
     public static readonly scallion: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Scallion',
@@ -833,18 +845,24 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly bellPepper: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Bell Pepper',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: true,
-        isTakoutUnitable: true,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly bellPepper = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Bell Pepper', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            true, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+                "wholeFoods": ["https://www.amazon.com/Green-Bell-Pepper-Organic-Each/dp/B07QYB5JNX"]
+            }, // purchase links
+            7, // perishableLimit
+        )
+    )
 
     public static readonly arrowRootStarch: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Arrow Root Starch',
@@ -948,23 +966,31 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly babyBellaMushroom: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Baby Bella Mushroom',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: true,
-        isTakoutUnitable: true,
-        isMeatProduct: false,
-        nutrition: {
-            [u.ounce.name]: {
-                calories: 6.24,
-                sodium: 1.7,
-            }
-        },
-    })
+    public static readonly babyBellaMushroom = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Baby Bella Mushroom', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+                [u.ounce.name]: {
+                    calories: 6.24,
+                    sodium: 1.7,
+                }
+            }, // nutrition
+            unit, // unit
+            {
+                'wholeFoods': [
+                    'https://www.amazon.com/365-Everyday-Value-Organic-Mushrooms/dp/B07NQDLF47',
+                ],
+            }, // purchaseLinks
+            7, // perishableLimit
+        )
+    )
 
     public static readonly zuchinni: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Zuchinni',

@@ -58,6 +58,7 @@ export class Item {
     isMeatProduct: boolean
     nutrition: any
     purchaseLinks?: IPurchaseLink
+    perishableLimit?: number // The number of days we want to keep the item before we should use it. The goal is to use before the perishable limit which may or may not be the expiration date.
 
     // Containers are a singleton
     constructor(
@@ -72,6 +73,7 @@ export class Item {
         nutrition: any,
         unit?: IUnitObj | null,
         purchaseLinks?: IPurchaseLink,
+        perishableLimit?: number,
     ) {
         this.name = name 
         this.putAwayTime = putAwayTime 
@@ -84,6 +86,7 @@ export class Item {
         this.nutrition = nutrition
         this.unit = unit
         this.purchaseLinks = purchaseLinks
+        this.perishableLimit = perishableLimit
     }
 
     public season(ingredients: any): IStep {

@@ -65,6 +65,7 @@ export class AnimalItems {
                     'https://www.amazon.com/Bell-Evans-Chicken-Boneless-Skinless/dp/B07881BQT9'
                 ]
             }, // purchaseLinks
+            7, // perishableLimit
         )
     )
 
@@ -261,6 +262,7 @@ export class AnimalItems {
             {}, // nutrition
             unit, // unit
             {}, // purchase links
+            7, // perishableLimit
         )
     )
 
@@ -277,18 +279,24 @@ export class AnimalItems {
         nutrition: {},
     })
 
-    public static readonly egg: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Egg',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Put eggs back in refridgerator',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: true,
-        nutrition: {},
-    })
+    public static readonly egg = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Egg', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            'Put eggs back in refridgerator',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            true, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+                'wholeFoods': ['https://www.amazon.com/Organic-Valley-Free-Range-Large-Brown/dp/B00CIZCSIM']
+            }, // purchase links
+            14, // Perishable Limit
+        )
+    )
 
     public static readonly eggWhite: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Egg White',

@@ -100,6 +100,7 @@ export class MeatItems extends FruitItems {
             {}, // Nutrition
             unit, // Unit
             {}, // purchaseLinks
+            7, // perishableLimit
         )
     )
 

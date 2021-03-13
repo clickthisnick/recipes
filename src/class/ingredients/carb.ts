@@ -100,6 +100,7 @@ export class CarbItems extends AnimalItems {
                     'https://www.amazon.com/Daves-Killer-Bread-Grains-Organic/dp/B001F79MMY',
                 ],
             }, // purchaseLinks
+            10, // perishableLimit
         )
     )
 
