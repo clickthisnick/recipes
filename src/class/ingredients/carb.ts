@@ -83,6 +83,24 @@ export class CarbItems extends AnimalItems {
         )
     )
 
+    public static readonly mapleSyrup = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Maple Syrup', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+            }, // purchaseLinks
+            // perishableLimit
+        )
+    )
+
     public static readonly bread = (quantity: number = 0, unit: IUnitObj | null = null) => (
         new Item(
             'Bread', // name
