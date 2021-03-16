@@ -144,6 +144,14 @@ class Bowl extends Container {
 }
 
 
+class ZiplockBag extends Container {
+    // Containers are a singleton
+    constructor(id: number) {
+        super('ziplockBag', id)
+    }
+}
+
+
 class KitchenAidMixingBowl extends Container {
     // Containers are a singleton
     constructor(id: number) {
@@ -326,6 +334,10 @@ export class Equipment {
         new KitchenAidMixingBowl(id)
     );
 
+    public static readonly ziplockBag = (id: number = 99) => (
+        new ZiplockBag(id)
+    );
+ 
     public static readonly bowl = (id: number = 99) => (
         new Bowl(id)
     );

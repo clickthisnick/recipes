@@ -119,4 +119,8 @@ export class Item {
     public cutInHalf(): any {
         return text.set(['Cut the', this.name, 'in half'])
     }
+
+    public cutIntoStrips(): any {
+        return text.set(['Cut the', this.name, 'into strips'])
+    }
 }
