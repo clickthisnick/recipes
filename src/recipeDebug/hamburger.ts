@@ -22,7 +22,7 @@ class Hamburgers extends Recipe {
         this.steps = [
             text.set(['Form 2, 1 inch hamburgers with', i.groundBeef8020(1, u.pound)]),
             e.pan().add(i.item('hamburgers')),
-            e.pan().cook(6, 'm', 5),
+            e.pan().cook(6, 'm', 4),
             Timer.end(),
             i.item('hamburger').season([
                 i.smokedPaprika(2, u.dash),
@@ -34,7 +34,7 @@ class Hamburgers extends Recipe {
                 i.Groups.mushroom(5, u.slice),
                 i.Groups.onion(5, u.slice),
             ]),
-            e.pan().cook(7, 'm', 5),
+            e.pan().cook(7, 'm', 4),
             Timer.end(),
             i.item('hamburger').season([
                 i.smokedPaprika(2, u.dash),
@@ -42,7 +42,7 @@ class Hamburgers extends Recipe {
                 i.garlicPowder(2, u.dash)
             ]),
             text.set(['Flip hamburgers']),
-            e.pan().cook(7, 'm', 5),
+            e.pan().cook(7, 'm', 4),
             Timer.end(),
             text.set(['Flip hamburgers']),
             Timer.set(5, 'm', 'Turn off heat and let food rest in pan'),
