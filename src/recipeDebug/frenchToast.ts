@@ -20,22 +20,24 @@ class FrenchToast extends Recipe {
     constructor() {
         super();
         this.steps = [
-            e.pan().preheat(6, 4),
+            text.set(['This makes 5 french toast slices']),
+            e.pan().preheat(4, 4),
             e.bowl().add([
                 i.egg(3, u.unit),
-                i.cinnamon(2, u.tsp),
+                i.oatMilk(3, u.tbsp),
+                i.cinnamon(1, u.tsp),
             ]),
             e.bowl().stir(),
             Timer.end(),
             e.pan().add([
-                i.butter(1, u.tsp),
+                i.coconutOil(1, u.tsp),
             ]),
             text.set(['Dip the', i.bread(), 'in the mixture']),
             e.pan().add(i.item('Dipped bread')),
-            e.pan().cook(3, 'm'),
+            e.pan().cook(1.75, 'm'),
             Timer.end(),
             text.set(['Flip french toast']),
-            e.pan().cook(2.5, 'm'),
+            e.pan().cook(1.75, 'm'),
             Timer.end(),
         ]
     }
