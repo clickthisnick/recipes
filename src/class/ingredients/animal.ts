@@ -20,19 +20,6 @@ export class AnimalItems {
         )
     )
 
-    public static readonly chickenBreastPackage: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name:'Chicken Breast Package',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: true,
-        nutrition: {},
-    })
-
     public static readonly chickenDrumstickPackage: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Chicken Drumstick Package',
         putAwayTime: 10,
@@ -45,6 +32,28 @@ export class AnimalItems {
         isMeatProduct: true,
         nutrition: {},
     })
+
+    public static readonly chickenBreast = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Chicken Breast', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            true, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+                'wf': [
+                    'https://www.amazon.com/365-Everyday-Value-Boneless-Skinless/dp/B0787Y555X/ref=sxin_9_wf_dsk_ap_sira_0o_wf',
+                ]
+            }, // purchaseLinks
+            7, // perishableLimit
+        )
+    )
 
     public static readonly chickenThigh = (quantity: number = 0, unit: IUnitObj | null = null) => (
         new Item(
@@ -60,7 +69,7 @@ export class AnimalItems {
             }, // nutrition
             unit, // unit
             {
-                'wholeFoods': [
+                'wf': [
                     'https://www.amazon.com/365-Everyday-Value-Boneless-Skinless-Pre-Packaged/dp/B07813VZHR',
                     'https://www.amazon.com/Bell-Evans-Chicken-Boneless-Skinless/dp/B07881BQT9'
                 ]
@@ -192,7 +201,7 @@ export class AnimalItems {
             {}, // nutrition
             unit, // unit
             {
-                'wholeFoods': ['https://www.amazon.com/365-Everyday-Value-Shredded-Parmesan/dp/B074H51Q58']
+                'wf': ['https://www.amazon.com/365-Everyday-Value-Shredded-Parmesan/dp/B074H51Q58']
             }, // purchase links
         )
     )
@@ -292,7 +301,7 @@ export class AnimalItems {
             {}, // nutrition
             unit, // unit
             {
-                'wholeFoods': ['https://www.amazon.com/Organic-Valley-Free-Range-Large-Brown/dp/B00CIZCSIM']
+                'wf': ['https://www.amazon.com/Organic-Valley-Free-Range-Large-Brown/dp/B00CIZCSIM']
             }, // purchase links
             14, // Perishable Limit
         )
@@ -352,7 +361,7 @@ export class AnimalItems {
             }, // nutrition
             unit, // unit
             {
-                'wholeFoods': ['https://www.amazon.com/365-Everyday-Value-Unsalted-Butter/dp/B074VDJ7KZ']
+                'wf': ['https://www.amazon.com/365-Everyday-Value-Unsalted-Butter/dp/B074VDJ7KZ']
             }, // purchaseLinks
         )
     )

@@ -31,7 +31,7 @@ export class CarbItems extends AnimalItems {
             }, // nutrition
             unit, // unit
             {
-                'wholeFoods': [
+                'wf': [
                     'https://www.amazon.com/Whole-Foods-Market-Organic-Spaghetti/dp/B07FX14M71',
                 ]
             }, // purchaseLinks
@@ -114,7 +114,7 @@ export class CarbItems extends AnimalItems {
             {}, // nutrition
             unit, // unit
             {
-                'wholeFoods': [
+                'wf': [
                     'https://www.amazon.com/Daves-Killer-Bread-Grains-Organic/dp/B001F79MMY',
                 ],
             }, // purchaseLinks
@@ -261,6 +261,24 @@ export class CarbItems extends AnimalItems {
         nutrition: {},
     })
 
+    public static readonly oatMilk = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Oat Milk', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+                'wf': ['https://www.amazon.com/Oatly-Milk-Oat-Full-Fat/dp/B07SX36KZZ/ref=sr_1_12_0o_wf'],
+            }, // purchaseLinks
+        )
+    )
+
     public static readonly wholeWheatFlour = (quantity: number = 0, unit: IUnitObj | null = null) => (
         new Item(
             'Whole Wheat Flour', // name
@@ -274,7 +292,7 @@ export class CarbItems extends AnimalItems {
             {}, // nutrition
             unit, // unit
             {
-                'wholeFoods': ['https://www.amazon.com/365-Everyday-Value-Organic-Pastry/dp/B074VD2ZKF'],
+                'wf': ['https://www.amazon.com/365-Everyday-Value-Organic-Pastry/dp/B074VD2ZKF'],
             }, // purchaseLinks
         )
     )
@@ -336,7 +354,7 @@ export class CarbItems extends AnimalItems {
             }, // nutrition
             unit, // unit
             {
-                'wholefoods': ['https://www.amazon.com/365-Whole-Foods-Market-Organic/dp/B084NJHWTQ']
+                'wf': ['https://www.amazon.com/365-Whole-Foods-Market-Organic/dp/B084NJHWTQ']
             }, // purchaseLinks
         )
     )

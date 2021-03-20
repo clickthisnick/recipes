@@ -19,7 +19,7 @@ export class SauceItems extends OilItems {
             }, // nutrition
             unit, // unit
             {
-                'wholeFoods': ['https://www.amazon.com/Native-Forest-Coconut-Cream-organic/dp/B07893W8C1'],
+                'wf': ['https://www.amazon.com/Native-Forest-Coconut-Cream-organic/dp/B07893W8C1'],
             }, // purchaseLinks
         )
     )
@@ -121,7 +121,7 @@ export class SauceItems extends OilItems {
                 sugar: 0,
             }
         },
-        link: 'https://www.amazon.com/365-Everyday-Value-Organic-Mustard/dp/B074J6RQZB?fpw=alm&s=wholefoods'
+        link: 'https://www.amazon.com/365-Everyday-Value-Organic-Mustard/dp/B074J6RQZB?fpw=alm&s=wf'
     })
 
     public static readonly germanMustard: IItem = (quantity: number = 0, unit: IUnitObj) => ({
@@ -239,7 +239,7 @@ export class SauceItems extends OilItems {
             }, // nutrition
             unit, // unit
             {
-                'wholeFoods': [
+                'wf': [
                     'https://www.amazon.com/365-Everyday-Value-Organic-Cheese/dp/B074H66176',
                     'https://www.amazon.com/365-Everyday-Value-Portobello-Mushroom/dp/B074J6YB78'
                 ]
@@ -265,7 +265,7 @@ export class SauceItems extends OilItems {
             }, // nutrition
             unit, // unit
             {
-                'wholefoods': [
+                'wf': [
                     'https://www.amazon.com/Wing-Time-Buffalo-Sauce-Ounce/dp/B003S2N5XG',
                     'https://www.amazon.com/WING-TIME-SAUCE-BUFFALO-MED/dp/B003S2QZVK'
                 ]

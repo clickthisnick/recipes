@@ -65,7 +65,7 @@ export class OilItems extends MeatItems {
             }, // nutrition
             unit, // unit
             {
-                'wholeFoods': ['https://www.amazon.com/365-Everyday-Value-Organic-Coconut/dp/B074H5BV9Y']
+                'wf': ['https://www.amazon.com/365-Everyday-Value-Organic-Coconut/dp/B074H5BV9Y']
             }, // purchase links
         )
     )
@@ -92,7 +92,7 @@ export class OilItems extends MeatItems {
             }, // nutrition
             unit, // unit
             {
-                'wholeFoods': ['https://www.amazon.com/365-Everyday-Value-Unfiltered-Californian/dp/B074HKKC3W']
+                'wf': ['https://www.amazon.com/365-Everyday-Value-Unfiltered-Californian/dp/B074HKKC3W']
             }, // purchase links
         )
     )

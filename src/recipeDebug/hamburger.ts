@@ -31,8 +31,8 @@ class Hamburgers extends Recipe {
             ]),
             text.set(['Flip hamburgers']),
             e.pan().add([
-                i.babyBellaMushroom(5, u.slice),
-                i.redOnion(5, u.slice),
+                i.Groups.mushroom(5, u.slice),
+                i.Groups.onion(5, u.slice),
             ]),
             e.pan().cook(7, 'm', 5),
             Timer.end(),

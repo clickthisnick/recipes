@@ -22,7 +22,7 @@ export class ChickenFajita extends Recipe {
         super();
         this.steps = [
             e.ziplockBag().add([
-                i.chickenThigh(1, u.pound),
+                i.Groups.chicken(1, u.pound),
                 i.oliveOil(2, u.tbsp),
                 i.chilliPowder(.5, u.tbsp),
                 i.cumin(.5, u.tbsp),
@@ -42,15 +42,15 @@ export class ChickenFajita extends Recipe {
             text.set(['Flip Chicken']),
             Timer.end(),
             e.pan().cook(7, 'm', 5),
-            i.redOnion().cutIntoStrips(),
-            i.babyBellaMushroom().cutIntoStrips(),
-            i.bellPepper().cutIntoStrips(),
+            i.Groups.onion(.5, u.unit).cutIntoStrips(),
+            i.Groups.mushroom(4, u.ounce).cutIntoStrips(),
+            i.greenBellPepper(1, u.unit).cutIntoStrips(),
             Timer.end(),
             text.set(['Take chicken out of pan']),
             e.pan().add([
-                i.redOnion(),
-                i.babyBellaMushroom(),
-                i.bellPepper(),
+                i.Groups.onion(),
+                i.Groups.mushroom(),
+                i.greenBellPepper(),
             ]),
             e.pan().cook(5, 'm', 5),
             Timer.end(),

@@ -20,9 +20,9 @@ class FrenchToast extends Recipe {
     constructor() {
         super();
         this.steps = [
-            e.pan().preheat(5, 5),
+            e.pan().preheat(6, 4),
             e.bowl().add([
-                i.egg(2, u.unit),
+                i.egg(3, u.unit),
                 i.cinnamon(2, u.tsp),
             ]),
             e.bowl().stir(),

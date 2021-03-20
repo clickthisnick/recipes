@@ -1,7 +1,6 @@
 import { IUnitObj } from '../../constants/units';
 import { IStep, istep } from '../step';
 import { Serializer as s } from '../serializer';
-import { Text as text} from '../text';
 
 export interface IEstimates {
     calories?: number;
@@ -112,15 +111,31 @@ export class Item {
         return addIStep
     }
 
-    public mixIn(ingredients: any): any {
-        return text.set(['Mix in', ingredients, 'with', this.name])
+    public mixIn(ingredients: any): IStep {
+        let addIStep = istep()
+
+        addIStep.text = ['Mix in', ingredients, 'with', this.name].join('' )
+
+        addIStep.ingredients.push(this)
+        addIStep.ingredients.push(ingredients)
+        return addIStep;
     }
 
-    public cutInHalf(): any {
-        return text.set(['Cut the', this.name, 'in half'])
+    public cutInHalf(): IStep {
+        let addIStep = istep()
+
+        addIStep.text = ['Cut the', this.name, 'in half'].join(' ')
+        addIStep.ingredients.push(this)
+
+        return addIStep;
     }
 
-    public cutIntoStrips(): any {
-        return text.set(['Cut the', this.name, 'into strips'])
+    public cutIntoStrips(): IStep {
+        let addIStep = istep()
+
+        addIStep.text = ['Cut the',  this.name, 'into strips'].join(' ')
+        addIStep.ingredients.push(this)
+
+        return addIStep;
     }
 }

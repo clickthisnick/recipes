@@ -12,12 +12,12 @@ export class MealRecipe extends RecipeContainer {
         this.recipeGroup = c.meal;
         this.recipeName = 'Spaghetti'
         this.variations = [
-            WholeFoodsLentilSpaghetti, DontUseModernBrandLentilPenne
+            LentilSpaghetti, DontUseModernBrandLentilPenne
         ]
     }
 }
 
-export class WholeFoodsLentilSpaghetti extends Recipe {
+export class LentilSpaghetti extends Recipe {
     constructor() {
         super();
         this.steps = [

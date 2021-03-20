@@ -22,13 +22,13 @@ class EggPepperBuckets extends Recipe {
         this.steps = [
             e.pan().add(i.avacadoOil(1, u.second)),
             e.pan().preheat(6, 2),
-            text.set(['Cut into 4 horitzontal buckets the', i.bellPepper(1, u.unit)]),
+            text.set(['Cut into 4 horitzontal buckets the', i.greenBellPepper(1, u.unit)]),
             Timer.end(),
-            e.pan().add(i.bellPepper()),
+            e.pan().add(i.greenBellPepper()),
             e.pan().cook(2, 'm'),
             Timer.end(),
-            text.set(['Flip', i.bellPepper()]),
-            text.set(['Crack', i.egg(4, u.unit), 'and put into the horizontal slices of', i.bellPepper()]),
+            text.set(['Flip', i.greenBellPepper()]),
+            text.set(['Crack', i.egg(4, u.unit), 'and put into the horizontal slices of', i.greenBellPepper()]),
             e.pan().cook(3, 'm'),
             i.item('egg').season([
                 i.smokedPaprika(1, u.dash),
@@ -37,7 +37,7 @@ class EggPepperBuckets extends Recipe {
                 i.seaSalt(1, u.dash),
             ]),
             Timer.end(),
-            text.set(['Flip', i.bellPepper()]),
+            text.set(['Flip', i.greenBellPepper()]),
             i.item('egg').season([
                 i.smokedPaprika(1, u.dash),
                 i.chilliPowder(1, u.dash),

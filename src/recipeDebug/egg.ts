@@ -22,7 +22,7 @@ export class ThawedHomemadeSausageEggs extends Recipe {
         this.steps = [
             e.pan().add([
                 i.homemadeItalianSausage(8, u.ounce),
-                i.babyBellaMushroom(4, u.ounce),
+                i.Groups.mushroom(4, u.ounce),
             ]),
             e.pan().cook(7, 'm', 4),
             Timer.end(),

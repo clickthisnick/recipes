@@ -9,12 +9,12 @@ export class MealRecipe extends Recipe {
         super();
         this.recipeGroup = c.chinese;
         this.addIngredients([
-            i.redOnion(.5),
+            i.Groups.onion(.5),
             i.scallion(3),
             i.garlicClove(2),
-            i.bellPepper(),
+            i.greenBellPepper(),
             i.zuchinni(2),
-            i.babyBellaMushroom(5),
+            i.Groups.mushroom(5),
             i.soySauce(1, u.tsp),
             i.padThaiSauce(2, u.tbsp),
             i.spiriliazer(),
@@ -26,11 +26,11 @@ export class MealRecipe extends Recipe {
         this.prep();
         this.addSteps([
             ['Put 3 seconds of', this.get(i.vegetableOil()), 'in pantelligent on 4'],
-            ['Cut', this.get(i.redOnion())],
+            ['Cut', this.get(i.Groups.onion())],
             ['Cut', this.get(i.scallion())],
-            ['Cut', this.get(i.bellPepper())],
+            ['Cut', this.get(i.greenBellPepper())],
             ['Cut', this.get(i.garlicClove())],
-            ['Cut', this.get(i.babyBellaMushroom())],
+            ['Cut', this.get(i.Groups.mushroom())],
             [Timer.set(7, 'm', 'put vegetables in pan')],
             [this.get(i.spiriliazer()), this.get(i.zuchinni())],
             [Timer.set(7, 'm')],

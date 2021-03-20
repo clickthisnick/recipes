@@ -200,18 +200,23 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly almondMilk: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Almond Milk',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly almondMilk = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Almond Milk', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            true, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+                'wf': ['https://www.amazon.com/365-Everyday-Value-Almondmilk-Unsweetened/dp/B074H6M4M4/ref=sr_1_21_0o_wf']
+            }, // purchase links
+        )
+    )
 
     public static readonly kale = (quantity: number = 0, unit: IUnitObj | null = null) => (
         new Item(
@@ -226,7 +231,7 @@ export class VegetableItems extends SpiceItems {
             {}, // nutrition
             unit, // unit
             {
-                'wholeFoods': ['https://www.amazon.com/365-Everyday-Value-Organic-Chopped/dp/B078J13FYR/'],
+                'wf': ['https://www.amazon.com/365-Everyday-Value-Organic-Chopped/dp/B078J13FYR/'],
             }, // purchaseLinks
             7, // perishableLimit
         )
@@ -258,7 +263,7 @@ export class VegetableItems extends SpiceItems {
             {}, // nutrition
             unit, // unit
             {
-                'wholeFoods': ['https://www.amazon.com/Asparagus-Green-Conventional-Whole-Guarantee/dp/B0787Y51DM'],
+                'wf': ['https://www.amazon.com/Asparagus-Green-Conventional-Whole-Guarantee/dp/B0787Y51DM'],
                 'amazonFresh': ['https://www.amazon.com/produce-aisle-176899-Asparagus-bunch/dp/B078ZG3THS'],
             }, // purchaseLinks
             7, // perishableLimit
@@ -278,7 +283,7 @@ export class VegetableItems extends SpiceItems {
             {}, // nutrition
             unit, // unit
             {
-                'wholeFoods': [
+                'wf': [
                     'https://www.amazon.com/Brussels-Sprout-Conventional-1-Bag/dp/B07813LYD6',
                     'https://www.amazon.com/Taylor-Farms-Trimmed-Brussels-Sprouts/dp/B077L4BGYN'
                 ],
@@ -300,7 +305,7 @@ export class VegetableItems extends SpiceItems {
             {}, // nutrition
             unit, // unit
             {
-                'wholeFoods': [
+                'wf': [
                     'https://www.amazon.com/365-Everyday-Value-Organic-Cinnamon/dp/B074H5CNFD',
                 ],
             }, // purchaseLinks
@@ -441,7 +446,7 @@ export class VegetableItems extends SpiceItems {
             {}, // nutrition
             unit, // unit
             {
-                'wholeFoods': ['https://www.amazon.com/365-Everyday-Value-Organic-Black/dp/B074H6QVKY']
+                'wf': ['https://www.amazon.com/365-Everyday-Value-Organic-Black/dp/B074H6QVKY']
             }, // purchase links
         )
     )
@@ -461,7 +466,7 @@ export class VegetableItems extends SpiceItems {
             }, // nutrition
             unit, // unit
             {
-                'wholeFoods': ['https://www.amazon.com/Avocado-Hass-Large-Organic-Each/dp/B0785WJ3LT']
+                'wf': ['https://www.amazon.com/Avocado-Hass-Large-Organic-Each/dp/B0785WJ3LT']
             }, // purchaseLinks
             5, // perishableLimit
         )
@@ -532,7 +537,7 @@ export class VegetableItems extends SpiceItems {
             {}, // nutrition
             unit, // unit
             {
-                'wholeFoods': [
+                'wf': [
                     'https://www.amazon.com/365-Everyday-Value-Organic-Concentrate/dp/B074H8KLVL',
                 ],
             }, // purchaseLinks
@@ -780,7 +785,8 @@ export class VegetableItems extends SpiceItems {
             }, // nutrition
             unit, // unit
             {
-                'wholeFoods': ['https://www.amazon.com/White-Onion-Organic-1-Each/dp/B0787Z3T3B'],
+                'Conventional - wf': ['https://www.amazon.com/Onion-Yellow-Conventional-1-Each/dp/B07QTZBZ2C/ref=sr_1_8_0g_wf'],
+                'Organic - wf': ['https://www.amazon.com/White-Onion-Organic-1-Each/dp/B0787Z3T3B'],
             }, // purchaseLinks
         )
     )
@@ -811,7 +817,10 @@ export class VegetableItems extends SpiceItems {
             {}, // nutrition
             unit, // unit
             {
-                'wholeFoods': [
+                'Conventional - wf': [
+                    'https://www.amazon.com/Onion-Red-Conventional-1-Each/dp/B0787T926H/ref=sr_1_2_0g_wf'
+                ],
+                'Organic - wf': [
                     'https://www.amazon.com/Onion-Red-Organic-1-Each/dp/B0787Y45SB',
                 ],
             }, // purchaseLinks
@@ -845,7 +854,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly bellPepper = (quantity: number = 0, unit: IUnitObj | null = null) => (
+    public static readonly greenBellPepper = (quantity: number = 0, unit: IUnitObj | null = null) => (
         new Item(
             'Bell Pepper', // name
             10, // putAwayTime
@@ -858,7 +867,8 @@ export class VegetableItems extends SpiceItems {
             {}, // nutrition
             unit, // unit
             {
-                "wholeFoods": ["https://www.amazon.com/Green-Bell-Pepper-Organic-Each/dp/B07QYB5JNX"]
+                "Conventional - wf": ["https://www.amazon.com/Green-Bell-Pepper-Conventional-Each/dp/B07815JXHB/ref=sr_1_1_0g_wf"],
+                "Organic - wf": ["https://www.amazon.com/Green-Bell-Pepper-Organic-Each/dp/B07QYB5JNX/ref=sr_1_2_0g_wf"],
             }, // purchase links
             7, // perishableLimit
         )
@@ -914,7 +924,7 @@ export class VegetableItems extends SpiceItems {
             }, // nutrition
             unit, // unit
             {
-                'wholeFoods': ['https://www.amazon.com/365-Everyday-Value-Organic-Tomato/dp/B074H5HH2H'],
+                'wf': ['https://www.amazon.com/365-Everyday-Value-Organic-Tomato/dp/B074H5HH2H'],
             }, // purchaseLinks
         )
     )
@@ -960,9 +970,31 @@ export class VegetableItems extends SpiceItems {
             }, // nutrition
             unit, // unit
             {
-                'wholeFoods': ['https://www.amazon.com/Garlic-Organic-1-Each/dp/B0788FLWK1'],
-                'amazonFresh': ['https://www.amazon.com/produce-aisle-mburring-Organic-Garlic/dp/B0035APRLO']
+                'wf': ['https://www.amazon.com/Garlic-Organic-1-Each/dp/B0788FLWK1'],
+                'fresh': ['https://www.amazon.com/produce-aisle-mburring-Organic-Garlic/dp/B0035APRLO']
             }, // purchaseLinks
+        )
+    )
+
+    public static readonly whiteMushroom = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'White Mushroom', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+                'wf - sliced': [
+                    'https://www.amazon.com/Mushroom-Sliced-Conventional-8-Ounce/dp/B07B6B8PGG/ref=sr_1_5_0o_wf',
+                ],
+            }, // purchaseLinks
+            7, // perishableLimit
         )
     )
 
@@ -984,9 +1016,15 @@ export class VegetableItems extends SpiceItems {
             }, // nutrition
             unit, // unit
             {
-                'wholeFoods': [
+                'wf - organic': [
                     'https://www.amazon.com/365-Everyday-Value-Organic-Mushrooms/dp/B07NQDLF47',
                 ],
+                'wf - sliced': [
+                    'https://www.amazon.com/365-Everyday-Value-Sliced-Mushrooms/dp/B07NQCSBBK/ref=sr_1_3_0o_wf',
+                ],
+                'wf - whole': [
+                    'https://www.amazon.com/Mushroom-Baby-Bella-8-Ounce/dp/B08LLCB9FC/ref=sr_1_1_0o_wf',
+                ]
             }, // purchaseLinks
             7, // perishableLimit
         )

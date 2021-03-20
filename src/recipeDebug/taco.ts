@@ -23,7 +23,7 @@ class GroundBeefTaco extends Recipe {
         this.steps = [
             e.pan().add(i.groundBeef8020(1, u.pound)),
             e.pan().cook(6, 'm', 6),
-            text.set(['Dice', i.redOnion(.5, u.unit)]),
+            text.set(['Dice', i.Groups.onion(.5, u.unit)]),
             Timer.end(),
             e.pan().add([
                 i.cumin(4, u.dash),
@@ -41,7 +41,7 @@ class GroundBeefTaco extends Recipe {
                 i.salsa(1, u.unit),
                 i.hotSauce(1, u.unit),
                 i.sourCream(1, u.unit),
-                i.redOnion(),
+                i.Groups.onion(),
             ])
         ];
     }
@@ -53,7 +53,7 @@ class BeefEyeRoundSteakTaco extends Recipe {
         this.steps = [
             e.ninja().add(i.BeefEyeRoundSteak(1, u.pound)),
             e.ninja().cook(2.5, 'm', 450),
-            text.set(['Dice', i.redOnion(.5, u.unit)]),
+            text.set(['Dice', i.Groups.onion(.5, u.unit)]),
             Timer.end(),
             text.set(['Flip']),
             e.ninja().cook(2.5, 'm', 450),
@@ -67,7 +67,7 @@ class BeefEyeRoundSteakTaco extends Recipe {
                 i.salsa(1, u.unit),
                 i.hotSauce(1, u.unit),
                 i.sourCream(1, u.unit),
-                i.redOnion(),
+                i.Groups.onion(),
             ])
         ];
     }
