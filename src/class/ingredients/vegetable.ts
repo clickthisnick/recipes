@@ -1,6 +1,7 @@
 import { IItem, Item } from './item';
 import { IUnitObj, Units as u } from '../../constants/units';
 import { SpiceItems } from './spice';
+import { Stores } from '../../class/stores';
 
 export class VegetableItems extends SpiceItems {
 
@@ -200,6 +201,26 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
+    public static readonly hamburgerBun = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Hamburger Bun', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            true, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+                [Stores.wegmans]: {
+                    'white': ['https://shop.wegmans.com/product/16394/wegmans-hamburger-rolls-8-pack']
+                }
+            }, // purchase links
+        )
+    )
+
     public static readonly almondMilk = (quantity: number = 0, unit: IUnitObj | null = null) => (
         new Item(
             'Almond Milk', // name
@@ -213,7 +234,9 @@ export class VegetableItems extends SpiceItems {
             {}, // nutrition
             unit, // unit
             {
-                'wf': ['https://www.amazon.com/365-Everyday-Value-Almondmilk-Unsweetened/dp/B074H6M4M4/ref=sr_1_21_0o_wf']
+                [Stores.wholeFoods]: {
+                    'unsweetented': ['https://www.amazon.com/365-Everyday-Value-Almondmilk-Unsweetened/dp/B074H6M4M4/ref=sr_1_21_0o_wf']
+                }
             }, // purchase links
         )
     )
@@ -231,7 +254,9 @@ export class VegetableItems extends SpiceItems {
             {}, // nutrition
             unit, // unit
             {
-                'wf': ['https://www.amazon.com/365-Everyday-Value-Organic-Chopped/dp/B078J13FYR/'],
+                [Stores.wholeFoods]: {
+                    'organic': ['https://www.amazon.com/365-Everyday-Value-Organic-Chopped/dp/B078J13FYR/'],
+                }
             }, // purchaseLinks
             7, // perishableLimit
         )
@@ -263,8 +288,12 @@ export class VegetableItems extends SpiceItems {
             {}, // nutrition
             unit, // unit
             {
-                'wf': ['https://www.amazon.com/Asparagus-Green-Conventional-Whole-Guarantee/dp/B0787Y51DM'],
-                'amazonFresh': ['https://www.amazon.com/produce-aisle-176899-Asparagus-bunch/dp/B078ZG3THS'],
+                [Stores.wegmans]: {
+                    'conventional': ['https://www.amazon.com/Asparagus-Green-Conventional-Whole-Guarantee/dp/B0787Y51DM'],
+                },
+                [Stores.amazonFresh]: {
+                    'conventional': ['https://www.amazon.com/produce-aisle-176899-Asparagus-bunch/dp/B078ZG3THS'],
+                }
             }, // purchaseLinks
             7, // perishableLimit
         )
@@ -283,10 +312,12 @@ export class VegetableItems extends SpiceItems {
             {}, // nutrition
             unit, // unit
             {
-                'wf': [
-                    'https://www.amazon.com/Brussels-Sprout-Conventional-1-Bag/dp/B07813LYD6',
-                    'https://www.amazon.com/Taylor-Farms-Trimmed-Brussels-Sprouts/dp/B077L4BGYN'
-                ],
+                [Stores.wholeFoods]: {
+                    'conventional': [
+                        'https://www.amazon.com/Brussels-Sprout-Conventional-1-Bag/dp/B07813LYD6',
+                        'https://www.amazon.com/Taylor-Farms-Trimmed-Brussels-Sprouts/dp/B077L4BGYN'
+                    ],
+                },
             }, // purchaseLinks
             7, // perishableLimit
         )
@@ -305,9 +336,11 @@ export class VegetableItems extends SpiceItems {
             {}, // nutrition
             unit, // unit
             {
-                'wf': [
-                    'https://www.amazon.com/365-Everyday-Value-Organic-Cinnamon/dp/B074H5CNFD',
-                ],
+                [Stores.wholeFoods]: {
+                    'organic': [
+                        'https://www.amazon.com/365-Everyday-Value-Organic-Cinnamon/dp/B074H5CNFD',
+                    ],
+                }
             }, // purchaseLinks
         )
     )
@@ -446,7 +479,9 @@ export class VegetableItems extends SpiceItems {
             {}, // nutrition
             unit, // unit
             {
-                'wf': ['https://www.amazon.com/365-Everyday-Value-Organic-Black/dp/B074H6QVKY']
+                [Stores.wholeFoods]: {
+                    'organic': ['https://www.amazon.com/365-Everyday-Value-Organic-Black/dp/B074H6QVKY']
+                }
             }, // purchase links
         )
     )
@@ -466,7 +501,9 @@ export class VegetableItems extends SpiceItems {
             }, // nutrition
             unit, // unit
             {
-                'wf': ['https://www.amazon.com/Avocado-Hass-Large-Organic-Each/dp/B0785WJ3LT']
+                [Stores.wholeFoods]: {
+                    'organic': ['https://www.amazon.com/Avocado-Hass-Large-Organic-Each/dp/B0785WJ3LT']
+                }
             }, // purchaseLinks
             5, // perishableLimit
         )
@@ -537,9 +574,14 @@ export class VegetableItems extends SpiceItems {
             {}, // nutrition
             unit, // unit
             {
-                'wf': [
-                    'https://www.amazon.com/365-Everyday-Value-Organic-Concentrate/dp/B074H8KLVL',
-                ],
+                [Stores.wegmans]: {
+                    'conventional': ['https://shop.wegmans.com/product/29839/realime-100-lime-juice-natural-strength']
+                },
+                [Stores.wholeFoods]: {
+                    'organic': [
+                        'https://www.amazon.com/365-Everyday-Value-Organic-Concentrate/dp/B074H8KLVL',
+                    ],
+                }
             }, // purchaseLinks
         )
     )
@@ -674,18 +716,44 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly breadFlour: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Bread Flour',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Put bread flour back in cupboard',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly pickleSpears = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Pickle Spears', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+                [Stores.wholeFoods]: {
+                    'reduce sodium': ['https://shop.wegmans.com/product/32241/wegmans-reduced-sodium-kosher-dill-spears'],
+                }
+            }, // purchaseLinks
+        )
+    )
+
+    public static readonly breadFlour = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Bread Flour', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+            }, // purchaseLinks
+        )
+    )
 
     public static readonly wheatBreadFlour: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Wheat Bread Flour',
@@ -766,7 +834,9 @@ export class VegetableItems extends SpiceItems {
             }, // nutrition
             unit, // unit
             {
-                'amazonFresh': ['https://www.amazon.com/Sabra-Supremely-Spicy-Hummus-17/dp/B00LME9DTM'],
+                [Stores.amazonFresh]: {
+                    'supremely spicy': ['https://www.amazon.com/Sabra-Supremely-Spicy-Hummus-17/dp/B00LME9DTM'],
+                }
             }, // purchaseLinks
         )
     )
@@ -785,8 +855,13 @@ export class VegetableItems extends SpiceItems {
             }, // nutrition
             unit, // unit
             {
-                'Conventional - wf': ['https://www.amazon.com/Onion-Yellow-Conventional-1-Each/dp/B07QTZBZ2C/ref=sr_1_8_0g_wf'],
-                'Organic - wf': ['https://www.amazon.com/White-Onion-Organic-1-Each/dp/B0787Z3T3B'],
+                [Stores.wegmans]: {
+                    'conventional bulk': ['https://shop.wegmans.com/product/16647/10-lb-cooking-onions'],
+                },
+                [Stores.wholeFoods]: {
+                    'conventional': ['https://www.amazon.com/Onion-Yellow-Conventional-1-Each/dp/B07QTZBZ2C/ref=sr_1_8_0g_wf'],
+                    'organic': ['https://www.amazon.com/White-Onion-Organic-1-Each/dp/B0787Z3T3B'],
+                }
             }, // purchaseLinks
         )
     )
@@ -817,12 +892,14 @@ export class VegetableItems extends SpiceItems {
             {}, // nutrition
             unit, // unit
             {
-                'Conventional - wf': [
-                    'https://www.amazon.com/Onion-Red-Conventional-1-Each/dp/B0787T926H/ref=sr_1_2_0g_wf'
-                ],
-                'Organic - wf': [
-                    'https://www.amazon.com/Onion-Red-Organic-1-Each/dp/B0787Y45SB',
-                ],
+                [Stores.wholeFoods]: {
+                    'conventional': [
+                        'https://www.amazon.com/Onion-Red-Conventional-1-Each/dp/B0787T926H/ref=sr_1_2_0g_wf'
+                    ],
+                    'organic': [
+                        'https://www.amazon.com/Onion-Red-Organic-1-Each/dp/B0787Y45SB',
+                    ],
+                }
             }, // purchaseLinks
             10, // perishableLimit
         )
@@ -867,8 +944,13 @@ export class VegetableItems extends SpiceItems {
             {}, // nutrition
             unit, // unit
             {
-                "Conventional - wf": ["https://www.amazon.com/Green-Bell-Pepper-Conventional-Each/dp/B07815JXHB/ref=sr_1_1_0g_wf"],
-                "Organic - wf": ["https://www.amazon.com/Green-Bell-Pepper-Organic-Each/dp/B07QYB5JNX/ref=sr_1_2_0g_wf"],
+                [Stores.wegmans]: {
+                    'conventional': ["https://shop.wegmans.com/product/31857/extra-large-green-peppers"],
+                },
+                [Stores.wholeFoods]: {
+                    "conventional": ["https://www.amazon.com/Green-Bell-Pepper-Conventional-Each/dp/B07815JXHB/ref=sr_1_1_0g_wf"],
+                    "organic": ["https://www.amazon.com/Green-Bell-Pepper-Organic-Each/dp/B07QYB5JNX/ref=sr_1_2_0g_wf"],
+                }
             }, // purchase links
             7, // perishableLimit
         )
@@ -924,7 +1006,13 @@ export class VegetableItems extends SpiceItems {
             }, // nutrition
             unit, // unit
             {
-                'wf': ['https://www.amazon.com/365-Everyday-Value-Organic-Tomato/dp/B074H5HH2H'],
+                [Stores.wegmans]: {
+                    'organic': ['https://shop.wegmans.com/product/111564/wegmans-organic-tomato-paste'],
+                    'conventional': ['https://shop.wegmans.com/product/112566/wegmans-tomato-paste']
+                },
+                [Stores.wholeFoods]: {
+                    'organic': ['https://www.amazon.com/365-Everyday-Value-Organic-Tomato/dp/B074H5HH2H'],
+                }
             }, // purchaseLinks
         )
     )
@@ -970,8 +1058,15 @@ export class VegetableItems extends SpiceItems {
             }, // nutrition
             unit, // unit
             {
-                'wf': ['https://www.amazon.com/Garlic-Organic-1-Each/dp/B0788FLWK1'],
-                'fresh': ['https://www.amazon.com/produce-aisle-mburring-Organic-Garlic/dp/B0035APRLO']
+                [Stores.wegmans]: {
+                    'conventional': ['https://shop.wegmans.com/product/232182/wegmans-garlic-5-count-family-pack'],
+                },
+                [Stores.wholeFoods]: {
+                    ['organic']: ['https://www.amazon.com/Garlic-Organic-1-Each/dp/B0788FLWK1'],
+                },
+                [Stores.amazonFresh]: {
+                    'organic': ['https://www.amazon.com/produce-aisle-mburring-Organic-Garlic/dp/B0035APRLO']
+                }
             }, // purchaseLinks
         )
     )
@@ -990,9 +1085,11 @@ export class VegetableItems extends SpiceItems {
             }, // nutrition
             unit, // unit
             {
-                'wf - sliced': [
-                    'https://www.amazon.com/Mushroom-Sliced-Conventional-8-Ounce/dp/B07B6B8PGG/ref=sr_1_5_0o_wf',
-                ],
+                [Stores.wholeFoods]: {
+                    'sliced': [
+                        'https://www.amazon.com/Mushroom-Sliced-Conventional-8-Ounce/dp/B07B6B8PGG/ref=sr_1_5_0o_wf',
+                    ],
+                },
             }, // purchaseLinks
             7, // perishableLimit
         )
@@ -1016,15 +1113,22 @@ export class VegetableItems extends SpiceItems {
             }, // nutrition
             unit, // unit
             {
-                'wf - organic': [
-                    'https://www.amazon.com/365-Everyday-Value-Organic-Mushrooms/dp/B07NQDLF47',
-                ],
-                'wf - sliced': [
-                    'https://www.amazon.com/365-Everyday-Value-Sliced-Mushrooms/dp/B07NQCSBBK/ref=sr_1_3_0o_wf',
-                ],
-                'wf - whole': [
-                    'https://www.amazon.com/Mushroom-Baby-Bella-8-Ounce/dp/B08LLCB9FC/ref=sr_1_1_0o_wf',
-                ]
+                [Stores.wegmans]: {
+                    'conventional': [
+                        'https://shop.wegmans.com/product/3728/wegmans-mushrooms-baby-bella-whole-family-pack'
+                    ],
+                },
+                [Stores.wholeFoods]: {
+                    'organic': [
+                        'https://www.amazon.com/365-Everyday-Value-Organic-Mushrooms/dp/B07NQDLF47',
+                    ],
+                    'sliced': [
+                        'https://www.amazon.com/365-Everyday-Value-Sliced-Mushrooms/dp/B07NQCSBBK/ref=sr_1_3_0o_wf',
+                    ],
+                    'whole': [
+                        'https://www.amazon.com/Mushroom-Baby-Bella-8-Ounce/dp/B08LLCB9FC/ref=sr_1_1_0o_wf',
+                    ]
+                }
             }, // purchaseLinks
             7, // perishableLimit
         )

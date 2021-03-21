@@ -187,12 +187,25 @@ function doneSelectingRecipes() {
 
             // When you click a saved url we don't include the purchaseLinks
             if (ingredients[ingredient].hasOwnProperty('purchaseLinks')) {
-                Object.keys(ingredients[ingredient]['purchaseLinks']).forEach(store => {
-                    const storeLinks = ingredients[ingredient]['purchaseLinks'][store];
+                const stores = Object.keys(ingredients[ingredient]['purchaseLinks']).sort()
 
-                    console.log(storeLinks);
-                    storeLinks.forEach(storeLink => {
-                        links += `&nbsp;<a href="${storeLink}" target="_blank">${store}</a>`
+                stores.forEach(store => {
+                    let linkCount = 0;
+                    links += `</br> ${store}: `
+
+                    const storeLinks = ingredients[ingredient]['purchaseLinks'][store];
+                    const storeKeys = Object.keys(storeLinks);
+
+                    storeKeys.forEach(storeKey => {
+                        const storeKeyLink = storeLinks[storeKey]
+
+                        if (linkCount > 0) {
+                            links += '&nbsp;|&nbsp;'
+                        }
+
+                        links += `&nbsp;<a href="${storeKeyLink}" target="_blank">${storeKey}</a>`
+
+                        linkCount += 1;
                     })
                 })
             }

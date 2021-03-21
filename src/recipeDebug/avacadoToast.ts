@@ -20,7 +20,7 @@ class AvacadoToast2People extends Recipe {
     constructor() {
         super();
         this.steps = [
-            text.set(['Put', i.bread(2, u.unit), 'on 5 in toaster']),
+            text.set(['Put', i.whiteBread(2, u.unit), 'on 5 in toaster']),
             Timer.set(3.5, 'm', 'Toast'),
             e.bowl().add([
                 i.avacadoLarge(1, u.unit),

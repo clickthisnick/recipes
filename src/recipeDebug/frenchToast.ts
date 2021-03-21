@@ -32,7 +32,7 @@ class FrenchToast extends Recipe {
             e.pan().add([
                 i.coconutOil(1, u.tsp),
             ]),
-            text.set(['Dip the', i.bread(), 'in the mixture']),
+            text.set(['Dip the', i.whiteBread(), 'in the mixture']),
             e.pan().add(i.item('Dipped bread')),
             e.pan().cook(1.75, 'm'),
             Timer.end(),

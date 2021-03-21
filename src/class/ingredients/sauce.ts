@@ -1,6 +1,7 @@
 import { IItem, Item } from './item';
 import { IUnitObj, Units as u } from '../../constants/units';
 import { OilItems } from './oil';
+import { Stores } from '../../class/stores';
 
 export class SauceItems extends OilItems {
 
@@ -19,7 +20,9 @@ export class SauceItems extends OilItems {
             }, // nutrition
             unit, // unit
             {
-                'wf': ['https://www.amazon.com/Native-Forest-Coconut-Cream-organic/dp/B07893W8C1'],
+                [Stores.wholeFoods]: {
+                    'organic': ['https://www.amazon.com/Native-Forest-Coconut-Cream-organic/dp/B07893W8C1'],
+                }
             }, // purchaseLinks
         )
     )
@@ -239,10 +242,13 @@ export class SauceItems extends OilItems {
             }, // nutrition
             unit, // unit
             {
-                'wf': [
-                    'https://www.amazon.com/365-Everyday-Value-Organic-Cheese/dp/B074H66176',
-                    'https://www.amazon.com/365-Everyday-Value-Portobello-Mushroom/dp/B074J6YB78'
-                ]
+                [Stores.wholeFoods]: {
+                    'organic': [
+                        'https://www.amazon.com/365-Everyday-Value-Organic-Cheese/dp/B074H66176',
+                    ],
+                    'conventional': ['https://www.amazon.com/365-Everyday-Value-Portobello-Mushroom/dp/B074J6YB78']
+                }
+
             }, // purchase links
         )
     )
@@ -265,10 +271,12 @@ export class SauceItems extends OilItems {
             }, // nutrition
             unit, // unit
             {
-                'wf': [
-                    'https://www.amazon.com/Wing-Time-Buffalo-Sauce-Ounce/dp/B003S2N5XG',
-                    'https://www.amazon.com/WING-TIME-SAUCE-BUFFALO-MED/dp/B003S2QZVK'
-                ]
+                [Stores.wholeFoods]: {
+                    'wing time': [
+                        'https://www.amazon.com/Wing-Time-Buffalo-Sauce-Ounce/dp/B003S2N5XG',
+                        'https://www.amazon.com/WING-TIME-SAUCE-BUFFALO-MED/dp/B003S2QZVK'
+                    ]
+                }
             }, // purchaseLinks
         )
     )

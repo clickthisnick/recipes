@@ -24,6 +24,10 @@ interface INutrition {
    [unit: string]: IEstimates;
 }
 
+interface IStorePurchaseLink {
+    [store: string]: IPurchaseLink,
+}
+
 interface IPurchaseLink {
     [store: string]: string[],
 }
@@ -56,7 +60,7 @@ export class Item {
     isTakoutUnitable: boolean
     isMeatProduct: boolean
     nutrition: any
-    purchaseLinks?: IPurchaseLink
+    purchaseLinks?: IStorePurchaseLink
     perishableLimit?: number // The number of days we want to keep the item before we should use it. The goal is to use before the perishable limit which may or may not be the expiration date.
 
     // Containers are a singleton
@@ -71,7 +75,7 @@ export class Item {
         isMeatProduct: boolean,
         nutrition: any,
         unit?: IUnitObj | null,
-        purchaseLinks?: IPurchaseLink,
+        purchaseLinks?: IStorePurchaseLink,
         perishableLimit?: number,
     ) {
         this.name = name 

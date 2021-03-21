@@ -36,10 +36,20 @@ function returnItem(itemName, quantity, unit, subItems: Item[]) {
 
         const puchaseLinks = ingredient.purchaseLinks;
         if (puchaseLinks) {
-            Object.keys(puchaseLinks).forEach(element => {
+            Object.keys(puchaseLinks).forEach(store => {
                 if (mainItem.purchaseLinks) {
-                    const linkKey = ingredient.name + ' ' + element;
-                    mainItem.purchaseLinks[linkKey] = puchaseLinks[element];
+                    if (!(store in mainItem.purchaseLinks)) {
+                        mainItem.purchaseLinks[store] = {}
+                    }
+
+                    
+                    Object.keys(puchaseLinks[store]).forEach(key => {
+                        if (mainItem.purchaseLinks) {
+                            const mainItemPurchaseLinks: any = mainItem.purchaseLinks[store];
+                            const itemKey = ingredient.name + ' ' + key
+                            mainItemPurchaseLinks[itemKey] = puchaseLinks[store][key];
+                        }
+                    });
                 }
             })
         }

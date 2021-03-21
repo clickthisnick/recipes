@@ -1,6 +1,7 @@
 import { IItem, Item } from './item';
 import { IUnitObj, Units as u } from '../../constants/units';
 import { MeatItems } from './meat';
+import { Stores } from '../../class/stores';
 
 export class OilItems extends MeatItems {
     public static readonly sesameOil: IItem = (quantity: number = 0, unit: IUnitObj) => ({
@@ -65,7 +66,12 @@ export class OilItems extends MeatItems {
             }, // nutrition
             unit, // unit
             {
-                'wf': ['https://www.amazon.com/365-Everyday-Value-Organic-Coconut/dp/B074H5BV9Y']
+                [Stores.wegmans]: {
+                    'organic': ['https://shop.wegmans.com/product/36486/wegmans-organic-extra-virgin-coconut-oil-unrefined']
+                },
+                [Stores.wholeFoods]: {
+                    'organic': ['https://www.amazon.com/365-Everyday-Value-Organic-Coconut/dp/B074H5BV9Y']
+                }
             }, // purchase links
         )
     )
@@ -92,7 +98,9 @@ export class OilItems extends MeatItems {
             }, // nutrition
             unit, // unit
             {
-                'wf': ['https://www.amazon.com/365-Everyday-Value-Unfiltered-Californian/dp/B074HKKC3W']
+                [Stores.wholeFoods]: {
+                    'california': ['https://www.amazon.com/365-Everyday-Value-Unfiltered-Californian/dp/B074HKKC3W']
+                }
             }, // purchase links
         )
     )

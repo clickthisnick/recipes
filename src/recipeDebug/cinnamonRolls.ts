@@ -36,7 +36,7 @@ export class CinnamonRolls extends Recipe {
             Timer.end(),
             e.kitchenAidMixingBowl().add([
                 i.item('yeast mixture'),
-                i.allPurposeFlour(3, u.cup),
+                i.wholeWheatFlour(3, u.cup),
             ]),
             Timer.set(1, 'm', 'Mix on speed 2'),
             Timer.end(),

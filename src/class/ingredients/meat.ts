@@ -1,6 +1,7 @@
 import { IItem, Item } from './item';
 import { IUnitObj, Units as u } from '../../constants/units';
 import { FruitItems } from './fruit';
+import { Stores } from '../../class/stores';
 
 export class MeatItems extends FruitItems {
     public static readonly flankSteak: IItem = (quantity: number = 0, unit: IUnitObj) => ({
@@ -42,18 +43,26 @@ export class MeatItems extends FruitItems {
         nutrition: {},
     })
 
-    public static readonly groundBeef8020: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Ground Beef 80/20',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Rinse and put measuring cup in dishwasher',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: true,
-        nutrition: {},
-    })
+    public static readonly groundBeef8020 = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Ground Beef 80/20', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+                [Stores.wegmans]: {
+                    '80/20': ['https://shop.wegmans.com/product/216270/wegmans-ground-beef-80-20-family-pack'],
+                }
+            }, // purchase links
+        )
+    )
 
     public static readonly londonBroil: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'London Broil',

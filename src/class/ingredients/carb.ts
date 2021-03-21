@@ -1,6 +1,7 @@
 import { IItem, Item } from './item';
 import { IUnitObj, Units as u } from '../../constants/units';
 import { AnimalItems } from './animal';
+import { Stores } from '../../class/stores';
 
 export class CarbItems extends AnimalItems {
 
@@ -31,9 +32,14 @@ export class CarbItems extends AnimalItems {
             }, // nutrition
             unit, // unit
             {
-                'wf': [
-                    'https://www.amazon.com/Whole-Foods-Market-Organic-Spaghetti/dp/B07FX14M71',
-                ]
+                [Stores.wegmans]: {
+                    'organic': ['https://shop.wegmans.com/product/35264/wegmans-organic-gluten-free-red-lentil-spaghetti'],
+                },
+                [Stores.wholeFoods]: {
+                    'organic': [
+                        'https://www.amazon.com/Whole-Foods-Market-Organic-Spaghetti/dp/B07FX14M71',
+                    ]
+                }
             }, // purchaseLinks
         )
     )
@@ -75,10 +81,12 @@ export class CarbItems extends AnimalItems {
             {}, // nutrition
             unit, // unit
             {
-                'amazonFresh': [
-                    'https://www.amazon.com/Snack-Factory-Pretzel-Crisps-Everything/dp/B013OUXDM4',
-                    'https://www.amazon.com/Snack-Factory-Pretzel-Crisps-Original/dp/B01M63ZHKX',
-                ],
+                [Stores.amazonFresh]: {
+                    'conventional': [
+                        'https://www.amazon.com/Snack-Factory-Pretzel-Crisps-Everything/dp/B013OUXDM4',
+                        'https://www.amazon.com/Snack-Factory-Pretzel-Crisps-Original/dp/B01M63ZHKX',
+                    ],
+                }
             }, // purchaseLinks
         )
     )
@@ -101,9 +109,9 @@ export class CarbItems extends AnimalItems {
         )
     )
 
-    public static readonly bread = (quantity: number = 0, unit: IUnitObj | null = null) => (
+    public static readonly wholeWheatBread = (quantity: number = 0, unit: IUnitObj | null = null) => (
         new Item(
-            'Bread', // name
+            'White Bread', // name
             10, // putAwayTime
             10, // takeOutTime
             '',  // cleanSteps
@@ -114,9 +122,30 @@ export class CarbItems extends AnimalItems {
             {}, // nutrition
             unit, // unit
             {
-                'wf': [
-                    'https://www.amazon.com/Daves-Killer-Bread-Grains-Organic/dp/B001F79MMY',
-                ],
+                [Stores.wegmans]: {
+                    'conventional': ['https://shop.wegmans.com/product/30552/wegmans-soft-100-whole-wheat-bread-price-good-for-only-2-or-more',]
+                }                    
+            }, // purchaseLinks
+            10, // perishableLimit
+        )
+    )
+
+    public static readonly whiteBread = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'White Bread', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+                [Stores.wegmans]: {
+                    'conventional': ['https://shop.wegmans.com/product/1841/wegmans-giant-bread']
+                }
             }, // purchaseLinks
             10, // perishableLimit
         )
@@ -139,23 +168,25 @@ export class CarbItems extends AnimalItems {
         }
     })
 
-    public static readonly ziti: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Ziti',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Rinse and put measuring cup in dishwasher',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {
-            [u.pound.name]: {
-                servings: 1,
-                total_cost: 1.99,
-            }
-        }
-    })
+    public static readonly ziti = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Ziti', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+                [Stores.wegmans]: {
+                    'conventional': ['https://shop.wegmans.com/product/221279/wegmans-pasta-ziti'],
+                }
+            }, // purchaseLinks
+        )
+    )
 
     public static readonly spaghettiWholeGrain: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Whole Grain Spaghetti',
@@ -274,7 +305,9 @@ export class CarbItems extends AnimalItems {
             {}, // nutrition
             unit, // unit
             {
-                'wf': ['https://www.amazon.com/Oatly-Milk-Oat-Full-Fat/dp/B07SX36KZZ/ref=sr_1_12_0o_wf'],
+                [Stores.wholeFoods]: {
+                    'oatly': ['https://www.amazon.com/Oatly-Milk-Oat-Full-Fat/dp/B07SX36KZZ/ref=sr_1_12_0o_wf'],
+                }
             }, // purchaseLinks
         )
     )
@@ -292,7 +325,12 @@ export class CarbItems extends AnimalItems {
             {}, // nutrition
             unit, // unit
             {
-                'wf': ['https://www.amazon.com/365-Everyday-Value-Organic-Pastry/dp/B074VD2ZKF'],
+                [Stores.wegmans]: {
+                    'conventional': ['https://shop.wegmans.com/product/54401/wegmans-whole-wheat-flour']
+                },
+                [Stores.wholeFoods]: {
+                    'organic': ['https://www.amazon.com/365-Everyday-Value-Organic-Pastry/dp/B074VD2ZKF'],
+                }
             }, // purchaseLinks
         )
     )
@@ -354,7 +392,9 @@ export class CarbItems extends AnimalItems {
             }, // nutrition
             unit, // unit
             {
-                'wf': ['https://www.amazon.com/365-Whole-Foods-Market-Organic/dp/B084NJHWTQ']
+                [Stores.wholeFoods]: {
+                    'organic': ['https://www.amazon.com/365-Whole-Foods-Market-Organic/dp/B084NJHWTQ']
+                }
             }, // purchaseLinks
         )
     )

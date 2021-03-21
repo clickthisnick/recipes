@@ -35,7 +35,7 @@ export class ChickenFajita extends Recipe {
             Timer.set(24, 'h', 'Let Chicken Marinade'),
             Timer.end(),
             e.pan().add([
-                i.oliveOil(1, u.tbsp),
+                i.coconutOil(1, u.tbsp),
                 i.item('Marinaded Chicken'),
             ]),
             e.pan().cook(7, 'm', 5),
@@ -56,9 +56,9 @@ export class ChickenFajita extends Recipe {
             Timer.end(),
             e.pan().add([
                 i.item('Cooked Chicken'),
-                i.limeJuice(1, u.tsp),
+                i.limeJuice(2, u.tsp),
             ]),
-            e.pan().cook(5, 'm', 2),
+            e.pan().cook(1, 'm', 2),
             e.pan().stir(),
             Timer.end()
         ];
