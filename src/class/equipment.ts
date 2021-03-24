@@ -177,6 +177,32 @@ class CookingContainer extends Container {
     }
 }
 
+class Oven extends CookingContainer {
+    constructor(id: number) {
+        super("oven", id)
+    }
+
+    public preheat(heat: number): IStep {
+        if (heat === 350) {
+            // Return how long preheating pan takes
+            // This is a guess.. should test it out
+            return Timer.set(5, 'm', `Preheat ${this.name} to 350°`);
+        }
+
+        if (heat === 500) {
+            // Return how long preheating pan takes
+            // This is a guess.. should test it out
+            return Timer.set(8, 'm', `Preheat ${this.name} to 500°`);
+        }
+
+        return Timer.set(5, 'm', `Preheat ${this.name} on heat ${heat}`);
+    }
+
+    public cook(duration: number, type: string, degrees: number): IStep {
+        return Timer.set(duration, type, `Cook ${this.name} @ ${degrees}°`);
+    }
+}
+
 class Ninja extends CookingContainer {
     constructor(id: number) {
         super("ninja", id)
@@ -211,9 +237,30 @@ class SaucePan extends CookingContainer {
     // }
 }
 
+class BakingSheet extends CookingContainer {
+    constructor(id: number) {
+        super("baking sheet", id)
+    }
+
+    // public cook(duration: number, type: string, item: any, heat: number, async: boolean = false) {
+    //     return [Timer.set(duration, type, `Cook ${sanitize(item)} in ${this.name} on heat ${heat}`, async)];
+    // }
+}
+
+class Pot extends CookingContainer {
+    constructor(id: number) {
+        super("pot", id)
+    }
+
+    public cook(duration: number, type: string, heat: number): IStep {
+        return Timer.set(duration, type, `Cook ${this.name} @ ${heat}°`);
+    }
+}
+
+
 class Teapot extends CookingContainer {
     constructor(id: number) {
-        super("sauce pan", id)
+        super("teapot", id)
     }
 
     // public cook(duration: number, type: string, item: any, heat: number, async: boolean = false) {
@@ -330,6 +377,10 @@ export class Equipment {
         new Pan(id)
     );
 
+    public static readonly oven = (id: number = 99) => (
+        new Oven(id)
+    );
+
     public static readonly kitchenAidMixingBowl = (id: number = 99) => (
         new KitchenAidMixingBowl(id)
     );
@@ -354,14 +405,17 @@ export class Equipment {
         new Blender(id)
     )
 
+    public static readonly bakingSheet = (id: number = 99) => (
+        new BakingSheet(id)
+    );
+
     public static readonly teapot = (id: number = 99) => (
         new Teapot(id)
     );
 
-    public static readonly pot: IEquipment = (id: number = 99) => ({
-        name: 'pot',
-        id: id
-    });
+    public static readonly pot = (id: number = 99) => (
+        new Pot(id)
+    );
 
     public static readonly instantPot = (id: number = 99) => (
         new InstantPot(id)

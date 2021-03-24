@@ -109,7 +109,6 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-
     public static readonly briocheHamburgerBun: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Brioche Hamburger Bun',
         putAwayTime: 10,
@@ -234,8 +233,11 @@ export class VegetableItems extends SpiceItems {
             {}, // nutrition
             unit, // unit
             {
+                [Stores.wegmans]: {
+                    'unsweetened': ['https://shop.wegmans.com/product/41821/blue-diamond-almond-breeze-almondmilk-unsweetened-original']
+                },
                 [Stores.wholeFoods]: {
-                    'unsweetented': ['https://www.amazon.com/365-Everyday-Value-Almondmilk-Unsweetened/dp/B074H6M4M4/ref=sr_1_21_0o_wf']
+                    'unsweetened': ['https://www.amazon.com/365-Everyday-Value-Almondmilk-Unsweetened/dp/B074H6M4M4/ref=sr_1_21_0o_wf']
                 }
             }, // purchase links
         )
@@ -930,6 +932,24 @@ export class VegetableItems extends SpiceItems {
         isMeatProduct: false,
         nutrition: {},
     })
+
+    public static readonly lemonZest = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Lemon Zest', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            true, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+            }, // purchase links
+            // perishableLimit
+        )
+    )
 
     public static readonly greenBellPepper = (quantity: number = 0, unit: IUnitObj | null = null) => (
         new Item(

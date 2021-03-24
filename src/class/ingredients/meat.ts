@@ -64,6 +64,27 @@ export class MeatItems extends FruitItems {
         )
     )
 
+    public static readonly premadePizza = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Premade Pizza', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            true, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+                [Stores.wegmans]: {
+                    'conventional bulk': ['https://shop.wegmans.com/product/31143/wegmans-fully-cooked-packaged-pepperoni-pizza-heat-serve'],
+                },
+            }, // purchaseLinks
+        )
+    )
+
     public static readonly londonBroil: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'London Broil',
         putAwayTime: 10,

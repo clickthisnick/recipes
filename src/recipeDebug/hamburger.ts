@@ -47,7 +47,7 @@ class Hamburgers extends Recipe {
             text.set(['Flip hamburgers']),
             Timer.set(5, 'm', 'Turn off heat and let food rest in pan'),
             Timer.end(),
-            text.set(['Put burgers between', i.briocheHamburgerBun(2, u.unit)]),
+            text.set(['Put burgers between', i.hamburgerBun(2, u.unit)]),
             i.item('hamburger').season([
                 i.germanMustard(2, u.tbsp),
                 i.ketchup(2, u.tbsp),

@@ -247,18 +247,25 @@ export class AnimalItems {
         )
     )
 
-    public static readonly cheddarCheese: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Cheedar Cheese',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Put monterey jack cheese back in refridgerator',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: true,
-        nutrition: {},
-    })
+    public static readonly cheddarCheese = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Cheddar Cheese', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            true, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+                [Stores.wegmans]: {
+                    'conventional': ['https://shop.wegmans.com/product/5204/wegmans-cheese-cheddar-mild-shredded-family-pack']
+                }
+            }, // purchase links
+        )
+    )
 
     public static readonly pepperJackCheese: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Pepper Jack Cheese',

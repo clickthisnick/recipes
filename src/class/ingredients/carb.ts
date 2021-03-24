@@ -91,6 +91,24 @@ export class CarbItems extends AnimalItems {
         )
     )
 
+    public static readonly whiteWine = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'White Wine', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+            }, // purchaseLinks
+            // perishableLimit
+        )
+    )
+
     public static readonly mapleSyrup = (quantity: number = 0, unit: IUnitObj | null = null) => (
         new Item(
             'Maple Syrup', // name
@@ -395,6 +413,24 @@ export class CarbItems extends AnimalItems {
                 [Stores.wholeFoods]: {
                     'organic': ['https://www.amazon.com/365-Whole-Foods-Market-Organic/dp/B084NJHWTQ']
                 }
+            }, // purchaseLinks
+        )
+    )
+
+    public static readonly arborioRice = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Arborio Rice', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            'Rinse and put away measuring cup',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
             }, // purchaseLinks
         )
     )

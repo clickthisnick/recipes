@@ -82,6 +82,12 @@ export class Items extends VegetableItems {
                 i.whiteOnion(),
                 i.redOnion(),
             ])
+        },
+        cheese: (quantity: number = 0, unit: IUnitObj | null = null) => {
+            return returnItem('onion', quantity, unit, [
+                i.cheddarCheese(),
+                i.mozzarellaCheese(),
+            ])
         }
     }
 }

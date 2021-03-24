@@ -134,6 +134,15 @@ export class Item {
         return addIStep;
     }
 
+    public dice(): IStep {
+        let addIStep = istep()
+
+        addIStep.text = ['Dice the',  this.name].join(' ')
+        addIStep.ingredients.push(this)
+
+        return addIStep;
+    }
+
     public cutIntoStrips(): IStep {
         let addIStep = istep()
 

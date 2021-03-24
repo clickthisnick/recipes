@@ -87,12 +87,9 @@ export class MiniCinnamonRolls extends Recipe {
             Timer.end(),
             e.kitchenAidMixingBowl().add([
                 i.item('yeast mixture'),
-                // TODO reduce recipe by 1/4 except sugar mixture
-                i.allPurposeFlour(3, u.cup),
+                i.wholeWheatFlour(3, u.cup),
             ]),
-            Timer.set(1, 'm', 'Mix on speed 2'),
-            Timer.end(),
-            Timer.set(1, 'm', 'Switch to bread hook, Run kitchen aid of speed 2'),
+            Timer.set(1, 'm', 'Mix on speed 2 with flat hook'),
             Timer.end(),
             Timer.set(50, 'm', 'Cover with upside down pyrex bowl'),
             Timer.end(),
@@ -108,13 +105,14 @@ export class MiniCinnamonRolls extends Recipe {
                     Timer.end(),
                 Timer.end(),
             Timer.end(),
-            text.set(['Flatten dough into a rectangle as thin as possible']),
+            text.set(['Flip baking tray upside down and spray with non stick']),
+            text.set(['Flatten dough into a rectangle as thin as possible on baking tray (No parchment paper)']),
             text.set(['Spread filling mixture on dough']),
             text.set(['Roll up dough']),
             text.set(['Cut into individual rolls and place on baking sheet']),
             text.set(['Put baking sheet above oven']),
             Timer.end(),
-            Timer.set(17, 'm', 'Cook cinnamon rolls'),
+            Timer.set(13, 'm', 'Cook cinnamon rolls'),
             Timer.end(),
         ];
     }
