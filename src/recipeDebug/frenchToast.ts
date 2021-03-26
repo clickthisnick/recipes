@@ -39,6 +39,26 @@ class FrenchToast extends Recipe {
             text.set(['Flip french toast']),
             e.pan().cook(1.75, 'm'),
             Timer.end(),
+            e.pan().add([
+                i.coconutOil(1, u.tsp),
+            ]),
+            text.set(['Dip the', i.whiteBread(), 'in the mixture']),
+            e.pan().add(i.item('Dipped bread')),
+            e.pan().cook(1.5, 'm'),
+            Timer.end(),
+            text.set(['Flip french toast']),
+            e.pan().cook(1.5, 'm'),
+            Timer.end(),
+            e.pan().add([
+                i.coconutOil(1, u.tsp),
+            ]),
+            text.set(['Dip the', i.whiteBread(), 'in the mixture']),
+            e.pan().add(i.item('Dipped bread')),
+            e.pan().cook(1.5, 'm'),
+            Timer.end(),
+            text.set(['Flip french toast']),
+            e.pan().cook(1.5, 'm'),
+            Timer.end(),
         ]
     }
 }

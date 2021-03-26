@@ -128,7 +128,11 @@ export class Item {
     public cutInHalf(): IStep {
         let addIStep = istep()
 
-        addIStep.text = ['Cut the', this.name, 'in half'].join(' ')
+        if (this.unit) {
+            addIStep.text = ['Cut', this.quantity, this.unit.name, this.name, 'in half'].join(' ')
+        } else {
+            addIStep.text = ['Cut the', this.name, 'in half'].join(' ')
+        }
         addIStep.ingredients.push(this)
 
         return addIStep;
@@ -137,7 +141,12 @@ export class Item {
     public dice(): IStep {
         let addIStep = istep()
 
-        addIStep.text = ['Dice the',  this.name].join(' ')
+        if (this.unit) {
+            addIStep.text = ['Dice', this.quantity, this.unit.name, this.name].join(' ')
+        } else {
+            addIStep.text = ['Dice the', this.name].join(' ')
+        }
+
         addIStep.ingredients.push(this)
 
         return addIStep;
@@ -146,7 +155,11 @@ export class Item {
     public cutIntoStrips(): IStep {
         let addIStep = istep()
 
-        addIStep.text = ['Cut the',  this.name, 'into strips'].join(' ')
+        if (this.unit) {
+            addIStep.text = ['Cut',  this.quantity, this.unit.name, this.name, 'into strips'].join(' ')
+        } else {
+            addIStep.text = ['Cut the', this.name, 'into strips'].join(' ')
+        }
         addIStep.ingredients.push(this)
 
         return addIStep;

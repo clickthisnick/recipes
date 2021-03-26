@@ -60,6 +60,9 @@ export class Units {
     public static readonly fluid_ounce: IUnitObj = {
         name: 'fluid ounce'
     };
+    public static readonly lemon: IUnitObj = {
+        name: 'lemon'
+    };
     public static readonly unit: IUnitObj = {
         name: 'unit'
     };

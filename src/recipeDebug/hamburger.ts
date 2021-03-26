@@ -22,7 +22,9 @@ class Hamburgers extends Recipe {
         this.steps = [
             text.set(['Form 2, 1 inch hamburgers with', i.groundBeef8020(1, u.pound)]),
             e.pan().add(i.item('hamburgers')),
-            e.pan().cook(6, 'm', 4),
+            e.pan().cookWithLidSlightlyOff(5, 'm', 4),
+            i.Groups.mushroom(5, u.slice).cutIntoStrips(),
+            i.Groups.onion(5, u.slice).cutIntoStrips(),
             Timer.end(),
             i.item('hamburger').season([
                 i.smokedPaprika(2, u.dash),
@@ -31,10 +33,10 @@ class Hamburgers extends Recipe {
             ]),
             text.set(['Flip hamburgers']),
             e.pan().add([
-                i.Groups.mushroom(5, u.slice),
-                i.Groups.onion(5, u.slice),
+                i.Groups.mushroom(),
+                i.Groups.onion(),
             ]),
-            e.pan().cook(7, 'm', 4),
+            e.pan().cookWithLidSlightlyOff(7, 'm', 4),
             Timer.end(),
             i.item('hamburger').season([
                 i.smokedPaprika(2, u.dash),
@@ -42,12 +44,14 @@ class Hamburgers extends Recipe {
                 i.garlicPowder(2, u.dash)
             ]),
             text.set(['Flip hamburgers']),
-            e.pan().cook(7, 'm', 4),
+            e.pan().cookWithLidSlightlyOff(5, 'm', 4),
             Timer.end(),
-            text.set(['Flip hamburgers']),
-            Timer.set(5, 'm', 'Turn off heat and let food rest in pan'),
+            e.pan().add([
+                i.hamburgerBun(2, u.unit),
+            ]),
+            e.pan().cook(2, 'm'),
             Timer.end(),
-            text.set(['Put burgers between', i.hamburgerBun(2, u.unit)]),
+            text.set(['Put burgers between', i.hamburgerBun()]),
             i.item('hamburger').season([
                 i.germanMustard(2, u.tbsp),
                 i.ketchup(2, u.tbsp),

@@ -305,6 +305,19 @@ class Pan extends CookingContainer {
 
         return Timer.set(duration, type, `Cook on heat ${heat}`)
     }
+
+    public cookWithLidSlightlyOff(duration: number, type: string, heat: number = 0): IStep {
+        if (heat === 0) {
+            if (this.heat) {
+                heat = this.heat
+            }
+            else {
+                throw new exception('Heat cannot be 0')
+            }
+        }
+
+        return Timer.set(duration, type, `Cook on heat ${heat}`)
+    }
 }
 
 class InstantPot extends CookingContainer {

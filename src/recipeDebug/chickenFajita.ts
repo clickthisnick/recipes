@@ -61,7 +61,7 @@ export class ChickenFajita extends Recipe {
             e.pan().cook(1, 'm', 2),
             e.pan().stir(),
             Timer.end(),
-            text.set(['Add ingredients to', i.softTortillaShell(), 'with', i.Groups.cheese()])
+            text.set(['Add ingredients to', i.softTortillaShell(1, u.unit), 'with', i.Groups.cheese(1, u.unit)])
         ];
     }
 }
