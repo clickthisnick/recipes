@@ -79,7 +79,8 @@ export class MeatItems extends FruitItems {
             unit, // unit
             {
                 [Stores.wegmans]: {
-                    'conventional bulk': ['https://shop.wegmans.com/product/31143/wegmans-fully-cooked-packaged-pepperoni-pizza-heat-serve'],
+                    'cheese': ['https://shop.wegmans.com/product/31038/wegmans-fully-cooked-packaged-cheese-pizza-heat-serve'],
+                    'pepperoni': ['https://shop.wegmans.com/product/31143/wegmans-fully-cooked-packaged-pepperoni-pizza-heat-serve'],
                 },
             }, // purchaseLinks
         )

@@ -479,18 +479,26 @@ export class CarbItems extends AnimalItems {
         nutrition: {}
     })
 
-    public static readonly softTortillaShell: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'soft tortilla shell',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Rinse and put measuring cup in dishwasher',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {}
-    })
+    public static readonly softTortillaShell = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Soft Tortilla Shell', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            'Rinse and put away measuring cup',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+                [Stores.wholeFoods]: {
+                    'conventional': ['https://shop.wegmans.com/product/25809/wegmans-fajita-tortilla-gordita-style-family-pack']
+                }
+            }, // purchaseLinks
+        )
+    )
 
     public static readonly flaxSeedCereal: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Flax seed cereal',

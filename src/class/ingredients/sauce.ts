@@ -127,18 +127,29 @@ export class SauceItems extends OilItems {
         link: 'https://www.amazon.com/365-Everyday-Value-Organic-Mustard/dp/B074J6RQZB?fpw=alm&s=wf'
     })
 
-    public static readonly germanMustard: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'German Mustard',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly germanMustard = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'German Mustard', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+                [Stores.wegmans]: {
+                    'whole': [
+                        'https://shop.wegmans.com/product/650/wegmans-whole-grain-dijon-mustard',
+                    ],
+                }
+
+            }, // purchase links
+        )
+    )
 
     public static readonly soySauce: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Soy Sauce',
