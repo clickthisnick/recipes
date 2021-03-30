@@ -66,18 +66,32 @@ export class SauceItems extends OilItems {
         nutrition: {}
     })
 
-    public static readonly salsa: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'salsa',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Put soy sauce back in refridgerator',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {}
-    })
+    public static readonly salsa = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'salsa', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+                [Stores.wegmans]: {
+                    'spicy': [
+                        'https://shop.wegmans.com/product/24395/wegmans-spicy-brown-mustard'
+                    ],
+                    'whole': [
+                        'https://shop.wegmans.com/product/650/wegmans-whole-grain-dijon-mustard',
+                    ],
+                }
+
+            }, // purchase links
+        )
+    )
 
     public static readonly hotSauce: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'hot sauce',

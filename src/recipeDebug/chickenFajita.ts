@@ -38,10 +38,10 @@ export class ChickenFajita extends Recipe {
                 i.coconutOil(1, u.tbsp),
                 i.item('Marinaded Chicken'),
             ]),
-            e.pan().cook(6, 'm', 5),
+            e.pan().cookWithLidSlightlyOff(5, 'm', 4),
             text.set(['Flip Chicken']),
             Timer.end(),
-            e.pan().cook(6, 'm', 5),
+            e.pan().cookWithLidSlightlyOff(5, 'm', 4),
             i.Groups.onion(.5, u.unit).cutIntoStrips(),
             i.Groups.mushroom(4, u.ounce).cutIntoStrips(),
             i.greenBellPepper(1, u.unit).cutIntoStrips(),
@@ -52,16 +52,16 @@ export class ChickenFajita extends Recipe {
                 i.Groups.mushroom(),
                 i.greenBellPepper(),
             ]),
-            e.pan().cook(5, 'm', 5),
+            e.pan().cookWithLidSlightlyOff(4, 'm', 4),
             Timer.end(),
             e.pan().add([
                 i.item('Cooked Chicken'),
                 i.limeJuice(2, u.tsp),
             ]),
-            e.pan().cook(1, 'm', 2),
+            e.pan().cookWithLidSlightlyOff(1, 'm', 2),
             e.pan().stir(),
             Timer.end(),
-            text.set(['Add ingredients to', i.softTortillaShell(1, u.unit), 'with', i.Groups.cheese(1, u.unit)])
+            text.set(['Add ingredients to', i.softTortillaShell(1, u.unit), 'with', i.Groups.cheese(1, u.unit), 'with', i.salsa(1, u.unit)])
         ];
     }
 }
