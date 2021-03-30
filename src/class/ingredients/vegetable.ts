@@ -739,6 +739,27 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
+    public static readonly pickleSlices = (quantity: number = 0, unit: IUnitObj | null = null) => (
+        new Item(
+            'Pickle Slices', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+                [Stores.wholeFoods]: {
+                    'conventional': ['https://shop.wegmans.com/product/31882/wegmans-hamburger-dill-slices'],
+                }
+            }, // purchaseLinks
+        )
+    )
+
     public static readonly breadFlour = (quantity: number = 0, unit: IUnitObj | null = null) => (
         new Item(
             'Bread Flour', // name

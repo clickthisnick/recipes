@@ -142,6 +142,9 @@ export class SauceItems extends OilItems {
             unit, // unit
             {
                 [Stores.wegmans]: {
+                    'spicy': [
+                        'https://shop.wegmans.com/product/24395/wegmans-spicy-brown-mustard'
+                    ],
                     'whole': [
                         'https://shop.wegmans.com/product/650/wegmans-whole-grain-dijon-mustard',
                     ],

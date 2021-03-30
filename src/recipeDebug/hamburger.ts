@@ -55,6 +55,7 @@ class Hamburgers extends Recipe {
             i.item('hamburger').season([
                 i.germanMustard(2, u.tbsp),
                 i.ketchup(2, u.tbsp),
+                i.pickleSpears(2, u.tbsp),
             ])
         ];
     }

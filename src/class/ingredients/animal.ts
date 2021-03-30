@@ -240,6 +240,9 @@ export class AnimalItems {
             {}, // nutrition
             unit, // unit
             {
+                [Stores.wegmans]: {
+                    'conventional': ['https://shop.wegmans.com/product/17248/wegmans-fancy-shredded-parmesan-cheese']
+                },
                 [Stores.wholeFoods]: {
                     'conventional': ['https://www.amazon.com/365-Everyday-Value-Shredded-Parmesan/dp/B074H51Q58']
                 }
