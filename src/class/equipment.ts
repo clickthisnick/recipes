@@ -316,7 +316,7 @@ class Pan extends CookingContainer {
             }
         }
 
-        return Timer.set(duration, type, `Cook on heat ${heat}`)
+        return Timer.set(duration, type, `Cook on heat ${heat} with lid slightly off`)
     }
 }
 
