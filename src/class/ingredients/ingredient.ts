@@ -29,7 +29,17 @@ interface IStorePurchaseLink {
 }
 
 interface IPurchaseLink {
-    [store: string]: string[],
+    [store: string]: IPurchaseItem[],
+}
+
+interface IPurchaseItem {
+    price: number,
+    quantity: number,
+    quantity_unit: IUnitObj,
+    link: string,
+    organic: boolean,
+    subscribeAndSaveEligible?: boolean,
+    priceConversionTable?: any // Keys are the unit name, value is the price per that unit
 }
 
 export interface IItemObj {
@@ -49,18 +59,18 @@ export interface IItem {
     (quantity?: number, unit?: IUnitObj): IItemObj;
 }
 
-export class Item {
+export class Ingredient {
     name: string
     putAwayTime: number
     takeOutTime: number
     cleanSteps: string
     quantity: number
-    unit?: IUnitObj | null
+    unit: IUnitObj
     wash: boolean
     isTakoutUnitable: boolean
     isMeatProduct: boolean
     nutrition: any
-    purchaseLinks?: IStorePurchaseLink
+    purchaseLinks: IStorePurchaseLink
     perishableLimit?: number // The number of days we want to keep the item before we should use it. The goal is to use before the perishable limit which may or may not be the expiration date.
 
     // Containers are a singleton
@@ -74,8 +84,8 @@ export class Item {
         isTakoutUnitable: boolean,
         isMeatProduct: boolean,
         nutrition: any,
-        unit?: IUnitObj | null,
-        purchaseLinks?: IStorePurchaseLink,
+        unit: IUnitObj,
+        purchaseLinks: IStorePurchaseLink,
         perishableLimit?: number,
     ) {
         this.name = name 

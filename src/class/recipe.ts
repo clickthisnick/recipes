@@ -1,5 +1,5 @@
-import { IEstimates, IEstimatesMissing } from './ingredients/item';
-import { IAllIngredientUnits } from '../constants/units';
+import { IEstimates, IEstimatesMissing } from './ingredients/ingredient';
+import { Ingredients, Units } from '../constants/units';
 import { IStep } from './step';
 import { exception } from 'console';
 
@@ -44,7 +44,7 @@ export class RecipeContainer {
         this.recipeHtml += `onclick="selectRecipe('${recipeName}')">${recipeName}</button>`
     }
 
-    public generateRecipes() {
+    public generateRecipeHtml() {
         let hideUnderRecipeGroup = false;
 
         const recipeGroupName = this.recipeName;
@@ -72,7 +72,7 @@ export class RecipeContainer {
 
 export class Recipe {
     public steps: IStep[] = [];
-    public ingredients: IAllIngredientUnits = {};
+    public ingredients: Ingredients = {};
     // public equipment: IAllEquipment = {};
     public vegan: boolean = true;
     public timeEstimateMilliseconds: number = 0;
@@ -132,16 +132,65 @@ export class Recipe {
         }
     }
 
+
+    private addIngredient(istep: IStep) {
+        // This adds all the ingredients from each step into ingredients in the main recipe
+        // And also does any trasformations like converting the ingredient to many different units
+
+        istep.ingredients.forEach(ingredient => {
+            // Unit could be null, dont add ingredient whose unit is null - item('hamburger') is an example of that
+            if (ingredient.unit !== Units.none && ingredient.quantity > 0) {
+
+                // If the recipe already knows about the ingredient
+                if (this.ingredients.hasOwnProperty(ingredient.name)) {
+
+                    // If the existing ingredient and the new ingredient have the same unit
+                    // Then just add the ingredient quantity
+                    if (this.ingredients[ingredient.name].unit.name == ingredient.unit.name) {
+                        this.ingredients[ingredient.name].quantity += ingredient.quantity
+                    } else {
+                        const units = Units.combineIngredientUnits(this.ingredients[ingredient.name], ingredient)
+
+                        if (units) {
+                            // update the ingredents unit and quantity
+                            this.ingredients[ingredient.name].unit = units.unit;
+                            this.ingredients[ingredient.name].quantity = units.quantity;
+                        } else { // If no units could be combined, just add the ingredient to the list under a different name
+                            this.ingredients[`${ingredient.name} - ${ingredient.unit}`] = ingredient
+                        }
+                    }
+                } else {
+                    this.ingredients[ingredient.name] = ingredient
+                }
+            }
+        })
+
+        if (istep.children.length > 0) {
+            istep.children.forEach(child => {
+                this.addIngredient(child);
+            })
+        }
+    }
+
     public printRecipe(recipeName): string {
         let html = ''
 
-        // Turn the human readable inputted steps into a formatted step which is easy to manipulate
-        // this.steps.forEach((item) => {
-        //     this.print(item)
-        // });
+        // Add the ingredients from each step of the recipe into the main recipe as combined ingredients
         this.steps.forEach(stepz => {
-            html += `<script>setSteps('${recipeName}', ${JSON.stringify(stepz)})</script>`
+            this.addIngredient(stepz)
         })
+
+        // Loop through the ingredients of the recipe and generate a pricing table for each purchasable link
+        Object.keys(this.ingredients).forEach(ingredientKey => {
+            const ingredient = this.ingredients[ingredientKey]
+
+            Units.setPricingTable(ingredient)
+        })
+
+        
+
+        html += `<script>setRecipe('${recipeName}', ${JSON.stringify(this)})</script>`
+
         return html    
     }
 }

@@ -1,15 +1,15 @@
 // This appears to be unused, but it is used as the init point of all items which extend it
 
 import { VegetableItems } from '../class/ingredients/vegetable';
-import { IUnitObj } from './units';
+import { IUnitObj, Units } from './units';
 import { Items as i } from './items';
-import { Item } from '../class/ingredients/item';
+import { Ingredient } from '../class/ingredients/ingredient';
 
-function returnItem(itemName, quantity, unit, subItems: Item[]) {
+function returnItem(itemName, quantity, unit, subItems: Ingredient[]) {
     // This functions attempts to take a group of items, and returns a singular item back
     // The reason why it exists is if you have a recipe that just needs "meat" but you don't care if its chickenThighs or beef
     // Then you can use this to just return meat, then in shopping mode - you get all the options for "meat" and you can choose the one you best see fit at the time
-    const mainItem = i.item(itemName, quantity, unit)
+    const mainItem = i.ingredient(itemName, quantity, unit)
     let lowestPerishableLimit: number | undefined = undefined;
 
     for (let idx = 0; idx < subItems.length; idx++) {
@@ -65,25 +65,25 @@ function returnItem(itemName, quantity, unit, subItems: Item[]) {
 
 export class Items extends VegetableItems {
     public static readonly Groups = {
-        chicken: (quantity: number = 0, unit: IUnitObj | null = null) => {
+        chicken: (quantity: number = 0, unit: IUnitObj = Units.none) => {
             return returnItem('chicken', quantity, unit, [
                 i.chickenBreast(),
                 i.chickenThigh(),
             ])
         },
-        mushroom: (quantity: number = 0, unit: IUnitObj | null = null) => {
+        mushroom: (quantity: number = 0, unit: IUnitObj = Units.none) => {
             return returnItem('mushroom', quantity, unit, [
                 i.whiteMushroom(),
                 i.babyBellaMushroom(),
             ])
         },
-        onion: (quantity: number = 0, unit: IUnitObj | null = null) => {
+        onion: (quantity: number = 0, unit: IUnitObj = Units.none) => {
             return returnItem('onion', quantity, unit, [
                 i.whiteOnion(),
                 i.redOnion(),
             ])
         },
-        cheese: (quantity: number = 0, unit: IUnitObj | null = null) => {
+        cheese: (quantity: number = 0, unit: IUnitObj = Units.none) => {
             return returnItem('cheese', quantity, unit, [
                 i.cheddarCheese(),
                 i.mozzarellaCheese(),

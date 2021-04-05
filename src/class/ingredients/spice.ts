@@ -1,5 +1,6 @@
-import { IItem } from './item';
-import { IUnitObj, Units as u } from '../../constants/units';
+import { Stores } from '../../class/stores';
+import { IItem, Ingredient } from './ingredient';
+import { IUnitObj, Units as u, Units } from '../../constants/units';
 import { SauceItems } from './sauce';
 
 export class SpiceItems extends SauceItems {
@@ -420,18 +421,36 @@ export class SpiceItems extends SauceItems {
         nutrition: {},
     })
 
-    public static readonly garlicPowder: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'garlic powder',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: true,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly garlicPowder = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Garlic Powder', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            true, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+                [Stores.amazon]: {
+                    'Amazon Brand - Happy Belly Granulated Garlic': [
+                        {
+                            price: 8.42,
+                            quantity: 24,
+                            quantity_unit: u.ounce,
+                            link: 'https://www.amazon.com/Amazon-Brand-Granulated-Garlic-Ounces/dp/B07QW1GKR1/ref=sr_1_6',
+                            organic: false,
+                            subscribeAndSaveEligible: true,
+                        }
+                    ],
+                }
+            }, // purchaseLinks
+            7, // perishableLimit
+        )
+    )
 
     public static readonly onionPowder: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'onion powder',

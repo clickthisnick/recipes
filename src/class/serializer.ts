@@ -1,8 +1,8 @@
-import { IItemObj, Item } from './ingredients/item';
+import { IItemObj, Ingredient } from './ingredients/ingredient';
 import { Units as u } from '../constants/units';
 
 export class Serializer {
-    public static turnIngObjIntoStr(ingObj: IItemObj | Item, includeUnit = false): string {
+    public static turnIngObjIntoStr(ingObj: IItemObj | Ingredient, includeUnit = false): string {
         // lowercase the name so it doesn't look weird
         ingObj.name = ingObj.name.toLowerCase()
         // If unit is noUnitQuantity just display the name

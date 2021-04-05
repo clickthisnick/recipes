@@ -1,12 +1,12 @@
-import { IItem, Item } from './item';
-import { IUnitObj, Units as u } from '../../constants/units';
+import { IItem, Ingredient } from './ingredient';
+import { IUnitObj, Units as u, Units } from '../../constants/units';
 import { OilItems } from './oil';
 import { Stores } from '../../class/stores';
 
 export class SauceItems extends OilItems {
 
-    public static readonly coconutCream = (quantity: number = 0, unit: IUnitObj | null = null) => (
-        new Item(
+    public static readonly coconutCream = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
             'Coconut Cream', // name
             10, // putAwayTime
             10, // takeOutTime
@@ -21,7 +21,15 @@ export class SauceItems extends OilItems {
             unit, // unit
             {
                 [Stores.wholeFoods]: {
-                    'organic': ['https://www.amazon.com/Native-Forest-Coconut-Cream-organic/dp/B07893W8C1'],
+                    'organic': [
+                        {
+                            price: 1.99,
+                            quantity: 5.4,
+                            quantity_unit: u.ounce,
+                            link: 'https://www.amazon.com/Native-Forest-Coconut-Cream-organic/dp/B07893W8C1',
+                            organic: true,
+                        }
+                    ]
                 }
             }, // purchaseLinks
         )
@@ -66,8 +74,8 @@ export class SauceItems extends OilItems {
         nutrition: {}
     })
 
-    public static readonly salsa = (quantity: number = 0, unit: IUnitObj | null = null) => (
-        new Item(
+    public static readonly salsa = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
             'salsa', // name
             10, // putAwayTime
             10, // takeOutTime
@@ -80,15 +88,28 @@ export class SauceItems extends OilItems {
             }, // nutrition
             unit, // unit
             {
+                [Stores.wholeFoods]: {
+                    'organic': [
+                        {
+                            price: 2.99,
+                            quantity: 16,
+                            quantity_unit: u.ounce,
+                            link: 'https://www.amazon.com/Whole-Foods-Market-Cantina-Roasted/dp/B07H5Q73PN/ref=sr_1_2_0g_wf',
+                            organic: false,
+                        }
+                    ]
+                },
                 [Stores.wegmans]: {
-                    'spicy': [
-                        'https://shop.wegmans.com/product/24395/wegmans-spicy-brown-mustard'
-                    ],
-                    'whole': [
-                        'https://shop.wegmans.com/product/650/wegmans-whole-grain-dijon-mustard',
-                    ],
+                    'chipotle': [
+                        {
+                            price: 3.09,
+                            quantity: 16,
+                            quantity_unit: u.ounce,
+                            link: 'https://shop.wegmans.com/product/19610/wegmans-salsa-roasted-chipotle',
+                            organic: false,
+                        }
+                    ]
                 }
-
             }, // purchase links
         )
     )
@@ -141,8 +162,8 @@ export class SauceItems extends OilItems {
         link: 'https://www.amazon.com/365-Everyday-Value-Organic-Mustard/dp/B074J6RQZB?fpw=alm&s=wf'
     })
 
-    public static readonly germanMustard = (quantity: number = 0, unit: IUnitObj | null = null) => (
-        new Item(
+    public static readonly germanMustard = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
             'German Mustard', // name
             10, // putAwayTime
             10, // takeOutTime
@@ -157,13 +178,35 @@ export class SauceItems extends OilItems {
             {
                 [Stores.wegmans]: {
                     'spicy': [
-                        'https://shop.wegmans.com/product/24395/wegmans-spicy-brown-mustard'
+                        {
+                            price: 1.49,
+                            quantity: 12,
+                            quantity_unit: u.ounce,
+                            link: 'https://shop.wegmans.com/product/24395/wegmans-spicy-brown-mustard',
+                            organic: false,
+                        }
                     ],
                     'whole': [
-                        'https://shop.wegmans.com/product/650/wegmans-whole-grain-dijon-mustard',
-                    ],
+                        {
+                            price: 2.89,
+                            quantity: 9.9,
+                            quantity_unit: u.ounce,
+                            link: 'https://shop.wegmans.com/product/650/wegmans-whole-grain-dijon-mustard',
+                            organic: false,
+                        }
+                    ]
+                },
+                [Stores.wholeFoods]: {
+                    'stone ground': [
+                        {
+                            price: 2.70,
+                            quantity: 12,
+                            quantity_unit: u.ounce,
+                            link: 'https://www.amazon.com/Organicville-Stone-Ground-Organic-Mustard/dp/B00MFNAX52/ref=sr_1_2_0o_wf',
+                            organic: true,
+                        }
+                    ]
                 }
-
             }, // purchase links
         )
     )
@@ -246,8 +289,8 @@ export class SauceItems extends OilItems {
         nutrition: {}
     })
 
-    public static readonly spaghettiSauce = (quantity: number = 0, unit: IUnitObj | null = null) => (
-        new Item(
+    public static readonly spaghettiSauce = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
             'Spaghetti Sauce', // name
             10, // putAwayTime
             10, // takeOutTime
@@ -271,18 +314,31 @@ export class SauceItems extends OilItems {
             unit, // unit
             {
                 [Stores.wholeFoods]: {
-                    'organic': [
-                        'https://www.amazon.com/365-Everyday-Value-Organic-Cheese/dp/B074H66176',
+                    'four cheese': [
+                        {
+                            price: 2.29,
+                            quantity: 25,
+                            quantity_unit: u.ounce,
+                            link: 'https://www.amazon.com/365-Everyday-Value-Organic-Cheese/dp/B074H66176',
+                            organic: true,
+                        }
                     ],
-                    'conventional': ['https://www.amazon.com/365-Everyday-Value-Portobello-Mushroom/dp/B074J6YB78']
+                    'poetobello': [
+                        {
+                            price: 2.29,
+                            quantity: 25,
+                            quantity_unit: u.ounce,
+                            link: 'https://www.amazon.com/365-Everyday-Value-Portobello-Mushroom/dp/B074J6YB78',
+                            organic: true,
+                        }
+                    ]
                 }
-
             }, // purchase links
         )
     )
 
-    public static readonly wingTimeMediumBuffaloSauce = (quantity: number = 0, unit: IUnitObj | null = null) => (
-        new Item(
+    public static readonly wingTimeMediumBuffaloSauce = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
             'Buffalo Sauce', // name
             10, // putAwayTime
             10, // takeOutTime
@@ -301,8 +357,13 @@ export class SauceItems extends OilItems {
             {
                 [Stores.wholeFoods]: {
                     'wing time': [
-                        'https://www.amazon.com/Wing-Time-Buffalo-Sauce-Ounce/dp/B003S2N5XG',
-                        'https://www.amazon.com/WING-TIME-SAUCE-BUFFALO-MED/dp/B003S2QZVK'
+                        {
+                            price: 4.79,
+                            quantity: 13,
+                            quantity_unit: u.ounce,
+                            link: 'https://www.amazon.com/WING-TIME-SAUCE-BUFFALO-MED/dp/B003S2QZVK',
+                            organic: false,
+                        }
                     ]
                 }
             }, // purchaseLinks

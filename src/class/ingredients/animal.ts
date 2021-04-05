@@ -1,12 +1,12 @@
-import { IItem, Item } from './item';
-import { IUnitObj, Units as u } from '../../constants/units';
+import { IItem, Ingredient } from './ingredient';
+import { IUnitObj, Units as u, Units } from '../../constants/units';
 import { Stores } from '../../class/stores';
 
 export class AnimalItems {
 
-    // This is used in recipes i.item('yeast mixture') - when you want an item, but there's not a specific one defined that fits
-    public static readonly item = (name: string, quantity: number = 0, unit: any = null, purchaseLinks: any = {}) => (
-        new Item(
+    // This is used in recipes i.ingredient('yeast mixture') - when you want an item, but there's not a specific one defined that fits
+    public static readonly ingredient = (name: string, quantity: number = 0, unit: any = null, purchaseLinks: any = {}) => (
+        new Ingredient(
             name,
             10,
             10,
@@ -21,8 +21,8 @@ export class AnimalItems {
         )
     )
 
-    public static readonly chickenDrumsticks = (quantity: number = 0, unit: IUnitObj | null = null) => (
-        new Item(
+    public static readonly chickenDrumsticks = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
             'Chicken Drumsticks', // name
             10, // putAwayTime
             10, // takeOutTime
@@ -36,15 +36,23 @@ export class AnimalItems {
             unit, // unit
             {
                 [Stores.wegmans]: {
-                    'conventional': ['https://shop.wegmans.com/product/54787/wegmans-chicken-drumsticks-family-pack']
-                },           
+                    'organic': [
+                        {
+                            price: 1.19,
+                            quantity: 1,
+                            quantity_unit: u.pound,
+                            link: 'https://shop.wegmans.com/product/54787/wegmans-chicken-drumsticks-family-pack',
+                            organic: false,
+                        }
+                    ]
+                },     
             }, // purchaseLinks
             7, // perishableLimit
         )
     )
 
-    public static readonly chickenBreast = (quantity: number = 0, unit: IUnitObj | null = null) => (
-        new Item(
+    public static readonly chickenBreast = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
             'Chicken Breast', // name
             10, // putAwayTime
             10, // takeOutTime
@@ -58,18 +66,34 @@ export class AnimalItems {
             unit, // unit
             {
                 [Stores.wegmans]: {
-                    'conventional': ['https://shop.wegmans.com/product/2584/wegmans-boneless-skinless-chicken-breasts-with-rib-meat-family-pack']
+                    'conventional': [
+                        {
+                            price: 2.29,
+                            quantity: 1,
+                            quantity_unit: u.pound,
+                            link: 'https://shop.wegmans.com/product/2584/wegmans-boneless-skinless-chicken-breasts-with-rib-meat-family-pack',
+                            organic: false,
+                        }
+                    ]
                 },
                 [Stores.wholeFoods]: {
-                    'conventional': ['https://www.amazon.com/365-Everyday-Value-Boneless-Skinless/dp/B0787Y555X/ref=sxin_9_wf_dsk_ap_sira_0o_wf',]
-                }                    
+                    'conventional': [
+                        {
+                            price: 3.99,
+                            quantity: 1,
+                            quantity_unit: u.pound,
+                            link: 'https://www.amazon.com/365-Everyday-Value-Boneless-Skinless/dp/B0787Y555X/ref=sr_1_4_0o_wf',
+                            organic: false,
+                        }
+                    ]
+                },          
             }, // purchaseLinks
             7, // perishableLimit
         )
     )
 
-    public static readonly chickenThigh = (quantity: number = 0, unit: IUnitObj | null = null) => (
-        new Item(
+    public static readonly chickenThigh = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
             'Chicken Thigh', // name
             10, // putAwayTime
             10, // takeOutTime
@@ -82,15 +106,15 @@ export class AnimalItems {
             }, // nutrition
             unit, // unit
             {
-                [Stores.wegmans]: {
-                    'conventional': ['https://shop.wegmans.com/product/11169/wegmans-boneless-skinless-highly-trimmed-chicken-thigh-cutlets-family-pack']
-                },
-                [Stores.wholeFoods]: {
-                    'conventional': [
-                        'https://www.amazon.com/365-Everyday-Value-Boneless-Skinless-Pre-Packaged/dp/B07813VZHR',
-                        'https://www.amazon.com/Bell-Evans-Chicken-Boneless-Skinless/dp/B07881BQT9'
-                    ]
-                }
+                // [Stores.wegmans]: {
+                //     'conventional': ['https://shop.wegmans.com/product/11169/wegmans-boneless-skinless-highly-trimmed-chicken-thigh-cutlets-family-pack']
+                // },
+                // [Stores.wholeFoods]: {
+                //     'conventional': [
+                //         'https://www.amazon.com/365-Everyday-Value-Boneless-Skinless-Pre-Packaged/dp/B07813VZHR',
+                //         'https://www.amazon.com/Bell-Evans-Chicken-Boneless-Skinless/dp/B07881BQT9'
+                //     ]
+                // }
             }, // purchaseLinks
             7, // perishableLimit
         )
@@ -148,8 +172,8 @@ export class AnimalItems {
         nutrition: {},
     })
 
-    public static readonly italianSausage = (quantity: number = 0, unit: IUnitObj | null = null) => (
-        new Item(
+    public static readonly italianSausage = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
             'Italian Sausage', // name
             10, // putAwayTime
             10, // takeOutTime
@@ -159,23 +183,37 @@ export class AnimalItems {
             false, // isTakoutUnitable
             true, // isMeatProduct
             {
-                calories: {
-                    [u.ounce.name]: 92.13625,
-                    [u.pound.name]: 1474.18,
-                },
-                sodium: {},
             }, // nutrition
             unit, // unit
             {
                 [Stores.wegmans]: {
-                    'conventional': ['https://shop.wegmans.com/product/12224/wegmans-italian-classics-hot-italian-sausage-family-pack']
-                }
+                    'conventional': [
+                        {
+                            price: 4.49,
+                            quantity: 1,
+                            quantity_unit: u.pound,
+                            link: 'https://shop.wegmans.com/product/12224/wegmans-italian-classics-hot-italian-sausage-family-pack',
+                            organic: false,
+                        }
+                    ]
+                },
+                [Stores.wholeFoods]: {
+                    'conventional': [
+                        {
+                            price: 5.99,
+                            quantity: 1,
+                            quantity_unit: u.pound,
+                            link: 'https://www.amazon.com/Sausage-Pork-Bulk-Italian-Mild/dp/B0787Z4BLG/ref=sr_1_3_0o_wf',
+                            organic: false,
+                        }
+                    ]
+                },
             }, // purchase links
         )
     )
 
-    public static readonly mozzarellaCheese = (quantity: number = 0, unit: IUnitObj | null = null) => (
-        new Item(
+    public static readonly mozzarellaCheese = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
             'Mozzarella Cheese', // name
             10, // putAwayTime
             10, // takeOutTime
@@ -187,15 +225,34 @@ export class AnimalItems {
             {}, // nutrition
             unit, // unit
             {
+                [Stores.wholeFoods]: {
+                    'organic': [
+                        {
+                            price: 6.49,
+                            quantity: 1,
+                            quantity_unit: u.pound,
+                            link: 'https://www.amazon.com/365-Everyday-Value-Mozzarella-Shred/dp/B074H5SS4J/ref=sr_1_3_0o_wf',
+                            organic: false,
+                        }
+                    ]
+                },
                 [Stores.wegmans]: {
-                    'conventional': ['https://shop.wegmans.com/product/5146/wegmans-cheese-mozzarella-part-skim-low-moisture-shredded-family-pack']
-                }
+                    'organic': [
+                        {
+                            price: 14.99,
+                            quantity: 80,
+                            quantity_unit: u.ounce,
+                            link: 'https://shop.wegmans.com/product/5146/wegmans-cheese-mozzarella-part-skim-low-moisture-shredded-family-pack',
+                            organic: false,
+                        }
+                    ]
+                },     
             }, // purchase links
         )
     )
 
-    public static readonly ricottaCheese = (quantity: number = 0, unit: IUnitObj | null = null) => (
-        new Item(
+    public static readonly ricottaCheese = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
             'Ricotta Cheese', // name
             10, // putAwayTime
             10, // takeOutTime
@@ -207,9 +264,6 @@ export class AnimalItems {
             {}, // nutrition
             unit, // unit
             {
-                [Stores.wegmans]: {
-                    'conventional': ['https://shop.wegmans.com/product/46314/wegmans-whole-milk-ricotta-cheese']
-                }
             }, // purchase links
         )
     )
@@ -227,8 +281,8 @@ export class AnimalItems {
         nutrition: {},
     })
 
-    public static readonly parmesanCheese = (quantity: number = 0, unit: IUnitObj | null = null) => (
-        new Item(
+    public static readonly parmesanCheese = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
             'Parmesan Cheese', // name
             10, // putAwayTime
             10, // takeOutTime
@@ -241,17 +295,40 @@ export class AnimalItems {
             unit, // unit
             {
                 [Stores.wegmans]: {
-                    'conventional': ['https://shop.wegmans.com/product/17248/wegmans-fancy-shredded-parmesan-cheese']
+                    'shredded': [
+                        {
+                            price: 2.79,
+                            quantity: 6,
+                            quantity_unit: u.ounce,
+                            link: 'https://shop.wegmans.com/product/17248/wegmans-fancy-shredded-parmesan-cheese',
+                            organic: false
+                        }
+                    ]
                 },
                 [Stores.wholeFoods]: {
-                    'conventional': ['https://www.amazon.com/365-Everyday-Value-Shredded-Parmesan/dp/B074H51Q58']
+                    'shredded': [
+                        {
+                            price: 3.99,
+                            quantity: 5,
+                            quantity_unit: u.ounce,
+                            link: 'https://www.amazon.com/365-Everyday-Value-Shredded-Parmesan/dp/B074H51Q58',
+                            organic: false
+                        },
+                        {
+                            price: 7.99,
+                            quantity: 1,
+                            quantity_unit: u.pound,
+                            link: 'https://www.amazon.com/Milano-Parmesan-Shred-Big-Pack/dp/B07D6V3DZ8/ref=sr_1_7_0o_wf',
+                            organic: false
+                        }
+                    ],
                 }
             }, // purchase links
         )
     )
 
-    public static readonly cheddarCheese = (quantity: number = 0, unit: IUnitObj | null = null) => (
-        new Item(
+    public static readonly cheddarCheese = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
             'Cheddar Cheese', // name
             10, // putAwayTime
             10, // takeOutTime
@@ -264,7 +341,15 @@ export class AnimalItems {
             unit, // unit
             {
                 [Stores.wegmans]: {
-                    'conventional': ['https://shop.wegmans.com/product/5204/wegmans-cheese-cheddar-mild-shredded-family-pack']
+                    'conventional': [
+                        {
+                            price: 16.09,
+                            quantity: 80,
+                            quantity_unit: u.ounce,
+                            link: 'https://shop.wegmans.com/product/5204/wegmans-cheese-cheddar-mild-shredded-family-pack',
+                            organic: false,
+                        }
+                    ]
                 }
             }, // purchase links
         )
@@ -309,8 +394,8 @@ export class AnimalItems {
         nutrition: {},
     })
 
-    public static readonly porkChops = (quantity: number = 0, unit: IUnitObj | null = null) => (
-        new Item(
+    public static readonly porkChops = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
             'Pork Chops', // name
             10, // putAwayTime
             10, // takeOutTime
@@ -339,8 +424,8 @@ export class AnimalItems {
         nutrition: {},
     })
 
-    public static readonly egg = (quantity: number = 0, unit: IUnitObj | null = null) => (
-        new Item(
+    public static readonly egg = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
             'Egg', // name
             10, // putAwayTime
             10, // takeOutTime
@@ -353,10 +438,26 @@ export class AnimalItems {
             unit, // unit
             {
                 [Stores.wegmans]: {
-                    'three dozen': ['https://shop.wegmans.com/product/53608/wegmans-three-dozen-large-eggs-family-pack'],
+                    'conventional - 3 dozed': [
+                        {
+                            price: 5.79,
+                            quantity: 36,
+                            quantity_unit: u.unit,
+                            link: 'https://shop.wegmans.com/product/53608/wegmans-three-dozen-large-eggs-family-pack',
+                            organic: false
+                        }
+                    ]
                 },
                 [Stores.wholeFoods]: {
-                    'organic': ['https://shop.wegmans.com/product/53608/wegmans-three-dozen-large-eggs-family-pack'],
+                    'conventional': [
+                        {
+                            price: 2.99,
+                            quantity: 12,
+                            quantity_unit: u.unit,
+                            link: 'https://www.amazon.com/365-Everyday-Value-Brown-Non-Gmo/dp/B07PFDYT9T/ref=sr_1_6_0o_wf',
+                            organic: false
+                        }
+                    ]
                 }
             }, // purchase links
             14, // Perishable Limit
@@ -402,8 +503,8 @@ export class AnimalItems {
         nutrition: {},
     })
 
-    public static readonly butter = (quantity: number = 0, unit: IUnitObj | null = null) => (
-        new Item(
+    public static readonly butter = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
             'Butter', // name
             10, // putAwayTime
             10, // takeOutTime
@@ -418,10 +519,26 @@ export class AnimalItems {
             unit, // unit
             {
                 [Stores.wegmans]: {
-                    'unsalted': ['https://shop.wegmans.com/product/50048/wegmans-butter-unsalted-sweet-cream']
+                    'conventional': [
+                        {
+                            price: 2.99,
+                            quantity: 1,
+                            quantity_unit: u.pound,
+                            link: 'https://www.amazon.com/365-Everyday-Value-Brown-Non-Gmo/dp/B07PFDYT9T/ref=sr_1_6_0o_wf',
+                            organic: false
+                        }
+                    ]
                 },
                 [Stores.wholeFoods]: {
-                    'unsalted': ['https://www.amazon.com/365-Everyday-Value-Unsalted-Butter/dp/B074VDJ7KZ']
+                    'conventional': [
+                        {
+                            price: 3.99,
+                            quantity: 16,
+                            quantity_unit: u.ounce,
+                            link: 'https://www.amazon.com/365-Everyday-Value-Unsalted-Butter/dp/B074VDJ7KZ/ref=sr_1_2_0o_wf',
+                            organic: false
+                        }
+                    ]
                 }
             }, // purchaseLinks
         )

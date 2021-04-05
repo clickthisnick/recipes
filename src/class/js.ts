@@ -1,4 +1,4 @@
-let recipeSteps = {}
+let recipes = {}
 let selectedRecipes = []
 let selectedRecipeNames = []
 let ingredients = {}
@@ -36,15 +36,16 @@ const parseParams = (querystring) => {
     }
 
     return obj;
-};
+}
 
 let queryString = parseParams(window.location.search)
 
-function setSteps(recipeName, steps) {
-    if (recipeSteps.hasOwnProperty(recipeName) === false) {
-        recipeSteps[recipeName] = []
+function setRecipe(recipeName, recipe) {
+    // Setting the recipe data into the recipe
+    if (recipes.hasOwnProperty(recipeName) === false) {
+        recipes[recipeName] = []
     }
-    recipeSteps[recipeName].push(steps)
+    recipes[recipeName].push(recipe)
 }
 
 function selectMode(id) {
@@ -58,41 +59,7 @@ function selectMode(id) {
 
 function selectRecipe(recipeName) {
     selectedRecipeNames.push(recipeName)
-    selectedRecipes.push(recipeSteps[recipeName])
-}
-
-function addIngredient(istep) {
-    istep.ingredients.forEach(ingredient => {
-        // Unit could be null, dont add ingredient whose unit is null - item('hamburger') is an example of that
-        if (ingredient.unit !== null && ingredient.quantity > 0) {
-            if (ingredients.hasOwnProperty(ingredient.name) === false) {
-                ingredients[ingredient.name] = {}
-                ingredients[ingredient.name]['units'] = {}
-
-                if (ingredient.purchaseLinks) {
-                    ingredients[ingredient.name]['purchaseLinks'] = ingredient.purchaseLinks
-                } else {
-                    ingredients[ingredient.name]['purchaseLinks'] = {}
-                }
-            }
-
-            if (ingredients[ingredient.name]['units'].hasOwnProperty(ingredient.unit.name) === false) {
-                ingredients[ingredient.name]['units'][ingredient.unit.name] = 0
-            }
-
-            if (ingredient.perishableLimit) {
-                perishableItems[ingredient.name] = ingredient.perishableLimit
-            }
-
-            ingredients[ingredient.name]['units'][ingredient.unit.name] += ingredient.quantity
-        }
-    })
-
-    if (istep.children.length > 0) {
-        istep.children.forEach(child => {
-            addIngredient(child);
-        })
-    }
+    selectedRecipes.push(recipes[recipeName])
 }
 
 function addStep(istep) {
@@ -163,15 +130,59 @@ function saveShoppingUrl() {
     document.getElementById('shoppingUrl').innerHTML = queryParamter + "<br>"
 }
 
+function generateLinks(linkByPrice, priceKeys) {
+    let links = ''
+
+    // sort the prices key so we can list them by price
+    priceKeys.sort()
+
+    priceKeys.forEach(priceKey => {
+        linkByPrice[priceKey].forEach(value => {
+            links += value
+        });
+    })
+    
+    return links
+}
+
+function applyCreditCardDiscounts(store, pricePerQuantity) {
+    // Include any discounts on the price per quantity 
+    if (store.startsWith("amazon")) {
+        return (pricePerQuantity * .95).toFixed(3)
+    } else if (store.startsWith("whole")) {
+        return (pricePerQuantity * .95).toFixed(3)
+    } else {
+        return (pricePerQuantity * .98).toFixed(3)
+    }
+}
 function doneSelectingRecipes() {
     hideElement('select')
     let shoppingDiv = document.getElementById('shopping')
 
     if (mode === 'shopping') {
         // Get all ingredients across all recipes
-        selectedRecipes.forEach(recipe => {
-            recipe.forEach(istep => {
-                addIngredient(istep);
+        // selectedRecipes is an array of array of recipes
+        selectedRecipes.forEach(singleRecipeArray => {
+            singleRecipeArray.forEach(singleRecipe => {
+                Object.keys(singleRecipe.ingredients).forEach(ingredientKey => {
+                    const ingredient = singleRecipe.ingredients[ingredientKey];
+                    
+                    perishableItems[ingredient.name] = ingredient.perishableLimit
+
+                    // If there are no previous ingredients, add the ingredient
+                    if (!ingredients.hasOwnProperty(ingredient.name)) {
+                        ingredients[ingredient.name] = ingredient
+                    } else {
+                        // If the previously known ingredient has the same unit as the ingredient we are adding
+                        // Just update the quantity
+                        if (ingredients[ingredient.name].unit.name == ingredient.unit.name) {
+                            ingredients[ingredient.name].quantity += ingredient.quantity
+                        } else {
+                            // Otherwise just add the ingredient as the unit
+                            ingredients[`${ingredient.name} ${ingredient.unit.name}`] = ingredient
+                        }
+                    }
+                })
             })
         })
 
@@ -182,46 +193,74 @@ function doneSelectingRecipes() {
         shoppingDiv.innerHTML += JSON.stringify(perishableItems)
         shoppingDiv.innerHTML += '<br>'
 
-        Object.keys(ingredients).forEach(ingredient => {
+        Object.keys(ingredients).forEach(ingredientKey => {
+            let commonUnit;
             let links = ''
 
+            let linkByPrice = {} // Key is prices, value is array of items
+            let priceKeys = [] // Keys of the linkByPrice
+
+            let ingredient = ingredients[ingredientKey]
+
             // When you click a saved url we don't include the purchaseLinks
-            if (ingredients[ingredient].hasOwnProperty('purchaseLinks')) {
-                const stores = Object.keys(ingredients[ingredient]['purchaseLinks']).sort()
+            if (ingredient.hasOwnProperty('purchaseLinks')) {
+                const stores = Object.keys(ingredient['purchaseLinks']).sort()
 
                 stores.forEach(store => {
-                    let linkCount = 0;
-                    links += `</br> ${store}: `
+                    const storeLinks = ingredient['purchaseLinks'][store];
+                    const storeDescriptions = Object.keys(storeLinks);
 
-                    const storeLinks = ingredients[ingredient]['purchaseLinks'][store];
-                    const storeKeys = Object.keys(storeLinks);
+                    storeDescriptions.forEach(storeDescription => {
+                        const items = storeLinks[storeDescription]
+                        items.forEach(item => {
 
-                    storeKeys.forEach(storeKey => {
-                        const storeKeyLink = storeLinks[storeKey]
+                            // Make the first unit found the common unit so when we price compare, all units are the same
+                            if (commonUnit === undefined) {
+                                commonUnit = item.quantity_unit.name
+                            }
 
-                        if (linkCount > 0) {
-                            links += '&nbsp;|&nbsp;'
-                        }
+                            let pricePerQuantity = item.priceConversionTable[commonUnit]
 
-                        links += `&nbsp;<a href="${storeKeyLink}" target="_blank">${storeKey}</a>`
+                            if (item.subscribeAndSaveEligible) {
+                                [.85, .95].forEach(discount => {
+                                    let subscribePricePerQuantity = (pricePerQuantity*discount).toFixed(3)
+                                    subscribePricePerQuantity = applyCreditCardDiscounts(store, subscribePricePerQuantity)
 
-                        linkCount += 1;
+                                    if (!linkByPrice.hasOwnProperty(subscribePricePerQuantity)) {
+                                        linkByPrice[subscribePricePerQuantity] = [`</br> ${store}: &nbsp;<a href="${item.link}" target="_blank">${storeDescription} - Subscribe ${100 - (discount * 100)}% ${item.price*discount} - ${subscribePricePerQuantity}/${commonUnit}</a>`]
+                                        priceKeys.push(subscribePricePerQuantity)
+                                    } else {
+                                        linkByPrice[subscribePricePerQuantity].push(`</br> ${store}: &nbsp;<a href="${item.link}" target="_blank">${storeDescription} - Subscribe ${100 - (discount * 100)}% ${item.price*discount} - ${subscribePricePerQuantity}/${commonUnit}</a>`)
+                                    }
+                                })
+                            }
+
+                            pricePerQuantity = applyCreditCardDiscounts(store, pricePerQuantity)
+
+                            if (!linkByPrice.hasOwnProperty(pricePerQuantity)) {
+                                linkByPrice[pricePerQuantity] = [`</br> ${store}: &nbsp;<a href="${item.link}" target="_blank">${storeDescription} - ${item.price} - ${pricePerQuantity}/${commonUnit}</a>`]
+                                priceKeys.push(pricePerQuantity)
+                            } else {
+                                linkByPrice[pricePerQuantity].push(`</br> ${store}: &nbsp;<a href="${item.link}" target="_blank">${storeDescription} - ${item.price} - ${pricePerQuantity}/${commonUnit}</a>`)
+                            }
+
+
+
+                        })
                     })
+
+                    links = generateLinks(linkByPrice, priceKeys)
                 })
             }
 
-            Object.keys(ingredients[ingredient]['units']).forEach(unit => {
-                // <!--On click it deletes the ingredient from the array of ingredients-- >
-                // <!--TODO once you delete an ingredient it remove all types from the ingredient list-- >
-                shoppingDiv.innerHTML += '<div id="shopping-' + ingredient + '" class="panel" style="">' + '<span onclick="this.classList.toggle(' + "'completed'" + "); document.getElementById('shopping-" + ingredient + "').remove(); delete ingredients['" + ingredient + "'" + '];" >' + ingredient + ' ' + ingredients[ingredient]['units'][unit] + ' ' + unit + '</span>' + links + '</div>'
-            })
+            shoppingDiv.innerHTML += '<div id="shopping-' + ingredient.name + '" class="panel" style="">' + '<span onclick="this.classList.toggle(' + "'completed'" + "); document.getElementById('shopping-" + ingredient.name  + "').remove(); delete ingredients['" + ingredient.name  + "'" + '];" >' + ingredient.name  + ' ' + ingredient.quantity + ' ' + ingredient.unit.name + '</span>' + links + '</div>'
         })
     } else {
-        selectedRecipes.forEach(recipe => {
-            recipe.forEach(istep => {
-                addStep(istep)
-            })
-        })
+        // selectedRecipes.forEach(recipe => {
+        //     recipe.forEach(istep => {
+        //         addStep(istep)
+        //     })
+        // })
     }
 }
 

@@ -25,14 +25,14 @@ class ButterChicken extends Recipe {
             text.set(['Dice', i.whiteOnion(1, u.unit)]),
             text.set(['Dice', i.garlicClove(5, u.unit)]),
             e.instantPot().add([
-                i.oliveOil(1, u.tbsp), 
+                i.oliveOil(1, u.tbsp),
                 i.butter(1, u.tbsp),
                 i.whiteOnion(),
                 i.groundGinger(2, u.tbsp),
                 i.garlicClove()
             ]),
             Timer.set(4, 'm', 'Saute in instant pot'),
-            text.set(['Cut', i.chickenThigh(2, u.pound), 'into 1 inch cubes']),
+            text.set(['Cut', i.Groups.chicken(2, u.pound), 'into 1 inch cubes']),
             text.set(['Wash knife']),
             text.set(['Wash cutting boards']),
             Timer.end(),
@@ -43,7 +43,7 @@ class ButterChicken extends Recipe {
             Timer.end(),
             e.instantPot().add([
                 i.water(.5, u.cup),
-                i.chickenThigh(),
+                i.Groups.chicken(),
                 i.gramMasala(1, u.tbsp),
                 i.paprika(1, u.tsp),
                 i.coconutSugar(2, u.tsp),

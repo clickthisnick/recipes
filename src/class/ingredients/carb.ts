@@ -1,5 +1,5 @@
-import { IItem, Item } from './item';
-import { IUnitObj, Units as u } from '../../constants/units';
+import { IItem, Ingredient } from './ingredient';
+import { IUnitObj, Units as u, Units } from '../../constants/units';
 import { AnimalItems } from './animal';
 import { Stores } from '../../class/stores';
 
@@ -18,8 +18,8 @@ export class CarbItems extends AnimalItems {
         nutrition: {}
     })
 
-    public static readonly lentilSpaghetti = (quantity: number = 0, unit: IUnitObj | null = null) => (
-        new Item(
+    public static readonly lentilSpaghetti = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
             'Lentil Spaghetti', // name
             10, // putAwayTime
             10, // takeOutTime
@@ -33,13 +33,27 @@ export class CarbItems extends AnimalItems {
             unit, // unit
             {
                 [Stores.wegmans]: {
-                    'organic': ['https://shop.wegmans.com/product/35264/wegmans-organic-gluten-free-red-lentil-spaghetti'],
+                    'organic': [
+                        {
+                            price: 3.49,
+                            quantity: 8.8,
+                            quantity_unit: u.ounce,
+                            link: 'https://shop.wegmans.com/product/35264/wegmans-organic-gluten-free-red-lentil-spaghetti',
+                            organic: true
+                        }
+                    ]
                 },
                 [Stores.wholeFoods]: {
                     'organic': [
-                        'https://www.amazon.com/Whole-Foods-Market-Organic-Spaghetti/dp/B07FX14M71',
+                        {
+                            price: 2.99,
+                            quantity: 8,
+                            quantity_unit: u.ounce,
+                            link: 'https://www.amazon.com/Whole-Foods-Market-Organic-Spaghetti/dp/B07FX14M71',
+                            organic: true
+                        }
                     ]
-                }
+                },
             }, // purchaseLinks
         )
     )
@@ -68,8 +82,8 @@ export class CarbItems extends AnimalItems {
         }
     })
 
-    public static readonly pretzelChips = (quantity: number = 0, unit: IUnitObj | null = null) => (
-        new Item(
+    public static readonly pretzelChips = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
             'Pretzel Chips', // name
             10, // putAwayTime
             10, // takeOutTime
@@ -81,18 +95,12 @@ export class CarbItems extends AnimalItems {
             {}, // nutrition
             unit, // unit
             {
-                [Stores.amazonFresh]: {
-                    'conventional': [
-                        'https://www.amazon.com/Snack-Factory-Pretzel-Crisps-Everything/dp/B013OUXDM4',
-                        'https://www.amazon.com/Snack-Factory-Pretzel-Crisps-Original/dp/B01M63ZHKX',
-                    ],
-                }
             }, // purchaseLinks
         )
     )
 
-    public static readonly whiteWine = (quantity: number = 0, unit: IUnitObj | null = null) => (
-        new Item(
+    public static readonly whiteWine = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
             'White Wine', // name
             10, // putAwayTime
             10, // takeOutTime
@@ -109,8 +117,8 @@ export class CarbItems extends AnimalItems {
         )
     )
 
-    public static readonly mapleSyrup = (quantity: number = 0, unit: IUnitObj | null = null) => (
-        new Item(
+    public static readonly mapleSyrup = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
             'Maple Syrup', // name
             10, // putAwayTime
             10, // takeOutTime
@@ -127,8 +135,8 @@ export class CarbItems extends AnimalItems {
         )
     )
 
-    public static readonly wholeWheatBread = (quantity: number = 0, unit: IUnitObj | null = null) => (
-        new Item(
+    public static readonly wholeWheatBread = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
             'White Bread', // name
             10, // putAwayTime
             10, // takeOutTime
@@ -141,15 +149,34 @@ export class CarbItems extends AnimalItems {
             unit, // unit
             {
                 [Stores.wegmans]: {
-                    'conventional': ['https://shop.wegmans.com/product/30552/wegmans-soft-100-whole-wheat-bread-price-good-for-only-2-or-more',]
-                }                    
+                    'conventional': [
+                        {
+                            price: 4.59,
+                            quantity: 40,
+                            quantity_unit: u.ounce,
+                            link: 'https://shop.wegmans.com/product/30552/wegmans-soft-100-whole-wheat-bread-price-good-for-only-2-or-more',
+                            organic: false
+                        }
+                    ]
+                },
+                [Stores.wholeFoods]: {
+                    'conventional': [
+                        {
+                            price: 3.99,
+                            quantity: 22,
+                            quantity_unit: u.ounce,
+                            link: 'https://www.amazon.com/365-Whole-Foods-Market-Sandwich/dp/B082N5Y5B2/ref=sr_1_2_0o_wf',
+                            organic: false
+                        }
+                    ]
+                },        
             }, // purchaseLinks
             10, // perishableLimit
         )
     )
 
-    public static readonly whiteBread = (quantity: number = 0, unit: IUnitObj | null = null) => (
-        new Item(
+    public static readonly whiteBread = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
             'White Bread', // name
             10, // putAwayTime
             10, // takeOutTime
@@ -162,8 +189,27 @@ export class CarbItems extends AnimalItems {
             unit, // unit
             {
                 [Stores.wegmans]: {
-                    'conventional': ['https://shop.wegmans.com/product/1841/wegmans-giant-bread']
-                }
+                    'conventional': [
+                        {
+                            price: 1.19,
+                            quantity: 22,
+                            quantity_unit: u.ounce,
+                            link: 'https://shop.wegmans.com/product/1841/wegmans-giant-bread',
+                            organic: false
+                        }
+                    ]
+                },
+                [Stores.wholeFoods]: {
+                    'conventional': [
+                        {
+                            price: 2.99,
+                            quantity: 24,
+                            quantity_unit: u.ounce,
+                            link: 'https://www.amazon.com/365-Everyday-Value-Sandwich-slices/dp/B074H67KW3/ref=sr_1_2_0o_wf',
+                            organic: false
+                        }
+                    ]
+                },   
             }, // purchaseLinks
             10, // perishableLimit
         )
@@ -186,8 +232,8 @@ export class CarbItems extends AnimalItems {
         }
     })
 
-    public static readonly ziti = (quantity: number = 0, unit: IUnitObj | null = null) => (
-        new Item(
+    public static readonly ziti = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
             'Ziti', // name
             10, // putAwayTime
             10, // takeOutTime
@@ -200,8 +246,27 @@ export class CarbItems extends AnimalItems {
             unit, // unit
             {
                 [Stores.wegmans]: {
-                    'conventional': ['https://shop.wegmans.com/product/221279/wegmans-pasta-ziti'],
-                }
+                    'conventional': [
+                        {
+                            price: 0.89,
+                            quantity: 16,
+                            quantity_unit: u.ounce,
+                            link: 'https://shop.wegmans.com/product/221279/wegmans-pasta-ziti',
+                            organic: false
+                        }
+                    ]
+                },
+                [Stores.wholeFoods]: {
+                    'organic': [
+                        {
+                            price: 1.99,
+                            quantity: 16,
+                            quantity_unit: u.ounce,
+                            link: 'https://www.amazon.com/Whole-Foods-Market-Organic-Ziti/dp/B074H64QCF/ref=sr_1_1_0o_wf',
+                            organic: true
+                        }
+                    ]
+                },
             }, // purchaseLinks
         )
     )
@@ -310,8 +375,8 @@ export class CarbItems extends AnimalItems {
         nutrition: {},
     })
 
-    public static readonly oatMilk = (quantity: number = 0, unit: IUnitObj | null = null) => (
-        new Item(
+    public static readonly oatMilk = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
             'Oat Milk', // name
             10, // putAwayTime
             10, // takeOutTime
@@ -323,15 +388,43 @@ export class CarbItems extends AnimalItems {
             {}, // nutrition
             unit, // unit
             {
+                [Stores.wegmans]: {
+                    'conventional': [
+                        {
+                            price: 4.39,
+                            quantity: 64,
+                            quantity_unit: u.fluid_ounce,
+                            link: 'https://shop.wegmans.com/product/227051/wegmans-milk-oat',
+                            organic: false
+                        }
+                    ]
+                },
                 [Stores.wholeFoods]: {
-                    'oatly': ['https://www.amazon.com/Oatly-Milk-Oat-Full-Fat/dp/B07SX36KZZ/ref=sr_1_12_0o_wf'],
-                }
+                    'oatly': [
+                        {
+                            price: 4.99,
+                            quantity: 64,
+                            quantity_unit: u.fluid_ounce,
+                            link: 'https://www.amazon.com/Oatly-Milk-Oat-Full-Fat/dp/B07SX36KZZ/ref=sr_1_12_0o_wf',
+                            organic: false
+                        }
+                    ],
+                    '365': [
+                        {
+                            price: 3.99,
+                            quantity: 64,
+                            quantity_unit: u.fluid_ounce,
+                            link: 'https://www.amazon.com/365-Everyday-Value-Beverage-Original/dp/B07SY3YFC1/ref=sr_1_5_0o_wf',
+                            organic: false
+                        }
+                    ],
+                },
             }, // purchaseLinks
         )
     )
 
-    public static readonly wholeWheatFlour = (quantity: number = 0, unit: IUnitObj | null = null) => (
-        new Item(
+    public static readonly wholeWheatFlour = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
             'Whole Wheat Flour', // name
             10, // putAwayTime
             10, // takeOutTime
@@ -344,11 +437,27 @@ export class CarbItems extends AnimalItems {
             unit, // unit
             {
                 [Stores.wegmans]: {
-                    'conventional': ['https://shop.wegmans.com/product/54401/wegmans-whole-wheat-flour']
+                    'conventional': [
+                        {
+                            price: 3.49,
+                            quantity: 5,
+                            quantity_unit: u.pound,
+                            link: 'https://shop.wegmans.com/product/54401/wegmans-whole-wheat-flour',
+                            organic: false
+                        }
+                    ]
                 },
                 [Stores.wholeFoods]: {
-                    'organic': ['https://www.amazon.com/365-Everyday-Value-Organic-Pastry/dp/B074VD2ZKF'],
-                }
+                    'conventional': [
+                        {
+                            price: 5.39,
+                            quantity: 5,
+                            quantity_unit: u.pound,
+                            link: 'https://www.amazon.com/King-Arthur-Whole-Traditional-Flour/dp/B0007MKWXQ/ref=sr_1_1_0o_wf',
+                            organic: false
+                        }
+                    ]
+                },
             }, // purchaseLinks
         )
     )
@@ -392,8 +501,8 @@ export class CarbItems extends AnimalItems {
         nutrition: {},
     })
 
-    public static readonly whiteRice = (quantity: number = 0, unit: IUnitObj | null = null) => (
-        new Item(
+    public static readonly whiteRice = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
             'White Rice', // name
             10, // putAwayTime
             10, // takeOutTime
@@ -403,22 +512,37 @@ export class CarbItems extends AnimalItems {
             false, // isTakoutUnitable
             false, // isMeatProduct
             {
-                [u.cup.name]: {
-                    calories: 678.96,
-                    sodium: 9.3,
-                }
             }, // nutrition
             unit, // unit
             {
+                [Stores.wegmans]: {
+                    'conventional': [
+                        {
+                            price: 5.79,
+                            quantity: 10,
+                            quantity_unit: u.pound,
+                            link: 'https://shop.wegmans.com/product/4815/wegmans-enriched-long-grain-white-rice',
+                            organic: false
+                        }
+                    ]
+                },
                 [Stores.wholeFoods]: {
-                    'organic': ['https://www.amazon.com/365-Whole-Foods-Market-Organic/dp/B084NJHWTQ']
+                    'organic': [
+                        {
+                            price: 3.99,
+                            quantity: 32,
+                            quantity_unit: u.ounce,
+                            link: 'https://www.amazon.com/365-Whole-Foods-Market-Organic/dp/B084NJHWTQ',
+                            organic: true
+                        }
+                    ]
                 }
             }, // purchaseLinks
         )
     )
 
-    public static readonly arborioRice = (quantity: number = 0, unit: IUnitObj | null = null) => (
-        new Item(
+    public static readonly arborioRice = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
             'Arborio Rice', // name
             10, // putAwayTime
             10, // takeOutTime
@@ -431,6 +555,39 @@ export class CarbItems extends AnimalItems {
             }, // nutrition
             unit, // unit
             {
+                [Stores.wegmans]: {
+                    'organic': [
+                        {
+                            price: 5.79,
+                            quantity: 32,
+                            quantity_unit: u.ounce,
+                            link: 'https://shop.wegmans.com/product/59630/wegmans-organic-arborio-rice',
+                            organic: true
+                        }
+                    ]
+                },
+                [Stores.wholeFoods]: {
+                    'organic': [
+                        {
+                            price: 2.99,
+                            quantity: 16,
+                            quantity_unit: u.ounce,
+                            link: 'https://www.amazon.com/365-Whole-Foods-Market-Arborio/dp/B084NJ55YB/ref=sr_1_1_0o_wf',
+                            organic: false
+                        }
+                    ]
+                },
+                [Stores.amazon]: {
+                    'organic': [
+                        {
+                            price: 23.99,
+                            quantity: 11,
+                            quantity_unit: u.pound,
+                            link: 'https://www.amazon.com/gp/product/B081S4MXB5/ref=ppx_yo_dt_b_asin_title_o00_s00?ie=UTF8&psc=1',
+                            organic: false
+                        }
+                    ]
+                }
             }, // purchaseLinks
         )
     )
@@ -479,8 +636,8 @@ export class CarbItems extends AnimalItems {
         nutrition: {}
     })
 
-    public static readonly softTortillaShell = (quantity: number = 0, unit: IUnitObj | null = null) => (
-        new Item(
+    public static readonly softTortillaShell = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
             'Soft Tortilla Shell', // name
             10, // putAwayTime
             10, // takeOutTime
@@ -493,8 +650,45 @@ export class CarbItems extends AnimalItems {
             }, // nutrition
             unit, // unit
             {
+                [Stores.wegmans]: {
+                    'Wegmans Fajita Tortilla Gordita Style, FAMILY PACK': [
+                        {
+                            price: 2.99,
+                            quantity: 30.5,
+                            quantity_unit: u.ounce,
+                            link: 'https://shop.wegmans.com/product/25809/wegmans-fajita-tortilla-gordita-style-family-pack',
+                            organic: false
+                        }
+                    ],
+                    'Wegmans Fajita Tortillas, Gordita Style': [
+                        {
+                            price: 1.89,
+                            quantity: 15,
+                            quantity_unit: u.ounce,
+                            link: 'https://shop.wegmans.com/product/20492/wegmans-fajita-tortillas-gordita-style',
+                            organic: false
+                        }
+                    ]
+                },
                 [Stores.wholeFoods]: {
-                    'conventional': ['https://shop.wegmans.com/product/25809/wegmans-fajita-tortilla-gordita-style-family-pack']
+                    '365 Everyday Value, Organic Flour Tortillas': [
+                        {
+                            price: 2.29,
+                            quantity: 12,
+                            quantity_unit: u.ounce,
+                            link: 'https://www.amazon.com/Maria-Ricardos-Tortilla-Wheat-Flour/dp/B01BPHD06M/ref=sr_1_3_0o_wf',
+                            organic: true
+                        }                   
+                    ],
+                    'Maria & Ricardos Tortilla 8In Wheat Flour': [
+                        {
+                            price: 3.79,
+                            quantity: 13.5,
+                            quantity_unit: u.ounce,
+                            link: 'https://www.amazon.com/Maria-Ricardos-Tortilla-Wheat-Flour/dp/B01BPHD06M/ref=sr_1_3_0o_wf',
+                            organic: false
+                        }
+                    ]
                 }
             }, // purchaseLinks
         )

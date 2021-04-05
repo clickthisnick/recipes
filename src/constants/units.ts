@@ -1,17 +1,18 @@
+import { Ingredient } from "../class/ingredients/ingredient";
+
 export interface IUnitObj {
     name: string;
 }
 
-interface IIngredientsUnits {
-    unit: string;
-    quantity: number;
-}
-
-export interface IAllIngredientUnits {
-   [name: string]: IIngredientsUnits[];
+export interface Ingredients {
+   // Key is the ingredient name
+   [name: string]: Ingredient;
 }
 
 export class Units {
+    public static readonly none: IUnitObj = {
+        name: 'none'
+    };    
     public static readonly cup: IUnitObj = {
         name: 'cup'
     };    
@@ -84,101 +85,158 @@ export class Units {
         name: 'thousand second counts'
     };
 
-    private static smymbolMap = {
-        "smallerThanOuter": "multiply",
-        "biggerThanOuter": "divide",
-    }
-
     private static conversionTable = {
         [Units.cup.name]: {
             [Units.tsp.name]: {
-                count: 48,
-                symbol: Units.smymbolMap['smallerThanOuter']
+                count: 1/48, // 48 tsp in a cup
             },
             [Units.tbsp.name]: {
-                count: 16,
-                symbol: Units.smymbolMap['smallerThanOuter']
+                count: 1/16, // 16 tbsp in a cup
             },
             [Units.ounce.name]: {
-                count: 8.446808,
-                symbol: Units.smymbolMap['smallerThanOuter']
+                count: 1/8, // 8 ounce in a cup
             }
         },
         [Units.ounce.name]: {
             [Units.cup.name]: {
-                count: 8.446808,
-                symbol: Units.smymbolMap['smallerThanOuter']
+                count: 1/8, // 8 ounce in a cup
+            },
+            [Units.pound.name]: {
+                count: 16, // 16 ounce in a pound
+            }
+        },
+        [Units.pound.name]: {
+            [Units.cup.name]: {
+                count: 1/128, // 1/128 pound in a cup
+            },
+            [Units.ounce.name]: {
+                count: 1/16, // 1/16 pound in an ounce
             }
         },
         [Units.tbsp.name]: {
             [Units.cup.name]: {
-                count: 16,
-                symbol: Units.smymbolMap['biggerThanOuter']
+                count: 16, // 16 tbsp in a cup
             },
             [Units.tsp.name]: {
-                count: 3,
-                smybol: Units.smymbolMap['smallerThanOuter']
+                count: 1/3, // 1/3 tbsp in a tsp
             }
         },
         [Units.tsp.name]: {
             [Units.cup.name]: {
-                count: 48,
-                symbol: Units.smymbolMap['biggerThanOuter']
+                count: 48, // 48 tsp in a cup
             },
             [Units.tbsp.name]: {
-                count: 3,
-                symbol: Units.smymbolMap['biggerThanOuter']
+                count: 3, // 3 tsp in a tbp
             }
         }
     }
 
-    public static greatCommonDenominator(allIngredientUnits: IAllIngredientUnits) {
-        // Just take the first ingredient unit and call it common
-        Object.keys(allIngredientUnits).forEach(key => {
-            let ingredientUnits = allIngredientUnits[key];
-            let commonUnit = ''
-            let commonQuantity = 0;
+    public static setPricingTable(ingredient: Ingredient) {
+        // Builds out a complete pricing table for every compatible unit on the ingredient itself
 
-            ingredientUnits.forEach(ingredientUnit => {
-                // Skip if no units
-                if (ingredientUnit.unit === null) {
-                    if (ingredientUnit.quantity === 0 ) {
-                        return;
-                    } else {
-                        throw new Error(`Ingredient had null unit but not null quantity. ${ingredientUnit}`)
+        // First check if there are any purchaseLinks which include the pricing data...
+        if (!ingredient.purchaseLinks) {
+            return
+        }
+
+        Object.keys(ingredient.purchaseLinks).forEach(storeKey => {
+            const store = ingredient.purchaseLinks[storeKey]
+
+            Object.keys(store).forEach(purchaseDescription => {
+                const purchaseArray = store[purchaseDescription]
+
+                purchaseArray.forEach(purchase => {
+                    purchase.priceConversionTable = {}
+
+                    // We need to take the price and divide by the quantity unit to get a price per unit
+                    purchase.priceConversionTable[purchase.quantity_unit.name] = (purchase.price / purchase.quantity).toFixed(3)
+
+                    // This is the base cost per unit of quantity. We need to multiple this by the unit conversion rate to get the price per other units
+                    const baseQuantityPrice = purchase.priceConversionTable[purchase.quantity_unit.name]
+
+                    // If there's no conversion for this unit just return. We have done all that we can do
+                    if (!this.conversionTable.hasOwnProperty(purchase.quantity_unit.name)) {
+                        return
                     }
-                }
 
-                // The first actual unit/quantity we find make that the baseline
-                if (commonUnit === '') {
-                    commonUnit = ingredientUnit.unit;
-                    commonQuantity += ingredientUnit.quantity;
-                    return
-                }
+                    // Now also set the price for every known conversion for the unit
+                    Object.keys(this.conversionTable[purchase.quantity_unit.name]).forEach(convertableUnitName => {
+                        const conversionRate = this.conversionTable[purchase.quantity_unit.name][convertableUnitName]
 
-                // If the unit is the same as the commonUnit then just add the quantity
-                if (commonUnit == ingredientUnit.unit) {
-                    commonQuantity += ingredientUnit.quantity
-                    return;
-                }
-                
-                let conversion = Units.conversionTable[ingredientUnit.unit][commonUnit]
-    
-                if (conversion.symbol == 'multiply') {
-                    commonQuantity += ingredientUnit.quantity * conversion.count
-                }
-    
-                if (conversion.symbol == 'divide') {
-                    commonQuantity += ingredientUnit.quantity / conversion.count
-                } 
+                        let pricePerUnit = 0
+
+                        pricePerUnit = baseQuantityPrice * conversionRate.count
+
+                        if (pricePerUnit !== 0) {
+                            purchase.priceConversionTable[convertableUnitName] = pricePerUnit.toFixed(3)
+                        }
+
+                    })
+                });
             });
-
-            allIngredientUnits[key] = [{
-                'unit': commonUnit,
-                'quantity': commonQuantity
-            }]
         });
+    }
 
-        return allIngredientUnits;
+    public static combineIngredientUnits(ingredient_1: Ingredient, ingredient_2: Ingredient) {
+        // Returns the common unit and amount between two ingredients
+
+        function isWholeNumber(n) {
+            return (n - Math.floor(n)) === 0; 
+        }
+
+        function convert(conversion, ingredient) {
+            // This converts the ingredient to the same unit as the conversion
+            return ingredient.quantity * conversion.count
+        }
+           
+        // Throw an error if a conversion is missing
+        if (!Units.conversionTable.hasOwnProperty(ingredient_1.unit.name)) {
+            throw new Error(`Unit conversion table does not have ${ingredient_1.unit.name}`)
+        }
+
+        if (!Units.conversionTable[ingredient_1.unit.name].hasOwnProperty(ingredient_2.unit.name)) {
+            throw new Error(`Unit conversion table for ${ingredient_1.unit.name} does not have ${ingredient_2.unit.name}`)
+        }
+
+        // If I convert unit 1 into 2 what is it
+        let one_two_conversion = Units.conversionTable[ingredient_1.unit.name][ingredient_2.unit.name]
+
+        // If I convert unit 2 into 1 what is it
+        let two_one_conversion = Units.conversionTable[ingredient_2.unit.name][ingredient_1.unit.name]
+
+        let unit_two_amount = convert(one_two_conversion, ingredient_2)
+        let unit_one_amount = convert(two_one_conversion, ingredient_1)
+
+        let quantity = 0;
+        let unit = ingredient_1.unit;
+
+        // console.log(`unit_two_amount ${unit_two_amount}`)
+        // console.log(`unit_two_amount whole ${isWholeNumber(unit_two_amount)}`)
+        // console.log(`unit_one_amount ${unit_one_amount}`)
+        // console.log(`unit_one_amount whole ${isWholeNumber(unit_one_amount)}`)
+
+        // Use whatever unit is a whole number and the least amount
+        if (isWholeNumber(unit_two_amount) && isWholeNumber(unit_one_amount)) {
+            if (unit_two_amount < unit_one_amount) {
+                quantity = unit_two_amount + ingredient_1.quantity
+                unit = ingredient_1.unit
+            } else {
+                quantity = unit_one_amount + ingredient_2.quantity
+                unit = ingredient_2.unit
+            }
+        } else if (isWholeNumber(unit_two_amount) && unit_two_amount <= 5) { // If unit two is a whole number and its not more than 3 (pain in the butt)
+            quantity = unit_two_amount + ingredient_1.quantity
+            unit = ingredient_1.unit
+        } else if (isWholeNumber(unit_one_amount) && unit_one_amount <= 5) { // If unit one is a whole number and its not more than 3 (pain in the butt)
+            quantity = unit_one_amount + ingredient_2.quantity
+            unit = ingredient_2.unit
+        } else { // If no whole numbers under 3 then just return empty object
+            return false
+        }
+
+        return {
+            quantity: quantity,
+            unit: unit
+        }
     }
 }

@@ -36,7 +36,7 @@ export class ChickenFajita extends Recipe {
             Timer.end(),
             e.pan().add([
                 i.coconutOil(1, u.tbsp),
-                i.item('Marinaded Chicken'),
+                i.ingredient('Marinaded Chicken'),
             ]),
             e.pan().cookWithLidSlightlyOff(5, 'm', 4),
             text.set(['Flip Chicken']),
@@ -55,7 +55,7 @@ export class ChickenFajita extends Recipe {
             e.pan().cookWithLidSlightlyOff(4, 'm', 4),
             Timer.end(),
             e.pan().add([
-                i.item('Cooked Chicken'),
+                i.ingredient('Cooked Chicken'),
                 i.limeJuice(2, u.tsp),
             ]),
             e.pan().cookWithLidSlightlyOff(1, 'm', 2),

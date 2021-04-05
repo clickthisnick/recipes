@@ -31,7 +31,7 @@ class PizzaDough extends Recipe {
             Timer.set(20, 'm', 'Wait for yeast to get cloudy'),
             Timer.end(),
             e.kitchenAidMixingBowl().add([
-                i.item('Yeast water')
+                i.ingredient('Yeast water')
             ]),
             e.kitchenAidMixingBowl().stir(),
             text.set(['Break dough in half and place in one in oiled red joesph containers (16oz) and the other in the mixing bowl.']),

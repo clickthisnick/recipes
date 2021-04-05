@@ -1,6 +1,7 @@
-import { IItem } from './item';
-import { IUnitObj, Units as u } from '../../constants/units';
+import { IItem, Ingredient } from './ingredient';
+import { IUnitObj, Units as u, Units } from '../../constants/units';
 import { CarbItems } from './carb';
+import { Stores } from '../../class/stores';
 
 export class FruitItems extends CarbItems {
     public static readonly apple: IItem = (quantity: number = 0, unit: IUnitObj) => ({
@@ -60,27 +61,35 @@ export class FruitItems extends CarbItems {
         },
     })
 
-    public static readonly cashewButter: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Cashew Butter',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Rinse and put measuring cup in dishwasher',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {
-            [u.tbsp.name]: {
-                servings: 14,
-                serving_size: 2,
-                calories: 190,
-                sodium: 0,
-                sugar: 1,
-                protein: 4, 
-            }
-        },
-    })
+    public static readonly cashewButter = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Cashew Butter', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+                [Stores.wholeFoods]: {
+                    'conventional': [
+                        {
+                            price: 8.99,
+                            quantity: 16,
+                            quantity_unit: u.ounce,
+                            link: 'https://www.amazon.com/365-Everyday-Value-Cashew-Butter/dp/B074H6R4YF/ref=sr_1_5_0o_wf_mod_primary_alm',
+                            organic: false,
+                        }
+                    ]
+                },          
+            }, // purchaseLinks
+            7, // perishableLimit
+        )
+    )
 
     public static readonly orangeJuice: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Orange Juice',

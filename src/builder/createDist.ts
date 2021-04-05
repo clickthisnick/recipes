@@ -1,9 +1,12 @@
 import * as fs from 'fs';
 import { HTML } from '../class/html';
+// import { IAllIngredientUnits } from '../constants/units';
+
 //import { Index } from '../class/index';
 //import { IStep } from '../class/step';
 
 // This is the path from root (package.json runs this)
+// const testFolder = 'src/recipeDebug2';
 const testFolder = 'src/recipeDebug';
 // const testFolder = 'src/recipesNewFormat';
 const cwd = process.cwd();
@@ -36,7 +39,25 @@ function generateRecipe(file: string) {
     }
   }
 
-  recipe.generateRecipes();
+  // Apply any transformations needed for recipes
+  // For example we are going to convert all recipes to calculate prices for the ingredients
+  // priceConversionTable
+  // TODO nick
+  // This is just casting the ingredients
+  // console.log(recipe);
+  // const recipeIngredients: IAllIngredientUnits[] = recipe.ingredients
+  // recipeIngredients.forEach(ingredients => {
+  //   console.log(ingredients.quantity_unit)
+  // })
+
+  recipe.generateRecipeHtml();
+//   this.variations.forEach(variation => {
+//     this.generateRecipeVariation(variation, hideUnderRecipeGroup)
+// })
+
+  // const initRecipe: Recipe = new recipeClass();
+  // const recipeName = recipeClass.name; 
+
   pageHtml += recipe.recipeHtml
 }
 

@@ -7,6 +7,11 @@ export class HTML {
     public static chartSet = '<meta charset="utf-8">';
     public static css = `<style>
 
+    a { 
+        color:orange;
+        text-decoration:none;
+    }
+
     html {
         background-color: #000000;
     }

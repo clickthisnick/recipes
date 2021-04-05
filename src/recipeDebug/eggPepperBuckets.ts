@@ -30,7 +30,7 @@ class EggPepperBuckets extends Recipe {
             text.set(['Flip', i.greenBellPepper()]),
             text.set(['Crack', i.egg(4, u.unit), 'and put into the horizontal slices of', i.greenBellPepper()]),
             e.pan().cook(3, 'm'),
-            i.item('egg').season([
+            i.ingredient('egg').season([
                 i.smokedPaprika(1, u.dash),
                 i.chilliPowder(1, u.dash),
                 i.blackPepper(1, u.dash),
@@ -38,7 +38,7 @@ class EggPepperBuckets extends Recipe {
             ]),
             Timer.end(),
             text.set(['Flip', i.greenBellPepper()]),
-            i.item('egg').season([
+            i.ingredient('egg').season([
                 i.smokedPaprika(1, u.dash),
                 i.chilliPowder(1, u.dash),
                 i.blackPepper(1, u.dash),

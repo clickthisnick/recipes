@@ -31,7 +31,7 @@ class Coffee extends Recipe {
             text.set(['Push french press top down']),
             e.coffeecup().add([
                 i.collagenPowder(1, u.scoop),
-                i.item('coffee', 2, u.inches),
+                i.ingredient('coffee', 2, u.inches),
             ]),
             e.coffeecup().stir(),
             text.set(['If iced coffee - Fill cup with ice']),

@@ -35,11 +35,11 @@ export class MozzarellaSticks extends Recipe {
             e.bowl().stir(),
             text.set(['Whisk', i.egg(1, u.unit)]),
             text.set(['Dip in egg mixture']),
-            text.set(['Roll dipped cheese in', i.item('seasoned panko')]),
+            text.set(['Roll dipped cheese in', i.ingredient('seasoned panko')]),
             Timer.set(60, 'm', 'Freeze'),
             Timer.end(),
             e.ninja().add([
-                i.item('cheese sticks')
+                i.ingredient('cheese sticks')
             ]),
             e.ninja().cook(6, 'm', 390),
             Timer.end(),

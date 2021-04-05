@@ -1,8 +1,10 @@
+import { Ingredient } from './ingredients/ingredient';
+
 export interface IStep {
     id: number;
     time: number; // In seconds
     text: string;
-    ingredients: any[]
+    ingredients: Ingredient[]
     equipment: any[]
     children: IStep[]
     disappearWhen: string
