@@ -109,7 +109,7 @@ function addStep(istep) {
         cookingDiv.innerHTML += divStep
     }
 
-    if (istep.children.length > 0) {
+    if (istep.children && istep.children.length > 0) {
         istep.children.forEach(child => {
             addStep(child);
         })
@@ -256,11 +256,13 @@ function doneSelectingRecipes() {
             shoppingDiv.innerHTML += '<div id="shopping-' + ingredient.name + '" class="panel" style="">' + '<span onclick="this.classList.toggle(' + "'completed'" + "); document.getElementById('shopping-" + ingredient.name  + "').remove(); delete ingredients['" + ingredient.name  + "'" + '];" >' + ingredient.name  + ' ' + ingredient.quantity + ' ' + ingredient.unit.name + '</span>' + links + '</div>'
         })
     } else {
-        // selectedRecipes.forEach(recipe => {
-        //     recipe.forEach(istep => {
-        //         addStep(istep)
-        //     })
-        // })
+        selectedRecipes.forEach(recipes => {
+            recipes.forEach(recipe => {
+                recipe.steps.forEach(istep => {
+                    addStep(istep)
+                })
+            })
+        })
     }
 }
 
