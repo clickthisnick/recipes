@@ -74,7 +74,10 @@ export class OilItems extends MeatItems {
                             quantity_unit: u.fluid_ounce,
                             link: 'https://www.amazon.com/BetterBody-Foods-Organic-Naturally-Refined/dp/B00U1RKGOW/ref=sr_1_6',
                             organic: true,
-                            subscribeAndSaveEligible: true
+                            discount: {
+                                'Subscribe 5 Products': 15,
+                                'Subscribe': 5,
+                            }
                         }
                     ]
                 },
@@ -154,7 +157,10 @@ export class OilItems extends MeatItems {
                             quantity_unit: u.fluid_ounce,
                             link: 'https://www.amazon.com/Pompeian-Robust-Extra-Virgin-Olive/dp/B0086OZ7X2/ref=sr_1_2_sspa',
                             organic: false,
-                            subscribeAndSaveEligible: true,
+                            discount: {
+                                'Subscribe 5 Products': 15,
+                                'Subscribe': 5,
+                            }
                         }
                     ],
                 },

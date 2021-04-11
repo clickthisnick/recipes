@@ -13,19 +13,29 @@ import { Time } from "./time";
 //     }
 // }
 export class Timer {
-    public static set(duration: number, type: string, text: string = ''): IStep {
+    public static set(duration: number, type: string, text: string = '', equipment = ['']): IStep {
         let step = istep()
         step.time = Time.convert(duration, type),
         step.showTimer = true
         step.text = text + ` for ${duration} ${type}`
         step.disappearWhen = 'timesUp'
+
+        if (equipment != ['']) {
+            step.equipment = equipment
+        }
+
         return step
     }
 
-    public static end(): IStep {
+    public static end(equipment = ['']): IStep {
         let step = istep()
         step.text = ''
         step.disappearWhen = 'timerIsUp'
+
+        if (equipment != ['']) {
+            step.equipment = equipment
+        }
+
         return step
     }
 }

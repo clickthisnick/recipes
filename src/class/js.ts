@@ -221,16 +221,20 @@ function doneSelectingRecipes() {
 
                             let pricePerQuantity = item.priceConversionTable[commonUnit]
 
-                            if (item.subscribeAndSaveEligible) {
-                                [.85, .95].forEach(discount => {
-                                    let subscribePricePerQuantity = (pricePerQuantity*discount).toFixed(3)
+                            if (item.discount) {
+                                Object.keys(item.discount).forEach(discountKey => {
+                                    const discountValue = item.discount[discountKey];
+                                    const priceMultiple = ((100 - discountValue) * .01).toFixed(2)
+                                    
+                                    let subscribePricePerQuantity = (pricePerQuantity*priceMultiple).toFixed(3)
+
                                     subscribePricePerQuantity = applyCreditCardDiscounts(store, subscribePricePerQuantity)
 
                                     if (!linkByPrice.hasOwnProperty(subscribePricePerQuantity)) {
-                                        linkByPrice[subscribePricePerQuantity] = [`</br> ${store}: &nbsp;<a href="${item.link}" target="_blank">${storeDescription} - Subscribe ${100 - (discount * 100)}% ${item.price*discount} - ${subscribePricePerQuantity}/${commonUnit}</a>`]
+                                        linkByPrice[subscribePricePerQuantity] = [`</br> ${store}: &nbsp;<a href="${item.link}" target="_blank">${storeDescription} - ${discountKey} ${subscribePricePerQuantity} - ${subscribePricePerQuantity}/${commonUnit}</a>`]
                                         priceKeys.push(subscribePricePerQuantity)
                                     } else {
-                                        linkByPrice[subscribePricePerQuantity].push(`</br> ${store}: &nbsp;<a href="${item.link}" target="_blank">${storeDescription} - Subscribe ${100 - (discount * 100)}% ${item.price*discount} - ${subscribePricePerQuantity}/${commonUnit}</a>`)
+                                        linkByPrice[subscribePricePerQuantity].push(`</br> ${store}: &nbsp;<a href="${item.link}" target="_blank">${storeDescription} - ${discountKey} ${subscribePricePerQuantity} - ${subscribePricePerQuantity}/${commonUnit}</a>`)
                                     }
                                 })
                             }

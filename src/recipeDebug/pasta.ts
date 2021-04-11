@@ -12,9 +12,39 @@ export class MealRecipe extends RecipeContainer {
         this.recipeGroup = c.meal;
         this.recipeName = 'Spaghetti'
         this.variations = [
-            LentilSpaghetti, LentilSpaghettiInstantPot, DontUseModernBrandLentilPenne
+            LentilPenne, LentilSpaghetti, LentilSpaghettiInstantPot, DontUseModernBrandLentilPenne
         ]
     }
+}
+
+export class LentilPenne extends Recipe {
+    constructor() {
+        super();
+        this.steps = [
+            e.pot().add([
+                i.water(25, u.second),
+            ]),
+            Timer.set(15, 'm', 'Wait for water to boil'),
+                i.Groups.mushroom(4, u.unit).cutIntoStrips(),
+            Timer.end(),
+            e.pot().add([
+                i.lentilSpaghetti(8, u.ounce),
+            ]),
+            Timer.set(10, 'm', 'let lentil penne cook'),
+                e.pan().add([
+                    i.Groups.mushroom(4, u.unit),
+                ]),
+                e.pan().cook(8, 'm'),
+                    e.pan().add([
+                        i.spaghettiSauce(25, u.ounce),
+                    ]),
+                    e.pan().cook(2, 'm'),
+                    Timer.end(),
+                Timer.end(['pan']),
+            Timer.end(['pot']),
+            text.set(['Top with', i.parmesanCheese(8, u.ounce)]),
+        ];
+    } 
 }
 
 export class LentilSpaghetti extends Recipe {

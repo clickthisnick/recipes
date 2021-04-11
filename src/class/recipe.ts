@@ -2,6 +2,7 @@ import { IEstimates, IEstimatesMissing } from './ingredients/ingredient';
 import { Ingredients, Units } from '../constants/units';
 import { IStep } from './step';
 import { exception } from 'console';
+import { Text as text } from './text';
 
 export interface IVariation {
     [details: string]: any[]; // Unititalized recipe
@@ -179,6 +180,34 @@ export class Recipe {
         this.steps.forEach(stepz => {
             this.addIngredient(stepz)
         })
+
+        // Loop through steps backwards and add a step to put away equipment if its no longer used
+        const foundEquipment = {};
+
+        // Since we are looping backwards we can add items to the array
+        for (let i = this.steps.length - 1; i >= 0; --i) {
+            const step = this.steps[i];
+
+            if (!step.equipment) {
+                continue
+            }
+
+            step.equipment.forEach(equipmentItem => {
+                if (equipmentItem === '') {
+                    return
+                }
+
+                if (foundEquipment.hasOwnProperty(equipmentItem)) {
+                    // If we have already found the equipment once, it must hae been from a later step
+                    // We can skip it since we assume its already been dealt with
+                    return
+                }
+
+                this.steps.splice(i+1, 0, text.set(['Clean and put away', equipmentItem]));
+
+                foundEquipment[equipmentItem] = true
+            })
+        }
 
         // Loop through the ingredients of the recipe and generate a pricing table for each purchasable link
         Object.keys(this.ingredients).forEach(ingredientKey => {

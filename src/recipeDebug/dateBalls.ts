@@ -12,7 +12,7 @@ export class MealRecipe extends RecipeContainer {
         this.recipeGroup = c.component;
         this.variations = [
             DateBalls
-        ]
+        ] 
      }
 }
 
@@ -29,11 +29,14 @@ class DateBalls extends Recipe {
                 i.collagenPowder(2, u.cup),
                 i.water(1, u.cup)
             ]),
-            text.set(['Blend for 30 seconds, stir, repeat until dough like']),
+            e.blender().blend(30, 's'),
+            Timer.end(),
             e.blender().add([
-                [i.cashewButter(56, u.tbsp), '(2 full 16 ounce containers)']
+                //[i.cashewButter(32, u.ounce), '(2 full 16 ounce containers)']
+                i.peanutButter(32, u.ounce),
             ]),
-            text.set(['Blend for 10 seconds, stir, repeat until dough like']),
+            e.blender().blend(10, 's'),
+            Timer.end(),
             text.set(['Remove blender base from top']),
             text.set(['Take a tbsp of batter and cut on cutting board, repeat until no more batter. Makes around 60']),
             Timer.set(120, 'm', 'Put on plastic cutting board and put into fridge'),

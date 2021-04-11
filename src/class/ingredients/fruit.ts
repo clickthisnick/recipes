@@ -17,49 +17,165 @@ export class FruitItems extends CarbItems {
         nutrition: {},
     })
 
-    public static readonly collagenPowder: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Collagen Powder',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Rinse and put measuring cup in dishwasher',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {
-            [u.tbsp.name]: {
-                servings: 25,
-                serving_size: 4,
-                calories: 70,
-                sodium: 65,
-                sugar: 0,
-                protein: 18, 
-            }
-        },
-    })
+    public static readonly collagenPowder = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Collagen Powder', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            true, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+                [Stores.amazon]: {
+                    'Anthony\'s Collagen Peptide Powder, 1 lb, Pure Hydrolyzed, Gluten Free, Keto and Paleo Friendly, Grass Fed': [
+                        {
+                            price: 17.99,
+                            quantity: 1,
+                            quantity_unit: u.pound,
+                            link: 'https://www.amazon.com/gp/product/B071S8D69C/ref=ppx_yo_dt_b_asin_title_o00_s00',
+                            organic: false,
+                            discount: {
+                                'Subscribe 5 Products': 5
+                            }
+                        }
+                    ]
+                },  
+            }, // purchase links
+        )
+    )
 
-    public static readonly pittedDates: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Pitted Date',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Rinse and put measuring cup in dishwasher',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {
-            [u.unit.name]: {
-                servings: 6,
-                serving_size: 6,
-                calories: 110,
-                sodium: 0,
-                sugar: 25,
-                protein: 1, 
-            }
-        },
-    })
+    public static readonly pittedDates = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Pitted Dates', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+                [Stores.wholeFoods]: {
+                    '365 by Whole Foods Market, Dried Fruit, Pitted Dates': [
+                        {
+                            price: 3.99,
+                            quantity: 8,
+                            quantity_unit: u.ounce,
+                            link: 'https://www.amazon.com/365-Everyday-Value-Dates-Pitted/dp/B074VDMNH7/ref=sr_1_5_0o_wf',
+                            organic: false,
+                        }
+                    ]
+                },
+                [Stores.amazon]: {
+                    'ORGANIC Pitted Dates (Deglet Nour) - Sunny Fruit 40oz Bulk Bag (2.5 lbs)': [
+                        {
+                            price: 16.59,
+                            quantity: 2.5,
+                            quantity_unit: u.pound,
+                            link: 'https://www.amazon.com/ORGANIC-Pitted-Dates-Deglet-Nour/dp/B0872L82ZK/ref=sr_1_10',
+                            organic: true,
+                            discount: {
+                                'Subscribe 5 Products': 5,
+                            }
+                        }
+                    ],
+                    '5 Pounds Of Dates Pitted (80oz) No Added Sugar, Non GMO, Kosher Certified,Healthy Snack for Kids & Adults': [
+                        {
+                            price: 24.89,
+                            quantity: 5,
+                            quantity_unit: u.pound,
+                            link: 'https://www.amazon.com/5-Pounds-Dates-Pitted-5lb/dp/B0727V394G/ref=sr_1_9',
+                            organic: false,
+                            discount: {
+                                'Subscribe 5 Products': 10,
+                                'Subscribe': 5
+                            }
+                        }
+                    ],
+                    'Mariani Pitted Dates - 40oz (Pack of 1) – Exceptional Taste and Soft Texture, No Sugar Added, Good Source of Dietary Fiber, Gluten Free, Vegan, Fat Free, Cholesterol Free, NonGMO, Resealable Bag': [
+                        {
+                            price: 14.08,
+                            quantity: 2.5,
+                            quantity_unit: u.pound,
+                            link: 'https://www.amazon.com/Mariani-Pitted-Dates-Natural-40-Ounce/dp/B0027YZBJC/ref=sxin_9',
+                            organic: false,
+                            discount: {
+                                'Subscribe 5 Products': 5,
+                            }
+                        }  
+                    ]                    
+                },  
+            }, // purchase links
+        )
+    )
+ 
+    public static readonly peanutButter = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Peanut Butter', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+                [Stores.wholeFoods]: {
+                    '365 by Whole Foods Market, Organic Peanut Butter, Creamy': [
+                        {
+                            price: 4.19,
+                            quantity: 16,
+                            quantity_unit: u.ounce,
+                            link: 'https://www.amazon.com/365-Everyday-Value-Organic-Unsweetened/dp/B074H61LYV/ref=sr_1_9_0o_wf',
+                            organic: true,
+                        }
+                    ],
+                    '365 by Whole Foods Market, Peanut Butter, Creamy': [
+                        {
+                            price: 2.49,
+                            quantity: 16,
+                            quantity_unit: u.ounce,
+                            link: 'https://www.amazon.com/365-Everyday-Value-Peanut-Butter/dp/B074H57SPT/ref=sr_1_7_0o_wf',
+                            organic: false,
+                        }  
+                    ],
+                    '365 by Whole Foods Market, Peanut Butter, Crunchy': [
+                        {
+                            price: 4.99,
+                            quantity: 36,
+                            quantity_unit: u.ounce,
+                            link: 'https://www.amazon.com/Everyday-Value-Peanut-Butter-Crunchy/dp/B074Y2V88X/ref=sr_1_16_0o_wf',
+                            organic: false,
+                        }
+                    ]
+                },
+                [Stores.amazonFresh]: {
+                    'Amazon Brand - Happy Belly Creamy Peanut Butter': [
+                        {
+                            price: 3.99,
+                            quantity: 40,
+                            quantity_unit: u.ounce,
+                            link: 'https://www.amazon.com/Amazon-Brand-Creamy-Peanut-Butter/dp/B07KWGSCW2',
+                            organic: false,
+                            discount: {
+                                'Subscribe 5 Products': 5
+                            }
+                        }  
+                    ],
+                },          
+            }, // purchaseLinks
+            7, // perishableLimit
+        )
+    )
 
     public static readonly cashewButter = (quantity: number = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(

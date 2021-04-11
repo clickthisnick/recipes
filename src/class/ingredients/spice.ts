@@ -256,27 +256,59 @@ export class SpiceItems extends SauceItems {
         nutrition: {},
     })
 
-    public static readonly cacaoPowderUnsweetened: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'unsweetened cacao powder',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: true,
-        isMeatProduct: false,
-        nutrition: {
-            [u.tbsp.name]: {
-                servings: 38,
-                serving_size: 1,
-                calories: 15,
-                sodium: 0,
-                sugar: 0,
-                protein: 1, 
-            }
-        },
-    })
+    public static readonly cacaoPowderUnsweetened = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'unsweetened cacao powder', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+                [Stores.amazon]: {
+                    'Anthony\'s Organic Raw Cocoa Powder, Cacao Powder 5lb': [
+                        {
+                            price: 29.99,
+                            quantity: 5,
+                            quantity_unit: u.pound,
+                            link: 'https://www.amazon.com/Organic-Anthonys-Verified-Gluten-Free-Non-GMO/dp/B00F7SU63G',
+                            organic: true,
+                        },
+                    ],
+                    'Anthony\'s Organic Raw Cocoa Powder, Cacao Powder 2lb': [
+                        {
+                            price: 14.85,
+                            quantity: 2,
+                            quantity_unit: u.pound,
+                            link: 'https://www.amazon.com/Organic-Anthonys-Verified-Gluten-Free-Non-GMO/dp/B0833QH1N4?th=1',
+                            organic: true,
+                            discount: {
+                                'Subscribe 5 Products': 5,
+                            }
+                        }
+                    ],
+                    'BetterBody Foods Organic Cacao Powder, Non-GMO, Gluten-Free Superfood': [
+                        {
+                            price: 8.49,
+                            quantity: 1,
+                            quantity_unit: u.pound,
+                            link: 'https://www.amazon.com/LIVfit-Superfood-Guilt-Free-Substitute-BetterBody/dp/B01IPZUZW4',
+                            organic: true,
+                            discount: {
+                                'Subscribe 5 Products': 15,
+                                'Subscribe': 5,
+                            }
+                        }
+                    ]
+                },
+            }, // purchase links
+        )
+    )
 
     public static readonly chilliPowder: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'chilli powder',
@@ -443,7 +475,10 @@ export class SpiceItems extends SauceItems {
                             quantity_unit: u.ounce,
                             link: 'https://www.amazon.com/Amazon-Brand-Granulated-Garlic-Ounces/dp/B07QW1GKR1/ref=sr_1_6',
                             organic: false,
-                            subscribeAndSaveEligible: true,
+                            discount: {
+                                'Subscribe 5 Products': 15,
+                                'Subscribe': 5,
+                            }
                         }
                     ],
                 }

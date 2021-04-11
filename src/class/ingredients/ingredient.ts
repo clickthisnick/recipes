@@ -1,6 +1,7 @@
 import { IUnitObj } from '../../constants/units';
 import { IStep, istep } from '../step';
 import { Serializer as s } from '../serializer';
+import { Equipment as e } from '../equipment';
 
 export interface IEstimates {
     calories?: number;
@@ -38,8 +39,12 @@ interface IPurchaseItem {
     quantity_unit: IUnitObj,
     link: string,
     organic: boolean,
-    subscribeAndSaveEligible?: boolean,
+    discount?: IDiscount,
     priceConversionTable?: any // Keys are the unit name, value is the price per that unit
+}
+
+interface IDiscount {
+    [store: string]: number,
 }
 
 export interface IItemObj {
@@ -144,6 +149,8 @@ export class Ingredient {
             addIStep.text = ['Cut the', this.name, 'in half'].join(' ')
         }
         addIStep.ingredients.push(this)
+        addIStep.equipment.push(e.cuttinBoard())
+        addIStep.equipment.push(e.knife())
 
         return addIStep;
     }
@@ -158,6 +165,8 @@ export class Ingredient {
         }
 
         addIStep.ingredients.push(this)
+        addIStep.equipment.push(e.cuttinBoard())
+        addIStep.equipment.push(e.knife())
 
         return addIStep;
     }
@@ -170,7 +179,8 @@ export class Ingredient {
         } else {
             addIStep.text = ['Cut the', this.name, 'into strips'].join(' ')
         }
-        addIStep.ingredients.push(this)
+        addIStep.equipment.push(e.cuttinBoard())
+        addIStep.equipment.push(e.knife())
 
         return addIStep;
     }

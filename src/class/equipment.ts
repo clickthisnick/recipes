@@ -19,17 +19,6 @@ export interface IEquipment {
     (id?: number): IEquipmentObj;
 }
 
-// function sanitize(item: any): string {
-//     if (typeof item === 'string') {
-//         return item;
-//     } else if (typeof item === 'object') {
-//         return s.turnIngObjIntoStr(item, true);
-//     }
-
-//     return 'error timer sanitizing';
-// }
-
-
 let containers: any = {}
 
 class Container {
@@ -53,6 +42,7 @@ class Container {
     public stir(): IStep {
         this.firstAction = false;
         let stirStep = istep()
+        stirStep.equipment.push(this.name)
         stirStep.text = `Stir ${this.name}`
         return stirStep
     }
@@ -60,6 +50,7 @@ class Container {
     public mix(): IStep {
         this.firstAction = false;
         let mixStep = istep()
+        mixStep.equipment.push(this.name)
         mixStep.text = `Mix ${this.name}`
         return mixStep
     }
@@ -67,7 +58,6 @@ class Container {
     // change to IItemObj | Item  once all ingredients are items
     public add(ingredients: any[] | any | any[][]): IStep {
         let addIStep = istep()
-        addIStep.equipment.push(this)
 
         let bindingWord = 'the'
 
@@ -111,6 +101,7 @@ class Container {
 
         addIStep.text = ['Add', s.turnIngObjIntoStr(ingredients, true), 'to', this.name].join(' ') 
         addIStep.ingredients.push(ingredients)
+        addIStep.equipment.push(this.name)
 
         return addIStep
 
@@ -253,7 +244,7 @@ class Pot extends CookingContainer {
     }
 
     public cook(duration: number, type: string, heat: number): IStep {
-        return Timer.set(duration, type, `Cook ${this.name} @ ${heat}°`);
+        return Timer.set(duration, type, `Cook ${this.name} @ ${heat}°`, [this.name]);
     }
 }
 
@@ -282,15 +273,15 @@ class Pan extends CookingContainer {
 
         if (heat === 5) {
             // Return how long preheating pan takes
-            return Timer.set(2, 'm', `Preheat ${this.name} on heat ${heat}`);
+            return Timer.set(2, 'm', `Preheat ${this.name} on heat ${heat}`, [this.name]);
         }
 
         if (heat === 7) {
             // Return how long preheating pan takes
-            return Timer.set(4, 'm', `Preheat ${this.name} on heat ${heat}`);
+            return Timer.set(4, 'm', `Preheat ${this.name} on heat ${heat}`, [this.name]);
         }
 
-        return Timer.set(minutes, 'm', `Preheat ${this.name} on heat ${heat}`);
+        return Timer.set(minutes, 'm', `Preheat ${this.name} on heat ${heat}`, [this.name]);
     }
 
     public cook(duration: number, type: string, heat: number = 0): IStep {
@@ -303,7 +294,7 @@ class Pan extends CookingContainer {
             }
         }
 
-        return Timer.set(duration, type, `Cook on heat ${heat}`)
+        return Timer.set(duration, type, `Cook on heat ${heat}`, [this.name])
     }
 
     public cookWithLidSlightlyOff(duration: number, type: string, heat: number = 0): IStep {
@@ -316,7 +307,7 @@ class Pan extends CookingContainer {
             }
         }
 
-        return Timer.set(duration, type, `Cook on heat ${heat} with lid slightly off`)
+        return Timer.set(duration, type, `Cook on heat ${heat} with lid slightly off`, ['pan'])
     }
 }
 
@@ -367,16 +358,22 @@ class Blender extends Container {
         super("blender", id)
     }
 
-    // public blend(duration, type) {
-    //     return [
-    //         Timer.set(duration, type, 'Blend', false),
-    //     ]
-    // }
+    public blend(duration, type) {
+        return Timer.set(duration, type, 'Blend', [this.name])
+    }
 }
 
 export class Equipment {
     // 99 is just an identifer that doesn't start with 0/1/2
     // By default we assume that equipment is reused throughout the recipe
+
+    public static readonly knife = () => {
+        return 'knife'
+    }
+
+    public static readonly cuttinBoard = () => {
+        return 'cutting board'
+    }
 
     public static readonly ninja = (id: number = 99) => (
         new Ninja(id)
