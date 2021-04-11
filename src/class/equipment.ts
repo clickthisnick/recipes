@@ -132,6 +132,10 @@ class Bowl extends Container {
     constructor(id: number) {
         super('bowl', id)
     }
+
+    public microwave(minutes: number): IStep {
+        return Timer.set(minutes, 'm', `Microwave ${this.name} for ${minutes} minutes`);
+    }
 }
 
 
@@ -147,6 +151,10 @@ class KitchenAidMixingBowl extends Container {
     // Containers are a singleton
     constructor(id: number) {
         super('KitchenAid Mixing Bowl', id)
+    }
+
+    public mixWithDoughHook(minutes: number): IStep {
+        return Timer.set(minutes, 'm', `Mix with dough hook for ${minutes} minutes`);
     }
 }
 
