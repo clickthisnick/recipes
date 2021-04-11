@@ -156,6 +156,10 @@ class KitchenAidMixingBowl extends Container {
     public mixWithDoughHook(minutes: number): IStep {
         return Timer.set(minutes, 'm', `Mix with dough hook for ${minutes} minutes`);
     }
+
+    public mixWithFlatBeater(minutes: number): IStep {
+        return Timer.set(minutes, 'm', `Mix with flat beater attachment for ${minutes} minutes`);
+    }
 }
 
 

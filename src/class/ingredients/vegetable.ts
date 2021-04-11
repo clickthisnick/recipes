@@ -597,6 +597,23 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
+    public static readonly lemonJuice = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Lemon Juice', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+            }, // purchaseLinks
+        )
+    )
+
     public static readonly limeJuice = (quantity: number = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Lime Juice', // name

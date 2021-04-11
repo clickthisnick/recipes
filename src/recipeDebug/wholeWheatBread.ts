@@ -30,17 +30,27 @@ export class WholeWheatBread extends Recipe {
             e.bowl().add([
                 i.water(2.5, u.cup),
             ]),
-            e.bowl().microwave(1),
+            e.bowl().microwave(1.05),
             Timer.end(),
             e.kitchenAidMixingBowl().add([
                 i.ingredient('Microwaved water')
             ]),
             e.kitchenAidMixingBowl().mixWithDoughHook(1),
-                e.oven().preheat(350),
+            Timer.end(),
+            Timer.set(10, 'm', 'Cover the kitchenaid bowl'),
+            Timer.end(),
+            e.oven().preheat(350),
+                e.kitchenAidMixingBowl().add([
+                    i.salt(1, u.tbsp),
+                    i.coconutOil(1/3, u.cup),
+                    i.honey(1/3, u.cup),
+                    i.lemonJuice(4, u.tsp)
+                ]),
+                e.kitchenAidMixingBowl().mixWithDoughHook(1),
                 Timer.end(),
             Timer.end(),
             e.kitchenAidMixingBowl().add([
-                i.wholeWheatFlour(2.5, u.cup),
+                i.wholeWheatBread(2.5, u.cup),
             ]),
             e.kitchenAidMixingBowl().mixWithDoughHook(3),
                 text.set(['Grease 2 bread pans']),
