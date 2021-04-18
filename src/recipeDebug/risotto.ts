@@ -102,7 +102,7 @@ class Risotto2Servings extends Recipe {
                 e.pot().add([
                     i.arborioRice(2, u.cup),
                     i.blackPepper(1, u.tsp),
-                    i.salt(1, u.tsp),
+                    //i.salt(1, u.tsp),
                 ]),
                 Timer.set(2, 'm', 'cook rice'),
                 Timer.end(),
@@ -117,9 +117,9 @@ class Risotto2Servings extends Recipe {
                 Timer.set(20, 'm', 'cook rice'),
                 Timer.end(),
                 text.set(['Turn stove heat off']),
-                e.pot().add([
-                    i.chickenStock(1, u.cup),
-                ]),
+                // e.pot().add([
+                //     i.chickenStock(1, u.cup),
+                // ]),
                 e.pot().add([
                     //i.parmesanCheese(2, u.cup),
                     i.parmesanCheese(1.5, u.cup),
@@ -127,7 +127,7 @@ class Risotto2Servings extends Recipe {
                     i.butter(3, u.tbsp),
                     i.lemonZest(.25, u.lemon),
                 ]),
-            Timer.end(['pot', 'pan']),
+            Timer.end(['pot', 'baking sheet']),
         ];
     }
 }

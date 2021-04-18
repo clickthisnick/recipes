@@ -21,27 +21,26 @@ class DateBalls extends Recipe {
         super();
         this.steps = [
             // Technically cashew butter should be 4 cups (64 tbsp) but this is easier since it's 2 full containers
-            Timer.set(5, 'm', 'Soak 40 dates in a bowl'), 
+            Timer.set(5, 'm', 'Soak 20 dates in a bowl'), 
             Timer.end(),
-            e.blender().add([
-                [i.pittedDates(40, u.unit), 'checking that there are no pits'],
-                i.cacaoPowderUnsweetened(1, u.cup),
-                i.collagenPowder(2, u.cup),
+            i.pittedDates(20, u.unit).dice(),
+            e.kitchenAidMixingBowl().add([
+                i.pittedDates(),
+                i.cacaoPowderUnsweetened(.5, u.cup),
+                i.collagenPowder(1, u.cup),
                 i.water(1, u.cup)
             ]),
-            e.blender().blend(30, 's'),
+            e.kitchenAidMixingBowl().mixWithWhisk(1),
             Timer.end(),
-            e.blender().add([
+            e.kitchenAidMixingBowl().add([
                 //[i.cashewButter(32, u.ounce), '(2 full 16 ounce containers)']
-                i.peanutButter(32, u.ounce),
+                i.peanutButter(16, u.ounce),
             ]),
-            e.blender().blend(10, 's'),
+            e.kitchenAidMixingBowl().mixWithWhisk(1),
             Timer.end(),
-            text.set(['Remove blender base from top']),
-            text.set(['Take a tbsp of batter and cut on cutting board, repeat until no more batter. Makes around 60']),
-            Timer.set(120, 'm', 'Put on plastic cutting board and put into fridge'),
+            text.set(['Take a tbsp of batter and put on cutting board, repeat until no more batter. Makes around 60']),
+            Timer.set(120, 'm', 'Put on plastic cutting board and put into freezer'),
             Timer.end(),
-            text.set(['Wash blender while still able to. (Wait a day and its 200% harder to clean)']),
             text.set(['Transfer pieces into plastic container and keep in freezer']),
         ];
     }
