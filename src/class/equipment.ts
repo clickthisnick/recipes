@@ -218,6 +218,10 @@ class Oven extends CookingContainer {
     public cook(duration: number, type: string, degrees: number): IStep {
         return Timer.set(duration, type, `Cook ${this.name} @ ${degrees}°`);
     }
+
+    public roast(duration: number, type: string, degrees: number): IStep {
+        return Timer.set(duration, type, `Roast ${this.name} @ ${degrees}°`);
+    }
 }
 
 class Ninja extends CookingContainer {
