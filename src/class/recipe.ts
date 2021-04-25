@@ -173,6 +173,26 @@ export class Recipe {
         }
     }
 
+    private getStepEquipment(step: IStep, equipment: any[] = []) {
+        // Calculates all the equipment for the step (and its children steps)
+
+        if (step.equipment !== []) {
+            step.equipment.forEach(equipmentItem => {
+                equipment.push(equipmentItem)
+            })
+        }
+
+        if (step.children) {
+            step.children.forEach(childStep => {
+                childStep.equipment.forEach(equipmentItem => {
+                    equipment.push(equipmentItem)
+                })
+            }) 
+        }
+        
+        return equipment
+    }
+
     public printRecipe(recipeName): string {
         let html = ''
 
@@ -187,23 +207,18 @@ export class Recipe {
         // Since we are looping backwards we can add items to the array
         for (let i = this.steps.length - 1; i >= 0; --i) {
             const step = this.steps[i];
+            const equipment = this.getStepEquipment(step)
 
-            if (!step.equipment) {
-                continue
-            }
-
-            step.equipment.forEach(equipmentItem => {
-                if (equipmentItem === '') {
-                    return
-                }
-
+            equipment.forEach(equipmentItem => {
                 if (foundEquipment.hasOwnProperty(equipmentItem)) {
                     // If we have already found the equipment once, it must hae been from a later step
                     // We can skip it since we assume its already been dealt with
                     return
                 }
 
-                this.steps.splice(i+1, 0, text.set(['Clean and put away', equipmentItem]));
+                // The +2 adds it a step beyond when it was last used
+                const stepPosition = (i + 2 > this.steps.length - 1) ? i+1 : i+2 
+                this.steps.splice(stepPosition, 0, text.set(['Clean and put away', equipmentItem]));
 
                 foundEquipment[equipmentItem] = true
             })
@@ -215,8 +230,6 @@ export class Recipe {
 
             Units.setPricingTable(ingredient)
         })
-
-        
 
         html += `<script>setRecipe('${recipeName}', ${JSON.stringify(this)})</script>`
 

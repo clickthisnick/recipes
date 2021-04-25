@@ -12,7 +12,7 @@
     "preremoveDist": "npm run createReadme",
     "removeDist": "./src/builder/removeDist.sh",
     "prebuild": "npm run removeDist",
-    "build": "./node_modules/ts-node/dist/bin.js ./src/builder/createDist.ts",
+    "build": "./node_modules/ts-node/dist/bin.js ./src/builder/createDist.ts --inspect",
     "postbuild": "npm run createExpirationCalculator",
     "createExpirationCalculator": "./node_modules/ts-node/dist/bin.js ./src/expirationCalculator/expirationCalculator.ts"
   },

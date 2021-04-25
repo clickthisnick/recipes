@@ -33,7 +33,7 @@ class DateBalls extends Recipe {
             e.kitchenAidMixingBowl().mixWithWhisk(1),
             Timer.end(),
             e.kitchenAidMixingBowl().add([
-                //[i.cashewButter(32, u.ounce), '(2 full 16 ounce containers)']
+                //[i.cashewButter(16, u.ounce), '(1 full 16 ounce containers)']
                 i.peanutButter(16, u.ounce),
             ]),
             e.kitchenAidMixingBowl().mixWithWhisk(1),

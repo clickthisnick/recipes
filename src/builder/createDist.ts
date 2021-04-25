@@ -6,8 +6,8 @@ import { HTML } from '../class/html';
 //import { IStep } from '../class/step';
 
 // This is the path from root (package.json runs this)
-// const testFolder = 'src/recipeDebug2';
 const testFolder = 'src/recipeDebug';
+// const testFolder = 'src/recipeDebug';
 // const testFolder = 'src/recipesNewFormat';
 const cwd = process.cwd();
 

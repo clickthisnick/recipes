@@ -80,10 +80,16 @@ class Container {
                 if (Array.isArray(ingredient)) {
                     ingredient.forEach((ingredientNText) => {
                         if (typeof(ingredientNText) === 'object') {
+                            // TODO there should really a func which return an istep object that is filled out properly
                             addIngredient.text = ['•', s.turnIngObjIntoStr(ingredientNText, true)].join(' ')
                             addIngredient.ingredients.push(ingredientNText)
                             addIngredient.time += ingredientNText.text
-                            addIStep.children.push(addIngredient)                    
+                            addIStep.children.push(addIngredient)     
+                            
+                            // If the unit is an equipment like a cup, then add it to the equipment
+                            if (ingredientNText.unit && ingredientNText.unit.isEquipment) {
+                                addIngredient.equipment.push(ingredientNText.unit.name)
+                            }
                         } else {
                             addIngredient.text += ' ' + ingredientNText
                         } 
@@ -93,6 +99,10 @@ class Container {
                     addIngredient.ingredients.push(ingredient)
                     addIngredient.time += ingredient.takeOutTime
                     addIStep.children.push(addIngredient)  
+                    // If the unit is an equipment like a cup, then add it to the equipment
+                    if (ingredient.unit && ingredient.unit.isEquipment) {
+                        addIngredient.equipment.push(ingredient.unit.name)
+                    }
                 }
             })
 

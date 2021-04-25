@@ -2,6 +2,8 @@ import { Ingredient } from "../class/ingredients/ingredient";
 
 export interface IUnitObj {
     name: string;
+    isEquipment: boolean;
+    properName: string;
 }
 
 export interface Ingredients {
@@ -11,78 +13,126 @@ export interface Ingredients {
 
 export class Units {
     public static readonly none: IUnitObj = {
-        name: 'none'
-    };    
+        name: 'none',
+        isEquipment: false,
+        properName: 'none',
+    };
     public static readonly cup: IUnitObj = {
-        name: 'cup'
-    };    
+        name: 'cup',
+        isEquipment: true,
+        properName: 'measuring cup',
+    };
     public static readonly bag: IUnitObj = {
-        name: 'bag'
+        name: 'bag',
+        isEquipment: true,
+        properName: 'bag',
     };    
     public static readonly container: IUnitObj = {
-        name: 'container'
-    };    
+        name: 'container',
+        isEquipment: true,
+        properName: 'container'
+    };
     public static readonly sprigs: IUnitObj = {
-        name: 'sprigs'
-    };    
+        name: 'sprigs',
+        isEquipment: false,
+        properName: 'sprigs'
+    };
     public static readonly spoon: IUnitObj = {
-        name: 'spoon'
-    };    
+        name: 'spoon',
+        isEquipment: true,
+        properName: 'spoon'
+    };
     public static readonly bunch: IUnitObj = {
-        name: 'bunch'
+        name: 'bunch',
+        isEquipment: false,
+        properName: 'bunch'
     };
     public static readonly dash: IUnitObj = {
-        name: 'dash'
+        name: 'dash',
+        isEquipment: false,
+        properName: 'dash'
     };
     public static readonly clove: IUnitObj = {
-        name: 'clove'
+        name: 'clove',
+        isEquipment: false,
+        properName: 'clove'
     };
     public static readonly noUnitQuantity: IUnitObj = {
-        name: ''
+        name: '',
+        isEquipment: false,
+        properName: ''
     };
     public static readonly tsp: IUnitObj = {
-        name: 'tsp'
+        name: 'tsp',
+        isEquipment: true,
+        properName: 'measuring tsp'
     };
     public static readonly tbsp: IUnitObj = {
-        name: 'Tbsp'
+        name: 'Tbsp',
+        isEquipment: true,
+        properName: 'measuring tbsp'
     };
     public static readonly stick: IUnitObj = {
-        name: 'stick'
+        name: 'stick',
+        isEquipment: false,
+        properName: 'stick'
     };
     public static readonly second: IUnitObj = {
-        name: 'second'
+        name: 'second',
+        isEquipment: false,
+        properName: 'second'
     };
     public static readonly pound: IUnitObj = {
-        name: 'pound'
+        name: 'pound',
+        isEquipment: false,
+        properName: 'pound'
     };
     public static readonly ounce: IUnitObj = {
-        name: 'ounce'
+        name: 'ounce',
+        isEquipment: false,
+        properName: 'ounce'
     };
     public static readonly fluid_ounce: IUnitObj = {
-        name: 'fluid ounce'
+        name: 'fluid ounce',
+        isEquipment: false,
+        properName: 'fluid_ounce'
     };
     public static readonly lemon: IUnitObj = {
-        name: 'lemon'
+        name: 'lemon',
+        isEquipment: false,
+        properName: 'lemon'
     };
     public static readonly unit: IUnitObj = {
-        name: 'unit'
+        name: 'unit',
+        isEquipment: false,
+        properName: 'unit'
     };
     public static readonly slice: IUnitObj = {
-        name: 'slice'
+        name: 'slice',
+        isEquipment: false,
+        properName: 'slice'
     };
     public static readonly scoop: IUnitObj = {
-        name: 'scoop'
+        name: 'scoop',
+        isEquipment: false,
+        properName: 'scoop'
     };
     public static readonly crack: IUnitObj = {
-        name: 'crack'
+        name: 'crack',
+        isEquipment: false,
+        properName: 'crack'
     };
 
     public static readonly inches: IUnitObj = {
-        name: 'inches'
+        name: 'inches',
+        isEquipment: false,
+        properName: 'inches'
     };
 
     public static readonly thousandSecondCounts: IUnitObj = {
-        name: 'thousand second counts'
+        name: 'thousand second counts',
+        isEquipment: false,
+        properName: 'thousandSecondCounts'
     };
 
     private static conversionTable = {
