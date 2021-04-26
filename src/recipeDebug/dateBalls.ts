@@ -28,7 +28,8 @@ class DateBalls extends Recipe {
                 i.pittedDates(),
                 i.cacaoPowderUnsweetened(.5, u.cup),
                 i.collagenPowder(1, u.cup),
-                i.water(1, u.cup)
+                i.water(1, u.cup),
+                i.water(.33, u.cup),
             ]),
             e.kitchenAidMixingBowl().mixWithWhisk(1),
             Timer.end(),

@@ -52,6 +52,9 @@ export class Serializer {
         if (`${quantity}`.endsWith('.33')) {
           quantityString = `${quantity-.33}⅓`;
         }
+        if (`${quantity}`.endsWith('.3333333333333333')) {
+          quantityString = `${quantity-.3333333333333333}⅓`;
+        }
         if (`${quantity}`.endsWith('.25')) {
           quantityString = `${quantity-.25}¼`;
         }
