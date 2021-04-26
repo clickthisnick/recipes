@@ -4,6 +4,7 @@ export interface IUnitObj {
     name: string;
     isEquipment: boolean;
     properName: string;
+    equipmentUnits: string[];
 }
 
 export interface Ingredients {
@@ -16,123 +17,147 @@ export class Units {
         name: 'none',
         isEquipment: false,
         properName: 'none',
+        equipmentUnits: [],
     };
     public static readonly cup: IUnitObj = {
         name: 'cup',
         isEquipment: true,
         properName: 'measuring cup',
+        equipmentUnits: ['¼', '⅓', '½', '1'],
     };
     public static readonly bag: IUnitObj = {
         name: 'bag',
         isEquipment: true,
         properName: 'bag',
+        equipmentUnits: [''],
     };    
     public static readonly container: IUnitObj = {
         name: 'container',
         isEquipment: true,
-        properName: 'container'
+        properName: 'container',
+        equipmentUnits: [''],
     };
     public static readonly sprigs: IUnitObj = {
         name: 'sprigs',
         isEquipment: false,
-        properName: 'sprigs'
+        properName: 'sprigs',
+        equipmentUnits: [],
     };
     public static readonly spoon: IUnitObj = {
         name: 'spoon',
         isEquipment: true,
-        properName: 'spoon'
+        properName: 'spoon',
+        equipmentUnits: [''],
     };
     public static readonly bunch: IUnitObj = {
         name: 'bunch',
         isEquipment: false,
-        properName: 'bunch'
+        properName: 'bunch',
+        equipmentUnits: [],
     };
     public static readonly dash: IUnitObj = {
         name: 'dash',
         isEquipment: false,
-        properName: 'dash'
+        properName: 'dash',
+        equipmentUnits: [],
     };
     public static readonly clove: IUnitObj = {
         name: 'clove',
         isEquipment: false,
-        properName: 'clove'
+        properName: 'clove',
+        equipmentUnits: [],
     };
     public static readonly noUnitQuantity: IUnitObj = {
         name: '',
         isEquipment: false,
-        properName: ''
+        properName: '',
+        equipmentUnits: [],
     };
     public static readonly tsp: IUnitObj = {
         name: 'tsp',
         isEquipment: true,
-        properName: 'measuring tsp'
+        properName: 'measuring tsp',
+        equipmentUnits: ['¼', '⅓', '½', '1'],
     };
     public static readonly tbsp: IUnitObj = {
         name: 'Tbsp',
         isEquipment: true,
-        properName: 'measuring tbsp'
+        properName: 'measuring tbsp',
+        equipmentUnits: ['¼', '⅓', '½', '1'],
     };
     public static readonly stick: IUnitObj = {
         name: 'stick',
         isEquipment: false,
-        properName: 'stick'
+        properName: 'stick',
+        equipmentUnits: [],
     };
     public static readonly second: IUnitObj = {
         name: 'second',
         isEquipment: false,
-        properName: 'second'
+        properName: 'second',
+        equipmentUnits: [],
     };
     public static readonly pound: IUnitObj = {
         name: 'pound',
         isEquipment: false,
-        properName: 'pound'
+        properName: 'pound',
+        equipmentUnits: [],
     };
     public static readonly ounce: IUnitObj = {
         name: 'ounce',
         isEquipment: false,
-        properName: 'ounce'
+        properName: 'ounce',
+        equipmentUnits: [],
     };
     public static readonly fluid_ounce: IUnitObj = {
         name: 'fluid ounce',
         isEquipment: false,
-        properName: 'fluid_ounce'
+        properName: 'fluid_ounce',
+        equipmentUnits: [],
     };
     public static readonly lemon: IUnitObj = {
         name: 'lemon',
         isEquipment: false,
-        properName: 'lemon'
+        properName: 'lemon',
+        equipmentUnits: [],
     };
     public static readonly unit: IUnitObj = {
         name: 'unit',
         isEquipment: false,
-        properName: 'unit'
+        properName: 'unit',
+        equipmentUnits: [],
     };
     public static readonly slice: IUnitObj = {
         name: 'slice',
         isEquipment: false,
-        properName: 'slice'
+        properName: 'slice',
+        equipmentUnits: [],
     };
     public static readonly scoop: IUnitObj = {
         name: 'scoop',
         isEquipment: false,
-        properName: 'scoop'
+        properName: 'scoop',
+        equipmentUnits: [],
     };
     public static readonly crack: IUnitObj = {
         name: 'crack',
         isEquipment: false,
-        properName: 'crack'
+        properName: 'crack',
+        equipmentUnits: [],
     };
 
     public static readonly inches: IUnitObj = {
         name: 'inches',
         isEquipment: false,
-        properName: 'inches'
+        properName: 'inches',
+        equipmentUnits: [],
     };
 
     public static readonly thousandSecondCounts: IUnitObj = {
         name: 'thousand second counts',
         isEquipment: false,
-        properName: 'thousandSecondCounts'
+        properName: 'thousandSecondCounts',
+        equipmentUnits: [],
     };
 
     private static conversionTable = {

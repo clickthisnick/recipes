@@ -88,7 +88,11 @@ class Container {
                             
                             // If the unit is an equipment like a cup, then add it to the equipment
                             if (ingredientNText.unit && ingredientNText.unit.isEquipment) {
-                                addIngredient.equipment.push(ingredientNText.unit.name)
+                                if (ingredientNText.unit.equipmentUnits.includes(ingredientNText.unit.quantity)) {
+                                    addIngredient.equipment.push(`${ingredientNText.unit.quantity} ${ingredientNText.unit.properName}`)
+                                } else {
+                                    addIngredient.equipment.push(ingredientNText.unit.properName)
+                                }
                             }
                         } else {
                             addIngredient.text += ' ' + ingredientNText
@@ -101,7 +105,11 @@ class Container {
                     addIStep.children.push(addIngredient)  
                     // If the unit is an equipment like a cup, then add it to the equipment
                     if (ingredient.unit && ingredient.unit.isEquipment) {
-                        addIngredient.equipment.push(ingredient.unit.name)
+                        if (ingredient.unit.equipmentUnits.includes(ingredient.unit.quantity)) {
+                            addIngredient.equipment.push(`${ingredient.unit.quantity} ${ingredient.unit.properName}`)
+                        } else {
+                            addIngredient.equipment.push(ingredient.unit.properName)
+                        }
                     }
                 }
             })
