@@ -22,9 +22,9 @@ export class LentilPenne extends Recipe {
         super();
         this.steps = [
             e.pot().add([
-                i.water(25, u.second),
+                i.water(18, u.second),
             ]),
-            Timer.set(15, 'm', 'Wait for water to boil'),
+            Timer.set(10, 'm', 'Wait for water to boil'),
                 i.Groups.mushroom(4, u.unit).cutIntoStrips(),
             Timer.end(),
             e.pot().add([
