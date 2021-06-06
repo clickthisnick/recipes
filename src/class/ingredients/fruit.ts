@@ -156,7 +156,21 @@ export class FruitItems extends CarbItems {
                             link: 'https://www.amazon.com/Everyday-Value-Peanut-Butter-Crunchy/dp/B074Y2V88X/ref=sr_1_16_0o_wf',
                             organic: false,
                         }
-                    ]
+                    ],
+                },
+                [Stores.amazon]: {
+                    'Happy Belly Creamy Peanut Butter': [
+                        {
+                            price: 4.69,
+                            quantity: 40,
+                            quantity_unit: u.ounce,
+                            link: 'https://www.amazon.com/dp/B07KWGSCW2/ref=sns_myd_detail_page',
+                            organic: false,
+                            discount: {
+                                'Subscribe 5 Products': 5
+                            }
+                        }
+                    ],
                 },
                 [Stores.amazonFresh]: {
                     'Amazon Brand - Happy Belly Creamy Peanut Butter': [

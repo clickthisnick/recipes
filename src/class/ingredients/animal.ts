@@ -519,12 +519,12 @@ export class AnimalItems {
             unit, // unit
             {
                 [Stores.wegmans]: {
-                    'conventional': [
+                    'Wegmans Butter, Unsalted, Sweet Cream': [
                         {
-                            price: 2.99,
+                            price: 3.69,
                             quantity: 1,
                             quantity_unit: u.pound,
-                            link: 'https://www.amazon.com/365-Everyday-Value-Brown-Non-Gmo/dp/B07PFDYT9T/ref=sr_1_6_0o_wf',
+                            link: 'https://shop.wegmans.com/product/50048/wegmans-butter-unsalted-sweet-cream',
                             organic: false
                         }
                     ]

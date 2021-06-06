@@ -21,26 +21,29 @@ class DateBalls extends Recipe {
         super();
         this.steps = [
             // Technically cashew butter should be 4 cups (64 tbsp) but this is easier since it's 2 full containers
-            Timer.set(5, 'm', 'Soak 20 dates in a bowl'), 
+            text.set(['Put', i.pittedDates(20, u.unit), 'in a', e.bowl()]),
+            Timer.set(5, 'm', 'Soak the dates'), 
             Timer.end(),
-            i.pittedDates(20, u.unit).dice(),
+            i.pittedDates().dice(),
             e.kitchenAidMixingBowl().add([
                 i.pittedDates(),
-                i.cacaoPowderUnsweetened(.5, u.cup),
-                i.collagenPowder(1, u.cup),
-                i.water(1, u.cup),
-                i.water(.33, u.cup),
+                i.cacaoPowderUnsweetened(.5, u.cup), // Use the same utensil
+                i.collagenPowder(.5, u.cup),
+                i.collagenPowder(.5, u.cup),
+                i.water(.5, u.cup),
+                i.water(.5, u.cup),
+                i.water(.5, u.cup),
             ]),
-            e.kitchenAidMixingBowl().mixWithWhisk(1),
+            e.kitchenAidMixingBowl().mixWithWhisk(3),
             Timer.end(),
             e.kitchenAidMixingBowl().add([
                 //[i.cashewButter(16, u.ounce), '(1 full 16 ounce containers)']
                 i.peanutButter(16, u.ounce),
             ]),
-            e.kitchenAidMixingBowl().mixWithWhisk(1),
+            e.kitchenAidMixingBowl().mixWithWhisk(3),
             Timer.end(),
             text.set(['Take a tbsp of batter and put on cutting board, repeat until no more batter. Makes around 60']),
-            Timer.set(120, 'm', 'Put on plastic cutting board and put into freezer'),
+            Timer.set(40, 'm', 'Put on plastic cutting board and put into freezer'),
             Timer.end(),
             text.set(['Transfer pieces into plastic container and keep in freezer']),
         ];
