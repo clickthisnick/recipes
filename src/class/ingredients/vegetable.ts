@@ -1278,6 +1278,25 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
+    public static readonly cabbage = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Cabbage', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+            }, // purchaseLinks
+            7, // perishableLimit
+        )
+    )
+
     public static readonly babyBellaMushroom = (quantity: number = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Baby Bella Mushroom', // name
