@@ -171,16 +171,16 @@ class KitchenAidMixingBowl extends Container {
         super('KitchenAid Mixing Bowl', id)
     }
 
-    public mixWithDoughHook(minutes: number): IStep {
-        return Timer.set(minutes, 'm', `Mix with dough hook for ${minutes} minutes`);
+    public mixWithDoughHook(speed: number, minutes: number): IStep {
+        return Timer.set(minutes, 'm', `Mix with dough hook on ${speed} for speed ${minutes} minutes`);
     }
 
-    public mixWithFlatBeater(minutes: number): IStep {
-        return Timer.set(minutes, 'm', `Mix with flat beater attachment for ${minutes} minutes`);
+    public mixWithFlatBeater(speed: number, minutes: number): IStep {
+        return Timer.set(minutes, 'm', `Mix with flat beater attachment on speed ${speed} for ${minutes} minutes`);
     }
 
-    public mixWithWhisk(minutes: number): IStep {
-        return Timer.set(minutes, 'm', `Mix with whisk attachment for ${minutes} minutes`);
+    public mixWithWhisk( speed: number, minutes: number): IStep {
+        return Timer.set(minutes, 'm', `Mix with whisk attachment on speed ${speed} for ${minutes} minutes`);
     }
 }
 

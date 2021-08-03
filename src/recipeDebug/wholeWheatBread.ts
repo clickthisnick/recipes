@@ -25,7 +25,7 @@ export class WholeWheatBread extends Recipe {
                 i.wholeWheatFlour(3.5, u.cup),
                 i.dryActiveYeast(4, u.tsp),
             ]),
-            e.kitchenAidMixingBowl().mixWithDoughHook(1),
+            e.kitchenAidMixingBowl().mixWithDoughHook(1, 1),
             Timer.end(),
             e.bowl().add([
                 i.water(2.5, u.cup),
@@ -35,7 +35,7 @@ export class WholeWheatBread extends Recipe {
             e.kitchenAidMixingBowl().add([
                 i.ingredient('Microwaved water')
             ]),
-            e.kitchenAidMixingBowl().mixWithDoughHook(1),
+            e.kitchenAidMixingBowl().mixWithDoughHook(1, 1),
             Timer.end(),
             Timer.set(10, 'm', 'Cover the kitchenaid bowl'),
             Timer.end(),
@@ -46,13 +46,13 @@ export class WholeWheatBread extends Recipe {
                     i.honey(1/3, u.cup),
                     i.lemonJuice(4, u.tsp)
                 ]),
-                e.kitchenAidMixingBowl().mixWithDoughHook(1),
+                e.kitchenAidMixingBowl().mixWithDoughHook(1,1),
                 Timer.end(),
             Timer.end(),
             e.kitchenAidMixingBowl().add([
                 i.wholeWheatBread(2.5, u.cup),
             ]),
-            e.kitchenAidMixingBowl().mixWithDoughHook(3),
+            e.kitchenAidMixingBowl().mixWithDoughHook(3,3),
                 text.set(['Grease 2 bread pans']),
             Timer.end(),
             text.set(['Turn off oven']),

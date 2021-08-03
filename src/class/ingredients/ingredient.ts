@@ -158,7 +158,7 @@ export class Ingredient {
     public dice(): IStep {
         let addIStep = istep()
 
-        if (this.unit) {
+        if (this.quantity && this.unit && this.unit.name) {
             addIStep.text = ['Dice', this.quantity, this.unit.name, this.name].join(' ')
         } else {
             addIStep.text = ['Dice the', this.name].join(' ')

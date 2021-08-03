@@ -20,7 +20,6 @@ class StirFry extends Recipe {
     constructor() {
         super();
         this.steps = [
-            text.set(['This makes 5 french toast slices']),
             e.pan().preheat(4, 2),
             text.set(["Peel and cut", i.carrots(2, u.unit)]),
             Timer.end(),
