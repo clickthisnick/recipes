@@ -173,7 +173,7 @@ export class FruitItems extends CarbItems {
                     ],
                 },
                 [Stores.amazonFresh]: {
-                    'Amazon Brand - Happy Belly Creamy Peanut Butter': [
+                    ' Amazon Brand - Happy Belly Creamy Peanut Butter': [
                         {
                             price: 3.99,
                             quantity: 40,

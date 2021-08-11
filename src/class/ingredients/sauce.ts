@@ -29,6 +29,15 @@ export class SauceItems extends OilItems {
                             link: 'https://www.amazon.com/Native-Forest-Coconut-Cream-organic/dp/B07893W8C1',
                             organic: true,
                         }
+                    ],
+                    'organic large': [
+                        {
+                            price: 2.99,
+                            quantity: 13.5,
+                            quantity_unit: u.fluid_ounce,
+                            link: 'https://www.amazon.com/365-Everyday-Value-Coconut-Organic/dp/B07NRSVLBQ',
+                            organic: true,
+                        }
                     ]
                 }
             }, // purchaseLinks

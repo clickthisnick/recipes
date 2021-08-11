@@ -12,12 +12,62 @@ export class MealRecipe extends RecipeContainer {
         this.recipeGroup = c.meal;
         this.recipeName = 'ButterChicken'
         this.variations = [
-            ButterChicken
+            ThreeQuartButterChicken,
+            SixQuartButterChicken
         ]
     }
 }
 
-class ButterChicken extends Recipe {
+class ThreeQuartButterChicken extends Recipe {
+    constructor() {
+        super();
+        this.steps = [
+            text.set(['Preheat Medium Instant Pot with Saute on low setting']),
+            text.set(['Dice', i.whiteOnion(.5, u.unit)]),
+            text.set(['Dice', i.garlicClove(2.5, u.unit)]),
+            e.instantPot().add([
+                i.oliveOil(.5, u.tbsp),
+                i.butter(.5, u.tbsp),
+                i.whiteOnion(),
+                i.groundGinger(1, u.tbsp),
+                i.garlicClove()
+            ]),
+            Timer.set(2, 'm', 'Saute in instant pot'),
+            text.set(['Cut', i.Groups.chicken(1, u.pound), 'into 1 inch cubes']),
+            text.set(['Wash knife']),
+            text.set(['Wash cutting boards']),
+            Timer.end(),
+            e.instantPot().add([
+                i.tomatoPaste(3, u.ounce)
+            ]),
+            Timer.set(1.5, 'm', 'Constantly stir'),
+            Timer.end(),
+            e.instantPot().add([
+                i.water(.25, u.cup),
+                i.Groups.chicken(),
+                i.gramMasala(.5, u.tbsp),
+                i.paprika(.5, u.tsp),
+                i.coconutSugar(1, u.tsp),
+                i.cumin(.5, u.tsp),
+                i.turmeric(.25, u.tsp),
+                i.salt(.5, u.tsp), // .5 for healthier
+                i.blackPepper(.5, u.tsp),
+            ]),
+            Timer.set(8, 'm', 'Pressure cook.'),
+            Timer.end(),
+            Timer.set(5, 'm', 'Let instant pot pressure release'),
+            text.set(['Put away spices']),
+            text.set(['Put away utensils']),
+            Timer.end(),
+            text.set(['Take inner instant pot bowl out and put on stove. Put away instant pot.']),
+            text.set(['Stir in', i.coconutCream(.5, u.cup)]),
+            Timer.set(1.5, 'm', 'Saute on medium'),
+            Timer.end()
+        ]
+    }
+}
+
+class SixQuartButterChicken extends Recipe {
     constructor() {
         super();
         this.steps = [

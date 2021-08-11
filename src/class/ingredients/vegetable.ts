@@ -679,18 +679,33 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly groundGinger: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Ground Ginger',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: true,
-        isTakoutUnitable: true,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly groundGinger = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Ground Ginger',
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+                [Stores.amazon]: {
+                    'organic': [
+                        {
+                            price: 8.99,
+                            quantity: 16,
+                            quantity_unit: u.ounce,
+                            link: 'https://www.amazon.com/Naturevibe-Botanicals-Zingiber-officinale-verified/dp/B088X6FW6B',
+                            organic: true,
+                        }
+                    ]
+                }
+            }, // purchaseLinks
+        )
+    )
 
     public static readonly shallot: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Shallot',
@@ -992,7 +1007,7 @@ export class VegetableItems extends SpiceItems {
                             price: 0.99,
                             quantity: 1,
                             quantity_unit: u.pound,
-                            link: 'https://www.amazon.com/produce-aisle-mburring-Yellow-Onion/dp/B001W3T2SK/ref=sr_1_2_0g_wf',
+                            link: 'https://www.amazon.com/Onion-Yellow-Conventional-1-Each/dp/B07QTZBZ2C',
                             organic: false,
                         }
                     ],

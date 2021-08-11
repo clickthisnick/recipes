@@ -122,18 +122,39 @@ export class SpiceItems extends SauceItems {
         nutrition: {},
     })
 
-    public static readonly thyme: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Dried Thyme',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Rinse and put measuring cup in dishwasher',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly thyme = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Dried Thyme', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+                [Stores.amazon]: {
+                    'Amazon Brand - Happy Belly Granulated Garlic': [
+                        {
+                            price: 13.14,
+                            quantity: 16,
+                            quantity_unit: u.ounce,
+                            link: 'https://www.amazon.com/Frontier-Thyme-Extract-Fancy-Grade/dp/B00016XJVK',
+                            organic: true,
+                            discount: {
+                                'Subscribe 5 Products': 15,
+                                'Subscribe': 5,
+                            }
+                        }
+                    ],
+                }
+            }, // purchaseLinks
+            7, // perishableLimit
+        )
+    )
 
     public static readonly monkFruit: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Monk Fruit',
@@ -336,18 +357,39 @@ export class SpiceItems extends SauceItems {
         nutrition: {},
     })
 
-    public static readonly blackPepper: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'black pepper',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly blackPepper = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Black Pepper', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+                [Stores.amazon]: {
+                    'Amazon Brand - Peppercorn': [
+                        {
+                            price: 7.28,
+                            quantity: 16,
+                            quantity_unit: u.ounce,
+                            link: 'https://www.amazon.com/dp/B07QW1GH8Q',
+                            organic: false,
+                            discount: {
+                                'Subscribe 5 Products': 15,
+                                'Subscribe': 5,
+                            }
+                        }
+                    ],
+                }
+            }, // purchaseLinks
+            0, // perishableLimit
+        )
+    )
 
     public static readonly parsley: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Parsley',
@@ -462,7 +504,7 @@ export class SpiceItems extends SauceItems {
             quantity, // quantity
             false, // wash
             false, // isTakoutUnitable
-            true, // isMeatProduct
+            false, // isMeatProduct
             {
             }, // nutrition
             unit, // unit
