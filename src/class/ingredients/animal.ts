@@ -106,15 +106,17 @@ export class AnimalItems {
             }, // nutrition
             unit, // unit
             {
-                // [Stores.wegmans]: {
-                //     'conventional': ['https://shop.wegmans.com/product/11169/wegmans-boneless-skinless-highly-trimmed-chicken-thigh-cutlets-family-pack']
-                // },
-                // [Stores.wholeFoods]: {
-                //     'conventional': [
-                //         'https://www.amazon.com/365-Everyday-Value-Boneless-Skinless-Pre-Packaged/dp/B07813VZHR',
-                //         'https://www.amazon.com/Bell-Evans-Chicken-Boneless-Skinless/dp/B07881BQT9'
-                //     ]
-                // }
+                [Stores.wholeFoods]: {
+                    'conventional': [
+                        {
+                            price: 4.99,
+                            quantity: 1,
+                            quantity_unit: u.pound,
+                            link: 'https://www.amazon.com/365-Everyday-Value-Boneless-Skinless/dp/B0787WHRNP',
+                            organic: false
+                        }                        
+                    ]
+                }
             }, // purchaseLinks
             7, // perishableLimit
         )
@@ -322,6 +324,15 @@ export class AnimalItems {
                             organic: false
                         }
                     ],
+                    'grated': [
+                        {
+                            price: 3.99,
+                            quantity: 5,
+                            quantity_unit: u.ounce,
+                            link: 'https://www.amazon.com/365-Everyday-Value-Grated-Parmesan/dp/B074H5SRZX',
+                            organic: false
+                        }
+                    ]
                 }
             }, // purchase links
         )

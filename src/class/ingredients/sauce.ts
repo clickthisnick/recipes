@@ -34,7 +34,7 @@ export class SauceItems extends OilItems {
                         {
                             price: 2.99,
                             quantity: 13.5,
-                            quantity_unit: u.fluid_ounce,
+                            quantity_unit: u.ounce,
                             link: 'https://www.amazon.com/365-Everyday-Value-Coconut-Organic/dp/B07NRSVLBQ',
                             organic: true,
                         }

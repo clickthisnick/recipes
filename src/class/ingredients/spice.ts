@@ -137,7 +137,7 @@ export class SpiceItems extends SauceItems {
             unit, // unit
             {
                 [Stores.amazon]: {
-                    'Amazon Brand - Happy Belly Granulated Garlic': [
+                    'Thyme': [
                         {
                             price: 13.14,
                             quantity: 16,

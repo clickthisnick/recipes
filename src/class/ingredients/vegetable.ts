@@ -1270,6 +1270,17 @@ export class VegetableItems extends SpiceItems {
                         }
                     ]
                 },
+                [Stores.wholeFoods]: {
+                    'organic': [
+                        {
+                            price: 3.99,
+                            quantity: 1,
+                            quantity_unit: u.pound,
+                            link: 'https://www.amazon.com/Garlic-Organic-1-Each/dp/B0788FLWK1',
+                            organic: true,
+                        }
+                    ]
+                }
             }, // purchaseLinks
         )
     )
