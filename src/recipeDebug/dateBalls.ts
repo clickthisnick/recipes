@@ -34,13 +34,15 @@ class DateBalls extends Recipe {
                 i.water(.5, u.cup),
                 i.water(.5, u.cup),
             ]),
-            e.kitchenAidMixingBowl().mixWithWhisk(3, 2),
+            e.kitchenAidMixingBowl().mixWithFlatBeater(2, 3),
             Timer.end(),
             e.kitchenAidMixingBowl().add([
                 //[i.cashewButter(16, u.ounce), '(1 full 16 ounce containers)']
                 i.peanutButter(16, u.ounce),
             ]),
-            e.kitchenAidMixingBowl().mixWithWhisk(3, 3),
+            e.kitchenAidMixingBowl().mixWithFlatBeater(0, 2),
+            Timer.end(),
+            e.kitchenAidMixingBowl().mixWithFlatBeater(1, 1),
             Timer.end(),
             text.set(['Take a tbsp of batter and put on cutting board, repeat until no more batter. Makes around 60']),
             Timer.set(60, 'm', 'Put on plastic cutting board and put into freezer'),
