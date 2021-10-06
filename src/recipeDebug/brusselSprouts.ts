@@ -19,7 +19,7 @@ class BrusselSprouts extends Recipe {
         this.steps = [
             e.ninja().preheatAirFry(15),
             i.brusselSprouts(1, u.pound).cutInHalf(),
-            i.brusselSprouts().season([
+            i.brusselSprouts().seasonWith([
                 i.dash(3, u.dash),
                 i.oliveOil(1, u.tbsp),
             ]),

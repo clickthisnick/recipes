@@ -21,7 +21,7 @@ class NinjaSouvideSteak extends Recipe {
     constructor() {
         super();
         this.steps = [
-            i.topSirloin(1, u.pound).season([
+            i.topSirloin(1, u.pound).seasonWith([
                 i.thyme(2, u.dash),
                 i.blackPepper(2, u.dash),
             ]),
@@ -37,7 +37,7 @@ class NinjaSouvideSteak extends Recipe {
             Timer.end(),
             Timer.set(15, 'm', 'Let steak rest'),
             Timer.end(),
-            i.topSirloin().season(i.steakSauce(1, u.unit))
+            i.topSirloin().seasonWith(i.steakSauce(1, u.unit))
         ];
     }
 }

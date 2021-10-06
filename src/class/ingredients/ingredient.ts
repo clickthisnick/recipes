@@ -107,7 +107,7 @@ export class Ingredient {
         this.perishableLimit = perishableLimit
     }
 
-    public season(ingredients: any): IStep {
+    public seasonWith(ingredients: any): IStep {
         let addIStep = istep()
 
         if (Array.isArray(ingredients)) {
@@ -137,6 +137,15 @@ export class Ingredient {
 
         addIStep.ingredients.push(this)
         addIStep.ingredients.push(ingredients)
+        return addIStep;
+    }
+
+    public flip(): IStep {
+        let addIStep = istep()
+
+        addIStep.text = ['Flip the', this.name].join('' )
+
+        addIStep.ingredients.push(this)
         return addIStep;
     }
 

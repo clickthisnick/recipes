@@ -26,7 +26,7 @@ class Hamburgers extends Recipe {
             i.Groups.mushroom(5, u.slice).cutIntoStrips(),
             i.Groups.onion(5, u.slice).cutIntoStrips(),
             Timer.end(),
-            i.ingredient('hamburger').season([
+            i.ingredient('hamburger').seasonWith([
                 i.smokedPaprika(2, u.dash),
                 i.chilliPowder(2, u.dash),
                 i.garlicPowder(2, u.dash)
@@ -38,7 +38,7 @@ class Hamburgers extends Recipe {
             ]),
             e.pan().cookWithLidSlightlyOff(7, 'm', 4),
             Timer.end(),
-            i.ingredient('hamburger').season([
+            i.ingredient('hamburger').seasonWith([
                 i.smokedPaprika(2, u.dash),
                 i.chilliPowder(2, u.dash),
                 i.garlicPowder(2, u.dash)
@@ -52,7 +52,7 @@ class Hamburgers extends Recipe {
             e.pan().cook(2, 'm'),
             Timer.end(),
             text.set(['Put burgers between', i.hamburgerBun()]),
-            i.ingredient('hamburger').season([
+            i.ingredient('hamburger').seasonWith([
                 i.germanMustard(2, u.tbsp),
                 i.ketchup(2, u.tbsp),
                 i.pickleSpears(2, u.tbsp),

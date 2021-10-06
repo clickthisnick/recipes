@@ -24,7 +24,7 @@ class Asparagus extends Recipe {
             text.set(['Brush', i.asparagus(), 'with', i.oliveOil(1, u.tsp)]),
             e.ninja().cook(4, 'm', 500),
             Timer.end(),
-            i.asparagus().season(i.dash(1, u.unit)),
+            i.asparagus().seasonWith(i.dash(1, u.unit)),
         ];
     }
 }

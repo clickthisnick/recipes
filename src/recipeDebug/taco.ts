@@ -35,7 +35,7 @@ class GroundBeefTaco extends Recipe {
             e.pan().stir(),
             e.pan().cook(4, 'm', 6),
             Timer.end(),
-            i.ingredient('taco').season([
+            i.ingredient('taco').seasonWith([
                 i.softTortillaShell(4, u.unit),
                 i.mozzarellaCheese(1, u.unit),
                 i.salsa(1, u.unit),
@@ -61,7 +61,7 @@ class BeefEyeRoundSteakTaco extends Recipe {
             Timer.set(10, 'm', 'Let beef rest'),
             Timer.end(),
             text.set(['Cut up BeefEyeRoundSteak']),
-            i.ingredient('taco').season([
+            i.ingredient('taco').seasonWith([
                 i.softTortillaShell(4, u.unit),
                 i.mozzarellaCheese(1, u.unit),
                 i.salsa(1, u.unit),

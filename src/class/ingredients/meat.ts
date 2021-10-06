@@ -4,18 +4,23 @@ import { FruitItems } from './fruit';
 import { Stores } from '../../class/stores';
 
 export class MeatItems extends FruitItems {
-    public static readonly flankSteak: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Flank Steak',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Rinse and put measuring cup in dishwasher',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: true,
-        nutrition: {},
-    })
+    public static readonly flankSteak = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Flank Steak', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            true, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+            }, // purchaseLinks
+        )
+    )
 
     public static readonly groundBeef: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Ground Beef',

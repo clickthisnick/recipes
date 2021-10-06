@@ -623,6 +623,24 @@ export class CarbItems extends AnimalItems {
         nutrition: {}
     })
 
+    public static readonly sweetPotatoes = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Sweet Potatoes', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            'Peel',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+            }, // purchaseLinks
+        )
+    )
+
     public static readonly wildBasmatiRice: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Wild Basmati Rice',
         putAwayTime: 10,

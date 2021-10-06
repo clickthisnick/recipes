@@ -154,6 +154,10 @@ class Bowl extends Container {
     public microwave(minutes: number): IStep {
         return Timer.set(minutes, 'm', `Microwave ${this.name} for ${minutes} minutes`);
     }
+
+    public whisk(): IStep {
+        return Timer.set(1, "m", "Whisk contents of the bowl");
+    }
 }
 
 
