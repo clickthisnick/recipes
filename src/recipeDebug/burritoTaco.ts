@@ -10,14 +10,14 @@ export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
         this.recipeGroup = c.component;
-        this.recipeName = 'Taco'
+        this.recipeName = 'BurritoTaco'
         this.variations = [
-            GroundBeefTaco, BeefEyeRoundSteakTaco,
+            GroundBeefBurritoTaco, BeefEyeRoundSteakTaco,
         ]
     }
 }
 
-class GroundBeefTaco extends Recipe {
+class GroundBeefBurritoTaco extends Recipe {
     constructor() {
         super();
         this.steps = [
@@ -41,6 +41,7 @@ class GroundBeefTaco extends Recipe {
                 i.salsa(1, u.unit),
                 i.hotSauce(1, u.unit),
                 i.sourCream(1, u.unit),
+                i.frozenCorn(1, u.unit),
                 i.Groups.onion(),
             ])
         ];

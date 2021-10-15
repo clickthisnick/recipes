@@ -926,6 +926,34 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
+    public static readonly frozenCorn = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Frozen Corn', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+                // [Stores.amazonFresh]: {
+                //     'supremely spicy': [
+                //         {
+                //             price: 2.29,
+                //             quantity: 16,
+                //             quantity_unit: u.fluid_ounce,
+                //             link: 'https://www.amazon.com/Sabra-Supremely-Spicy-Hummus-17/dp/B00LME9DTM',
+                //         }
+                //     ]
+                // },
+            }, // purchaseLinks
+        )
+    )
+
     public static readonly redPepperFlakes: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Red Pepper Flakes',
         putAwayTime: 10,
