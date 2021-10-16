@@ -193,4 +193,30 @@ export class Ingredient {
 
         return addIStep;
     }
+
+    public cutIntoSlices(): IStep {
+        let addIStep = istep()
+
+        if (this.unit) {
+            addIStep.text = ['Cut',  this.quantity, this.unit.name, this.name, 'into slices'].join(' ')
+        } else {
+            addIStep.text = ['Cut the', this.name, 'into slices'].join(' ')
+        }
+        addIStep.equipment.push(e.cuttinBoard())
+        addIStep.equipment.push(e.knife())
+
+        return addIStep;
+    }
+
+    public patDry(): IStep {
+        let addIStep = istep()
+
+        if (this.unit) {
+            addIStep.text = ['Pat',  this.quantity, this.unit.name, this.name, 'dry with paper towels'].join(' ')
+        } else {
+            addIStep.text = ['Pat', this.name, 'dry with paper towels'].join(' ')
+        }
+
+        return addIStep;
+    }
 }
