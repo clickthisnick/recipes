@@ -27,11 +27,11 @@ class ChickenThighsSeared extends Recipe {
                 i.salt(5, u.crack),
             ]),
             e.bowl().mix(),
-            e.pan().preheat(6, 3),
+            e.pan().preheat(6, 4),
                 e.pan().add([i.oliveOil(3, u.tsp)]),
                 i.chickenThigh(1, u.pound).patDry(),
                 i.chickenThigh().seasonWith([
-                    i.ingredient('Bowl season mixture')
+                    i.ingredient('Bowl season mixture'),
                 ]),
             Timer.end(),
             text.set(["Make sure thights are cooked smooth side down first"]),
