@@ -1410,6 +1410,25 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
+    public static readonly spinach = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Spinach', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+            }, // purchaseLinks
+            7, // perishableLimit
+        )
+    )
+
     public static readonly zuchinni: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Zuchinni',
         putAwayTime: 10,

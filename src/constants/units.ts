@@ -61,6 +61,12 @@ export class Units {
         properName: 'dash',
         equipmentUnits: [],
     };
+    public static readonly handful: IUnitObj = {
+        name: 'handful',
+        isEquipment: false,
+        properName: 'handful',
+        equipmentUnits: [],
+    };
     public static readonly clove: IUnitObj = {
         name: 'clove',
         isEquipment: false,
