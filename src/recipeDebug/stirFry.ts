@@ -10,13 +10,49 @@ export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
         this.recipeGroup = c.component;
+        this.recipeName = 'StirFry'
         this.variations = [
-            StirFry
+            SitrFryChicken,
+            StirFryVegan,
         ]
     }
 }
 
-class StirFry extends Recipe {
+class SitrFryChicken extends Recipe {
+    constructor() {
+        super();
+        this.steps = [
+            e.pan().preheat(4, 2),
+            i.chickenThigh(1, u.pound).cutIntoSlices(),
+            Timer.end(),
+            e.pan().add([
+                i.oliveOil(1, u.tbsp),
+                i.soySauce(1, u.tsp),
+                i.pepperFlake(1, u.tsp),
+                i.chickenThigh(),
+            ]),
+            e.pan().cook(4, "m", 4),
+            i.carrots(2, u.unit).peel(),
+            i.carrots().cutIntoThinSlices(),
+            i.celery(2, u.stick).cutIntoSlices(),
+            i.whiteMushroom(4, u.unit).cutIntoThinSlices(),
+            text.set(["Cut", i.Groups.onion(1, u.unit)]),
+            Timer.end(),
+            text.set(['Remove chicken from pan']),
+            e.pan().add([
+                i.Groups.onion(),
+                i.carrots(),
+                i.celery(),
+                i.whiteMushroom(),
+            ]),
+            e.pan().cook(3, "m", 4),
+            Timer.end(),
+        ]
+    }
+}
+
+
+class StirFryVegan extends Recipe {
     constructor() {
         super();
         this.steps = [

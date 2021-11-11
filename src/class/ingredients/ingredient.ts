@@ -164,6 +164,20 @@ export class Ingredient {
         return addIStep;
     }
 
+    public peel(): IStep {
+        let addIStep = istep()
+
+        if (this.unit) {
+            addIStep.text = ['Peel', this.quantity, this.unit.name, this.name].join(' ')
+        } else {
+            addIStep.text = ['Peel the', this.name].join(' ')
+        }
+        addIStep.ingredients.push(this)
+        addIStep.equipment.push(e.peeler())
+
+        return addIStep;
+    }
+
     public dice(): IStep {
         let addIStep = istep()
 
@@ -187,6 +201,20 @@ export class Ingredient {
             addIStep.text = ['Cut',  this.quantity, this.unit.name, this.name, 'into strips'].join(' ')
         } else {
             addIStep.text = ['Cut the', this.name, 'into strips'].join(' ')
+        }
+        addIStep.equipment.push(e.cuttinBoard())
+        addIStep.equipment.push(e.knife())
+
+        return addIStep;
+    }
+
+    public cutIntoThinSlices(): IStep {
+        let addIStep = istep()
+
+        if (this.unit) {
+            addIStep.text = ['Slice',  this.quantity, this.unit.name, this.name, 'thinly'].join(' ')
+        } else {
+            addIStep.text = ['Slice', this.name, 'thinly'].join(' ')
         }
         addIStep.equipment.push(e.cuttinBoard())
         addIStep.equipment.push(e.knife())

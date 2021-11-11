@@ -161,32 +161,43 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly carrots: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Carrots',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly carrots = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Carrots', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            true, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+            }, // purchase links
+        )
+    )
 
-    public static readonly celery: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Celery',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
-    
+    public static readonly celery = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Celery', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+
+            }, // nutrition
+            unit, // unit
+            {
+            }, // purchaseLinks
+            5, // perishableLimit
+        )
+    )
+
     public static readonly frozenTatorTots: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Frozen Tator Tots',
         putAwayTime: 10,

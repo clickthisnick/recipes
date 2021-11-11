@@ -417,6 +417,11 @@ export class Equipment {
         return 'cutting board'
     }
 
+
+    public static readonly peeler = () => {
+        return 'peeler'
+    }
+
     public static readonly ninja = (id: number = 99) => (
         new Ninja(id)
     );
@@ -480,6 +485,11 @@ export class Equipment {
 
     public static readonly woodenSpoon: IEquipment = (id: number = 99) => ({
         name: 'wooden spoon',
+        id: id
+    });
+
+    public static readonly spoon: IEquipment = (id: number = 99) => ({
+        name: 'spoon',
         id: id
     });
 }
