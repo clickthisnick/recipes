@@ -156,6 +156,44 @@ export class SpiceItems extends SauceItems {
         )
     )
 
+    public static readonly mintLeaf = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Mint Leaf', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+            }, // purchaseLinks
+            7, // perishableLimit
+        )
+    )
+
+    public static readonly gingerPowder = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Ginger Powder', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+            }, // purchaseLinks
+            7, // perishableLimit
+        )
+    )
+
     public static readonly monkFruit: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Monk Fruit',
         putAwayTime: 10,
