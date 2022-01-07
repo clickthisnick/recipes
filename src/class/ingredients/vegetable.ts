@@ -1064,18 +1064,23 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly yellowOnion: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Yellow Onion',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: true,
-        isTakoutUnitable: true,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly yellowOnion = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Yellow Onion', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+            }, // purchaseLinks
+        )
+    )
 
     public static readonly redOnion = (quantity: number = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(

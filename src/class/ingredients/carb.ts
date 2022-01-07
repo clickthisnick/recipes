@@ -712,6 +712,24 @@ export class CarbItems extends AnimalItems {
         )
     )
 
+    public static readonly basmatiRice = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Basmati Rice', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            'Rinse and put away measuring cup',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+            }, // purchaseLinks
+        )
+    )
+
     public static readonly flaxSeedCereal: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Flax seed cereal',
         putAwayTime: 10,

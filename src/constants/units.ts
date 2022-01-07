@@ -97,6 +97,12 @@ export class Units {
         properName: 'stick',
         equipmentUnits: [],
     };
+    public static readonly strand: IUnitObj = {
+        name: 'strand',
+        isEquipment: false,
+        properName: 'strand',
+        equipmentUnits: [],
+    };
     public static readonly second: IUnitObj = {
         name: 'second',
         isEquipment: false,

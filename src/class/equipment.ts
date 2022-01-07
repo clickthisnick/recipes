@@ -382,6 +382,24 @@ class InstantPot extends CookingContainer {
         return preheatStep
     }
 
+    public sautee(preheat: number, duration: number, type: string): IStep {
+        let preheatStep = istep()
+        preheatStep.time += Time.convert(preheat, type)
+        preheatStep.text = `Put ${this.name} on high sautee for ${duration} minutes`
+        preheatStep.equipment.push(this)
+        preheatStep.disappearWhen = 'timeUp'
+
+        let pressureCookStep = istep()
+        pressureCookStep.time += Time.convert(duration, type)
+        pressureCookStep.equipment.push(this)
+        pressureCookStep.text = `Wait for ${this.name} to be done cooking`
+        pressureCookStep.disappearWhen = 'timeUp'
+
+        preheatStep.children.push(pressureCookStep)
+
+        return preheatStep
+    }
+
     // public pressureRelease(duration: number, type: string) {
     //     return [
     //         Timer.set(duration, type, `Let pressure release`, true),

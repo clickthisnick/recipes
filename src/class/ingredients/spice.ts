@@ -194,6 +194,25 @@ export class SpiceItems extends SauceItems {
         )
     )
 
+    public static readonly saffron = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Saffron', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+            }, // purchaseLinks
+            7, // perishableLimit
+        )
+    )
+
     public static readonly monkFruit: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Monk Fruit',
         putAwayTime: 10,
@@ -394,6 +413,101 @@ export class SpiceItems extends SauceItems {
         isMeatProduct: false,
         nutrition: {},
     })
+
+    public static readonly dhanaJeera = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Dhana Jeera', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+            }, // purchaseLinks
+            0, // perishableLimit
+        )
+    )
+
+    public static readonly bayLeaf = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Bay Leaf', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+            }, // purchaseLinks
+            0, // perishableLimit
+        )
+    )
+
+    public static readonly greenCardamonSeed = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Green Cardamon Seed', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+            }, // purchaseLinks
+            0, // perishableLimit
+        )
+    )
+
+    public static readonly clove = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Clove', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+            }, // purchaseLinks
+            0, // perishableLimit
+        )
+    )
+
+    public static readonly wholeBlackPepper = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Whole Black Pepper', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+            }, // purchaseLinks
+            0, // perishableLimit
+        )
+    )
 
     public static readonly blackPepper = (quantity: number = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
