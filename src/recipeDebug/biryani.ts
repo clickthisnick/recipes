@@ -41,7 +41,7 @@ class Biryani extends Recipe {
                 i.butter(2, u.tbsp),
                 i.yellowOnion(),
             ]),
-            e.instantPot().sautee(1, 12, 'm'),
+            e.instantPot().sautee(12, 'm'),
                 e.bowl(1).add([
                     i.coconutMilk(2, u.tbsp),
                     i.saffron(10, u.stick),
