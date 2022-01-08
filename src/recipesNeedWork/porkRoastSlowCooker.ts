@@ -25,7 +25,7 @@ export class MealRecipe extends Recipe {
             ['Cover pork roast with', this.get(i.garlicPowder()), 'on both sides'],
             ['Put pork roast in ziplock bag'],
             ['Put', this.get(i.oliveOil()), 'in bag'],
-            [Timer.set(8, 'h', 'Put ziplock bag in refridgerator for 8 hours')],
+            [Timer.set(8, 'h', 'Put ziplock bag in refrigerator for 8 hours')],
             [Timer.set(270, 'm', 'Put pork roast in slow cooker on low for 4 and a half hours')],
             [Timer.set(10, 'm', 'Take pork roast out of slow cooker and let sit for 10 minutes')],
             ['Trim excess fat'],

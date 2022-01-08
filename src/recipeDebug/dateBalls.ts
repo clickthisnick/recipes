@@ -12,7 +12,7 @@ export class MealRecipe extends RecipeContainer {
         this.recipeGroup = c.component;
         this.variations = [
             DateBalls
-        ] 
+        ]
      }
 }
 
@@ -22,7 +22,7 @@ class DateBalls extends Recipe {
         this.steps = [
             // Technically cashew butter should be 4 cups (64 tbsp) but this is easier since it's 2 full containers
             text.set(['Put', i.pittedDates(20, u.unit), 'in a', e.bowl()]),
-            Timer.set(5, 'm', 'Soak the dates'), 
+            Timer.set(5, 'm', 'Soak the dates'),
             Timer.end(),
             i.pittedDates().dice(),
             e.kitchenAidMixingBowl().add([

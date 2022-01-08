@@ -55,7 +55,7 @@ export class Timer {
 // export function timer()
 
 // }
-//     // 99 is just an identifer that doesn't start with 0/1/2
+//     // 99 is just an identifier that doesn't start with 0/1/2
 //     // By default we assume that equipment is reused throughout the recipe
 
 //     public static readonly set = (duration: number, type: string, extraText: string = '', async: boolean = true) => (
@@ -67,7 +67,7 @@ export class Timer {
 //     };
 // }
 
-// export class TimerInternal { 
+// export class TimerInternal {
 //     constructor() {
 //         timers.push(this);
 //     }

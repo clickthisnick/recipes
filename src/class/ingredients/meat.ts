@@ -34,7 +34,7 @@ export class MeatItems extends FruitItems {
         isMeatProduct: true,
         nutrition: {},
     })
-    
+
     public static readonly BeefEyeRoundSteak: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Beef Eye Round Steak',
         putAwayTime: 10,
@@ -120,7 +120,7 @@ export class MeatItems extends FruitItems {
                             link: 'https://shop.wegmans.com/product/31143/wegmans-fully-cooked-packaged-pepperoni-pizza-heat-serve',
                             organic: false
                         }
-                        
+
                     ]
                 },
                 [Stores.wholeFoods]: {

@@ -93,10 +93,10 @@ export class Ingredient {
         purchaseLinks: IStorePurchaseLink,
         perishableLimit?: number,
     ) {
-        this.name = name 
-        this.putAwayTime = putAwayTime 
+        this.name = name
+        this.putAwayTime = putAwayTime
         this.takeOutTime = takeOutTime
-        this.cleanSteps = cleanSteps 
+        this.cleanSteps = cleanSteps
         this.quantity = quantity
         this.wash = wash
         this.isTakoutUnitable = isTakoutUnitable

@@ -44,7 +44,7 @@ export class LentilPenne extends Recipe {
             Timer.end(['pot']),
             text.set(['Top with', i.parmesanCheese(8, u.ounce)]),
         ];
-    } 
+    }
 }
 
 export class LentilSpaghetti extends Recipe {
@@ -74,7 +74,7 @@ export class LentilSpaghetti extends Recipe {
             Timer.end(),
             text.set(['Top with', i.parmesanCheese(8, u.ounce)]),
         ];
-    } 
+    }
 }
 
 export class LentilSpaghettiInstantPot extends Recipe {

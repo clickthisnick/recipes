@@ -74,7 +74,7 @@ export class SpiceItems extends SauceItems {
         name: 'Coconut Sugar',
         putAwayTime: 10,
         takeOutTime: 10,
-        cleanSteps: 'Put soy sauce back in refridgerator',
+        cleanSteps: 'Put soy sauce back in refrigerator',
         quantity: quantity,
         unit: unit || null,
         wash: false,
@@ -276,7 +276,7 @@ export class SpiceItems extends SauceItems {
         isTakoutUnitable: false,
         isMeatProduct: false,
         nutrition: {
-            
+
         },
     })
 
@@ -291,7 +291,7 @@ export class SpiceItems extends SauceItems {
         isTakoutUnitable: false,
         isMeatProduct: false,
         nutrition: {
-            
+
         },
     })
 

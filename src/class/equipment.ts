@@ -61,14 +61,14 @@ class Container {
 
         let bindingWord = 'the'
 
-        // If its the first 
+        // If its the first
         if (this.firstAction) {
             if (['a','e','i','o','u'].includes(this.name[0])) {
                 bindingWord = 'an'
             } else {
                 bindingWord = 'a'
             }
-        } 
+        }
 
         this.firstAction = false;
 
@@ -84,8 +84,8 @@ class Container {
                             addIngredient.text = ['•', s.turnIngObjIntoStr(ingredientNText, true)].join(' ')
                             addIngredient.ingredients.push(ingredientNText)
                             addIngredient.time += ingredientNText.text
-                            addIStep.children.push(addIngredient)     
-                            
+                            addIStep.children.push(addIngredient)
+
                             // If the unit is an equipment like a cup, then add it to the equipment
                             if (ingredientNText.unit && ingredientNText.unit.isEquipment) {
                                 if (ingredientNText.unit.equipmentUnits.includes(ingredientNText.unit.quantity)) {
@@ -96,13 +96,13 @@ class Container {
                             }
                         } else {
                             addIngredient.text += ' ' + ingredientNText
-                        } 
+                        }
                     })
                 } else {
                     addIngredient.text = ['•', s.turnIngObjIntoStr(ingredient, true)].join(' ')
                     addIngredient.ingredients.push(ingredient)
                     addIngredient.time += ingredient.takeOutTime
-                    addIStep.children.push(addIngredient)  
+                    addIStep.children.push(addIngredient)
                     // If the unit is an equipment like a cup, then add it to the equipment
                     if (ingredient.unit && ingredient.unit.isEquipment) {
                         if (ingredient.unit.equipmentUnits.includes(ingredient.unit.quantity)) {
@@ -117,7 +117,7 @@ class Container {
             return addIStep
         }
 
-        addIStep.text = ['Add', s.turnIngObjIntoStr(ingredients, true), 'to', this.name].join(' ') 
+        addIStep.text = ['Add', s.turnIngObjIntoStr(ingredients, true), 'to', this.name].join(' ')
         addIStep.ingredients.push(ingredients)
         addIStep.equipment.push(this.name)
 
@@ -127,7 +127,7 @@ class Container {
         // let finalArray: any = []
         // finalArray.push('Add')
         // ingredients.forEach(element => {
-        //     finalArray.push(element); 
+        //     finalArray.push(element);
         // });
         // finalArray.push('to')
         // finalArray.push(this)
@@ -410,7 +410,7 @@ class Blender extends Container {
 }
 
 export class Equipment {
-    // 99 is just an identifer that doesn't start with 0/1/2
+    // 99 is just an identifier that doesn't start with 0/1/2
     // By default we assume that equipment is reused throughout the recipe
 
     public static readonly knife = () => {
@@ -449,7 +449,7 @@ export class Equipment {
     public static readonly ziplockBag = (id: number = 99) => (
         new ZiplockBag(id)
     );
- 
+
     public static readonly bowl = (id: number = 99) => (
         new Bowl(id)
     );

@@ -46,7 +46,7 @@ class EggPepperBuckets extends Recipe {
             ]),
             e.pan().cook(1, 'm'),
             Timer.end(),
-            Timer.set(1, 'm', 'For runny serve immediatly, otherwise let rest a minute'),
+            Timer.set(1, 'm', 'For runny serve immediately, otherwise let rest a minute'),
             Timer.end(),
         ];
     }

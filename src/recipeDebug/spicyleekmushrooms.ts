@@ -47,5 +47,3 @@ class LeekMushroom extends Recipe {
         ];
     }
 }
-
-

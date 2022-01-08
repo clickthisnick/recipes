@@ -169,7 +169,7 @@ export class CarbItems extends AnimalItems {
                             organic: false
                         }
                     ]
-                },        
+                },
             }, // purchaseLinks
             10, // perishableLimit
         )
@@ -209,7 +209,7 @@ export class CarbItems extends AnimalItems {
                             organic: false
                         }
                     ]
-                },   
+                },
             }, // purchaseLinks
             10, // perishableLimit
         )
@@ -696,7 +696,7 @@ export class CarbItems extends AnimalItems {
                             quantity_unit: u.ounce,
                             link: 'https://www.amazon.com/Maria-Ricardos-Tortilla-Wheat-Flour/dp/B01BPHD06M/ref=sr_1_3_0o_wf',
                             organic: true
-                        }                   
+                        }
                     ],
                     'Maria & Ricardos Tortilla 8In Wheat Flour': [
                         {

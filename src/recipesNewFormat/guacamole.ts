@@ -49,6 +49,6 @@ class MangoHabanero extends Recipe {
             ['Put in', i.mango(.5, u.ounce)],
             ['Put in the leaves only, (NO STEMS)', i.cilantro(.1, u.ounce)],
             ['Pull string to puree'],
-        ];         
+        ];
     }
 }

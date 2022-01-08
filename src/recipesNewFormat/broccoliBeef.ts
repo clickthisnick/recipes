@@ -39,7 +39,7 @@ class BroccoliBeef extends Recipe {
             ),
             ['Put cover on pan'],
             e.pan().cook(5, 'm'),
-                [Async.step, 
+                [Async.step,
                     e.bowl().add([
                         i.arrowRootStarch(2, u.tbsp),
                         i.water(.75, u.cup),

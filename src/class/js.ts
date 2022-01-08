@@ -64,7 +64,7 @@ function selectRecipe(recipeName) {
 
 function addStep(istep) {
     let cookingDiv = document.getElementById('cooking')
-    if (!cookingDiv) { 
+    if (!cookingDiv) {
         alert('Cannot find cooking element id')
         return;
     }
@@ -91,7 +91,7 @@ function addStep(istep) {
     } else {
         cookingDiv.innerHTML += "";
         // <!--Only double quote should be around the onclick-- >
-            
+
         let divStep = ''
         divStep += "<div class='panel' id='panel-"
         divStep += istep.id + "' "
@@ -141,12 +141,12 @@ function generateLinks(linkByPrice, priceKeys) {
             links += value
         });
     })
-    
+
     return links
 }
 
 function applyCreditCardDiscounts(store, pricePerQuantity) {
-    // Include any discounts on the price per quantity 
+    // Include any discounts on the price per quantity
     if (store.startsWith("amazon")) {
         return (pricePerQuantity * .95).toFixed(3)
     } else if (store.startsWith("whole")) {
@@ -166,7 +166,7 @@ function doneSelectingRecipes() {
             singleRecipeArray.forEach(singleRecipe => {
                 Object.keys(singleRecipe.ingredients).forEach(ingredientKey => {
                     const ingredient = singleRecipe.ingredients[ingredientKey];
-                    
+
                     perishableItems[ingredient.name] = ingredient.perishableLimit
 
                     // If there are no previous ingredients, add the ingredient
@@ -225,7 +225,7 @@ function doneSelectingRecipes() {
                                 Object.keys(item.discount).forEach(discountKey => {
                                     const discountValue = item.discount[discountKey];
                                     const priceMultiple = ((100 - discountValue) * .01).toFixed(2)
-                                    
+
                                     let subscribePricePerQuantity = (pricePerQuantity*priceMultiple).toFixed(3)
 
                                     subscribePricePerQuantity = applyCreditCardDiscounts(store, subscribePricePerQuantity)
@@ -279,8 +279,8 @@ function showElementsByClassName(className) {
 
     for (let i = 0; i < elements.length; i++) {
         let element = elements[i];
-        element.style.display = "inline";    
-    }    
+        element.style.display = "inline";
+    }
 }
 
 function hideElement(id) {

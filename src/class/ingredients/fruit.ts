@@ -43,7 +43,7 @@ export class FruitItems extends CarbItems {
                             }
                         }
                     ]
-                },  
+                },
             }, // purchase links
         )
     )
@@ -108,13 +108,13 @@ export class FruitItems extends CarbItems {
                             discount: {
                                 'Subscribe 5 Products': 5,
                             }
-                        }  
-                    ]                    
-                },  
+                        }
+                    ]
+                },
             }, // purchase links
         )
     )
- 
+
     public static readonly peanutButter = (quantity: number = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Peanut Butter', // name
@@ -146,7 +146,7 @@ export class FruitItems extends CarbItems {
                             quantity_unit: u.ounce,
                             link: 'https://www.amazon.com/365-Everyday-Value-Peanut-Butter/dp/B074H57SPT/ref=sr_1_7_0o_wf',
                             organic: false,
-                        }  
+                        }
                     ],
                     '365 by Whole Foods Market, Peanut Butter, Crunchy': [
                         {
@@ -183,9 +183,9 @@ export class FruitItems extends CarbItems {
                             discount: {
                                 'Subscribe 5 Products': 5
                             }
-                        }  
+                        }
                     ],
-                },          
+                },
             }, // purchaseLinks
             7, // perishableLimit
         )
@@ -215,7 +215,7 @@ export class FruitItems extends CarbItems {
                             organic: false,
                         }
                     ]
-                },          
+                },
             }, // purchaseLinks
             7, // perishableLimit
         )
@@ -238,7 +238,7 @@ export class FruitItems extends CarbItems {
                 calories: 110,
                 sodium: 0,
                 sugar: 22,
-                protein: 2, 
+                protein: 2,
             }
         },
         link: 'https://www.amazon.com/gp/product/B074H6QW3S/ref=afx_dp_ingress?ie=UTF8&almBrandId=VUZHIFdob2xlIEZvb2Rz&fpw=alm'

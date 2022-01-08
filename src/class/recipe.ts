@@ -28,7 +28,7 @@ export class RecipeContainer {
 
     private generateRecipeVariation(recipeClass, includeInVariation=false) {
         const initRecipe: Recipe = new recipeClass();
-        const recipeName = recipeClass.name; 
+        const recipeName = recipeClass.name;
 
         // Ensure the recipe is valid
         initRecipe.validate(recipeName)
@@ -37,7 +37,7 @@ export class RecipeContainer {
         this.recipeHtml += initRecipe.printRecipe(recipeName)
 
         if (includeInVariation) {
-            this.recipeHtml += `<button class="${this.recipeName}-group" style="display: none" `            
+            this.recipeHtml += `<button class="${this.recipeName}-group" style="display: none" `
         } else {
             this.recipeHtml += `<button `
         }
@@ -136,7 +136,7 @@ export class Recipe {
 
     private addIngredient(istep: IStep) {
         // This adds all the ingredients from each step into ingredients in the main recipe
-        // And also does any trasformations like converting the ingredient to many different units
+        // And also does any transformations like converting the ingredient to many different units
 
         istep.ingredients.forEach(ingredient => {
             // Unit could be null, dont add ingredient whose unit is null - item('hamburger') is an example of that
@@ -187,9 +187,9 @@ export class Recipe {
                 childStep.equipment.forEach(equipmentItem => {
                     equipment.push(equipmentItem)
                 })
-            }) 
+            })
         }
-        
+
         return equipment
     }
 
@@ -217,7 +217,7 @@ export class Recipe {
                 }
 
                 // The +2 adds it a step beyond when it was last used
-                const stepPosition = (i + 2 > this.steps.length - 1) ? i+1 : i+2 
+                const stepPosition = (i + 2 > this.steps.length - 1) ? i+1 : i+2
                 this.steps.splice(stepPosition, 0, text.set(['Clean and put away', equipmentItem]));
 
                 foundEquipment[equipmentItem] = true
@@ -233,6 +233,6 @@ export class Recipe {
 
         html += `<script>setRecipe('${recipeName}', ${JSON.stringify(this)})</script>`
 
-        return html    
+        return html
     }
 }

@@ -45,7 +45,7 @@ export class AnimalItems {
                             organic: false,
                         }
                     ]
-                },     
+                },
             }, // purchaseLinks
             7, // perishableLimit
         )
@@ -86,7 +86,7 @@ export class AnimalItems {
                             organic: false,
                         }
                     ]
-                },          
+                },
             }, // purchaseLinks
             7, // perishableLimit
         )
@@ -114,7 +114,7 @@ export class AnimalItems {
                             quantity_unit: u.pound,
                             link: 'https://www.amazon.com/365-Everyday-Value-Boneless-Skinless/dp/B0787WHRNP',
                             organic: false
-                        }                        
+                        }
                     ]
                 }
             }, // purchaseLinks
@@ -248,7 +248,7 @@ export class AnimalItems {
                             organic: false,
                         }
                     ]
-                },     
+                },
             }, // purchase links
         )
     )
@@ -370,7 +370,7 @@ export class AnimalItems {
         name: 'Pepper Jack Cheese',
         putAwayTime: 10,
         takeOutTime: 10,
-        cleanSteps: 'Put monterey jack cheese back in refridgerator',
+        cleanSteps: 'Put monterey jack cheese back in refrigerator',
         quantity: quantity,
         unit: unit || null,
         wash: false,
@@ -383,7 +383,7 @@ export class AnimalItems {
         name: 'Monterey Jack Cheese',
         putAwayTime: 10,
         takeOutTime: 10,
-        cleanSteps: 'Put monterey jack cheese back in refridgerator',
+        cleanSteps: 'Put monterey jack cheese back in refrigerator',
         quantity: quantity,
         unit: unit || null,
         wash: false,
@@ -440,7 +440,7 @@ export class AnimalItems {
             'Egg', // name
             10, // putAwayTime
             10, // takeOutTime
-            'Put eggs back in refridgerator',  // cleanSteps
+            'Put eggs back in refrigerator',  // cleanSteps
             quantity, // quantity
             false, // wash
             false, // isTakoutUnitable
@@ -479,7 +479,7 @@ export class AnimalItems {
         name: 'Egg White',
         putAwayTime: 10,
         takeOutTime: 10,
-        cleanSteps: 'Put egg whites back in refridgerator',
+        cleanSteps: 'Put egg whites back in refrigerator',
         quantity: quantity,
         unit: unit || null,
         wash: false,
@@ -492,7 +492,7 @@ export class AnimalItems {
         name: 'Ham',
         putAwayTime: 10,
         takeOutTime: 10,
-        cleanSteps: 'Put ham back in refridgerator',
+        cleanSteps: 'Put ham back in refrigerator',
         quantity: quantity,
         unit: unit || null,
         wash: false,

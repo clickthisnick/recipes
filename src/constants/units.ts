@@ -30,7 +30,7 @@ export class Units {
         isEquipment: true,
         properName: 'bag',
         equipmentUnits: [''],
-    };    
+    };
     public static readonly container: IUnitObj = {
         name: 'container',
         isEquipment: true,
@@ -268,14 +268,14 @@ export class Units {
         // Returns the common unit and amount between two ingredients
 
         function isWholeNumber(n) {
-            return (n - Math.floor(n)) === 0; 
+            return (n - Math.floor(n)) === 0;
         }
 
         function convert(conversion, ingredient) {
             // This converts the ingredient to the same unit as the conversion
             return ingredient.quantity * conversion.count
         }
-           
+
         // Throw an error if a conversion is missing
         if (!Units.conversionTable.hasOwnProperty(ingredient_1.unit.name)) {
             throw new Error(`Unit conversion table does not have ${ingredient_1.unit.name}`)

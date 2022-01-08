@@ -34,13 +34,13 @@ class ChickenThighsSeared extends Recipe {
                     i.ingredient('Bowl season mixture'),
                 ]),
             Timer.end(),
-            text.set(["Make sure thights are cooked smooth side down first"]),
+            text.set(["Make sure thighs are cooked smooth side down first"]),
             e.pan().add([
                 i.chickenThigh()
             ]),
             e.pan().cook(5, 'm', 6),
             Timer.end(),
-            text.set(["Flip chicken thights"]),
+            text.set(["Flip chicken thighs"]),
             e.pan().cook(6, 'm', 6),
                 i.garlicClove().cutIntoStrips(),
             Timer.end(),

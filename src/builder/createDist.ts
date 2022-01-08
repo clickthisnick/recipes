@@ -56,7 +56,7 @@ function generateRecipe(file: string) {
 // })
 
   // const initRecipe: Recipe = new recipeClass();
-  // const recipeName = recipeClass.name; 
+  // const recipeName = recipeClass.name;
 
   pageHtml += recipe.recipeHtml
 }
@@ -101,7 +101,7 @@ function run() {
             // Whereas when you originally generate the link you get the online purchase options
             ingredients[key]['units'] = {}
             ingredients[key]['units'][item[0]] = item[1]
-            
+
           })
         }
         doneSelectingRecipes()

@@ -401,7 +401,7 @@ export class VegetableItems extends SpiceItems {
             false, // isMeatProduct
             {}, // nutrition
             unit, // unit
-            {            
+            {
                 [Stores.wholeFoods]: {
                     'conventional': [
                         {
@@ -902,7 +902,7 @@ export class VegetableItems extends SpiceItems {
         name: 'Active Dry Yeast',
         putAwayTime: 10,
         takeOutTime: 10,
-        cleanSteps: 'Put dry active yeast back in refridgerator',
+        cleanSteps: 'Put dry active yeast back in refrigerator',
         quantity: quantity,
         unit: unit || null,
         wash: false,

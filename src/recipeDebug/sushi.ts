@@ -28,7 +28,7 @@ class SushiRice4Rolls extends Recipe {
             ]),
             Timer.set(15, 'm', 'Cook rice in instant pot on low pressure'),
             Timer.end(),
-            Timer.set(10, 'm', 'Let instant pot natural relase'),
+            Timer.set(10, 'm', 'Let instant pot natural release'),
             Timer.end(),
             text.set(['Unplug instant pot heat']),
             e.instantPot().add([
@@ -54,7 +54,7 @@ class Sushi extends Recipe {
             ]),
             Timer.set(12, 'm', 'Cook rice in instant pot on low pressure'),
             Timer.end(),
-            Timer.set(10, 'm', 'Let instant pot natural relase'),
+            Timer.set(10, 'm', 'Let instant pot natural release'),
             Timer.end(),
             text.set(['Unplug instant pot heat']),
             e.instantPot().add([

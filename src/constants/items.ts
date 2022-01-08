@@ -42,7 +42,7 @@ function returnItem(itemName, quantity, unit, subItems: Ingredient[]) {
                         mainItem.purchaseLinks[store] = {}
                     }
 
-                    
+
                     Object.keys(puchaseLinks[store]).forEach(key => {
                         if (mainItem.purchaseLinks) {
                             const mainItemPurchaseLinks: any = mainItem.purchaseLinks[store];

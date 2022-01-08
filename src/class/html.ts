@@ -7,7 +7,7 @@ export class HTML {
     public static chartSet = '<meta charset="utf-8">';
     public static css = `<style>
 
-    a { 
+    a {
         color:orange;
         text-decoration:none;
     }
@@ -38,7 +38,7 @@ export class HTML {
     }
 
     #ingredients {
-        
+
     }
 
     .completed {
