@@ -147,8 +147,8 @@ class StandMixer extends Container {
 
 class Bowl extends Container {
     // Containers are a singleton
-    constructor(id: number) {
-        super('bowl', id)
+    constructor(id: number, name:string="bowl") {
+        super(name, id)
     }
 
     public microwave(minutes: number): IStep {
@@ -157,6 +157,12 @@ class Bowl extends Container {
 
     public whisk(): IStep {
         return Timer.set(1, "m", "Whisk contents of the bowl");
+    }
+}
+
+class LargeBowl extends Bowl {
+    constructor(id: number) {
+        super(id, "largebowl")
     }
 }
 
@@ -452,6 +458,10 @@ export class Equipment {
 
     public static readonly bowl = (id: number = 99) => (
         new Bowl(id)
+    );
+
+    public static readonly largeBowl = (id: number = 99) => (
+        new LargeBowl(id)
     );
 
     public static readonly standMixer = (id: number = 99) => (

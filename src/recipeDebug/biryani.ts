@@ -9,7 +9,7 @@ import { Text as text} from '../class/text';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.recipeName = 'rice';
+        this.recipeName = 'Biryani Rice';
         this.recipeGroup = c.component;
         this.variations = [
             Biryani1PoundChicken1CupRice, Biryani2PoundChicken2CupRice
@@ -41,10 +41,10 @@ class Biryani1PoundChicken1CupRice extends Recipe {
                 i.butter(2, u.tbsp),
                 i.yellowOnion(),
             ]),
-            e.instantPot().sautee(12, 'm'),
+            e.instantPot().sautee(10, 'm'),
                 e.bowl(1).add([
-                    i.coconutMilk(4, u.tbsp),
-                    i.saffron(20, u.stick),
+                    i.coconutMilk(2, u.tbsp),
+                    i.saffron(10, u.stick),
                 ]),
                 e.bowl(1).microwave(.5),
                 Timer.end(),
@@ -53,10 +53,10 @@ class Biryani1PoundChicken1CupRice extends Recipe {
             text.set(['Put onions to one side of the instapot, so you can add the whole spices to the other side']),
             e.instantPot().add([
                 // 1 stick Cinnamon (Dalchini)
-                i.bayLeaf(4, u.unit),
-                i.greenCardamonSeed(1, u.tsp),
-                i.wholeBlackPepper(1, u.tsp),
-                i.clove(8, u.unit),
+                i.bayLeaf(2, u.unit),
+                i.greenCardamonSeed(.5, u.tsp),
+                i.wholeBlackPepper(.5, u.tsp),
+                i.clove(4, u.unit),
                 // ▢½ teaspoon Cumin seeds (Jeera)
             ]),
             Timer.set(1, 'm', 'Sitr spices and onion SEPARATELY '),
@@ -69,9 +69,9 @@ class Biryani1PoundChicken1CupRice extends Recipe {
             Timer.end(),
             text.set(['In the next step, when you add the rice on top of the chicken, make sure to flatten it out.']),
             e.instantPot().add([
-                i.basmatiRice(2, u.cup),
+                i.basmatiRice(1, u.cup),
                 i.ingredient('Milk + Saffron Mixture'),
-                i.water(2, u.cup),
+                i.water(1, u.cup),
             ]),
             e.instantPot().pressureCook(1, 8, 'm'),
             text.set(['Natural pressure release for 10 minutes.']),
@@ -105,8 +105,8 @@ class Biryani2PoundChicken2CupRice extends Recipe {
             ]),
             e.instantPot().sautee(12, 'm'),
                 e.bowl(1).add([
-                    i.coconutMilk(2, u.tbsp),
-                    i.saffron(10, u.stick),
+                    i.coconutMilk(4, u.tbsp),
+                    i.saffron(20, u.stick),
                 ]),
                 e.bowl(1).microwave(.25),
                 Timer.end(),
@@ -114,12 +114,12 @@ class Biryani2PoundChicken2CupRice extends Recipe {
             text.set(['Take out half of the onions and put into a bowl']),
             text.set(['Put onions to one side of the instapot, so you can add the whole spices to the other side']),
             e.instantPot().add([
-                // 1 stick Cinnamon (Dalchini)
-                i.bayLeaf(2, u.unit),
-                i.greenCardamonSeed(.5, u.tsp),
-                i.wholeBlackPepper(.5, u.tsp),
-                i.clove(4, u.unit),
-                // ▢½ teaspoon Cumin seeds (Jeera)
+                // 2 stick Cinnamon (Dalchini)
+                i.bayLeaf(4, u.unit),
+                i.greenCardamonSeed(1, u.tsp),
+                i.wholeBlackPepper(1, u.tsp),
+                i.clove(8, u.unit),
+                // 1 teaspoon Cumin seeds (Jeera)
             ]),
             Timer.set(1, 'm', 'Sitr spices and onion SEPARATELY '),
             Timer.end(),
@@ -131,9 +131,9 @@ class Biryani2PoundChicken2CupRice extends Recipe {
             Timer.end(),
             text.set(['In the next step, when you add the rice on top of the chicken, make sure to flatten it out.']),
             e.instantPot().add([
-                i.basmatiRice(1, u.cup),
+                i.basmatiRice(2, u.cup),
                 i.ingredient('Milk + Saffron Mixture'),
-                i.water(1, u.cup),
+                i.water(2, u.cup),
             ]),
             e.instantPot().pressureCook(1, 4, 'm'),
             text.set(['Natural pressure release for 10 minutes.']),
