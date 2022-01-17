@@ -32,7 +32,7 @@ constructor() {
         e.pan().preheat(7),
         text.set(['Put away', i.brownRice()]),
         text.set(['Wash', i.kale(1, u.unit)]),
-        text.set(['Rinse', i.blackBeans(2, u.tbsp), 'in sink with strainer (So bean juice doesnt get on counter)'],),
+        text.set(['Rinse', i.blackBeans(2, u.tbsp), 'in sink with strainer (So bean juice doesn\'t get on counter)'],),
         Timer.end(),
         e.pan().add([
             i.chilliOil(2, u.tbsp),
@@ -67,7 +67,7 @@ class BuffaloKaleBowlWhiteRice extends Recipe {
             e.pan().preheat(7),
             text.set(['Put away', i.brownRice()]),
             text.set(['Wash', i.kale(1, u.unit)]),
-            text.set(['Rinse', i.blackBeans(2, u.tbsp), 'in sink with strainer (So bean juice doesnt get on counter)'],),
+            text.set(['Rinse', i.blackBeans(2, u.tbsp), 'in sink with strainer (So bean juice doesn\'t get on counter)'],),
             Timer.end(),
             e.pan().add([
                 i.chilliOil(2, u.tbsp),

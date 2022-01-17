@@ -108,7 +108,7 @@ function run() {
     }
     </script>`
 
-  // Just setting to lowercase incase git isn't case sensitive (Like on osx/windows)
+  // Just setting to lowercase in case git isn't case sensitive (Like on osx/windows)
   fs.writeFileSync(`${process.cwd()}/dist/${recipeName.toLowerCase()}.html`, pageHtml);
 
   // This creates the index

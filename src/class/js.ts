@@ -11,7 +11,7 @@ function playSound(url) {
 }
 
 function generateHtml() {
-    // Reset root incase we are dynamically doing things
+    // Reset root in case we are dynamically doing things
     let root = document.getElementById('root')
 
     if (root) {

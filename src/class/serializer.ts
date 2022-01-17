@@ -41,6 +41,10 @@ export class Serializer {
           return '';
         }
 
+        const sDifferentSpellingMap = {
+          "dash": "dashes",
+        }
+
         let quantityString: string = `${quantity}`;
 
         if (`${quantity}`.endsWith('.75')) {
@@ -69,7 +73,11 @@ export class Serializer {
         let unitString: string = unit;
 
         if (quantity > 1) {
-          unitString = `${unitString}s`;
+          if (unitString in sDifferentSpellingMap) {
+              unitString = sDifferentSpellingMap[unitString];
+          } else {
+            unitString = `${unitString}s`
+          }
         }
 
         return `${quantityString} ${unitString}`;

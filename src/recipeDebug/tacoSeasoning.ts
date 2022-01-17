@@ -22,7 +22,7 @@ class TacoSeasoning1PoundMeat extends Recipe {
             e.largeBowl().add([
                 i.chilliPowder(1, u.tbsp),
                 i.salt(1, u.tsp),
-                i.blackPepper(10, u.crack), // 1 u.tsp // TODO calculate this someday
+                i.blackPepper(20, u.crack), // 1 u.tsp // TODO calculate this someday
                 i.cumin(1.5, u.tsp),
                 i.garlicPowder(.25, u.tsp),
                 i.onionPowder(.25, u.tsp),
