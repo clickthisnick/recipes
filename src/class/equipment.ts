@@ -57,10 +57,23 @@ class Container {
 
     // change to IItemObj | Item  once all ingredients are items
     public add(ingredients: any[] | any | any[][]): IStep {
+
+        function hydrateIStep(addIngredient, ingredient) {
+            addIngredient.text = ['•', s.turnIngObjIntoStr(ingredient, true)].join(' ')
+            addIngredient.ingredients.push(ingredient)
+            addIngredient.time += ingredient.takeOutTime
+            addIStep.children.push(addIngredient)
+
+            // If the unit is an equipment like a cup, then add it to the equipment
+            if (ingredient.unit && ingredient.unit.isEquipment) {
+                let str_ = (ingredient.unit.equipmentUnits.includes(ingredient.unit.quantity)) ? `${ingredient.unit.quantity} ${ingredient.unit.properName}` : ingredient.unit.properName
+                addIngredient.equipment.push(str_)
+            }
+        }
+
         let addIStep = istep()
 
         let bindingWord = 'the'
-
         // If its the first
         if (this.firstAction) {
             if (['a','e','i','o','u'].includes(this.name[0])) {
@@ -68,9 +81,8 @@ class Container {
             } else {
                 bindingWord = 'a'
             }
+            this.firstAction = false;
         }
-
-        this.firstAction = false;
 
         if (Array.isArray(ingredients)) {
             addIStep.text = ['Add the following to', bindingWord, this.name].join(' ')
@@ -80,37 +92,13 @@ class Container {
                 if (Array.isArray(ingredient)) {
                     ingredient.forEach((ingredientNText) => {
                         if (typeof(ingredientNText) === 'object') {
-                            // TODO there should really a func which return an istep object that is filled out properly
-                            addIngredient.text = ['•', s.turnIngObjIntoStr(ingredientNText, true)].join(' ')
-                            addIngredient.ingredients.push(ingredientNText)
-                            addIngredient.time += ingredientNText.text
-                            addIStep.children.push(addIngredient)
-
-                            // If the unit is an equipment like a cup, then add it to the equipment
-                            if (ingredientNText.unit && ingredientNText.unit.isEquipment) {
-                                if (ingredientNText.unit.equipmentUnits.includes(ingredientNText.unit.quantity)) {
-                                    addIngredient.equipment.push(`${ingredientNText.unit.quantity} ${ingredientNText.unit.properName}`)
-                                } else {
-                                    addIngredient.equipment.push(ingredientNText.unit.properName)
-                                }
-                            }
+                            hydrateIStep(addIngredient, ingredient)
                         } else {
                             addIngredient.text += ' ' + ingredientNText
                         }
                     })
                 } else {
-                    addIngredient.text = ['•', s.turnIngObjIntoStr(ingredient, true)].join(' ')
-                    addIngredient.ingredients.push(ingredient)
-                    addIngredient.time += ingredient.takeOutTime
-                    addIStep.children.push(addIngredient)
-                    // If the unit is an equipment like a cup, then add it to the equipment
-                    if (ingredient.unit && ingredient.unit.isEquipment) {
-                        if (ingredient.unit.equipmentUnits.includes(ingredient.unit.quantity)) {
-                            addIngredient.equipment.push(`${ingredient.unit.quantity} ${ingredient.unit.properName}`)
-                        } else {
-                            addIngredient.equipment.push(ingredient.unit.properName)
-                        }
-                    }
+                    hydrateIStep(addIngredient, ingredient)
                 }
             })
 
@@ -332,7 +320,7 @@ class Pan extends CookingContainer {
         return Timer.set(minutes, 'm', `Preheat ${this.name} on heat ${heat}`, [this.name]);
     }
 
-    public cook(duration: number, type: string, heat: number = 0): IStep {
+    public _cookStr(text: string, duration: number, type: string, heat: number = 0): IStep {
         if (heat === 0) {
             if (this.heat) {
                 heat = this.heat
@@ -342,20 +330,20 @@ class Pan extends CookingContainer {
             }
         }
 
-        return Timer.set(duration, type, `Cook on heat ${heat}`, [this.name])
+        return Timer.set(duration, type, text, [this.name])
     }
 
-    public cookWithLidSlightlyOff(duration: number, type: string, heat: number = 0): IStep {
-        if (heat === 0) {
-            if (this.heat) {
-                heat = this.heat
-            }
-            else {
-                throw new exception('Heat cannot be 0')
-            }
-        }
+    public cook(duration: number, type: string, heat: number = 0): IStep {
+        return this._cookStr(`Cook on heat ${heat}`, duration, type, heat)
+    }
 
-        return Timer.set(duration, type, `Cook on heat ${heat} with lid slightly off`, ['pan'])
+
+    public cookWithLidSlightlyOff(duration: number, type: string, heat: number = 0): IStep {
+        return this._cookStr(`Cook on heat ${heat} with lid slightly off`, duration, type, heat)
+    }
+
+    public cookWithLid(duration: number, type: string, heat: number = 0): IStep {
+        return this._cookStr(`Cook on heat ${heat} with lid`, duration, type, heat)
     }
 }
 
