@@ -447,6 +447,23 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
+    public static readonly propelPacket = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'propelPacket', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+            }, // purchase links
+        )
+    )
+
     public static readonly aminosCoconut: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Aminos Coconut',
         putAwayTime: 10,

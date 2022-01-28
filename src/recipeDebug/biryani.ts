@@ -23,15 +23,17 @@ class Biryani1PoundChicken1CupRice extends Recipe {
         this.steps = [
             e.bowl(0).add([
                 i.plainYogurt(.5, u.cup),
+                i.lemonJuice(1, u.tbsp),
+                i.mintLeaf(2, u.tbsp),
+                i.dhanaJeera(1, u.tbsp),// i.cilantro(2, u.tbsp),
+
                 i.gramMasala(1, u.tsp),
                 i.chilliPowder(1, u.tsp),
                 i.salt(1, u.tsp),
-                i.dhanaJeera(1, u.tbsp),// i.cilantro(2, u.tbsp),
                 i.gingerPowder(.5, u.tsp), // i.gingerPaste(.5, u.tsp),
                 i.garlicPowder(.5, u.tsp), // i.garlicPaste(.5, u.tsp),
                 i.turmeric(.25, u.tsp),
-                i.lemonJuice(1, u.tbsp),
-                i.mintLeaf(2, u.tbsp),
+
                 i.chickenBreast(1, u.pound),// i.chickenBreast(1, u.pound),
             ]),
             Timer.set(30, 'm', 'Let chicken marinade'),
@@ -73,7 +75,7 @@ class Biryani1PoundChicken1CupRice extends Recipe {
                 i.ingredient('Milk + Saffron Mixture'),
                 i.water(1, u.cup),
             ]),
-            e.instantPot().pressureCook(1, 8, 'm'),
+            e.instantPot().pressureCook(1, 4, 'm'),
             text.set(['Natural pressure release for 10 minutes.']),
         ];
     }
@@ -85,15 +87,17 @@ class Biryani2PoundChicken2CupRice extends Recipe {
         this.steps = [
             e.bowl(0).add([
                 i.plainYogurt(1, u.cup),
+                i.lemonJuice(2, u.tbsp),
+                i.mintLeaf(4, u.tbsp),
+                i.dhanaJeera(2, u.tbsp),// i.cilantro(2, u.tbsp),
+
                 i.gramMasala(2, u.tsp),
                 i.chilliPowder(2, u.tsp),
                 i.salt(2, u.tsp),
-                i.dhanaJeera(2, u.tbsp),// i.cilantro(2, u.tbsp),
                 i.gingerPowder(1, u.tsp), // i.gingerPaste(.5, u.tsp),
                 i.garlicPowder(1, u.tsp), // i.garlicPaste(.5, u.tsp),
                 i.turmeric(.5, u.tsp),
-                i.lemonJuice(2, u.tbsp),
-                i.mintLeaf(4, u.tbsp),
+
                 i.chickenBreast(2, u.pound),// i.chickenBreast(1, u.pound),
             ]),
             Timer.set(30, 'm', 'Let chicken marinade'),
@@ -135,7 +139,7 @@ class Biryani2PoundChicken2CupRice extends Recipe {
                 i.ingredient('Milk + Saffron Mixture'),
                 i.water(2, u.cup),
             ]),
-            e.instantPot().pressureCook(1, 4, 'm'),
+            e.instantPot().pressureCook(1, 8, 'm'),
             text.set(['Natural pressure release for 10 minutes.']),
         ];
     }

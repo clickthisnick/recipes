@@ -171,6 +171,19 @@ export class SauceItems extends OilItems {
         link: 'https://www.amazon.com/365-Everyday-Value-Organic-Mustard/dp/B074J6RQZB?fpw=alm&s=wf'
     })
 
+    public static readonly citricAcid: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'citric acid',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: true,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        nutrition: {},
+    })
+
     public static readonly germanMustard = (quantity: number = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'German Mustard', // name

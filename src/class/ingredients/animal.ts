@@ -122,6 +122,23 @@ export class AnimalItems {
         )
     )
 
+    public static readonly gelatin = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Gelatin', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+            }, // purchase links
+        )
+    )
+
     public static readonly chickenStock: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Chicken Stock',
         putAwayTime: 10,
