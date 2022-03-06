@@ -194,6 +194,22 @@ export class Ingredient {
         return addIStep;
     }
 
+    public mince(): IStep {
+        let addIStep = istep()
+
+        if (this.quantity && this.unit && this.unit.name) {
+            addIStep.text = ['Mince', this.quantity, this.unit.name, this.name].join(' ')
+        } else {
+            addIStep.text = ['Mince the', this.name].join(' ')
+        }
+
+        addIStep.ingredients.push(this)
+        addIStep.equipment.push(e.cuttinBoard())
+        addIStep.equipment.push(e.knife())
+
+        return addIStep;
+    }
+
     public cutIntoStrips(): IStep {
         let addIStep = istep()
 

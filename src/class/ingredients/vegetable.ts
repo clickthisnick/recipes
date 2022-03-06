@@ -1156,7 +1156,7 @@ export class VegetableItems extends SpiceItems {
 
     public static readonly greenBellPepper = (quantity: number = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
-            'Bell Pepper', // name
+            'Green Bell Pepper', // name
             10, // putAwayTime
             10, // takeOutTime
             '',  // cleanSteps
@@ -1182,6 +1182,24 @@ export class VegetableItems extends SpiceItems {
                 //     "conventional": ["https://www.amazon.com/Green-Bell-Pepper-Conventional-Each/dp/B07815JXHB/ref=sr_1_1_0g_wf"],
                 //     "organic": ["https://www.amazon.com/Green-Bell-Pepper-Organic-Each/dp/B07QYB5JNX/ref=sr_1_2_0g_wf"],
                 // }
+            }, // purchase links
+            7, // perishableLimit
+        )
+    )
+
+    public static readonly redBellPepper = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Red Bell Pepper', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            true, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
             }, // purchase links
             7, // perishableLimit
         )
@@ -1325,6 +1343,25 @@ export class VegetableItems extends SpiceItems {
                         }
                     ]
                 }
+            }, // purchaseLinks
+        )
+    )
+
+    public static readonly basil = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Basil', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            true, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+
+            }, // nutrition
+            unit, // unit
+            {
             }, // purchaseLinks
         )
     )
