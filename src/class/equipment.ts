@@ -139,8 +139,14 @@ class Bowl extends Container {
         super(name, id)
     }
 
-    public microwave(minutes: number): IStep {
-        return Timer.set(minutes, 'm', `Microwave ${this.name} for ${minutes} minutes`);
+    public microwave(duration: number, unit: string = ""): IStep {
+        let humanUnit = "minutes"
+
+        if (unit == "s") {
+            humanUnit = "seconds"
+        }
+
+        return Timer.set(duration, unit, `Microwave ${this.name} for ${duration} ${humanUnit}`);
     }
 
     public whisk(): IStep {

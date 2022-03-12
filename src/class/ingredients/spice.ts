@@ -528,6 +528,23 @@ export class SpiceItems extends SauceItems {
         )
     )
 
+    public static readonly citricAcid = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Citric Acid', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+            }, // purchaseLinks
+        )
+    )
+
     public static readonly blackPepper = (quantity: number = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Black Pepper', // name

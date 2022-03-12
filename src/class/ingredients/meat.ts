@@ -22,6 +22,23 @@ export class MeatItems extends FruitItems {
         )
     )
 
+    public static readonly gelatin = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Gelatin', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+            }, // purchaseLinks
+        )
+    )
+
     public static readonly groundBeef: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Ground Beef',
         putAwayTime: 10,
