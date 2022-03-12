@@ -20,9 +20,10 @@ class CurryPanang extends Recipe {
     constructor() {
         super();
         this.steps = [
+            i.whiteOnion(.5, u.unit).cutIntoThinSlices(),
             e.instantPot().add([
                 i.oliveOil(1, u.tbsp),
-                i.whiteOnion(1, u.unit),
+                i.whiteOnion(),
             ]),
             e.instantPot().sautee(3, 'm'),
                 i.greenBellPepper(1, u.unit).cutIntoThinSlices(),
@@ -30,9 +31,6 @@ class CurryPanang extends Recipe {
                 i.garlicClove(4, u.unit).mince(),
                 i.groundGinger(2, u.tsp).mince(),
                 i.whiteMushroom(.5, u.pound).cutIntoSlices(),
-            Timer.end(),
-            e.instantPot().sautee(2, "m"),
-                i.chickenBreast(2, u.pound).cutIntoThinSlices(),
             Timer.end(),
             e.instantPot().add([
                 i.greenBellPepper(),
@@ -42,6 +40,7 @@ class CurryPanang extends Recipe {
                 i.whiteMushroom(),
             ]),
             e.instantPot().sautee(2, "m"),
+                i.chickenBreast(2, u.pound).cutIntoThinSlices(),
             Timer.end(),
             e.instantPot().add([
                 i.panangCurryPaste(1, u.tbsp),
@@ -53,7 +52,7 @@ class CurryPanang extends Recipe {
                 i.coconutMilk(.5, u.unit),
                 i.chickenBreast(),
             ]),
-            e.instantPot().sautee(12, "m"),
+            e.instantPot().pressureCook(0, 4, "m"),
             Timer.end(),
             e.instantPot().add([
                 i.brownSugar(.25, u.cup),
