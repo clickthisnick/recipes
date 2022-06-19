@@ -10,13 +10,31 @@ export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
         this.recipeGroup = c.meal;
+        this.recipeName = 'Coffee'
         this.variations = [
-            Coffee
+            FrenchPressCoffee,
+            KemexCoffee,
          ]
      }
 }
 
-class Coffee extends Recipe {
+class KemexCoffee extends Recipe {
+    constructor() {
+        super();
+        this.steps = [
+            text.set(['Take out filter']),
+            text.set(['Set filer 1 layer on side / 3 layers the other side into coffee maker']),
+            text.set(['Put in ground coffee. Strong is 1/4 Cup, Weak 3 Tbsp.']),
+            text.set(['Put away grond coffee container']),
+            text.set(['Fill back water tank to 6']),
+            Timer.set(5, 'm', 'Wait for coffee to brew'),
+            Timer.end(),
+            text.set(['Throw away coffee filter']),
+        ];
+    }
+}
+
+class FrenchPressCoffee extends Recipe {
     constructor() {
         super();
         this.steps = [
