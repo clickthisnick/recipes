@@ -10,11 +10,35 @@ export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
         this.recipeGroup = c.component;
+        this.recipeName = "NoSugarPeanutBalls"
         this.variations = [
-            DateBalls
+            DateBalls,
+            PeanutSludge,
         ]
      }
 }
+
+class PeanutSludge extends Recipe {
+    constructor() {
+        super();
+        this.steps = [
+            e.kitchenAidMixingBowl().add([
+                i.water(.25, u.cup),
+                i.cacaoPowderUnsweetened(1, u.tbsp),
+            ]),
+            e.kitchenAidMixingBowl().mixWithFlatBeater(3, 1),
+            Timer.end(),
+            e.kitchenAidMixingBowl().add([
+                i.peanutButter(6, u.ounce),
+            ]),
+            e.kitchenAidMixingBowl().mixWithFlatBeater(5, 2),
+            Timer.end(),
+            Timer.set(45, 'm', 'Put in freezer'),
+            Timer.end(),
+        ];
+    }
+}
+
 
 class DateBalls extends Recipe {
     constructor() {
