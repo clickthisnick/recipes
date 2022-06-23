@@ -24,6 +24,7 @@ class ThaiBasil extends Recipe {
                 i.whiteRice(1, u.cup),
                 i.water(1.5, u.cup),
             ]),
+            e.instantPot().pressureCook(0, 5, 'm'),
             e.bowl().add([
                 i.soySauce(2, u.tsp),
                 i.coconutSugar(1, u.tsp),
