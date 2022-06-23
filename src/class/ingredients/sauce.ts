@@ -220,6 +220,32 @@ export class SauceItems extends OilItems {
         )
     )
 
+    public static readonly peanutOil: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'Peanut Oil',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Put peanut oil away',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        nutrition: {}
+    })
+
+    public static readonly oysterSauce: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+        name: 'Oyster Sauce',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Put oyster sauce back in refrigerator',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        nutrition: {}
+    })
+
     public static readonly soySauce: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Soy Sauce',
         putAwayTime: 10,

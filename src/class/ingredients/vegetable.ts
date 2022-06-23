@@ -731,18 +731,23 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly serranoChilli: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Serrano Chilli',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: true,
-        isTakoutUnitable: true,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly serranoChilli = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Serrano Chilli', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+            }, // purchaseLinks
+        )
+    )
 
     public static readonly cilantro: IItem = (quantity: number = 0, unit: IUnitObj) => ({
         name: 'Cilantro',
@@ -924,18 +929,23 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly greenOnion: IItem = (quantity: number = 0, unit: IUnitObj) => ({
-        name: 'Green Onion',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: true,
-        isTakoutUnitable: true,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly greenOnion = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Green Onion', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+            }, // purchaseLinks
+        )
+    )
 
     public static readonly frozenCorn = (quantity: number = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
