@@ -174,6 +174,24 @@ export class AnimalItems {
         nutrition: {},
     })
 
+    public static readonly sausage = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Sausage', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+            }, // purchaseLinks
+        )
+    )
+
     public static readonly italianSausage = (quantity: number = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Italian Sausage', // name

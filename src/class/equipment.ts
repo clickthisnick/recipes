@@ -133,6 +133,23 @@ class StandMixer extends Container {
     }
 }
 
+class Plate extends Container {
+    // Containers are a singleton
+    constructor(id: number, name:string="plate") {
+        super(name, id)
+    }
+
+    public microwave(duration: number, unit: string = ""): IStep {
+        let humanUnit = "minutes"
+
+        if (unit == "s") {
+            humanUnit = "seconds"
+        }
+
+        return Timer.set(duration, unit, `Microwave ${this.name} for ${duration} ${humanUnit}`);
+    }
+}
+
 class Bowl extends Container {
     // Containers are a singleton
     constructor(id: number, name:string="bowl") {
@@ -436,6 +453,10 @@ export class Equipment {
 
     public static readonly pan = (id: number = 99) => (
         new Pan(id)
+    );
+
+    public static readonly plate = (id: number = 99) => (
+        new Plate(id)
     );
 
     public static readonly oven = (id: number = 99) => (
