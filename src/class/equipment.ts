@@ -403,11 +403,9 @@ class InstantPot extends CookingContainer {
         return Timer.set(duration, type, `Sautee on high`)
     }
 
-    // public pressureRelease(duration: number, type: string) {
-    //     return [
-    //         Timer.set(duration, type, `Let pressure release`, true),
-    //     ]
-    // }
+    public pressureRelease(duration: number, type: string): IStep {
+        return Timer.set(duration, type, 'Let pressure release')
+    }
 }
 
 class CoffeeCup extends Container {
