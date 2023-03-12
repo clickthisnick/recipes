@@ -7,7 +7,10 @@ let perishableItems = {}
 
 function playSound() {
     let audio = document.getElementById("beep")
-    audio.play()    
+    // overrides the empty sound already played on the object
+    // this is so ios will asynchronously play the sounds
+    audio.src = "../src/sounds/pager-beep.mp3"
+    audio.play()
 }
 
 function generateHtml() {
@@ -54,8 +57,8 @@ function selectMode(id) {
     mode = id
 
     let audio = document.getElementById("beep")
-    audio.play()    
-    
+    audio.play()
+
     hideElement('cookingButton')
     hideElement('shoppingButton')
 }
