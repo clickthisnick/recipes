@@ -5,6 +5,11 @@ export class HTML {
     public static headerEnd = '</h1>';
     public static mobileViewport = '<meta name="viewport" content="width=device-width, initial-scale=1">';
     public static chartSet = '<meta charset="utf-8">';
+    public static audio = `<audio controls id="beep">
+        <source src="../src/sounds/pager-beep.mp3"" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>`
+
     public static css = `<style>
 
     a {

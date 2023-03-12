@@ -6,17 +6,8 @@ let mode = ''
 let perishableItems = {}
 
 function playSound() {
-    const audio = new Audio();
-    audio.autoplay = true;
-
-    // onClick of first interaction on page before I need the sounds
-    // (This is a tiny MP3 file that is silent and extremely short - retrieved from https://bigsoundbank.com and then modified)
-    audio.src = "data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV";
-
-    // later on when you actually want to play a sound at any point without user interaction
-    audio.src = "https://www.clickthisnick.com/recipes/src/sounds/pager-beep.mp3";
-
-    audio.play();
+    let audio = document.getElementById("beep")
+    audio.play()    
 }
 
 function generateHtml() {
@@ -62,6 +53,9 @@ function selectMode(id) {
     showElement('select')
     mode = id
 
+    let audio = document.getElementById("beep")
+    audio.play()    
+    
     hideElement('cookingButton')
     hideElement('shoppingButton')
 }

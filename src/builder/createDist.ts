@@ -13,6 +13,7 @@ const cwd = process.cwd();
 
 let pageHtml = ''
 pageHtml += HTML.mobileViewport;
+pageHtml += HTML.audio;
 pageHtml += HTML.chartSet;
 pageHtml += HTML.css;
 pageHtml += HTML.javascript();
