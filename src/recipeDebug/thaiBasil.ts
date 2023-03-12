@@ -12,7 +12,8 @@ export class MealRecipe extends RecipeContainer {
         this.recipeGroup = c.component;
         this.variations = [
             ThaiBasil,
-            ThaiBasil2Servings
+            ThaiBasil2Servings,
+            ThaiBasilNoFreshIngredients,
         ]
     }
 }
@@ -124,6 +125,43 @@ class ThaiBasil extends Recipe {
             e.pan().add([
                 i.basil(1, u.cup),
             ])
+        ];
+    }
+}
+
+class ThaiBasilNoFreshIngredients extends Recipe {
+    constructor() {
+        super();
+        this.steps = [
+            e.instantPot().add([
+                i.whiteRice(.75, u.cup),
+                i.water(1.25, u.cup),
+            ]),
+            e.instantPot().pressureCook(0, 5, 'm'),
+            e.bowl().add([
+                i.coconutSugar(1, u.tsp),
+                i.soySauce(2, u.tsp),
+                i.oysterSauce(2, u.tsp),
+                i.water(2, u.tbsp),
+                i.garlicPowder(1, u.tbsp),
+                i.onionPowder(1, u.tbsp),
+                i.redPepperFlakes(1, u.tbsp),
+            ]),
+            e.pan().add([
+                i.peanutOil(1.5, u.tbsp),
+            ]),
+            e.pan().preheat(7, 1),
+            i.chickenBreast(.5, u.pound).dice(),
+            Timer.end(),
+            Timer.set(2, 'm'),
+            Timer.end(),
+            e.pan().add([
+                i.ingredient('sauce'),
+            ]),
+            Timer.set(1, 'm'),
+            Timer.end(),
+            e.instantPot().pressureRelease(2, 'm'),
+            Timer.end(),
         ];
     }
 }
