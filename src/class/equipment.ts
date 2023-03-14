@@ -37,6 +37,15 @@ class Container {
         containers[`${name}${id}`] = this;
     }
 
+    public done(): IStep {
+        this.firstAction = false;
+        const stirStep = istep()
+        stirStep.equipment.push(this.name)
+        // just have empty step for now
+        stirStep.text = ''
+        return stirStep
+    }
+
     public stir(): IStep {
         this.firstAction = false;
         const stirStep = istep()
@@ -299,9 +308,37 @@ class Pot extends CookingContainer {
     constructor(id: number) {
         super("pot", id)
     }
+    heat: number;
+
+    public _getHeat(heat = 0) {
+        if (heat === 0) {
+            if (this.heat) {
+                return this.heat
+            } else {
+                throw new Error('Heat cannot be 0')
+            }
+        }
+        return heat
+    }
+
+    public _cookStr(text: string, duration: number, type: string, heat = 0): IStep {
+        heat = this._getHeat(heat)
+        return Timer.set(duration, type, text, [this.name])
+    }
 
     public cook(duration: number, type: string, heat: number): IStep {
-        return Timer.set(duration, type, `Cook ${this.name} @ ${heat}°`, [this.name]);
+        heat = this._getHeat(heat)
+        return this._cookStr(`Cook ${this.name}`, duration, type, heat)
+    }
+
+    public cookWithLid(duration: number, type: string, heat = 0): IStep {
+        heat = this._getHeat(heat)
+        return this._cookStr(`Cook ${this.name} with lid`, duration, type, heat)
+    }
+
+    public boilWithLid(duration: number, type: string, heat = 0): IStep {
+        heat = this._getHeat(heat)
+        return this._cookStr(`Boil ${this.name} contents on heat ${heat} with lid on`, duration, type, heat)
     }
 }
 
@@ -341,29 +378,35 @@ class Pan extends CookingContainer {
         return Timer.set(minutes, 'm', `Preheat ${this.name} on heat ${heat}`, [this.name]);
     }
 
-    public _cookStr(text: string, duration: number, type: string, heat = 0): IStep {
+    public _getHeat(heat = 0) {
         if (heat === 0) {
             if (this.heat) {
-                heat = this.heat
-            }
-            else {
+                return this.heat
+            } else {
                 throw new Error('Heat cannot be 0')
             }
         }
+        return heat
+    }
 
+    public _cookStr(text: string, duration: number, type: string, heat = 0): IStep {
+        heat = this._getHeat(heat)
         return Timer.set(duration, type, text, [this.name])
     }
 
     public cook(duration: number, type: string, heat = 0): IStep {
+        heat = this._getHeat(heat)
         return this._cookStr(`Cook on heat ${heat}`, duration, type, heat)
     }
 
 
     public cookWithLidSlightlyOff(duration: number, type: string, heat = 0): IStep {
+        heat = this._getHeat(heat)
         return this._cookStr(`Cook on heat ${heat} with lid slightly off`, duration, type, heat)
     }
 
     public cookWithLid(duration: number, type: string, heat = 0): IStep {
+        heat = this._getHeat(heat)
         return this._cookStr(`Cook on heat ${heat} with lid`, duration, type, heat)
     }
 }
