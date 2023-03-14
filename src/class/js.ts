@@ -1,12 +1,12 @@
-let recipes = {}
-let selectedRecipes = []
-let selectedRecipeNames = []
-let ingredients = {}
+const recipes = {}
+const selectedRecipes = []
+const selectedRecipeNames = []
+const ingredients = {}
 let mode = ''
-let perishableItems = {}
+const perishableItems = {}
 
 function playSound() {
-    let audio = document.getElementById("beep")
+    const audio = document.getElementById("beep")
     // overrides the empty sound already played on the object
     // this is so ios will asynchronously play the sounds
     audio.src = "../src/sounds/pager-beep.mp3"
@@ -15,7 +15,7 @@ function playSound() {
 
 function generateHtml() {
     // Reset root in case we are dynamically doing things
-    let root = document.getElementById('root')
+    const root = document.getElementById('root')
 
     if (root) {
         root.innerHTML = ''
@@ -41,7 +41,7 @@ const parseParams = (querystring) => {
     return obj;
 }
 
-let queryString = parseParams(window.location.search)
+const queryString = parseParams(window.location.search)
 
 function setRecipe(recipeName, recipe) {
     // Setting the recipe data into the recipe
@@ -56,7 +56,8 @@ function selectMode(id) {
     showElement('select')
     mode = id
 
-    let audio = document.getElementById("beep")
+    // Play the silent beep so ios lets us play it in the background later (after we change src)
+    const audio = document.getElementById("beep")
     audio.play()
 
     hideElement('cookingButton')
@@ -69,7 +70,7 @@ function selectRecipe(recipeName) {
 }
 
 function addStep(istep) {
-    let cookingDiv = document.getElementById('cooking')
+    const cookingDiv = document.getElementById('cooking')
     if (!cookingDiv) {
         alert('Cannot find cooking element id')
         return;
@@ -128,7 +129,7 @@ function saveShoppingUrl() {
     //        <!--ingredients = { asparagus: { tsb: 1 } } -->
     let queryParamter = document.location.href.split('?')[0] + '?mode=shopping' + '&recipes=' + selectedRecipeNames
     Object.keys(ingredients).forEach(ingredient => {
-        let unit = Object.keys(ingredients[ingredient]['units'])[0]
+        const unit = Object.keys(ingredients[ingredient]['units'])[0]
         // < !--url encode - example - replace any spaces with % 20 -- >
         queryParamter += '&' + encodeURI(ingredient) + '=["' + unit + '", %20' + ingredients[ingredient]['units'][unit] + ']'
     })
@@ -163,7 +164,7 @@ function applyCreditCardDiscounts(store, pricePerQuantity) {
 }
 function doneSelectingRecipes() {
     hideElement('select')
-    let shoppingDiv = document.getElementById('shopping')
+    const shoppingDiv = document.getElementById('shopping')
 
     if (mode === 'shopping') {
         // Get all ingredients across all recipes
@@ -203,10 +204,10 @@ function doneSelectingRecipes() {
             let commonUnit;
             let links = ''
 
-            let linkByPrice = {} // Key is prices, value is array of items
-            let priceKeys = [] // Keys of the linkByPrice
+            const linkByPrice = {} // Key is prices, value is array of items
+            const priceKeys = [] // Keys of the linkByPrice
 
-            let ingredient = ingredients[ingredientKey]
+            const ingredient = ingredients[ingredientKey]
 
             // When you click a saved url we don't include the purchaseLinks
             if (ingredient.hasOwnProperty('purchaseLinks')) {
@@ -281,10 +282,10 @@ function showElement(id) {
 }
 
 function showElementsByClassName(className) {
-    var elements = document.getElementsByClassName(className);
+    const elements = document.getElementsByClassName(className);
 
     for (let i = 0; i < elements.length; i++) {
-        let element = elements[i];
+        const element = elements[i];
         element.style.display = "inline";
     }
 }
@@ -304,7 +305,7 @@ function hideElement(id) {
 // This is where my new recipe app ends
 
 function setIntervalX(callback, delay, repetitions) {
-    var x = 0;
+    let x = 0;
     var intervalID = window.setInterval(function () {
 
         callback();
@@ -316,13 +317,13 @@ function setIntervalX(callback, delay, repetitions) {
 }
 
 function showAllIngredients() {
-    let ingredientDiv = document.getElementById('ingredients');
+    const ingredientDiv = document.getElementById('ingredients');
 
     ingredientDiv.style.display = 'inline'
 }
 
 function showAllSteps() {
-    let elements = document.getElementsByClassName('panel');
+    const elements = document.getElementsByClassName('panel');
 
     for (let i = 0; i < elements.length; i++) {
         elements[i].style.display = 'block';
@@ -334,11 +335,11 @@ function setStepVisibility(idxToShow, idxToHide) {
     document.getElementById("panel-" + idxToShow).style.display = 'block';
 }
 
-var timerClicks = {};
+const timerClicks = {};
 
 function startTimer(duration, stepId, stepIdxToShow, async) {
-    let timerPanelId = "panel-" + stepId
-    let timerElement = document.getElementById(timerPanelId);
+    const timerPanelId = "panel-" + stepId
+    const timerElement = document.getElementById(timerPanelId);
     if (timerClicks.hasOwnProperty(timerPanelId)) {
         timerClicks[timerPanelId] += 1
     } else {
@@ -346,7 +347,7 @@ function startTimer(duration, stepId, stepIdxToShow, async) {
     }
 
     if (timerElement && timerElement.getAttribute('class')) {
-        let timerClass = timerElement.getAttribute('class');
+        const timerClass = timerElement.getAttribute('class');
         if (timerClass && timerClass.includes('timer')) {
             // <!--If you click block 2 times after timer started, then you can skip-- >
             if (timerClicks[timerPanelId] >= 2) {
@@ -368,8 +369,8 @@ function startTimer(duration, stepId, stepIdxToShow, async) {
     //     document.getElementById("panel-" + stepIdxToShow).style.display = 'block';
     // }
 
-    let originalTimerHtml = timerElement.innerHTML;
-    let intervalID = window.setInterval(function () {
+    const originalTimerHtml = timerElement.innerHTML;
+    const intervalID = window.setInterval(function () {
         let minutes = parseInt(duration / 60, 10)
         let seconds = parseInt(duration % 60, 10);
 
@@ -398,11 +399,11 @@ function loadTimer(seconds, stepId, stepIdxToShow, async) {
     startTimer(seconds, stepId, stepIdxToShow, async);
 }
 
-var shownId = '';
+let shownId = '';
 
 function getCheckedOptions() {
-   var id = '';
-   var htmlCollection = document.getElementById('options').getElementsByTagName('button')
+   let id = '';
+   const htmlCollection = document.getElementById('options').getElementsByTagName('button')
 
    for (const item of htmlCollection) {
      if (item.classList[0] == 'completed') {
@@ -415,7 +416,7 @@ function getCheckedOptions() {
 
 // Used to hide/show recipes
 function showRecipe() {
-    var id = getCheckedOptions()
+    const id = getCheckedOptions()
 
     // Show
     if (document.getElementById(id)) {

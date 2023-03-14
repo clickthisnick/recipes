@@ -1,7 +1,6 @@
 import { IEstimates, IEstimatesMissing } from './ingredients/ingredient';
 import { Ingredients, Units } from '../constants/units';
 import { IStep } from './step';
-import { exception } from 'console';
 import { Text as text } from './text';
 
 export interface IVariation {
@@ -9,8 +8,8 @@ export interface IVariation {
 }
 
 export class RecipeContainer {
-    public recipeHtml: string = '';
-    public recipeName: string = '';
+    public recipeHtml = '';
+    public recipeName = '';
     public recipeGroup: string;
     public variations: any[];
     // public recipeOptions: any;
@@ -75,8 +74,8 @@ export class Recipe {
     public steps: IStep[] = [];
     public ingredients: Ingredients = {};
     // public equipment: IAllEquipment = {};
-    public vegan: boolean = true;
-    public timeEstimateMilliseconds: number = 0;
+    public vegan = true;
+    public timeEstimateMilliseconds = 0;
     // TODO expand to other metrics
     public estimates: IEstimates = {
         calories: 0,
@@ -100,11 +99,11 @@ export class Recipe {
     //private metricsToShow: string[] = Object.keys(this.estimatesMissing);
     //private metrics: string[] = Object.keys(this.estimatesMissing);
 
-    public recipeHtml: string = '';
+    public recipeHtml = '';
 
     // Whether to auto show the recipe
     // Useful if the recipe only has one option
-    public autoShow: boolean = false;
+    public autoShow = false;
 
     private print(step: IStep) {
         this.recipeHtml += ''
@@ -117,7 +116,7 @@ export class Recipe {
     }
 
     public validate(recipeName) {
-        let timers: any[] = []
+        const timers: any[] = []
         this.steps.forEach(stepz => {
             if (stepz.showTimer) {
                 timers.push(stepz.text);
@@ -129,7 +128,7 @@ export class Recipe {
         if (timers.length > 0) {
             console.log(recipeName)
             console.log(timers)
-            throw new exception('Timers left open');
+            throw new Error('Timers left open');
         }
     }
 
@@ -176,7 +175,7 @@ export class Recipe {
     private getStepEquipment(step: IStep, equipment: any[] = []) {
         // Calculates all the equipment for the step (and its children steps)
 
-        if (step.equipment !== []) {
+        if (step.equipment.length > 0) {
             step.equipment.forEach(equipmentItem => {
                 equipment.push(equipmentItem)
             })

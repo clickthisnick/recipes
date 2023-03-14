@@ -5,7 +5,7 @@ import { Stores } from '../../class/stores';
 
 export class SauceItems extends OilItems {
 
-    public static readonly coconutCream = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly coconutCream = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Coconut Cream', // name
             10, // putAwayTime
@@ -44,7 +44,7 @@ export class SauceItems extends OilItems {
         )
     )
 
-    public static readonly coconutMilk: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly coconutMilk: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Coconut Milk',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -57,7 +57,7 @@ export class SauceItems extends OilItems {
         nutrition: {}
     })
 
-    public static readonly ketchup: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly ketchup: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Ketchup',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -70,7 +70,7 @@ export class SauceItems extends OilItems {
         nutrition: {}
     })
 
-    public static readonly steakSauce: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly steakSauce: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'steak sauce',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -83,7 +83,7 @@ export class SauceItems extends OilItems {
         nutrition: {}
     })
 
-    public static readonly salsa = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly salsa = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'salsa', // name
             10, // putAwayTime
@@ -123,7 +123,7 @@ export class SauceItems extends OilItems {
         )
     )
 
-    public static readonly hotSauce: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly hotSauce: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'hot sauce',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -136,7 +136,7 @@ export class SauceItems extends OilItems {
         nutrition: {}
     })
 
-    public static readonly sourCream: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly sourCream: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'sour cream',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -149,7 +149,7 @@ export class SauceItems extends OilItems {
         nutrition: {}
     })
 
-    public static readonly dijonMustard: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly dijonMustard: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Dijon Mustard',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -171,7 +171,7 @@ export class SauceItems extends OilItems {
         link: 'https://www.amazon.com/365-Everyday-Value-Organic-Mustard/dp/B074J6RQZB?fpw=alm&s=wf'
     })
 
-    public static readonly germanMustard = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly germanMustard = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'German Mustard', // name
             10, // putAwayTime
@@ -220,7 +220,7 @@ export class SauceItems extends OilItems {
         )
     )
 
-    public static readonly peanutOil: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly peanutOil: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Peanut Oil',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -233,7 +233,7 @@ export class SauceItems extends OilItems {
         nutrition: {}
     })
 
-    public static readonly oysterSauce: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly oysterSauce: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Oyster Sauce',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -246,7 +246,7 @@ export class SauceItems extends OilItems {
         nutrition: {}
     })
 
-    public static readonly soySauce: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly soySauce: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Soy Sauce',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -259,7 +259,7 @@ export class SauceItems extends OilItems {
         nutrition: {}
     })
 
-    public static readonly padThaiSauce: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly padThaiSauce: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Pad Thai Sauce',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -272,7 +272,7 @@ export class SauceItems extends OilItems {
         nutrition: {}
     })
 
-    public static readonly barbecueSauce: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly barbecueSauce: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Barbecue Sauce',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -285,7 +285,7 @@ export class SauceItems extends OilItems {
         nutrition: {},
     })
 
-    public static readonly pizzaSauce: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly pizzaSauce: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Pizza Sauce',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -298,7 +298,7 @@ export class SauceItems extends OilItems {
         nutrition: {}
     })
 
-    public static readonly sirachaSauce: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly sirachaSauce: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Siracha Sauce',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -311,7 +311,7 @@ export class SauceItems extends OilItems {
         nutrition: {}
     })
 
-    public static readonly hoisonSauce: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly hoisonSauce: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Hoison Sauce',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -324,7 +324,7 @@ export class SauceItems extends OilItems {
         nutrition: {}
     })
 
-    public static readonly spaghettiSauce = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly spaghettiSauce = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Spaghetti Sauce', // name
             10, // putAwayTime
@@ -372,7 +372,7 @@ export class SauceItems extends OilItems {
         )
     )
 
-    public static readonly wingTimeMediumBuffaloSauce = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly wingTimeMediumBuffaloSauce = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Buffalo Sauce', // name
             10, // putAwayTime
@@ -405,7 +405,7 @@ export class SauceItems extends OilItems {
         )
     )
 
-    public static readonly buffaloSauce: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly buffaloSauce: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Buffalo Sauce',
         putAwayTime: 10,
         takeOutTime: 10,

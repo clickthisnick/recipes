@@ -65,25 +65,25 @@ function returnItem(itemName, quantity, unit, subItems: Ingredient[]) {
 
 export class Items extends VegetableItems {
     public static readonly Groups = {
-        chicken: (quantity: number = 0, unit: IUnitObj = Units.none) => {
+        chicken: (quantity = 0, unit: IUnitObj = Units.none) => {
             return returnItem('chicken', quantity, unit, [
                 i.chickenBreast(),
                 i.chickenThigh(),
             ])
         },
-        mushroom: (quantity: number = 0, unit: IUnitObj = Units.none) => {
+        mushroom: (quantity = 0, unit: IUnitObj = Units.none) => {
             return returnItem('mushroom', quantity, unit, [
                 i.whiteMushroom(),
                 i.babyBellaMushroom(),
             ])
         },
-        onion: (quantity: number = 0, unit: IUnitObj = Units.none) => {
+        onion: (quantity = 0, unit: IUnitObj = Units.none) => {
             return returnItem('onion', quantity, unit, [
                 i.whiteOnion(),
                 i.redOnion(),
             ])
         },
-        cheese: (quantity: number = 0, unit: IUnitObj = Units.none) => {
+        cheese: (quantity = 0, unit: IUnitObj = Units.none) => {
             return returnItem('cheese', quantity, unit, [
                 i.cheddarCheese(),
                 i.mozzarellaCheese(),

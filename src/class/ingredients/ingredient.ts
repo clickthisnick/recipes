@@ -108,14 +108,14 @@ export class Ingredient {
     }
 
     public seasonWith(ingredients: any): IStep {
-        let addIStep = istep()
+        const addIStep = istep()
 
         if (Array.isArray(ingredients)) {
             addIStep.text = ['Season', s.turnIngObjIntoStr(this, true), 'with the following'].join(' ')
             addIStep.ingredients.push(this)
             addIStep.disappearWhen = 'childrenGone'
             ingredients.forEach((ingredient) => {
-                let addIngredient = istep()
+                const addIngredient = istep()
                 addIngredient.text = ['•', s.turnIngObjIntoStr(ingredient, true)].join(' ')
                 addIngredient.ingredients.push(ingredient)
                 addIngredient.time += ingredient.takeOutTime
@@ -131,7 +131,7 @@ export class Ingredient {
     }
 
     public mixIn(ingredients: any): IStep {
-        let addIStep = istep()
+        const addIStep = istep()
 
         addIStep.text = ['Mix in', ingredients, 'with', this.name].join('' )
 
@@ -141,7 +141,7 @@ export class Ingredient {
     }
 
     public flip(): IStep {
-        let addIStep = istep()
+        const addIStep = istep()
 
         addIStep.text = ['Flip the', this.name].join('' )
 
@@ -150,7 +150,7 @@ export class Ingredient {
     }
 
     public cutInHalf(): IStep {
-        let addIStep = istep()
+        const addIStep = istep()
 
         if (this.unit) {
             addIStep.text = ['Cut', this.quantity, this.unit.name, this.name, 'in half'].join(' ')
@@ -165,7 +165,7 @@ export class Ingredient {
     }
 
     public peel(): IStep {
-        let addIStep = istep()
+        const addIStep = istep()
 
         if (this.unit) {
             addIStep.text = ['Peel', this.quantity, this.unit.name, this.name].join(' ')
@@ -179,7 +179,7 @@ export class Ingredient {
     }
 
     public dice(): IStep {
-        let addIStep = istep()
+        const addIStep = istep()
 
         if (this.quantity && this.unit && this.unit.name) {
             addIStep.text = ['Dice', this.quantity, this.unit.name, this.name].join(' ')
@@ -195,7 +195,7 @@ export class Ingredient {
     }
 
     public mince(): IStep {
-        let addIStep = istep()
+        const addIStep = istep()
 
         if (this.quantity && this.unit && this.unit.name) {
             addIStep.text = ['Mince', this.quantity, this.unit.name, this.name].join(' ')
@@ -211,7 +211,7 @@ export class Ingredient {
     }
 
     public cutIntoStrips(): IStep {
-        let addIStep = istep()
+        const addIStep = istep()
 
         if (this.unit) {
             addIStep.text = ['Cut',  this.quantity, this.unit.name, this.name, 'into strips'].join(' ')
@@ -225,7 +225,7 @@ export class Ingredient {
     }
 
     public cutIntoThinSlices(): IStep {
-        let addIStep = istep()
+        const addIStep = istep()
 
         if (this.unit) {
             addIStep.text = ['Slice',  this.quantity, this.unit.name, this.name, 'thinly'].join(' ')
@@ -239,7 +239,7 @@ export class Ingredient {
     }
 
     public cutIntoSlices(): IStep {
-        let addIStep = istep()
+        const addIStep = istep()
 
         if (this.unit) {
             addIStep.text = ['Cut',  this.quantity, this.unit.name, this.name, 'into slices'].join(' ')
@@ -253,7 +253,7 @@ export class Ingredient {
     }
 
     public patDry(): IStep {
-        let addIStep = istep()
+        const addIStep = istep()
 
         if (this.unit) {
             addIStep.text = ['Pat',  this.quantity, this.unit.name, this.name, 'dry with paper towels'].join(' ')

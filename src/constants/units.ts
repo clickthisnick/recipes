@@ -1,4 +1,4 @@
-import { Ingredient } from "../class/ingredients/ingredient";
+import { Ingredient } from '../class/ingredients/ingredient';
 
 export interface IUnitObj {
     name: string;
@@ -286,13 +286,13 @@ export class Units {
         }
 
         // If I convert unit 1 into 2 what is it
-        let one_two_conversion = Units.conversionTable[ingredient_1.unit.name][ingredient_2.unit.name]
+        const one_two_conversion = Units.conversionTable[ingredient_1.unit.name][ingredient_2.unit.name]
 
         // If I convert unit 2 into 1 what is it
-        let two_one_conversion = Units.conversionTable[ingredient_2.unit.name][ingredient_1.unit.name]
+        const two_one_conversion = Units.conversionTable[ingredient_2.unit.name][ingredient_1.unit.name]
 
-        let unit_two_amount = convert(one_two_conversion, ingredient_2)
-        let unit_one_amount = convert(two_one_conversion, ingredient_1)
+        const unit_two_amount = convert(one_two_conversion, ingredient_2)
+        const unit_one_amount = convert(two_one_conversion, ingredient_1)
 
         let quantity = 0;
         let unit = ingredient_1.unit;

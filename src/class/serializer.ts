@@ -27,7 +27,7 @@ export class Serializer {
         const ingName = ingObj.name;
 
         // Return the correct unit
-        let unitQuantity: String = '';
+        let unitQuantity = '';
         if (includeUnit && ingObj.unit) {
           unitQuantity = this.convertUnitIntoStr(ingObj.unit.name, ingObj.quantity);
         }
@@ -45,7 +45,7 @@ export class Serializer {
           "dash": "dashes",
         }
 
-        let quantityString: string = `${quantity}`;
+        let quantityString = `${quantity}`;
 
         if (`${quantity}`.endsWith('.75')) {
           quantityString = `${quantity-.75}¾`;

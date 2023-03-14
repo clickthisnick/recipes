@@ -5,7 +5,7 @@ import { Stores } from '../../class/stores';
 
 export class VegetableItems extends SpiceItems {
 
-    public static readonly vitalWheatGluten: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly vitalWheatGluten: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Vital Wheat Gluten',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -18,7 +18,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly coffeeGrounds: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly coffeeGrounds: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Coffee Grounds',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -31,7 +31,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly bakingPowder: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly bakingPowder: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Baking Powder',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -44,7 +44,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly whiteVinegar: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly whiteVinegar: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'White Vinegar',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -57,7 +57,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly frozenStirFryVeggies: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly frozenStirFryVeggies: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Frozen Stirfry Veggies',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -70,7 +70,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly almondFlour: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly almondFlour: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Almond Flour',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -83,7 +83,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly pankoBreadCrumbs: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly pankoBreadCrumbs: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Panko Bread Crumbs',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -96,7 +96,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly beyondBurger: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly beyondBurger: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Beyond Burger',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -109,7 +109,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly briocheHamburgerBun: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly briocheHamburgerBun: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Brioche Hamburger Bun',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -122,7 +122,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly lentils: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly lentils: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Lentils',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -135,7 +135,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly pizzaCrust: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly pizzaCrust: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Pizza Crust',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -148,7 +148,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly popcorn: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly popcorn: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Popcorn',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -161,7 +161,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly carrots = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly carrots = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Carrots', // name
             10, // putAwayTime
@@ -178,7 +178,7 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly celery = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly celery = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Celery', // name
             10, // putAwayTime
@@ -198,7 +198,7 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly frozenTatorTots: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly frozenTatorTots: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Frozen Tator Tots',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -211,7 +211,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly hamburgerBun = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly hamburgerBun = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Hamburger Bun', // name
             10, // putAwayTime
@@ -239,7 +239,7 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly almondMilk = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly almondMilk = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Almond Milk', // name
             10, // putAwayTime
@@ -278,7 +278,7 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly kale = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly kale = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Kale', // name
             10, // putAwayTime
@@ -318,7 +318,7 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly cookingSpray: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly cookingSpray: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Cooking Spray',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -331,7 +331,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly asparagus = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly asparagus = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'asparagus', // name
             10, // putAwayTime
@@ -371,7 +371,7 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly brusselSprouts = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly brusselSprouts = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Brussel Sprouts', // name
             10, // putAwayTime
@@ -389,7 +389,7 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly appleSauce = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly appleSauce = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Apple Sauce', // name
             10, // putAwayTime
@@ -417,7 +417,7 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly timer: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly timer: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Timer',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -430,7 +430,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly water = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly water = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Water', // name
             10, // putAwayTime
@@ -447,7 +447,7 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly aminosCoconut: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly aminosCoconut: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Aminos Coconut',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -460,7 +460,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly liquidSmoke: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly liquidSmoke: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Liquid Smoke',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -473,7 +473,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly seasonedRiceVinegar: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly seasonedRiceVinegar: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Seasoned Rice Vinegar',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -486,7 +486,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly appleCiderVinegar: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly appleCiderVinegar: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Apple Cider Vinegar',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -499,7 +499,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly blackBeans = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly blackBeans = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Black Beans', // name
             10, // putAwayTime
@@ -536,7 +536,7 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly avacadoLarge = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly avacadoLarge = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Large Avacado', // name
             10, // putAwayTime
@@ -556,7 +556,7 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly avacado: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly avacado: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Avacado',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -569,7 +569,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly cauliflower: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly cauliflower: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Cauliflower',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -582,7 +582,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly leek: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly leek: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Leek',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -595,7 +595,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly lime: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly lime: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Lime',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -608,7 +608,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly lemonJuice = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly lemonJuice = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Lemon Juice', // name
             10, // putAwayTime
@@ -625,7 +625,7 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly limeJuice = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly limeJuice = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Lime Juice', // name
             10, // putAwayTime
@@ -664,7 +664,7 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly romaTomato: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly romaTomato: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Roma Tomato',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -677,7 +677,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly pickleHotdogSlice: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly pickleHotdogSlice: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Pickle',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -690,7 +690,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly groundGinger = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly groundGinger = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Ground Ginger',
             10, // putAwayTime
@@ -718,7 +718,7 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly shallot: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly shallot: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Shallot',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -731,7 +731,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly serranoChilli = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly serranoChilli = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Serrano Chilli', // name
             10, // putAwayTime
@@ -749,7 +749,7 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly cilantro: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly cilantro: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Cilantro',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -762,7 +762,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly habanero: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly habanero: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Habanero',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -775,7 +775,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly mango: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly mango: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Mango',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -788,7 +788,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly jalapeno: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly jalapeno: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Jalapeno',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -801,7 +801,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly spiriliazer: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly spiriliazer: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Spirilizer',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -814,7 +814,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly pickleSpears = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly pickleSpears = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Pickle Spears', // name
             10, // putAwayTime
@@ -843,7 +843,7 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly pickleSlices = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly pickleSlices = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Pickle Slices', // name
             10, // putAwayTime
@@ -872,7 +872,7 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly breadFlour = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly breadFlour = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Bread Flour', // name
             10, // putAwayTime
@@ -890,7 +890,7 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly wheatBreadFlour: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly wheatBreadFlour: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Wheat Bread Flour',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -903,7 +903,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly dryActiveYeast: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly dryActiveYeast: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Active Dry Yeast',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -916,7 +916,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly brownSugar: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly brownSugar: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Brown Sugar',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -929,7 +929,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly greenOnion = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly greenOnion = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Green Onion', // name
             10, // putAwayTime
@@ -947,7 +947,7 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly frozenCorn = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly frozenCorn = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Frozen Corn', // name
             10, // putAwayTime
@@ -975,7 +975,7 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly redPepperFlakes: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly redPepperFlakes: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Red Pepper Flakes',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -988,7 +988,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly spicyHummus = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly spicyHummus = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Spicy Hummus', // name
             10, // putAwayTime
@@ -1016,7 +1016,7 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly whiteOnion = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly whiteOnion = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'White Onion', // name
             10, // putAwayTime
@@ -1074,7 +1074,7 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly yellowOnion = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly yellowOnion = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Yellow Onion', // name
             10, // putAwayTime
@@ -1092,7 +1092,7 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly redOnion = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly redOnion = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Red Onion', // name
             10, // putAwayTime
@@ -1120,7 +1120,7 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly scallion: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly scallion: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Scallion',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -1133,7 +1133,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly cannedHotCherryPepper: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly cannedHotCherryPepper: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Canned Hot Cherry Pepper',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -1146,7 +1146,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly lemonZest = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly lemonZest = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Lemon Zest', // name
             10, // putAwayTime
@@ -1164,7 +1164,7 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly greenBellPepper = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly greenBellPepper = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Green Bell Pepper', // name
             10, // putAwayTime
@@ -1197,7 +1197,7 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly redBellPepper = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly redBellPepper = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Red Bell Pepper', // name
             10, // putAwayTime
@@ -1215,7 +1215,7 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly arrowRootStarch: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly arrowRootStarch: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Arrow Root Starch',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -1228,7 +1228,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly broccoli: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly broccoli: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Broccoli',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -1241,7 +1241,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly tomatoPaste = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly tomatoPaste = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Tomato Paste', // name
             10, // putAwayTime
@@ -1290,7 +1290,7 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly chipotlePepperInAdoboSauce: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly chipotlePepperInAdoboSauce: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Chipotle Pepper In Adobo Sauce',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -1303,7 +1303,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly driedOregano: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly driedOregano: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Dried Oregano',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -1316,7 +1316,7 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly garlicClove = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly garlicClove = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Garlic Clove', // name
             10, // putAwayTime
@@ -1357,7 +1357,7 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly basil = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly basil = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Basil', // name
             10, // putAwayTime
@@ -1376,7 +1376,7 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly whiteMushroom = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly whiteMushroom = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'White Mushroom', // name
             10, // putAwayTime
@@ -1395,7 +1395,7 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly cabbage = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly cabbage = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Cabbage', // name
             10, // putAwayTime
@@ -1414,7 +1414,7 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly babyBellaMushroom = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly babyBellaMushroom = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Baby Bella Mushroom', // name
             10, // putAwayTime
@@ -1473,7 +1473,7 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly spinach = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly spinach = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Spinach', // name
             10, // putAwayTime
@@ -1492,7 +1492,7 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly zuchinni: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly zuchinni: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Zuchinni',
         putAwayTime: 10,
         takeOutTime: 10,

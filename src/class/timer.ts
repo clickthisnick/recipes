@@ -13,14 +13,16 @@ import { Time } from "./time";
 //     }
 // }
 export class Timer {
-    public static set(duration: number, type: string, text: string = '', equipment = ['']): IStep {
-        let step = istep()
+    public static set(duration: number, type: string, text = '', equipment = ['']): IStep {
+        const step = istep()
         step.time = Time.convert(duration, type),
         step.showTimer = true
         step.text = text + ` for ${duration} ${type}`
         step.disappearWhen = 'timesUp'
 
-        if (equipment != ['']) {
+        // get rid of [""]
+        equipment = equipment.filter(n => n)
+        if (equipment) {
             step.equipment = equipment
         }
 
@@ -28,11 +30,14 @@ export class Timer {
     }
 
     public static end(equipment = ['']): IStep {
-        let step = istep()
+        const step = istep()
         step.text = ''
         step.disappearWhen = 'timerIsUp'
 
-        if (equipment != ['']) {
+        // get rid of [""]
+        equipment = equipment.filter(n => n)
+
+        if (equipment) {
             step.equipment = equipment
         }
 

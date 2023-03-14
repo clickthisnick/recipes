@@ -4,7 +4,7 @@ import { MeatItems } from './meat';
 import { Stores } from '../../class/stores';
 
 export class OilItems extends MeatItems {
-    public static readonly sesameOil: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly sesameOil: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Sesame Oil',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -17,7 +17,7 @@ export class OilItems extends MeatItems {
         nutrition: {}
     })
 
-    public static readonly avacadoOil: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly avacadoOil: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Avacado Oil',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -30,7 +30,7 @@ export class OilItems extends MeatItems {
         nutrition: {},
     })
 
-    public static readonly chilliOil: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly chilliOil: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Chilli Oil',
         putAwayTime: 10,
         takeOutTime: 10,
@@ -52,7 +52,7 @@ export class OilItems extends MeatItems {
         },
     })
 
-    public static readonly coconutOil = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly coconutOil = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Coconut Oil', // name
             10, // putAwayTime
@@ -107,7 +107,7 @@ export class OilItems extends MeatItems {
         )
     )
 
-    public static readonly oliveOil = (quantity: number = 0, unit: IUnitObj = Units.none) => (
+    public static readonly oliveOil = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Olive Oil', // name
             10, // putAwayTime
@@ -179,7 +179,7 @@ export class OilItems extends MeatItems {
         )
     )
 
-    public static readonly vegetableOil: IItem = (quantity: number = 0, unit: IUnitObj) => ({
+    public static readonly vegetableOil: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Vegetable Oil',
         putAwayTime: 10,
         takeOutTime: 10,

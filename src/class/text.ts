@@ -6,8 +6,8 @@ export class Text {
     // By default we assume that equipment is reused throughout the recipe
 
     public static readonly set = (texts: any[]): IStep => {
-        let textArray: any[] = []
-        let ingredientsArray: any[] = []
+        const textArray: any[] = []
+        const ingredientsArray: any[] = []
 
         texts.forEach(text => {
             if (typeof text === 'object') {
@@ -19,7 +19,7 @@ export class Text {
             }
         })
 
-        let step = istep()
+        const step = istep()
 
         step.text = textArray.join(' ')
         step.disappearWhen = 'clicked'

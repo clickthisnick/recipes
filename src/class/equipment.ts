@@ -1,9 +1,7 @@
 import { Time } from './time';
 import { Timer } from './timer';
 import { Serializer as s } from './serializer';
-// import { exception } from 'console';
 import { IStep, istep } from './step';
-import { exception } from 'console';
 
 export interface IAllEquipment {
    [name: string]: number;
@@ -19,7 +17,7 @@ export interface IEquipment {
     (id?: number): IEquipmentObj;
 }
 
-let containers: any = {}
+const containers: any = {}
 
 class Container {
     name: string;
@@ -41,7 +39,7 @@ class Container {
 
     public stir(): IStep {
         this.firstAction = false;
-        let stirStep = istep()
+        const stirStep = istep()
         stirStep.equipment.push(this.name)
         stirStep.text = `Stir ${this.name}`
         return stirStep
@@ -49,7 +47,7 @@ class Container {
 
     public mix(): IStep {
         this.firstAction = false;
-        let mixStep = istep()
+        const mixStep = istep()
         mixStep.equipment.push(this.name)
         mixStep.text = `Mix ${this.name}`
         return mixStep
@@ -66,12 +64,12 @@ class Container {
 
             // If the unit is an equipment like a cup, then add it to the equipment
             if (ingredient.unit && ingredient.unit.isEquipment) {
-                let str_ = (ingredient.unit.equipmentUnits.includes(ingredient.unit.quantity)) ? `${ingredient.unit.quantity} ${ingredient.unit.properName}` : ingredient.unit.properName
+                const str_ = (ingredient.unit.equipmentUnits.includes(ingredient.unit.quantity)) ? `${ingredient.unit.quantity} ${ingredient.unit.properName}` : ingredient.unit.properName
                 addIngredient.equipment.push(str_)
             }
         }
 
-        let addIStep = istep()
+        const addIStep = istep()
 
         let bindingWord = 'the'
         // If its the first
@@ -88,7 +86,7 @@ class Container {
             addIStep.text = ['Add the following to', bindingWord, this.name].join(' ')
             addIStep.disappearWhen = 'childrenGone'
             ingredients.forEach((ingredient) => {
-                let addIngredient = istep()
+                const addIngredient = istep()
                 if (Array.isArray(ingredient)) {
                     ingredient.forEach((ingredientNText) => {
                         if (typeof(ingredientNText) === 'object') {
@@ -135,11 +133,11 @@ class StandMixer extends Container {
 
 class Plate extends Container {
     // Containers are a singleton
-    constructor(id: number, name:string="plate") {
+    constructor(id: number, name="plate") {
         super(name, id)
     }
 
-    public microwave(duration: number, unit: string = ""): IStep {
+    public microwave(duration: number, unit = ""): IStep {
         let humanUnit = "minutes"
 
         if (unit == "s") {
@@ -152,11 +150,11 @@ class Plate extends Container {
 
 class Bowl extends Container {
     // Containers are a singleton
-    constructor(id: number, name:string="bowl") {
+    constructor(id: number, name="bowl") {
         super(name, id)
     }
 
-    public microwave(duration: number, unit: string = ""): IStep {
+    public microwave(duration: number, unit = ""): IStep {
         let humanUnit = "minutes"
 
         if (unit == "s") {
@@ -326,7 +324,7 @@ class Pan extends CookingContainer {
         super("pan", id)
     }
 
-    public preheat(heat: number, minutes: number = 0): IStep {
+    public preheat(heat: number, minutes = 0): IStep {
         // This is a guess.. should test it out
         this.heat = heat
 
@@ -343,29 +341,29 @@ class Pan extends CookingContainer {
         return Timer.set(minutes, 'm', `Preheat ${this.name} on heat ${heat}`, [this.name]);
     }
 
-    public _cookStr(text: string, duration: number, type: string, heat: number = 0): IStep {
+    public _cookStr(text: string, duration: number, type: string, heat = 0): IStep {
         if (heat === 0) {
             if (this.heat) {
                 heat = this.heat
             }
             else {
-                throw new exception('Heat cannot be 0')
+                throw new Error('Heat cannot be 0')
             }
         }
 
         return Timer.set(duration, type, text, [this.name])
     }
 
-    public cook(duration: number, type: string, heat: number = 0): IStep {
+    public cook(duration: number, type: string, heat = 0): IStep {
         return this._cookStr(`Cook on heat ${heat}`, duration, type, heat)
     }
 
 
-    public cookWithLidSlightlyOff(duration: number, type: string, heat: number = 0): IStep {
+    public cookWithLidSlightlyOff(duration: number, type: string, heat = 0): IStep {
         return this._cookStr(`Cook on heat ${heat} with lid slightly off`, duration, type, heat)
     }
 
-    public cookWithLid(duration: number, type: string, heat: number = 0): IStep {
+    public cookWithLid(duration: number, type: string, heat = 0): IStep {
         return this._cookStr(`Cook on heat ${heat} with lid`, duration, type, heat)
     }
 }
@@ -376,18 +374,18 @@ class InstantPot extends CookingContainer {
         }
 
     public pressureCook(preheat: number, duration: number, type: string): IStep {
-        let preheatStep = istep()
+        const preheatStep = istep()
         preheatStep.time += Time.convert(preheat, type)
         preheatStep.text = `Put ${this.name} on high pressure for ${duration} minutes`
         preheatStep.equipment.push(this)
         preheatStep.disappearWhen = 'timeUp'
 
-        let ensureSeal = istep()
+        const ensureSeal = istep()
         ensureSeal.text = `Ensure ${this.name} has sealed`
         ensureSeal.equipment.push(this)
         ensureSeal.disappearWhen = 'clicked'
 
-        let pressureCookStep = istep()
+        const pressureCookStep = istep()
         pressureCookStep.time += Time.convert(duration, type)
         pressureCookStep.equipment.push(this)
         pressureCookStep.text = `Wait for ${this.name} to be done cooking`
@@ -441,81 +439,81 @@ export class Equipment {
         return 'peeler'
     }
 
-    public static readonly ninja = (id: number = 99) => (
+    public static readonly ninja = (id = 99) => (
         new Ninja(id)
     );
 
-    public static readonly saucePan = (id: number = 99) => (
+    public static readonly saucePan = (id = 99) => (
         new SaucePan(id)
     );
 
-    public static readonly pan = (id: number = 99) => (
+    public static readonly pan = (id = 99) => (
         new Pan(id)
     );
 
-    public static readonly plate = (id: number = 99) => (
+    public static readonly plate = (id = 99) => (
         new Plate(id)
     );
 
-    public static readonly oven = (id: number = 99) => (
+    public static readonly oven = (id = 99) => (
         new Oven(id)
     );
 
-    public static readonly kitchenAidMixingBowl = (id: number = 99) => (
+    public static readonly kitchenAidMixingBowl = (id = 99) => (
         new KitchenAidMixingBowl(id)
     );
 
-    public static readonly ziplockBag = (id: number = 99) => (
+    public static readonly ziplockBag = (id = 99) => (
         new ZiplockBag(id)
     );
 
-    public static readonly bowl = (id: number = 99) => (
+    public static readonly bowl = (id = 99) => (
         new Bowl(id)
     );
 
-    public static readonly largeBowl = (id: number = 99) => (
+    public static readonly largeBowl = (id = 99) => (
         new LargeBowl(id)
     );
 
-    public static readonly standMixer = (id: number = 99) => (
+    public static readonly standMixer = (id = 99) => (
         new StandMixer(id)
     );
 
-    public static readonly coffeecup = (id: number = 99) => (
+    public static readonly coffeecup = (id = 99) => (
         new CoffeeCup(id)
     );
 
-    public static readonly blender = (id: number = 99) => (
+    public static readonly blender = (id = 99) => (
         new Blender(id)
     )
 
-    public static readonly bakingSheet = (id: number = 99) => (
+    public static readonly bakingSheet = (id = 99) => (
         new BakingSheet(id)
     );
 
-    public static readonly teapot = (id: number = 99) => (
+    public static readonly teapot = (id = 99) => (
         new Teapot(id)
     );
 
-    public static readonly pot = (id: number = 99) => (
+    public static readonly pot = (id = 99) => (
         new Pot(id)
     );
 
-    public static readonly instantPot = (id: number = 99) => (
+    public static readonly instantPot = (id = 99) => (
         new InstantPot(id)
     );
 
-    public static readonly souvide: IEquipment = (id: number = 99) => ({
+    public static readonly souvide: IEquipment = (id = 99) => ({
         name: 'souvide',
         id: id
     });
 
-    public static readonly woodenSpoon: IEquipment = (id: number = 99) => ({
+    public static readonly woodenSpoon: IEquipment = (id = 99) => ({
         name: 'wooden spoon',
         id: id
     });
 
-    public static readonly spoon: IEquipment = (id: number = 99) => ({
+    public static readonly spoon: IEquipment = (id = 99) => ({
         name: 'spoon',
         id: id
     });
