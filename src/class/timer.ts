@@ -12,13 +12,26 @@ import { Time } from "./time";
 //         showTimer: boolean
 //     }
 // }
+
+// Start at some number that is much higher than all recipes... for now at least
+// TODO think of something better
+let id = 1000000
+let ids: any = []
+
+function getITimerId() {
+    ids.push(id)
+    id += 1
+    return ids[ids.length - 1]
+}
+
 export class Timer {
     public static set(duration: number, type: string, text = '', equipment = ['']): IStep {
         const step = istep()
+        step.id = getITimerId()
         step.time = Time.convert(duration, type),
         step.showTimer = true
         step.text = text + ` for ${duration} ${type}`
-        step.disappearWhen = 'timesUp'
+        step.disappearWhen = 'timerIsUp'
 
         // get rid of [""]
         equipment = equipment.filter(n => n)
@@ -31,7 +44,11 @@ export class Timer {
 
     public static end(equipment = ['']): IStep {
         const step = istep()
+        let endId = ids.pop()
+        step.id = endId * 2
+        step.style = 'background-color:#8B0000;'
         step.text = ''
+        // TODO this is not implemented, we need this to turn green for a few seconds and then disappear when the timer is up
         step.disappearWhen = 'timerIsUp'
 
         // get rid of [""]

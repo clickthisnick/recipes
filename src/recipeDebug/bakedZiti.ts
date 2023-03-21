@@ -25,15 +25,17 @@ class BakedZiti extends Recipe {
                 i.water(6, u.cup),
             ]),
             e.pot().boilWithLid(10, 'm', 7),
+                text.set(['mince', i.garlicClove(4, u.unit)]),
+                text.set(['mince', i.whiteOnion(1, u.unit)]),
             Timer.end(),
             e.pot().add([
                 i.ziti(16, u.ounce),
                 i.oliveOil(1, u.tbsp),
             ]),
             e.pot().cookWithLid(13, 'm', 7),
-                e.pan().preheat(7, 3),
-                    text.set(['mince', i.garlicClove(4, u.unit), i.Groups.onion(1, u.unit)]),
+                e.pan().preheat(7, 2),
                 Timer.end(),
+                text.set(['Preheat oven to 350']),
                 e.pan().add([
                     i.italianSausage(16, u.ounce)
                 ]),
@@ -41,11 +43,10 @@ class BakedZiti extends Recipe {
                 Timer.end(),
                 e.pan().add([
                     i.garlicClove(),
-                    i.Groups.onion(),  
+                    i.Groups.onion(),
                     i.italianSeasoning(1, u.tsp),
                 ]),
                 e.pan().cook(5, 'm'),
-                    text.set(['Preheat oven to 350']),
                 Timer.end(),
                 e.pan().add([
                     i.spaghettiSauce(16, u.ounce)

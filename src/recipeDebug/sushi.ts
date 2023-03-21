@@ -67,7 +67,7 @@ class Sushi extends Recipe {
             text.set(['Cook', i.salmon(.25, u.pound), 'on all sides briefly, about 2 min']),
             text.set(['Spoon', i.sushiRice(), 'on', i.seaweed(1, u.unit), 'leaving about an inch of', i.seaweed(), 'uncovered']),
             text.set(['Spread out rice with spoon']),
-            text.set(['Put', i.avacado(1, u.unit), 'and', i.salmon(), 'in the middle of the', i.sushiRice()]),
+            text.set(['Put', i.avocado(1, u.unit), 'and', i.salmon(), 'in the middle of the', i.sushiRice()]),
             text.set(['Tightly wrap and wet the uncovered inch of', i.seaweed(), 'and overlap the roll']),
             text.set(['Put water on the outside of the uncovered', i.seaweed(), 'as well so it sticks']),
             text.set(['Optionally, if the', i.sushiRice(), 'is still warm, put rolls into freezer for 5 min']),

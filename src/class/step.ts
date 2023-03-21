@@ -7,6 +7,7 @@ export interface IStep {
     ingredients: Ingredient[]
     equipment: any[]
     children: IStep[]
+    style: string;
     disappearWhen: string
     showTimer: boolean
 }
@@ -26,6 +27,7 @@ export function istep(): IStep {
         ingredients: [],
         equipment: [],
         children: [],
+        style: '',
         disappearWhen: 'clicked',
         showTimer: false,
     }

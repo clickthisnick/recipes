@@ -421,7 +421,7 @@ class InstantPot extends CookingContainer {
         preheatStep.time += Time.convert(preheat, type)
         preheatStep.text = `Put ${this.name} on high pressure for ${duration} minutes`
         preheatStep.equipment.push(this)
-        preheatStep.disappearWhen = 'timeUp'
+        preheatStep.disappearWhen = 'timerIsUp'
 
         const ensureSeal = istep()
         ensureSeal.text = `Ensure ${this.name} has sealed`
@@ -432,7 +432,7 @@ class InstantPot extends CookingContainer {
         pressureCookStep.time += Time.convert(duration, type)
         pressureCookStep.equipment.push(this)
         pressureCookStep.text = `Wait for ${this.name} to be done cooking`
-        pressureCookStep.disappearWhen = 'timeUp'
+        pressureCookStep.disappearWhen = 'timerIsUp'
 
         preheatStep.children.push(ensureSeal)
         preheatStep.children.push(pressureCookStep)

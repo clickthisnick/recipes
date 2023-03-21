@@ -76,45 +76,40 @@ function addStep(istep) {
         return;
     }
 
+    let divStep = ''
+    divStep += "<div class='panel' id='panel-"
+    divStep += istep.id + "' "
+
+    if (istep.style) {
+        divStep += `style="${istep.style}" `
+    }
+
+    divStep += 'onclick="this.classList.toggle('
+    divStep += "'timer'"
+
     if (istep.showTimer) {
         // <!--Only double quote should be around the onclick-- >
-        let divStep = ''
-        divStep += "<div class='panel' id='panel-"
-        divStep += istep.id + "' "
-        divStep += 'onclick="this.classList.toggle('
-        divStep += "'timer'"
         divStep += "); loadTimer("
         divStep += istep.time
         divStep += ", "
         divStep += istep.id
         divStep += ");"
-        divStep += '"><span id='
-        divStep += "'"
-        divStep += istep.id
-        divStep += "'></span>"
-        divStep += istep.text
-        divStep += "</div>";
-        cookingDiv.innerHTML += divStep
     } else {
         cookingDiv.innerHTML += "";
         // <!--Only double quote should be around the onclick-- >
-
-        let divStep = ''
-        divStep += "<div class='panel' id='panel-"
-        divStep += istep.id + "' "
-        divStep += 'onclick="this.classList.toggle('
-        divStep += "'timer'"
         divStep += "); document.getElementById('panel-"
         divStep += istep.id
         divStep += "').remove();"
-        divStep += '"><span id='
-        divStep += "'"
-        divStep += istep.id
-        divStep += "'></span>"
-        divStep += istep.text
-        divStep += "</div>";
-        cookingDiv.innerHTML += divStep
     }
+
+    divStep += '"><span id='
+    divStep += "'"
+    divStep += istep.id
+    divStep += "'></span>"
+    divStep += istep.text
+    divStep += "</div>";
+
+    cookingDiv.innerHTML += divStep
 
     if (istep.children && istep.children.length > 0) {
         istep.children.forEach(child => {
@@ -389,6 +384,8 @@ function startTimer(duration, stepId, stepIdxToShow, async) {
             }
 
             if (document.getElementById(timerPanelId).style.display != 'none') {
+                // our end timers are always x2 our start timer id
+                document.getElementById(`panel-${stepId * 2}`)?.remove();
                 playSound()
             }
         }

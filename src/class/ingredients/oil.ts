@@ -17,8 +17,8 @@ export class OilItems extends MeatItems {
         nutrition: {}
     })
 
-    public static readonly avacadoOil: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Avacado Oil',
+    public static readonly avocadoOil: IItem = (quantity = 0, unit: IUnitObj) => ({
+        name: 'avocado Oil',
         putAwayTime: 10,
         takeOutTime: 10,
         cleanSteps: '',

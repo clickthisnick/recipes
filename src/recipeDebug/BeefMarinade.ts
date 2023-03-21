@@ -24,7 +24,7 @@ export class TwoLbBeefMarinade extends Recipe {
             e.bowl().add([
                 i.appleCiderVinegar(.25, u.cup),
                 i.aminosCoconut(.25, u.cup),
-                i.avacadoOil(2, u.tbsp),
+                i.avocadoOil(2, u.tbsp),
                 i.garlicPowder(2, u.tsp),
                 i.blackPepper(2, u.tsp),
                 i.onionPowder(1, u.tsp),
@@ -43,7 +43,7 @@ export class OneLbBeefMarinade extends Recipe {
             e.bowl().add([
                 i.appleCiderVinegar(1/8, u.cup),
                 i.aminosCoconut(1/8, u.cup),
-                i.avacadoOil(1, u.tbsp),
+                i.avocadoOil(1, u.tbsp),
                 i.garlicPowder(1, u.tsp),
                 i.blackPepper(1, u.tsp),
                 i.onionPowder(.5, u.tsp),

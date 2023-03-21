@@ -20,7 +20,7 @@ class EggPepperBuckets extends Recipe {
     constructor() {
         super();
         this.steps = [
-            e.pan().add(i.avacadoOil(1, u.second)),
+            e.pan().add(i.avocadoOil(1, u.second)),
             e.pan().preheat(6, 2),
             text.set(['Cut into 4 horitzontal buckets the', i.greenBellPepper(1, u.unit)]),
             Timer.end(),

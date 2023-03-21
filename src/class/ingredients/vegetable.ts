@@ -389,6 +389,24 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
+    public static readonly romaineLettuce = (quantity = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Romaine Lettuce', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+            }, // purchaseLinks
+            7, // perishableLimit
+        )
+    )
+
     public static readonly appleSauce = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Apple Sauce', // name
@@ -536,9 +554,9 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly avacadoLarge = (quantity = 0, unit: IUnitObj = Units.none) => (
+    public static readonly avocadoLarge = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
-            'Large Avacado', // name
+            'Large avocado', // name
             10, // putAwayTime
             10, // takeOutTime
             '',  // cleanSteps
@@ -556,8 +574,8 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
-    public static readonly avacado: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Avacado',
+    public static readonly avocado: IItem = (quantity = 0, unit: IUnitObj) => ({
+        name: 'avocado',
         putAwayTime: 10,
         takeOutTime: 10,
         cleanSteps: '',

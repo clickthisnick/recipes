@@ -12,7 +12,7 @@ export class MealRecipe extends RecipeContainer {
         this.recipeGroup = c.component;
         this.recipeName = 'BurritoTaco'
         this.variations = [
-            GroundBeefBurritoTaco, BeefEyeRoundSteakTaco,
+            GroundBeefBurritoTaco, GroundBeefBurritoTacoRomaine, BeefEyeRoundSteakTaco,
         ]
     }
 }
@@ -23,7 +23,7 @@ class GroundBeefBurritoTaco extends Recipe {
         this.steps = [
             e.pan().add(i.groundBeef8020(1, u.pound)),
             e.pan().cook(6, 'm', 6),
-            i.Groups.onion(.5, u.unit).cutIntoThinSlices(),
+                i.Groups.onion(.5, u.unit).cutIntoThinSlices(),
             Timer.end(),
             // Cumin should be toasted the rest taste better adding at the end
             e.pan().add([
@@ -39,17 +39,48 @@ class GroundBeefBurritoTaco extends Recipe {
                 i.pepperFlake(1, u.tsp),
                 i.blackPepper(10, u.crack),
                 i.Groups.onion(),
+                i.mozzarellaCheese(1, u.unit),
             ]),
             e.pan().stir(),
             i.ingredient('taco').seasonWith([
                 i.softTortillaShell(4, u.unit),
-                i.mozzarellaCheese(1, u.unit),
                 i.salsa(1, u.unit),
-                i.hotSauce(1, u.unit),
-                i.sourCream(1, u.unit),
-                i.frozenCorn(1, u.unit),
                 i.Groups.onion(),
             ])
+        ];
+    }
+}
+
+class GroundBeefBurritoTacoRomaine extends Recipe {
+    constructor() {
+        super();
+        this.steps = [
+            e.pan().add(i.groundBeef8020(1, u.pound)),
+            e.pan().cook(6, 'm', 6),
+                i.Groups.onion(.5, u.unit).cutIntoThinSlices(),
+            Timer.end(),
+            // Cumin should be toasted the rest taste better adding at the end
+            e.pan().add([
+                i.cumin(2, u.tsp),
+            ]),
+            e.pan().stir(),
+            e.pan().cook(4, 'm', 6),
+            Timer.end(),
+            e.pan().add([
+                i.chilliPowder(1, u.tsp),
+                i.paprika(1, u.tsp),
+                i.garlicPowder(1, u.tsp),
+                i.pepperFlake(1, u.tsp),
+                i.blackPepper(10, u.crack),
+                i.Groups.onion(),
+                i.mozzarellaCheese(1, u.unit),
+            ]),
+            e.pan().stir(),
+            i.ingredient('taco').seasonWith([
+                i.salsa(1, u.unit),
+                i.Groups.onion(),
+            ]),
+            text.set(['Fill', i.romaineLettuce(2, u.unit), 'with meat']),
         ];
     }
 }
@@ -72,8 +103,6 @@ class BeefEyeRoundSteakTaco extends Recipe {
                 i.softTortillaShell(4, u.unit),
                 i.mozzarellaCheese(1, u.unit),
                 i.salsa(1, u.unit),
-                i.hotSauce(1, u.unit),
-                i.sourCream(1, u.unit),
                 i.Groups.onion(),
             ])
         ];

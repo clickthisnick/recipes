@@ -20,7 +20,7 @@ class Normal extends Recipe {
         this.steps = [
             ['Get out scale'],
             ['Put string chopper on scale and tar'],
-            ['Put in', i.avacado(4.4, u.ounce)],
+            ['Put in', i.avocado(4.4, u.ounce)],
             ['Put in', i.garlicClove(2, u.unit)],
             ['Put in', i.Groups.onion(1.7, u.ounce)],
             ['Put in', i.limeJuice(1.5, u.tbsp)],
@@ -38,7 +38,7 @@ class MangoHabanero extends Recipe {
         super();
         this.steps = [
             ['Get out scale'],
-            ['Put in', i.avacado(5.5, u.ounce)],
+            ['Put in', i.avocado(5.5, u.ounce)],
             ['Put string chopper on scale and tar'],
             ['Put in', i.garlicClove(2, u.unit)],
             ['Put in', i.Groups.onion(1.7, u.ounce)],

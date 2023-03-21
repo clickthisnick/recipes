@@ -11,26 +11,26 @@ export class MealRecipe extends RecipeContainer {
         super();
         this.recipeGroup = c.component;
         this.variations = [
-            AvacadoToast2People
+            avocadoToast2People
         ]
     }
 }
 
-class AvacadoToast2People extends Recipe {
+class avocadoToast2People extends Recipe {
     constructor() {
         super();
         this.steps = [
             text.set(['Put', i.whiteBread(2, u.unit), 'on 5 in toaster']),
             Timer.set(3.5, 'm', 'Toast'),
             e.bowl().add([
-                i.avacadoLarge(1, u.unit),
+                i.avocadoLarge(1, u.unit),
                 i.limeJuice(2, u.tbsp),
                 i.garlicPowder(1, u.tsp),
                 i.onionGranules(1, u.tsp),
                 i.salt(4, u.crack),
             ]),
             e.bowl().stir(),
-            text.set(['Spread avacado mixture on toast']),
+            text.set(['Spread avocado mixture on toast']),
             text.set(['Sprinkle on', i.smokedPaprika(2, u.dash)]),
             Timer.end()
         ];
