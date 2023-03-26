@@ -26,22 +26,24 @@ export class LentilPenne extends Recipe {
             ]),
             Timer.set(10, 'm', 'Wait for water to boil'),
                 i.Groups.mushroom(4, u.unit).cutIntoStrips(),
+                e.pan().add([
+                    i.oliveOil(1, u.tsp),
+                    i.Groups.mushroom(4, u.unit),
+                ]),
+                e.pan().cook(8, 'm'),
+                Timer.end(),
             Timer.end(),
             e.pot().add([
                 i.lentilSpaghetti(8, u.ounce),
             ]),
             Timer.set(10, 'm', 'let lentil penne cook'),
                 e.pan().add([
-                    i.Groups.mushroom(4, u.unit),
+                    i.spaghettiSauce(25, u.ounce),
+                    i.oliveOil(1, u.tsp),
                 ]),
-                e.pan().cook(8, 'm'),
-                    e.pan().add([
-                        i.spaghettiSauce(25, u.ounce),
-                    ]),
-                    e.pan().cook(2, 'm'),
-                    Timer.end(),
-                Timer.end(['pan']),
-            Timer.end(['pot']),
+                e.pan().cook(6, 'm'),
+                Timer.end(),
+            Timer.end(),
             text.set(['Top with', i.parmesanCheese(8, u.ounce)]),
         ];
     }
