@@ -79,6 +79,7 @@ class BaconEggs extends Recipe {
             Timer.end(),
             Timer.set(2, 'm', 'Turn pan heat off and move pan to cool burner'),
             Timer.end(),
+            text.set(['Remove bacon from pan']),
             e.pan().add([
                 i.egg(),
             ]),
