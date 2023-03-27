@@ -224,6 +224,20 @@ export class Ingredient {
         return addIStep;
     }
 
+    public cutIntoHalfInchStrips(): IStep {
+        const addIStep = istep()
+
+        if (this.unit) {
+            addIStep.text = ['Cut',  this.quantity, this.unit.name, this.name, 'into half inch strips'].join(' ')
+        } else {
+            addIStep.text = ['Cut the', this.name, 'into half inch strips'].join(' ')
+        }
+        addIStep.equipment.push(e.cuttinBoard())
+        addIStep.equipment.push(e.knife())
+
+        return addIStep;
+    }
+
     public cutIntoThinSlices(): IStep {
         const addIStep = istep()
 

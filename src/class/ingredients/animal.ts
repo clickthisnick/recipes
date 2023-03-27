@@ -573,6 +573,25 @@ export class AnimalItems {
         )
     )
 
+    public static readonly bacon = (quantity = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Bacon', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            'Put package back in refrigerator',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            true, // isMeatProduct
+            {
+
+            }, // nutrition
+            unit, // unit
+            {
+            }, // purchaseLinks
+        )
+    )
+
     public static readonly eggPasta: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Egg Pasta',
         putAwayTime: 10,
