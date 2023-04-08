@@ -32,7 +32,7 @@ repos:
     -   id: sort-simple-yaml
     -   id: trailing-whitespace
 -   repo: https://github.com/psf/black
-    rev: 23.1.0
+    rev: 23.3.0
     hooks:
     -   id: black
 -   repo: https://github.com/codespell-project/codespell
@@ -41,10 +41,10 @@ repos:
     -   id: codespell
         args: []
 -   repo: https://github.com/PyCQA/pylint
-    rev: v2.17.0
+    rev: v3.0.0a6
     hooks:
     -   id: pylint
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.1.1
+    rev: v1.2.0
     hooks:
     -   id: mypy

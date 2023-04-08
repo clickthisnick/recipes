@@ -78,19 +78,24 @@ function run() {
     // Parse any queryStrings
     pageHtml += `
     <script>
+    let recipesSelected = []
+
     if (queryString.hasOwnProperty('mode')) {
         let mode = queryString['mode']
         delete queryString['mode'];
 
+        console.log(queryString)
         if (queryString.hasOwnProperty('recipes')) {
-          let recipes = queryString['recipes']
+          const recipesSelectedStr = queryString['recipes']
+          recipesSelected = recipesSelectedStr.split(',')
           delete queryString['recipes'];
-          document.getElementById('shopping').innerHTML += recipes
         }
 
         selectMode(mode)
 
         if (mode == 'shopping') {
+          // TODO make this work again later
+          document.getElementById('shopping').innerHTML += recipes
           Object.keys(queryString).forEach(key => {
             // [unit, quantity]
             let item = JSON.parse(queryString[key]);
@@ -104,7 +109,14 @@ function run() {
             ingredients[key]['units'][item[0]] = item[1]
 
           })
+        } else if (mode == 'cooking') {
+          // /dist/main.html?mode=cooking&recipes=CleanWaterBottle
+
+          recipesSelected.forEach(recipeName => {
+            selectRecipe(recipeName)
+          })
         }
+
         doneSelectingRecipes()
     }
     </script>`
