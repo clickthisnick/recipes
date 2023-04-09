@@ -353,6 +353,14 @@ class Teapot extends CookingContainer {
     // }
 }
 
+class FoodProcessor extends CookingContainer {
+    heat: number;
+
+    constructor(id: number) {
+        super("food processor", id)
+    }
+}
+
 
 class Pan extends CookingContainer {
     heat: number;
@@ -492,6 +500,11 @@ export class Equipment {
 
     public static readonly pan = (id = 99) => (
         new Pan(id)
+    );
+
+
+    public static readonly foodProcessor = (id = 99) => (
+        new FoodProcessor(id)
     );
 
     public static readonly plate = (id = 99) => (

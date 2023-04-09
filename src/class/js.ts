@@ -13,19 +13,10 @@ function playSound() {
     audio.play()
 }
 
-function generateHtml() {
-    // Reset root in case we are dynamically doing things
-    const root = document.getElementById('root')
-
-    if (root) {
-        root.innerHTML = ''
-    }
-}
-
-const parseParams = (querystring) => {
+const parseParams = (windowLocationSearch) => {
 
     // parse query string
-    const params = new URLSearchParams(querystring);
+    const params = new URLSearchParams(windowLocationSearch);
 
     const obj = {};
 
@@ -299,31 +290,8 @@ function hideElement(id) {
 
 // This is where my new recipe app ends
 
-function setIntervalX(callback, delay, repetitions) {
-    let x = 0;
-    var intervalID = window.setInterval(function () {
 
-        callback();
 
-        if (++x === repetitions) {
-            window.clearInterval(intervalID);
-        }
-    }, delay);
-}
-
-function showAllIngredients() {
-    const ingredientDiv = document.getElementById('ingredients');
-
-    ingredientDiv.style.display = 'inline'
-}
-
-function showAllSteps() {
-    const elements = document.getElementsByClassName('panel');
-
-    for (let i = 0; i < elements.length; i++) {
-        elements[i].style.display = 'block';
-    }
-}
 
 function setStepVisibility(idxToShow, idxToHide) {
     document.getElementById("panel-" + idxToHide).style.display = 'none';

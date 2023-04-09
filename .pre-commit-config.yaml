@@ -48,3 +48,9 @@ repos:
     rev: v1.2.0
     hooks:
     -   id: mypy
+-   repo: https://github.com/pre-commit/mirrors-eslint
+    rev: 'v8.38.0'  # Use the sha / tag you want to point at
+    hooks:
+    -   id: eslint
+        files: \.[jt]sx?$  # *.js, *.jsx, *.ts and *.tsx
+        types: [file]

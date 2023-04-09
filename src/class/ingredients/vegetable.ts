@@ -708,6 +708,23 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
+    public static readonly freshGinger = (quantity = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Fresh Ginger',
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+            }, // purchaseLinks
+        )
+    )
+
     public static readonly groundGinger = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Ground Ginger',

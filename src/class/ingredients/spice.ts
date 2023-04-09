@@ -308,6 +308,32 @@ export class SpiceItems extends SauceItems {
         nutrition: {},
     })
 
+    public static readonly nutmeg: IItem = (quantity = 0, unit: IUnitObj) => ({
+        name: 'nutmeg',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: true,
+        isMeatProduct: false,
+        nutrition: {},
+    })
+
+    public static readonly allSpice: IItem = (quantity = 0, unit: IUnitObj) => ({
+        name: 'all spice',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: true,
+        isMeatProduct: false,
+        nutrition: {},
+    })
+
     public static readonly lawlrySaltFree: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'lawlry salk free seasoning',
         putAwayTime: 10,
