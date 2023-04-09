@@ -20,14 +20,16 @@ class CleanWaterBottle extends Recipe {
     constructor() {
         super();
         this.steps = [
+            text.set(['Make sure straw is in water bottle']),
             text.set(['Put 10 seconds water in water bottle']),
             text.set(['Put in', i.whiteVinegar(1, u.tsp)]),
-            Timer.set(60, 's', 'shake'),
+            Timer.set(45, 's', 'shake'),
             Timer.end(),
             text.set(['Dump out water']),
+            text.set(['Use straw pipe cleaner and clean the straw']),
             text.set(['Put 10 seconds water in water bottle']),
             text.set(['Put in', i.bakingPowder(.5, u.tsp)]),
-            Timer.set(60, 's', 'shake'),
+            Timer.set(45, 's', 'shake'),
             Timer.end(),
             text.set(['Dump out water']),
             text.set(['Put 10 seconds water in water bottle']),
