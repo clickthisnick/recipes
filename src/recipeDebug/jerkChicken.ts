@@ -9,8 +9,9 @@ export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
         this.recipeGroup = c.component;
+        this.recipeName = 'JerkChicken'
         this.variations = [
-            JerkChicken
+            JerkChicken1andHalfPound, JerkChicken3Lb
         ]
     }
 }
@@ -39,7 +40,35 @@ export class MealRecipe extends RecipeContainer {
 // Grill until chicken is cooked through, turning occasionally (and reducing burning temperature slightly if it's browning too quickly) about 30 minutes.
 
 
-class JerkChicken extends Recipe {
+class JerkChicken1andHalfPound extends Recipe {
+    constructor() {
+        super();
+        this.steps = [
+            text.set(['Cut top of habenero']),
+            text.set(['Take skin off ginger as good as you can without wasting the ginger']),
+            text.set(['Cut the ginger into diced onion pieces']),
+            e.foodProcessor().add([
+                i.greenOnion(3, u.unit),
+                i.garlicClove(2, u.clove),
+                i.habanero(1, u.unit),
+                i.freshGinger(.75, u.inches),
+                i.limeJuice(.1667, u.cup),
+                i.soySauce(.123, u.cup),
+                i.coconutSugar(2.25, u.tsp),
+                i.thyme(1.5, u.tsp),
+                i.blackPepper(.5, u.tsp),
+                i.allSpice(.5, u.tsp),
+                i.cinnamon(.25, u.tsp),
+                i.nutmeg(.25, u.tsp),
+            ]),
+            e.foodProcessor().mix(),
+            text.set(['Pour mixture and about 1.5 pounds (5 pieces) of chicken thighs/drumsticks into ziplock bag'])
+
+        ];
+    }
+}
+
+class JerkChicken3Lb extends Recipe {
     constructor() {
         super();
         this.steps = [
@@ -61,8 +90,7 @@ class JerkChicken extends Recipe {
                 i.nutmeg(.5, u.tsp),
             ]),
             e.foodProcessor().mix(),
-            text.set(['Pour mixture and about 1.5 pounds (5 pieces) of chicken thighs/drumsticks into ziplock bag'])
-
+            text.set(['Pour mixture and about 3 pounds (4 pieces) of chicken thighs/drumsticks into ziplock bag'])
         ];
     }
 }
