@@ -34,7 +34,7 @@ class GreenGiant extends Recipe {
 class SuperVeggie extends Recipe {
     constructor() {
         super();
-        let greenGiant = new GreenGiant().steps
+        const greenGiant = new GreenGiant().steps
 
         this.steps = [
             e.strainer().add([
