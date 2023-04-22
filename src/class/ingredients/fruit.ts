@@ -17,6 +17,57 @@ export class FruitItems extends CarbItems {
         nutrition: {},
     })
 
+    public static readonly collagenPeptides = (quantity = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Collagen Peptides', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            true, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+            }, // purchase links
+        )
+    )
+
+    public static readonly cocoaFlavanols = (quantity = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Cocoa Flavanols', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            true, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+            }, // purchase links
+        )
+    )
+
+    public static readonly aminoComplex = (quantity = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Amino Complex', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            true, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+            }, // purchase links
+        )
+    )
+
     public static readonly collagenPowder = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Collagen Powder', // name

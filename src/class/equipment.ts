@@ -157,6 +157,13 @@ class Plate extends Container {
     }
 }
 
+class Mug extends Container {
+    // Containers are a singleton
+    constructor(id: number, name="mug") {
+        super(name, id)
+    }
+}
+
 class Bowl extends Container {
     // Containers are a singleton
     constructor(id: number, name="bowl") {
@@ -336,12 +343,27 @@ class Pot extends CookingContainer {
         return this._cookStr(`Cook ${this.name} with lid`, duration, type, heat)
     }
 
+    public cookWithLidSlightlyOff(duration: number, type: string, heat = 0): IStep {
+        heat = this._getHeat(heat)
+        return this._cookStr(`Cook ${this.name} with lid slightly off`, duration, type, heat)
+    }
+
     public boilWithLid(duration: number, type: string, heat = 0): IStep {
         heat = this._getHeat(heat)
         return this._cookStr(`Boil ${this.name} contents on heat ${heat} with lid on`, duration, type, heat)
     }
 }
 
+
+class Strainer extends CookingContainer {
+    constructor(id: number) {
+        super("strainer", id)
+    }
+
+    public wash(text: string, duration: number, type: string): IStep {
+        return Timer.set(duration, type, text, [this.name])
+    }
+}
 
 class Teapot extends CookingContainer {
     constructor(id: number) {
@@ -527,6 +549,10 @@ export class Equipment {
         new Bowl(id)
     );
 
+    public static readonly mug = (id = 99) => (
+        new Mug(id)
+    );
+
     public static readonly largeBowl = (id = 99) => (
         new LargeBowl(id)
     );
@@ -553,6 +579,10 @@ export class Equipment {
 
     public static readonly pot = (id = 99) => (
         new Pot(id)
+    );
+
+    public static readonly strainer = (id = 99) => (
+        new Strainer(id)
     );
 
     public static readonly instantPot = (id = 99) => (

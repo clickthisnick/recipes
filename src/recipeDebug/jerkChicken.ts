@@ -39,7 +39,6 @@ export class MealRecipe extends RecipeContainer {
 // Or grill instructions: preheat a gas grill to medium-high heat (about 400 degrees.) Clean grill grates and rub lightly with oil using tongs and an oiled paper towel.
 // Grill until chicken is cooked through, turning occasionally (and reducing burning temperature slightly if it's browning too quickly) about 30 minutes.
 
-
 class JerkChicken1andHalfPound extends Recipe {
     constructor() {
         super();

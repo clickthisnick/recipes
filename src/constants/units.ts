@@ -121,6 +121,12 @@ export class Units {
         properName: 'ounce',
         equipmentUnits: [],
     };
+    public static readonly gram: IUnitObj = {
+        name: 'gram',
+        isEquipment: false,
+        properName: 'gram',
+        equipmentUnits: [],
+    };
     public static readonly fluid_ounce: IUnitObj = {
         name: 'fluid ounce',
         isEquipment: false,

@@ -122,6 +122,19 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
+    public static readonly blackLentils: IItem = (quantity = 0, unit: IUnitObj) => ({
+        name: 'Black Lentils',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        nutrition: {},
+    })
+
     public static readonly lentils: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Lentils',
         putAwayTime: 10,
@@ -1414,6 +1427,25 @@ export class VegetableItems extends SpiceItems {
     public static readonly whiteMushroom = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'White Mushroom', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+            }, // purchaseLinks
+            7, // perishableLimit
+        )
+    )
+
+    public static readonly shitatkeMushroom = (quantity = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Shitatke eMushroom', // name
             10, // putAwayTime
             10, // takeOutTime
             '',  // cleanSteps
