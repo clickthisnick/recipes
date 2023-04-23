@@ -644,6 +644,19 @@ export class SpiceItems extends SauceItems {
         nutrition: {},
     })
 
+    public static readonly ceylonCinnamon: IItem = (quantity = 0, unit: IUnitObj) => ({
+        name: 'Ceylon Cinnamon',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Put cinnamon back in cupboard',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        nutrition: {},
+    })
+
     public static readonly cinnamon: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'cinnamon',
         putAwayTime: 10,

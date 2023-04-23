@@ -25,6 +25,7 @@ class GreenGiant extends Recipe {
                 i.collagenPeptides(20, u.gram),
                 i.cocoaFlavanols(.5, u.gram),
                 i.aminoComplex(7.6, u.gram),
+                i.cinnamon(1, u.tsp),
             ])
         ];
     }
