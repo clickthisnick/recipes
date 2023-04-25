@@ -51,9 +51,60 @@ export class FruitItems extends CarbItems {
         )
     )
 
+    public static readonly creatine = (quantity = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Creatine', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            true, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+            }, // purchase links
+        )
+    )
+
     public static readonly aminoComplex = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Amino Complex', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            true, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+            }, // purchase links
+        )
+    )
+
+    public static readonly strawberry = (quantity = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Strawberry', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            true, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+            }, // purchase links
+        )
+    )
+
+    public static readonly macadamiaNut = (quantity = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Macadamia Nut', // name
             10, // putAwayTime
             10, // takeOutTime
             '',  // cleanSteps

@@ -11,7 +11,7 @@ export class MealRecipe extends RecipeContainer {
         this.recipeName = 'blueprint';
         this.recipeGroup = c.component;
         this.variations = [
-            GreenGiant, SuperVeggie
+            GreenGiant, SuperVeggie, NuttyPudding
         ]
     }
 }
@@ -26,6 +26,7 @@ class GreenGiant extends Recipe {
                 i.cocoaFlavanols(.5, u.gram),
                 i.aminoComplex(7.6, u.gram),
                 i.cinnamon(1, u.tsp),
+                i.creatine(2.5, u.gram),
             ])
         ];
     }
@@ -70,6 +71,27 @@ class SuperVeggie extends Recipe {
             i.ingredient('lentil').seasonWith([
                 i.cumin(1, u.tbsp),
             ])
+        ];
+    }
+}
+
+class NuttyPudding extends Recipe {
+    constructor() {
+        super();
+
+        // TODO add the rest later
+        this.steps = [
+            e.bulletMixer().add([
+                i.almondMilk(50, u.ml),
+                i.macadamiaNut(3, u.tbsp),
+                i.strawberry(1, u.cup),
+                i.ceylonCinnamon(.5, u.tsp),
+                i.flaxSeed(1, u.tsp),
+                i.walnut(2, u.tsp),
+                i.pomegraniteJuice(2, u.ounce),
+
+            ]),
+            e.bulletMixer().mix(),
         ];
     }
 }

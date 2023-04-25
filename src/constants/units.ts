@@ -25,6 +25,12 @@ export class Units {
         properName: 'measuring cup',
         equipmentUnits: ['¼', '⅓', '½', '1'],
     };
+    public static readonly ml: IUnitObj = {
+        name: 'ml',
+        isEquipment: true,
+        properName: 'milliliter',
+        equipmentUnits: [],
+    };
     public static readonly bag: IUnitObj = {
         name: 'bag',
         isEquipment: true,

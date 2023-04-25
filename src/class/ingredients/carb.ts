@@ -730,6 +730,45 @@ export class CarbItems extends AnimalItems {
         )
     )
 
+    public static readonly pomegraniteJuice: IItem = (quantity = 0, unit: IUnitObj) => ({
+        name: 'Pomegranite Juice',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Rinse and put measuring cup in dishwasher',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        nutrition: {}
+    })
+
+    public static readonly walnut: IItem = (quantity = 0, unit: IUnitObj) => ({
+        name: 'Walnut',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Rinse and put measuring cup in dishwasher',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        nutrition: {}
+    })
+
+    public static readonly flaxSeed: IItem = (quantity = 0, unit: IUnitObj) => ({
+        name: 'Flax seed',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: 'Rinse and put measuring cup in dishwasher',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: false,
+        nutrition: {}
+    })
+
     public static readonly flaxSeedCereal: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Flax seed cereal',
         putAwayTime: 10,
