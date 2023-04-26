@@ -47,29 +47,27 @@ class SuperVeggie extends Recipe {
                 i.blackLentils(),
                 i.water(3, u.cup),
             ]),
-            e.pot(0).cookWithLidSlightlyOff(23, 'm', 7),
+            e.pot(0).cookWithLidSlightlyOff(14, 'm', 7), // 23 min total
                 greenGiant[0], // There's only 1 step right now
                 Timer.end(),
-                e.pot(1).add([
-                    i.water(5, u.cup),
-                ]),
-                e.pot(1).cook(2, 'm', 7),
-                Timer.end(),
-                e.pot(1).add([
+            Timer.end(),
+            e.pot(0).cookWithLidSlightlyOff(9, 'm', 7), // The remaining of the 23 min lentil cook
+                e.pan().add([
                     i.broccoli(250, u.gram),
                     i.cauliflower(150, u.gram),
-                ]),
-                e.pot(1).cook(4, 'm', 7),
-                Timer.end(),
-                e.pan().add([
-                    i.oliveOil(1, u.tbsp),
                     i.shitatkeMushroom(50, u.gram),
                 ]),
-                e.pan().cook(3, 'm'),
+                e.pan().cookWithLid(6, 'm', 7),
                 Timer.end(),
             Timer.end(),
-            i.ingredient('lentil').seasonWith([
+            e.bulletMixer().add([
                 i.cumin(1, u.tbsp),
+                i.lime(1, u.unit),
+                i.oliveOil(1, u.tbsp),
+                i.freshGinger(3, u.gram),
+            ]),
+            i.ingredient('lentil').seasonWith([
+                i.ingredient('mixture')
             ])
         ];
     }
