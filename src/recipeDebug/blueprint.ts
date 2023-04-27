@@ -47,17 +47,17 @@ class SuperVeggie extends Recipe {
                 i.blackLentils(),
                 i.water(3, u.cup),
             ]),
-            e.pot(0).cookWithLidSlightlyOff(14, 'm', 7), // 23 min total
+            e.pot(0).cookWithLidSlightlyOff(4, 'm', 7), // 20 min for black/ 23 min for green total
                 greenGiant[0], // There's only 1 step right now
                 Timer.end(),
             Timer.end(),
-            e.pot(0).cookWithLidSlightlyOff(9, 'm', 7), // The remaining of the 23 min lentil cook
+            e.pot(0).cookWithLidSlightlyOff(16, 'm', 7), // The remaining of the lentil cook
                 e.pan().add([
                     i.broccoli(250, u.gram),
                     i.cauliflower(150, u.gram),
                     i.shitatkeMushroom(50, u.gram),
                 ]),
-                e.pan().cookWithLid(6, 'm', 7),
+                e.pan().cookWithLid(13, 'm', 5),
                 Timer.end(),
             Timer.end(),
             e.bulletMixer().add([
