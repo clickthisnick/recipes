@@ -4,6 +4,7 @@ import { Equipment as e } from '../class/equipment';
 import { Categories as c } from '../constants/categories';
 import { Units as u } from '../constants/units';
 import { Timer } from '../class/timer';
+import { Text as text} from '../class/text';
 
 export class MealRecipe extends RecipeContainer {
     constructor() {
@@ -47,25 +48,27 @@ class SuperVeggie extends Recipe {
                 i.blackLentils(),
                 i.water(3, u.cup),
             ]),
-            e.pot(0).cookWithLidSlightlyOff(4, 'm', 7), // 20 min for black/ 23 min for green total
+            e.pot(0).cookWithLidSlightlyOff(5, 'm', 7), // 20 min for black/ 23 min for green total
                 greenGiant[0], // There's only 1 step right now
                 Timer.end(),
             Timer.end(),
-            e.pot(0).cookWithLidSlightlyOff(16, 'm', 7), // The remaining of the lentil cook
+            e.pot(0).cookWithLidSlightlyOff(15, 'm', 7), // The remaining of the lentil cook
                 e.pan().add([
+                    i.shitatkeMushroom(50, u.gram), // put in first so they defrost more
                     i.broccoli(250, u.gram),
                     i.cauliflower(150, u.gram),
-                    i.shitatkeMushroom(50, u.gram),
                 ]),
-                e.pan().cookWithLid(13, 'm', 5),
+                // Cook pan until lentils are done
+                e.pan().cookWithLid(14, 'm', 5),
+                    text.set(['Do stretch routine.']),
+                    e.bulletMixer().add([
+                        i.cumin(1, u.tbsp),
+                        i.lime(1, u.unit),
+                        i.oliveOil(1, u.tbsp),
+                        i.freshGinger(3, u.gram),
+                    ]),
                 Timer.end(),
             Timer.end(),
-            e.bulletMixer().add([
-                i.cumin(1, u.tbsp),
-                i.lime(1, u.unit),
-                i.oliveOil(1, u.tbsp),
-                i.freshGinger(3, u.gram),
-            ]),
             i.ingredient('lentil').seasonWith([
                 i.ingredient('mixture')
             ])
