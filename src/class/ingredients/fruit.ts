@@ -68,6 +68,23 @@ export class FruitItems extends CarbItems {
         )
     )
 
+    public static readonly chlorellaPowder = (quantity = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Chlorella Powder', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            true, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+            }, // purchase links
+        )
+    )
+
     public static readonly aminoComplex = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Amino Complex', // name

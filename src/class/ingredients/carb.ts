@@ -730,8 +730,8 @@ export class CarbItems extends AnimalItems {
         )
     )
 
-    public static readonly pomegraniteJuice: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Pomegranite Juice',
+    public static readonly pomegranateJuice: IItem = (quantity = 0, unit: IUnitObj) => ({
+        name: 'Pomegranate Juice',
         putAwayTime: 10,
         takeOutTime: 10,
         cleanSteps: 'Rinse and put measuring cup in dishwasher',

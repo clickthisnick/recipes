@@ -28,6 +28,8 @@ class GreenGiant extends Recipe {
                 i.aminoComplex(7.6, u.gram),
                 i.cinnamon(1, u.tsp),
                 i.creatine(2.5, u.gram),
+                i.chlorellaPowder(1, u.tbsp),
+                // 2 Tbsp chlorella powder, yielding 13.5mg spermidine
             ])
         ];
     }
@@ -61,16 +63,17 @@ class SuperVeggie extends Recipe {
                 // Cook pan until lentils are done
                 e.pan().cookWithLid(14, 'm', 5),
                     text.set(['Do stretch routine.']),
-                    e.bulletMixer().add([
-                        i.cumin(1, u.tbsp),
-                        i.lime(1, u.unit),
-                        i.oliveOil(1, u.tbsp),
-                        i.freshGinger(3, u.gram),
+                    e.pan(2).add([ // tmp for partner
+                        i.broccoli(50, u.gram),
+                        i.cauliflower(30, u.gram),
                     ]),
                 Timer.end(),
             Timer.end(),
             i.ingredient('lentil').seasonWith([
-                i.ingredient('mixture')
+                i.cumin(1, u.tbsp),
+                i.lime(1, u.unit),
+                i.oliveOil(1, u.tbsp),
+                i.freshGinger(3, u.gram),
             ])
         ];
     }
@@ -89,7 +92,7 @@ class NuttyPudding extends Recipe {
                 i.ceylonCinnamon(.5, u.tsp),
                 i.flaxSeed(1, u.tsp),
                 i.walnut(2, u.tsp),
-                i.pomegraniteJuice(2, u.ounce),
+                i.pomegranateJuice(2, u.ounce),
 
             ]),
             e.bulletMixer().mix(),
