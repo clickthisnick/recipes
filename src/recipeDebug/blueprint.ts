@@ -74,6 +74,8 @@ class SuperVeggie extends Recipe {
                 i.lime(1, u.unit),
                 i.oliveOil(1, u.tbsp),
                 i.freshGinger(3, u.gram),
+                i.appleCiderVinegar(1, u.tbsp),
+                i.hempSeed(1, u.tbsp),
             ])
         ];
     }
@@ -87,13 +89,16 @@ class NuttyPudding extends Recipe {
         this.steps = [
             e.bulletMixer().add([
                 i.almondMilk(50, u.ml),
-                i.macadamiaNut(3, u.tbsp),
-                i.strawberry(1, u.cup),
+                i.macadamiaNut(23, u.gram), // 3 Tbsp ground macadamia nuts (20% off + free m-nut oil)
+                i.cacaoPowderUnsweetened(1, u.tbsp), // 1 Tbsp non dutched cocoa
+                i.strawberry(1, u.cup), // 1 cup blueberries/raspberries/strawberries (your choice)
+                i.cherry(3, u.unit),
                 i.ceylonCinnamon(.5, u.tsp),
                 i.flaxSeed(1, u.tsp),
                 i.walnut(2, u.tsp),
                 i.pomegranateJuice(2, u.ounce),
-
+                // 1/2 brazil nut
+                // 1 tsp sunflower lecithin
             ]),
             e.bulletMixer().mix(),
         ];

@@ -119,9 +119,43 @@ export class FruitItems extends CarbItems {
         )
     )
 
+        public static readonly cherry = (quantity = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Cherry', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            true, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+            }, // purchase links
+        )
+    )
+
     public static readonly macadamiaNut = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Macadamia Nut', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            true, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+            }, // purchase links
+        )
+    )
+
+    public static readonly hempSeed = (quantity = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Hemp Seed', // name
             10, // putAwayTime
             10, // takeOutTime
             '',  // cleanSteps
