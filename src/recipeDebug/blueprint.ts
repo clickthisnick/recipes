@@ -36,6 +36,18 @@ class GreenGiant extends Recipe {
 }
 
 // TODO needs some work but is basically right
+ // Lentils - 600 Calories
+ // Olive Oil - 120 Calories
+ // Hemp - 60 Calories
+ // Apple Cider Vinegar - 20 Calories
+ // Ginger 3G - 5 Calories
+ // Garlic Clove - 4 Calories
+ // Musrooms - 24 Calories
+ // Broccoli - 85 Calories
+ // Cauliflower - 38 Calories
+ // Cumin - 22 Calories
+ // 978 Calories
+
 class SuperVeggie extends Recipe {
     constructor() {
         super();
@@ -76,6 +88,8 @@ class SuperVeggie extends Recipe {
                 i.freshGinger(3, u.gram),
                 i.appleCiderVinegar(1, u.tbsp),
                 i.hempSeed(1, u.tbsp),
+                i.freshGinger(3, u.gram),
+                i.garlicClove(1, u.clove),
             ])
         ];
     }
