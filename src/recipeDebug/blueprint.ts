@@ -102,16 +102,16 @@ class NuttyPudding extends Recipe {
         // TODO add the rest later
         this.steps = [
             e.bulletMixer().add([
-                i.almondMilk(50, u.ml),
+                i.pomegranateJuice(56.7, u.gram), // 2 ounces
                 i.macadamiaNut(23, u.gram), // 3 Tbsp ground macadamia nuts (20% off + free m-nut oil)
-                i.cacaoPowderUnsweetened(1, u.tbsp), // 1 Tbsp non dutched cocoa
-                i.strawberry(1, u.cup), // 1 cup blueberries/raspberries/strawberries (your choice)
-                i.cherry(3, u.unit),
-                i.ceylonCinnamon(.5, u.tsp),
+                i.walnut(4.79, u.gram), // 2 tsp
+                i.brazilNut(1, u.half),
                 i.flaxSeed(1, u.tsp),
-                i.walnut(2, u.tsp),
-                i.pomegranateJuice(2, u.ounce),
-                // 1/2 brazil nut
+                i.ceylonCinnamon(.5, u.tsp),
+                i.cacaoPowderUnsweetened(1, u.tbsp), // 1 Tbsp non dutched cocoa
+                i.strawberry(123, u.gram), // 1 cup blueberries/raspberries/strawberries (your choice)
+                i.cherry(3, u.unit),
+                i.almondMilk(105, u.gram),
                 // 1 tsp sunflower lecithin
             ]),
             e.bulletMixer().mix(),
