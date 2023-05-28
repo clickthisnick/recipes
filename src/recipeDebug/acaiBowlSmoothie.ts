@@ -20,7 +20,7 @@ class AcaiBowlSmoothie extends Recipe {
         super();
         this.steps = [
             e.bulletMixer().add([
-                i.almondMilk(105, u.gram),
+                i.almondMilk(130, u.gram),
                 i.peanutButter(50, u.gram),
                 i.acaiFrozenMix(2, u.unit),
                 i.frozenStrawberry(123, u.gram),
