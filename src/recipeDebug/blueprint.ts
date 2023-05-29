@@ -12,7 +12,7 @@ export class MealRecipe extends RecipeContainer {
         this.recipeName = 'blueprint';
         this.recipeGroup = c.component;
         this.variations = [
-            GreenGiant, SuperVeggie, NuttyPudding
+            GreenGiant, SuperVeggie, NuttyPudding, NuttyPudding4Days
         ]
     }
 }
@@ -113,6 +113,30 @@ class NuttyPudding extends Recipe {
                 i.cherry(3, u.unit),
                 i.almondMilk(105, u.gram),
                 // 1 tsp sunflower lecithin
+            ]),
+            e.bulletMixer().mix(),
+        ];
+    }
+}
+
+class NuttyPudding4Days extends Recipe {
+    constructor() {
+        super();
+
+        // TODO add the rest later
+        this.steps = [
+            e.bulletMixer().add([
+                i.pomegranateJuice(226.8, u.gram), // 2 ounces
+                i.macadamiaNut(92, u.gram), // 3 Tbsp ground macadamia nuts (20% off + free m-nut oil)
+                i.walnut(19.16, u.gram), // 2 tsp
+                i.brazilNut(4, u.half),
+                i.flaxSeed(4, u.tsp),
+                i.ceylonCinnamon(2, u.tsp),
+                i.cacaoPowderUnsweetened(4, u.tbsp), // 1 Tbsp non dutched cocoa
+                i.strawberry(492, u.gram), // 1 cup blueberries/raspberries/strawberries (your choice)
+                i.cherry(12, u.unit),
+                i.almondMilk(420, u.gram),
+                i.sunflowerLechtin(4, u.tsp), // tsp sunflower lecithin
             ]),
             e.bulletMixer().mix(),
         ];

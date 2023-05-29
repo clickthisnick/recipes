@@ -252,6 +252,23 @@ export class VegetableItems extends SpiceItems {
         )
     )
 
+    public static readonly sunflowerLechtin = (quantity = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Sunflower Lechtin', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            true, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+            }, // purchase links
+        )
+    )
+
     public static readonly almondMilk = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Almond Milk', // name
