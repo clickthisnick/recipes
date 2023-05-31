@@ -157,6 +157,12 @@ export class Units {
         properName: 'unit',
         equipmentUnits: [],
     };
+    public static readonly quarter: IUnitObj = {
+        name: 'quarter',
+        isEquipment: false,
+        properName: 'unit',
+        equipmentUnits: [],
+    };
     public static readonly slice: IUnitObj = {
         name: 'slice',
         isEquipment: false,

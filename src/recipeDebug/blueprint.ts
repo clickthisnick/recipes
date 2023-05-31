@@ -17,6 +17,13 @@ export class MealRecipe extends RecipeContainer {
     }
 }
 
+// Collagen - 70 Calories
+// Cocoa Falvanoids - 6 Calories
+// Amino Complex - 25 Calories
+// Cinnamon - 6 Calories
+// Creatine - ?
+// Chlorella - 48 Calories
+// 155 Calories
 class GreenGiant extends Recipe {
     constructor() {
         super();
@@ -28,7 +35,7 @@ class GreenGiant extends Recipe {
                 i.aminoComplex(7.6, u.gram),
                 i.cinnamon(1, u.tsp),
                 i.creatine(2.5, u.gram),
-                i.chlorellaPowder(1, u.tbsp),
+                i.chlorellaPowder(2, u.tbsp),
                 // 2 Tbsp chlorella powder, yielding 13.5mg spermidine
             ])
         ];
@@ -95,24 +102,36 @@ class SuperVeggie extends Recipe {
     }
 }
 
+//
 class NuttyPudding extends Recipe {
     constructor() {
         super();
 
-        // TODO add the rest later
+        // Pomegranate Juice - 31 Calories
+        // Macadamia Nut - 165 Calories
+        // Walnut - 31 Calories
+        // Brazil Nut - 8.25 Calories
+        // Flaxseed - 13 Calories
+        // Cinnamon - 3 Calories
+        // Cocoa Powder - 4 Calories
+        // Strawberries - 39 Calories
+        // Cherries - 12 Calories
+        // Almond Milk - 108.5 Calories
+        // Sunflower Lechtin - 20.33 Calories
+        // 437.08 Calories
         this.steps = [
             e.bulletMixer().add([
                 i.pomegranateJuice(56.7, u.gram), // 2 ounces
                 i.macadamiaNut(23, u.gram), // 3 Tbsp ground macadamia nuts (20% off + free m-nut oil)
                 i.walnut(4.79, u.gram), // 2 tsp
-                i.brazilNut(1, u.half),
+                i.brazilNut(1, u.quarter),
                 i.flaxSeed(1, u.tsp),
                 i.ceylonCinnamon(.5, u.tsp),
                 i.cacaoPowderUnsweetened(1, u.tbsp), // 1 Tbsp non dutched cocoa
                 i.strawberry(123, u.gram), // 1 cup blueberries/raspberries/strawberries (your choice)
                 i.cherry(3, u.unit),
                 i.almondMilk(105, u.gram),
-                // 1 tsp sunflower lecithin
+                i.sunflowerLechtin(1, u.tsp),
             ]),
             e.bulletMixer().mix(),
         ];
@@ -129,7 +148,7 @@ class NuttyPudding4Days extends Recipe {
                 i.pomegranateJuice(226.8, u.gram), // 2 ounces
                 i.macadamiaNut(92, u.gram), // 3 Tbsp ground macadamia nuts (20% off + free m-nut oil)
                 i.walnut(19.16, u.gram), // 2 tsp
-                i.brazilNut(4, u.half),
+                i.brazilNut(1, u.unit),
                 i.flaxSeed(4, u.tsp),
                 i.ceylonCinnamon(2, u.tsp),
                 i.cacaoPowderUnsweetened(4, u.tbsp), // 1 Tbsp non dutched cocoa
