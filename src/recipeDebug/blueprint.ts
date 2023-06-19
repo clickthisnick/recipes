@@ -6,6 +6,7 @@ import { Units as u } from '../constants/units';
 import { Timer } from '../class/timer';
 import { Text as text} from '../class/text';
 
+// 1570 Calories - Green Giant / Super Veggie / Nutty Pudding
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
@@ -58,7 +59,6 @@ class GreenGiant extends Recipe {
 class SuperVeggie extends Recipe {
     constructor() {
         super();
-        const greenGiant = new GreenGiant().steps
 
         this.steps = [
             e.strainer().add([
@@ -69,11 +69,8 @@ class SuperVeggie extends Recipe {
                 i.blackLentils(),
                 i.water(3, u.cup),
             ]),
-            e.pot(0).cookWithLidSlightlyOff(5, 'm', 7), // 20 min for black/ 23 min for green total
-                greenGiant[0], // There's only 1 step right now
-                Timer.end(),
-            Timer.end(),
-            e.pot(0).cookWithLidSlightlyOff(15, 'm', 7), // The remaining of the lentil cook
+            e.pot(0).cookWithLidSlightlyOff(20, 'm', 7), // 20 min for black/ 23 min for green total
+                text.set(['Drink the green giant']),
                 e.pan().add([
                     i.shitatkeMushroom(50, u.gram), // put in first so they defrost more
                     i.broccoli(250, u.gram),
@@ -82,10 +79,11 @@ class SuperVeggie extends Recipe {
                 // Cook pan until lentils are done
                 e.pan().cookWithLid(14, 'm', 5),
                     text.set(['Do stretch routine.']),
-                    e.pan(2).add([ // tmp for partner
-                        i.broccoli(50, u.gram),
-                        i.cauliflower(30, u.gram),
-                    ]),
+                    // Alex
+                    // e.pan(2).add([ // tmp for partner
+                    //     i.broccoli(50, u.gram),
+                    //     i.cauliflower(30, u.gram),
+                    // ]),
                 Timer.end(),
             Timer.end(),
             i.ingredient('lentil').seasonWith([
