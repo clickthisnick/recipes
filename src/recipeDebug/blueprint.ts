@@ -65,6 +65,7 @@ class SuperVeggie extends Recipe {
                 i.blackLentils(1, u.cup),
             ]),
             e.strainer().wash("Wash with water and look for rocks", 10, 's'),
+            Timer.end(),
             e.pot(0).add([
                 i.blackLentils(),
                 i.water(3, u.cup),
