@@ -324,8 +324,8 @@ class Pot extends CookingContainer {
     }
     heat: number;
 
-    public _getHeat(heat = 0) {
-        if (heat === 0) {
+    public _getHeat(heat) {
+        if (heat < 1) {
             if (this.heat) {
                 return this.heat
             } else {
@@ -335,7 +335,7 @@ class Pot extends CookingContainer {
         return heat
     }
 
-    public _cookStr(text: string, duration: number, type: string, heat = 0): IStep {
+    public _cookStr(text: string, duration: number, type: string, heat: number): IStep {
         heat = this._getHeat(heat)
         return Timer.set(duration, type, text, [this.name])
     }
@@ -345,17 +345,22 @@ class Pot extends CookingContainer {
         return this._cookStr(`Cook ${this.name}`, duration, type, heat)
     }
 
-    public cookWithLid(duration: number, type: string, heat = 0): IStep {
+    public cookWithoutLid(duration: number, type: string, heat: number): IStep {
+        heat = this._getHeat(heat)
+        return this._cookStr(`Cook ${this.name} without lid`, duration, type, heat)
+    }
+
+    public cookWithLid(duration: number, type: string, heat: number): IStep {
         heat = this._getHeat(heat)
         return this._cookStr(`Cook ${this.name} with lid`, duration, type, heat)
     }
 
-    public cookWithLidSlightlyOff(duration: number, type: string, heat = 0): IStep {
+    public cookWithLidSlightlyOff(duration: number, type: string, heat: number): IStep {
         heat = this._getHeat(heat)
         return this._cookStr(`Cook ${this.name} with lid slightly off`, duration, type, heat)
     }
 
-    public boilWithLid(duration: number, type: string, heat = 0): IStep {
+    public boilWithLid(duration: number, type: string, heat: number): IStep {
         heat = this._getHeat(heat)
         return this._cookStr(`Boil ${this.name} contents on heat ${heat} with lid on`, duration, type, heat)
     }

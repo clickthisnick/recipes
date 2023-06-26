@@ -33,7 +33,7 @@ class ThaiBasil2Servings extends Recipe {
                 i.oysterSauce(4, u.tsp),
                 i.water(4, u.tbsp),
             ]),
-            i.garlicClove(4, u.clove).dice(),
+            i.garlicClove(4, u.unit).dice(),
             i.serranoChilli(4, u.unit).dice(),
             i.greenOnion(2, u.unit).dice(),
             e.pan().add([
@@ -89,7 +89,7 @@ class ThaiBasil extends Recipe {
                 i.oysterSauce(2, u.tsp),
                 i.water(2, u.tbsp),
             ]),
-            i.garlicClove(2, u.clove).dice(),
+            i.garlicClove(2, u.unit).dice(),
             i.serranoChilli(2, u.unit).dice(),
             i.greenOnion(1, u.unit).dice(),
             e.plate().add([

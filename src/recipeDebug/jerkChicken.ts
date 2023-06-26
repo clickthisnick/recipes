@@ -48,7 +48,7 @@ class JerkChicken1andHalfPound extends Recipe {
             text.set(['Cut the ginger into diced onion pieces']),
             e.foodProcessor().add([
                 i.greenOnion(3, u.unit),
-                i.garlicClove(2, u.clove),
+                i.garlicClove(2, u.unit),
                 i.habanero(1, u.unit),
                 i.freshGinger(.75, u.inches),
                 i.limeJuice(.1667, u.cup),
@@ -76,7 +76,7 @@ class JerkChicken3Lb extends Recipe {
             text.set(['Cut the ginger into diced onion size']),
             e.foodProcessor().add([
                 i.greenOnion(6, u.unit),
-                i.garlicClove(4, u.clove),
+                i.garlicClove(4, u.unit),
                 i.habanero(2, u.unit),
                 i.freshGinger(1.5, u.inches),
                 i.limeJuice(3, u.unit),

@@ -30,14 +30,14 @@ class GreenGiant extends Recipe {
         super();
         this.steps = [
             e.mug().add([
-                i.water(8, u.ounce),
+                // 2 Tbsp chlorella powder, yielding 13.5mg spermidine
+                i.chlorellaPowder(2, u.tbsp),
                 i.collagenPeptides(20, u.gram),
-                i.cocoaFlavanols(.5, u.gram),
                 i.aminoComplex(7.6, u.gram),
                 i.cinnamon(1, u.tsp),
                 i.creatine(2.5, u.gram),
-                i.chlorellaPowder(2, u.tbsp),
-                // 2 Tbsp chlorella powder, yielding 13.5mg spermidine
+                i.cocoaFlavanols(.5, u.gram),
+                i.water(8, u.ounce),
             ])
         ];
     }
@@ -64,13 +64,12 @@ class SuperVeggie extends Recipe {
             e.strainer().add([
                 i.blackLentils(1, u.cup),
             ]),
-            e.strainer().wash("Wash with water and look for rocks", 10, 's'),
-            Timer.end(),
+            text.set(["Wash lentils with water and look for rocks"]),
             e.pot(0).add([
                 i.blackLentils(),
                 i.water(3, u.cup),
             ]),
-            e.pot(0).cookWithLidSlightlyOff(20, 'm', 7), // 20 min for black/ 23 min for green total
+            e.pot(0).cookWithLidSlightlyOff(21, 'm', 7), // 20 min for black/ 23 min for green total
                 text.set(['Drink the green giant']),
                 e.pan().add([
                     i.shitatkeMushroom(50, u.gram), // put in first so they defrost more
@@ -95,7 +94,7 @@ class SuperVeggie extends Recipe {
                 i.appleCiderVinegar(1, u.tbsp),
                 i.hempSeed(1, u.tbsp),
                 i.freshGinger(3, u.gram),
-                i.garlicClove(1, u.clove),
+                i.garlicClove(1, u.unit),
             ])
         ];
     }

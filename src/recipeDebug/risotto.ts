@@ -36,12 +36,12 @@ class Risotto extends Recipe {
                 i.salt(.5, u.tsp),
             ]),
             text.set(['Set timer for 20 minutes to toss oven contents']),
-            e.oven().cook(40, 'm', 350),
+            e.oven().cook(34, 'm', 350),
             e.pot().add([
                 i.oliveOil(2, u.tbsp),
                 i.whiteOnion(),
             ]),
-            e.pot().cook(5, 'm', 4),
+            e.pot().cook(5, 'm', 6),
             Timer.end(),
             e.pot().add([
                 i.arborioRice(1, u.cup),
@@ -53,12 +53,12 @@ class Risotto extends Recipe {
             e.pot().add([
                 i.whiteWine(.5, u.cup),
             ]),
-            Timer.set(2, 'm', 'cook rice with lid on'),
+            e.pot().cookWithLid(2, 'm', 6),
             Timer.end(),
             e.pot().add([
                 i.chickenStock(2.5, u.cup),
             ]),
-            Timer.set(18, 'm', 'cook rice'),
+            e.pot().cookWithoutLid(14, 'm', 6),
             Timer.end(),
             text.set(['Turn stove heat off']),
             e.pot().add([
@@ -92,12 +92,12 @@ class Risotto2Servings extends Recipe {
                 i.salt(1, u.tsp),
             ]),
             text.set(['Set timer for 20 minutes to toss oven contents']),
-            e.oven().cook(40, 'm', 350),
+            e.oven().cook(34, 'm', 350),
                 e.pot().add([
                     i.oliveOil(2, u.tbsp),
                     i.whiteOnion(),
                 ]),
-                e.pot().cook(5, 'm', 4),
+                e.pot().cook(5, 'm', 6),
                 Timer.end(),
                 e.pot().add([
                     i.arborioRice(2, u.cup),
@@ -109,12 +109,12 @@ class Risotto2Servings extends Recipe {
                 e.pot().add([
                     i.whiteWine(1, u.cup),
                 ]),
-                Timer.set(4, 'm', 'cook rice with lid on'),
+                e.pot().cookWithLid(4, 'm', 6),
                 Timer.end(),
                 e.pot().add([
                     i.chickenStock(5, u.cup),
                 ]),
-                Timer.set(20, 'm', 'cook rice'),
+                e.pot().cookWithoutLid(14, 'm', 6),
                 Timer.end(),
                 text.set(['Turn stove heat off']),
                 // e.pot().add([
