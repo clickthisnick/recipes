@@ -13,7 +13,7 @@ export class MealRecipe extends RecipeContainer {
         this.recipeName = 'blueprint';
         this.recipeGroup = c.component;
         this.variations = [
-            GreenGiant, SuperVeggie, NuttyPudding, NuttyPudding4Days
+            GreenGiant, SuperVeggie, NuttyPudding, NuttyPudding2Days, PillsMorning
         ]
     }
 }
@@ -31,7 +31,7 @@ class GreenGiant extends Recipe {
         this.steps = [
             e.mug().add([
                 // 2 Tbsp chlorella powder, yielding 13.5mg spermidine
-                i.chlorellaPowder(2, u.tbsp),
+                i.chlorellaPowder(4, u.halftbsp),
                 i.collagenPeptides(20, u.gram),
                 i.aminoComplex(7.6, u.gram),
                 i.cinnamon(1, u.tsp),
@@ -70,6 +70,7 @@ class SuperVeggie extends Recipe {
                 i.water(3, u.cup),
             ]),
             e.pot(0).cookWithLidSlightlyOff(21, 'm', 7), // 20 min for black/ 23 min for green total
+                text.set(['Drink a glass of water with morning pills']),
                 text.set(['Drink the green giant']),
                 e.pan().add([
                     i.shitatkeMushroom(50, u.gram), // put in first so they defrost more
@@ -117,6 +118,7 @@ class NuttyPudding extends Recipe {
         // Almond Milk - 108.5 Calories
         // Sunflower Lechtin - 20.33 Calories
         // 437.08 Calories
+        // 340 Grams Weight
         this.steps = [
             e.bulletMixer().add([
                 i.pomegranateJuice(56.7, u.gram), // 2 ounces
@@ -136,26 +138,42 @@ class NuttyPudding extends Recipe {
     }
 }
 
-class NuttyPudding4Days extends Recipe {
+class NuttyPudding2Days extends Recipe {
+     constructor() {
+        super();
+
+        // 340 Grams Weight
+        this.steps = [
+            e.bulletMixer().add([
+                i.pomegranateJuice(113.4, u.gram),
+                i.macadamiaNut(46, u.gram),
+                i.walnut(9.58, u.gram),
+                i.brazilNut(2, u.quarter),
+                i.flaxSeed(2, u.tsp),
+                i.ceylonCinnamon(1, u.tsp),
+                i.cacaoPowderUnsweetened(2, u.tbsp),
+                i.strawberry(246, u.gram),
+                i.cherry(6, u.unit),
+                i.almondMilk(210, u.gram),
+                i.sunflowerLechtin(2, u.tsp),
+            ]),
+            e.bulletMixer().mix(),
+            text.set(["Pour 340 Grams into Iron Flask Cup"]),
+        ];
+    }
+}
+
+class PillsMorning extends Recipe {
     constructor() {
         super();
 
-        // TODO add the rest later
         this.steps = [
-            e.bulletMixer().add([
-                i.pomegranateJuice(226.8, u.gram), // 2 ounces
-                i.macadamiaNut(92, u.gram), // 3 Tbsp ground macadamia nuts (20% off + free m-nut oil)
-                i.walnut(19.16, u.gram), // 2 tsp
-                i.brazilNut(1, u.unit),
-                i.flaxSeed(4, u.tsp),
-                i.ceylonCinnamon(2, u.tsp),
-                i.cacaoPowderUnsweetened(4, u.tbsp), // 1 Tbsp non dutched cocoa
-                i.strawberry(492, u.gram), // 1 cup blueberries/raspberries/strawberries (your choice)
-                i.cherry(12, u.unit),
-                i.almondMilk(420, u.gram),
-                i.sunflowerLechtin(4, u.tsp), // tsp sunflower lecithin
-            ]),
-            e.bulletMixer().mix(),
+            text.set(["1 Odorless Garlic"]),
+            text.set(["2 Ginger Root"]),
+            text.set(["1 Turmeric"]),
+            text.set(["1 Vitamin D"]),
+            text.set(["1 Ashwaganda"]),
+            text.set(["1 BroccoMax"]),
         ];
     }
 }

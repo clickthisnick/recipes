@@ -91,6 +91,12 @@ export class Units {
         properName: 'measuring tbsp',
         equipmentUnits: ['¼', '⅓', '½', '1'],
     };
+    public static readonly halftbsp: IUnitObj = {
+        name: 'half Tbsp',
+        isEquipment: true,
+        properName: 'measuring tbsp',
+        equipmentUnits: ['¼', '⅓', '½', '1'],
+    };
     public static readonly stick: IUnitObj = {
         name: 'stick',
         isEquipment: false,
