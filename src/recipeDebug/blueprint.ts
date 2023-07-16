@@ -32,11 +32,11 @@ class GreenGiant extends Recipe {
             e.mug().add([
                 // 2 Tbsp chlorella powder, yielding 13.5mg spermidine
                 i.chlorellaPowder(4, u.halftbsp),
-                i.collagenPeptides(20, u.gram),
-                i.aminoComplex(7.6, u.gram),
+                i.ingredient('20 grams of collagen peptides (about 6 half tsbp)'), //i.collagenPeptides(20, u.gram),
                 i.cinnamon(1, u.tsp),
+                i.aminoComplex(7.6, u.gram),
                 i.creatine(2.5, u.gram),
-                i.cocoaFlavanols(.5, u.gram),
+                i.ingredient('.5 grams of cocoa flavanols (2 measurements with the obtuse (rounded) end brushed off)'), // i.cocoaFlavanols(.5, u.gram),
                 i.water(8, u.ounce),
             ])
         ];
@@ -126,12 +126,12 @@ class NuttyPudding extends Recipe {
                 i.walnut(4.79, u.gram), // 2 tsp
                 i.brazilNut(1, u.quarter),
                 i.flaxSeed(1, u.tsp),
-                i.ceylonCinnamon(.5, u.tsp),
+                i.sunflowerLechtin(1, u.tsp),
                 i.cacaoPowderUnsweetened(1, u.tbsp), // 1 Tbsp non dutched cocoa
+                i.ceylonCinnamon(.5, u.tsp),
                 i.strawberry(123, u.gram), // 1 cup blueberries/raspberries/strawberries (your choice)
                 i.cherry(3, u.unit),
                 i.almondMilk(105, u.gram),
-                i.sunflowerLechtin(1, u.tsp),
             ]),
             e.bulletMixer().mix(),
         ];
@@ -150,12 +150,12 @@ class NuttyPudding2Days extends Recipe {
                 i.walnut(9.58, u.gram),
                 i.brazilNut(2, u.quarter),
                 i.flaxSeed(2, u.tsp),
-                i.ceylonCinnamon(1, u.tsp),
+                i.sunflowerLechtin(2, u.tsp),
                 i.cacaoPowderUnsweetened(2, u.tbsp),
+                i.ceylonCinnamon(1, u.tsp),
                 i.strawberry(246, u.gram),
                 i.cherry(6, u.unit),
                 i.almondMilk(210, u.gram),
-                i.sunflowerLechtin(2, u.tsp),
             ]),
             e.bulletMixer().mix(),
             text.set(["Pour 340 Grams into Iron Flask Cup"]),
