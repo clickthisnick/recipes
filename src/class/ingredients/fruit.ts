@@ -128,10 +128,21 @@ export class FruitItems extends CarbItems {
             quantity, // quantity
             false, // wash
             false, // isTakoutUnitable
-            true, // isMeatProduct
+            false, // isMeatProduct
             {}, // nutrition
             unit, // unit
             {
+                [Stores.wholeFoods]: {
+                    'organic': [
+                        {
+                            price: 6.69,
+                            quantity: 32,
+                            quantity_unit: u.ounce,
+                            link: 'https://www.wholefoodsmarket.com/product/365-by-whole-foods-market-365-whole-foods-market-organic-whole-strawberries-b09gcp3jng',
+                            organic: true,
+                        }
+                    ]
+                }
             }, // purchase links
         )
     )
@@ -196,10 +207,21 @@ export class FruitItems extends CarbItems {
             quantity, // quantity
             false, // wash
             false, // isTakoutUnitable
-            true, // isMeatProduct
+            false, // isMeatProduct
             {}, // nutrition
             unit, // unit
             {
+                [Stores.wholeFoods]: {
+                    'organic': [
+                        {
+                            price: 10.79,
+                            quantity: 8,
+                            quantity_unit: u.ounce,
+                            link: 'https://www.wholefoodsmarket.com/product/365-by-whole-foods-market-organic-macadamia-nuts-8-oz-b086hk83yf',
+                            organic: true,
+                        }
+                    ]
+                }
             }, // purchase links
         )
     )

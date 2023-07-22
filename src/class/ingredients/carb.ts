@@ -730,31 +730,61 @@ export class CarbItems extends AnimalItems {
         )
     )
 
-    public static readonly pomegranateJuice: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Pomegranate Juice',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Rinse and put measuring cup in dishwasher',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {}
-    })
+    public static readonly pomegranateJuice = (quantity = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Pomegranate Juice', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+                [Stores.wholeFoods]: {
+                    'organic': [
+                        {
+                            price: 10.49,
+                            quantity: 32,
+                            quantity_unit: u.fluid_ounce,
+                            link: 'https://www.wholefoodsmarket.com/product/rw-knudsen-family-rw-knudsen-just-pomegranate-juice-32-fl-oz-b001o8mi4ss',
+                            organic: true,
+                        }
+                    ]
+                }
+            }, // purchase links
+        )
+    )
 
-    public static readonly walnut: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Walnut',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Rinse and put measuring cup in dishwasher',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {}
-    })
+    public static readonly walnut = (quantity = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Walnut', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+                [Stores.wholeFoods]: {
+                    'organic': [
+                        {
+                            price: 7.99,
+                            quantity: 10,
+                            quantity_unit: u.ounce,
+                            link: 'https://www.wholefoodsmarket.com/product/365-by-whole-foods-market-organic-walnut-halves-pieces-10-oz-b07glt4z49',
+                            organic: true,
+                        }
+                    ]
+                }
+            }, // purchase links
+        )
+    )
 
     public static readonly brazilNut: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Brazil Nut',
@@ -769,18 +799,33 @@ export class CarbItems extends AnimalItems {
         nutrition: {}
     })
 
-    public static readonly flaxSeed: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Flax seed',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Rinse and put measuring cup in dishwasher',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {}
-    })
+    public static readonly flaxSeed = (quantity = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Flax seed', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+                [Stores.wholeFoods]: {
+                    'organic': [
+                        {
+                            price: 5.49,
+                            quantity: 16,
+                            quantity_unit: u.ounce,
+                            link: 'https://www.wholefoodsmarket.com/product/365-by-whole-foods-market-organic-brown-whole-flaxseed-16-oz-b07myfzr8z',
+                            organic: true,
+                        }
+                    ]
+                }
+            }, // purchase links
+        )
+    )
 
     public static readonly flaxSeedCereal: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Flax seed cereal',

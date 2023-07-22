@@ -122,18 +122,33 @@ export class VegetableItems extends SpiceItems {
         nutrition: {},
     })
 
-    public static readonly blackLentils: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Black Lentils',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly blackLentils = (quantity = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Black Lentils', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+                [Stores.wholeFoods]: {
+                    'organic': [
+                        {
+                            price: 3.19,
+                            quantity: 16,
+                            quantity_unit: u.ounce,
+                            link: 'https://www.amazon.com/365-Whole-Foods-Market-Organic/dp/B084NHD2R9/ref=sr_1_5_f3',
+                            organic: true,
+                        }
+                    ]
+                }
+            }, // purchase links
+        )
+    )
 
     public static readonly lentils: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Lentils',
@@ -293,7 +308,7 @@ export class VegetableItems extends SpiceItems {
                         }
                     ]
                 },
-                [Stores.wholeFoods]: {
+                [Stores.amazon]: {
                     'organic unsweetened': [
                         {
                             price: 3.19,
@@ -303,7 +318,18 @@ export class VegetableItems extends SpiceItems {
                             organic: true,
                         }
                     ]
-                }
+                },
+                [Stores.wholeFoods]: {
+                    'organic unsweetened': [
+                        {
+                            price: 3.19,
+                            quantity: 64,
+                            quantity_unit: u.fluid_ounce,
+                            link: 'https://www.wholefoodsmarket.com/product/365-by-whole-foods-market-organic-unsweetened-almond-milk-96-fl-oz-b08tsqr1cs',
+                            organic: true,
+                        }
+                    ]
+                },
             }, // purchase links
         )
     )
