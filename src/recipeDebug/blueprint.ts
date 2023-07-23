@@ -13,7 +13,7 @@ export class MealRecipe extends RecipeContainer {
         this.recipeName = 'blueprint';
         this.recipeGroup = c.component;
         this.variations = [
-            GreenGiant, SuperVeggie, NuttyPudding, NuttyPudding2Days, PillsMorning
+            GreenGiant, SuperVeggie, NuttyPudding, NuttyPudding2Days, PillsMorning, SweetPotato
         ]
     }
 }
@@ -39,6 +39,22 @@ class GreenGiant extends Recipe {
                 i.ingredient('.5 grams of cocoa flavanols (2 measurements with the obtuse (rounded) end brushed off)'), // i.cocoaFlavanols(.5, u.gram),
                 i.water(8, u.ounce),
             ])
+        ];
+    }
+}
+
+class SweetPotato extends Recipe {
+    constructor() {
+        super();
+        this.steps = [
+            e.oven().preheat(425),
+            Timer.end(),
+            e.pan().add([
+                i.sweetPotatoes(4, u.unit),
+                i.oliveOil(3, u.tbsp),
+            ]),
+            e.pan().cook(30, 'm', 425),
+            Timer.end(),
         ];
     }
 }
@@ -115,9 +131,9 @@ class NuttyPudding extends Recipe {
         // Cocoa Powder - 4 Calories
         // Strawberries - 39 Calories
         // Cherries - 12 Calories
-        // Almond Milk - 108.5 Calories
+        // Almond Milk - 18.5 Calories
         // Sunflower Lechtin - 20.33 Calories
-        // 437.08 Calories
+        // 327.08 Calories
         // 340 Grams Weight
         this.steps = [
             e.bulletMixer().add([
