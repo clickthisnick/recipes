@@ -181,6 +181,23 @@ export class FruitItems extends CarbItems {
         )
     )
 
+    public static readonly frozenBlueberry = (quantity = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Frozen Blueberry', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            true, // isMeatProduct
+            {}, // nutrition
+            unit, // unit
+            {
+            }, // purchase links
+        )
+    )
+
     public static readonly cherry = (quantity = 0, unit: IUnitObj = Units.none) => (
         new Ingredient(
             'Cherry', // name

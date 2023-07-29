@@ -32,8 +32,8 @@ class GreenGiant extends Recipe {
             e.mug().add([
                 // 2 Tbsp chlorella powder, yielding 13.5mg spermidine
                 i.chlorellaPowder(4, u.halftbsp),
-                i.ingredient('20 grams of collagen peptides (about 6 half tsbp)'), //i.collagenPeptides(20, u.gram),
                 i.cinnamon(1, u.tsp),
+                i.ingredient('20 grams of collagen peptides (about 6 half tsbp)'), //i.collagenPeptides(20, u.gram),
                 i.aminoComplex(7.6, u.gram),
                 i.creatine(2.5, u.gram),
                 i.ingredient('.5 grams of cocoa flavanols (2 measurements with the obtuse (rounded) end brushed off)'), // i.cocoaFlavanols(.5, u.gram),
