@@ -169,6 +169,7 @@ class NuttyPudding2Days extends Recipe {
                 i.sunflowerLechtin(2, u.tsp),
                 i.cacaoPowderUnsweetened(2, u.tbsp),
                 i.ceylonCinnamon(1, u.tsp),
+                i.peaProtein(2, u.scoop),
                 i.strawberry(246, u.gram),
                 i.cherry(6, u.unit),
                 i.almondMilk(210, u.gram),
@@ -190,6 +191,8 @@ class PillsMorning extends Recipe {
             text.set(["1 Vitamin D"]),
             text.set(["1 Ashwaganda"]),
             text.set(["1 BroccoMax"]),
+            text.set(["1 Zinc"]),
+            text.set(["1 Ca-AWG?? TODO"]),
         ];
     }
 }

@@ -414,6 +414,24 @@ export class SpiceItems extends SauceItems {
         )
     )
 
+    public static readonly peaProtein = (quantity = 0, unit: IUnitObj = Units.none) => (
+        new Ingredient(
+            'Pea Protein', // name
+            10, // putAwayTime
+            10, // takeOutTime
+            '',  // cleanSteps
+            quantity, // quantity
+            false, // wash
+            false, // isTakoutUnitable
+            false, // isMeatProduct
+            {
+            }, // nutrition
+            unit, // unit
+            {
+            }, // purchase links
+        )
+    )
+
     public static readonly chilliPowder: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'chilli powder',
         putAwayTime: 10,
