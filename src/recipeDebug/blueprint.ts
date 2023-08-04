@@ -13,33 +13,8 @@ export class MealRecipe extends RecipeContainer {
         this.recipeName = 'blueprint';
         this.recipeGroup = c.component;
         this.variations = [
-            GreenGiant, SuperVeggie, NuttyPudding, NuttyPudding2Days, PillsMorning, SweetPotato
+            SuperVeggie, NuttyPudding, NuttyPudding2Days, SweetPotato
         ]
-    }
-}
-
-// Collagen - 70 Calories
-// Cocoa Falvanoids - 6 Calories
-// Amino Complex - 25 Calories
-// Cinnamon - 6 Calories
-// Creatine - ?
-// Chlorella - 48 Calories
-// 155 Calories
-class GreenGiant extends Recipe {
-    constructor() {
-        super();
-        this.steps = [
-            e.mug().add([
-                // 2 Tbsp chlorella powder, yielding 13.5mg spermidine
-                i.chlorellaPowder(4, u.halftbsp),
-                i.cinnamon(1, u.tsp),
-                i.ingredient('20 grams of collagen peptides (about 6 half tsbp)'), //i.collagenPeptides(20, u.gram),
-                i.aminoComplex(7.6, u.gram),
-                i.creatine(2.5, u.gram),
-                i.ingredient('.5 grams of cocoa flavanols (2 measurements with the obtuse (rounded) end brushed off)'), // i.cocoaFlavanols(.5, u.gram),
-                i.water(8, u.ounce),
-            ])
-        ];
     }
 }
 
@@ -85,7 +60,7 @@ class SuperVeggie extends Recipe {
                 i.blackLentils(),
                 i.water(3, u.cup),
             ]),
-            e.pot(0).cookWithLidSlightlyOff(21, 'm', 7), // 20 min for black/ 23 min for green total
+            e.pot(0).cookWithLidSlightlyOff(21, 'm', 7, "lentils"), // 20 min for black/ 23 min for green total
                 text.set(['Drink a glass of water with morning pills']),
                 text.set(['Drink the green giant']),
                 e.pan().add([
@@ -94,7 +69,7 @@ class SuperVeggie extends Recipe {
                     i.cauliflower(150, u.gram),
                 ]),
                 // Cook pan until lentils are done
-                e.pan().cookWithLid(14, 'm', 5),
+                e.pan().cookWithLid(14, 'm', 5, "broccoli"),
                     text.set(['Do stretch routine.']),
                     // Alex
                     // e.pan(2).add([ // tmp for partner
@@ -117,82 +92,37 @@ class SuperVeggie extends Recipe {
     }
 }
 
-//
+class NuttyPudding2Days extends Recipe {
+    constructor() {
+        super();
+        this.steps = [
+            e.bulletMixer().add([
+                i.pomegranateJuice(113.4, u.gram),
+                i.almondMilk(210, u.gram),
+                i.ingredient('NuttyPudding mixture'),
+                // blend for 1 minute on low
+                i.strawberry(246, u.gram),
+                i.cherry(6, u.unit),
+            ]),
+            e.bulletMixer().mix(),
+        ];
+    }
+}
+
 class NuttyPudding extends Recipe {
     constructor() {
         super();
 
-        // Pomegranate Juice - 31 Calories
-        // Macadamia Nut - 165 Calories
-        // Walnut - 31 Calories
-        // Brazil Nut - 8.25 Calories
-        // Flaxseed - 13 Calories
-        // Cinnamon - 3 Calories
-        // Cocoa Powder - 4 Calories
-        // Strawberries - 39 Calories
-        // Cherries - 12 Calories
-        // Almond Milk - 18.5 Calories
-        // Sunflower Lechtin - 20.33 Calories
-        // 327.08 Calories
-        // 340 Grams Weight
         this.steps = [
             e.bulletMixer().add([
-                i.pomegranateJuice(56.7, u.gram), // 2 ounces
-                i.macadamiaNut(23, u.gram), // 3 Tbsp ground macadamia nuts (20% off + free m-nut oil)
-                i.walnut(4.79, u.gram), // 2 tsp
-                i.brazilNut(1, u.quarter),
-                i.flaxSeed(1, u.tsp),
-                i.sunflowerLechtin(1, u.tsp),
-                i.cacaoPowderUnsweetened(1, u.tbsp), // 1 Tbsp non dutched cocoa
-                i.ceylonCinnamon(.5, u.tsp),
-                i.strawberry(123, u.gram), // 1 cup blueberries/raspberries/strawberries (your choice)
-                i.cherry(3, u.unit),
+                i.pomegranateJuice(56.7, u.gram),
                 i.almondMilk(105, u.gram),
+                i.ingredient('NuttyPudding mixture'),
+                // blend for 1 minute on low
+                i.strawberry(123, u.gram),
+                i.cherry(3, u.unit),
             ]),
             e.bulletMixer().mix(),
-        ];
-    }
-}
-
-class NuttyPudding2Days extends Recipe {
-     constructor() {
-        super();
-
-        // 340 Grams Weight
-        this.steps = [
-            e.bulletMixer().add([
-                i.pomegranateJuice(113.4, u.gram),
-                i.macadamiaNut(46, u.gram),
-                i.walnut(9.58, u.gram),
-                i.brazilNut(2, u.quarter),
-                i.flaxSeed(2, u.tsp),
-                i.sunflowerLechtin(2, u.tsp),
-                i.cacaoPowderUnsweetened(2, u.tbsp),
-                i.ceylonCinnamon(1, u.tsp),
-                i.peaProtein(2, u.scoop),
-                i.strawberry(246, u.gram),
-                i.cherry(6, u.unit),
-                i.almondMilk(210, u.gram),
-            ]),
-            e.bulletMixer().mix(),
-            text.set(["Pour 340 Grams into Iron Flask Cup"]),
-        ];
-    }
-}
-
-class PillsMorning extends Recipe {
-    constructor() {
-        super();
-
-        this.steps = [
-            text.set(["1 Odorless Garlic"]),
-            text.set(["2 Ginger Root"]),
-            text.set(["1 Turmeric"]),
-            text.set(["1 Vitamin D"]),
-            text.set(["1 Ashwaganda"]),
-            text.set(["1 BroccoMax"]),
-            text.set(["1 Zinc"]),
-            text.set(["1 Ca-AWG?? TODO"]),
         ];
     }
 }
