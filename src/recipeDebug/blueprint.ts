@@ -103,6 +103,7 @@ class NuttyPudding2Days extends Recipe {
                 // blend for 1 minute on low
                 i.strawberry(246, u.gram),
                 i.cherry(6, u.unit),
+                // blend for 1 minute on low
             ]),
             e.bulletMixer().mix(),
         ];
@@ -121,6 +122,7 @@ class NuttyPudding extends Recipe {
                 // blend for 1 minute on low
                 i.strawberry(123, u.gram),
                 i.cherry(3, u.unit),
+                // blend for 1 minute on low
             ]),
             e.bulletMixer().mix(),
         ];

@@ -12,7 +12,7 @@ export class MealRecipe extends RecipeContainer {
         this.recipeName = 'blueprint prep';
         this.recipeGroup = c.component;
         this.variations = [
-            GreenGiant, PillsMorning, NuttyPudding, NuttyPudding2Days
+            GreenGiantPrep, PillsMorningPrep, NuttyPuddingPrep, NuttyPudding2DaysPrep
         ]
     }
 }
@@ -24,7 +24,7 @@ export class MealRecipe extends RecipeContainer {
 // Creatine - ?
 // Chlorella - 48 Calories
 // 155 Calories
-class GreenGiant extends Recipe {
+class GreenGiantPrep extends Recipe {
     constructor() {
         super();
         this.steps = [
@@ -43,7 +43,7 @@ class GreenGiant extends Recipe {
 }
 
 
-class PillsMorning extends Recipe {
+class PillsMorningPrep extends Recipe {
     constructor() {
         super();
 
@@ -60,7 +60,7 @@ class PillsMorning extends Recipe {
     }
 }
 
-class NuttyPudding extends Recipe {
+class NuttyPuddingPrep extends Recipe {
     constructor() {
         super();
 
@@ -73,13 +73,14 @@ class NuttyPudding extends Recipe {
                 i.sunflowerLechtin(1, u.tsp),
                 i.cacaoPowderUnsweetened(1, u.tbsp), // 1 Tbsp non dutched cocoa
                 i.ceylonCinnamon(.5, u.tsp),
+                i.peaProtein(1, u.scoop),
             ]),
             e.bulletMixer().mix(),
         ];
     }
 }
 
-class NuttyPudding2Days extends Recipe {
+class NuttyPudding2DaysPrep extends Recipe {
     constructor() {
         super();
 
@@ -92,6 +93,7 @@ class NuttyPudding2Days extends Recipe {
                 i.sunflowerLechtin(2, u.tsp),
                 i.cacaoPowderUnsweetened(2, u.tbsp), // 1 Tbsp non dutched cocoa
                 i.ceylonCinnamon(1, u.tsp),
+                i.peaProtein(2, u.scoop),
             ]),
             e.bulletMixer().mix(),
         ];
