@@ -12,7 +12,7 @@ export class MealRecipe extends RecipeContainer {
         this.recipeName = 'blueprint prep';
         this.recipeGroup = c.component;
         this.variations = [
-            GreenGiantPrep, PillsMorningPrep, NuttyPuddingPrep, NuttyPudding2DaysPrep
+            GreenGiantPrep, SuperVeggiePrep, PillsMorningPrep, NuttyPudding2DaysPrep
         ]
     }
 }
@@ -60,22 +60,15 @@ class PillsMorningPrep extends Recipe {
     }
 }
 
-class NuttyPuddingPrep extends Recipe {
+class SuperVeggiePrep extends Recipe {
     constructor() {
         super();
 
         this.steps = [
-            e.bulletMixer().add([
-                i.macadamiaNut(23, u.gram), // 3 Tbsp ground macadamia nuts (20% off + free m-nut oil)
-                i.walnut(4.79, u.gram), // 2 tsp
-                i.brazilNut(1, u.quarter),
-                i.flaxSeed(1, u.tsp),
-                i.sunflowerLechtin(1, u.tsp),
-                i.cacaoPowderUnsweetened(1, u.tbsp), // 1 Tbsp non dutched cocoa
-                i.ceylonCinnamon(.5, u.tsp),
-                i.peaProtein(1, u.scoop),
-            ]),
-            e.bulletMixer().mix(),
+            text.set(["Put 200 Grams of black lentils in 17.6 ounce stainless steel container"]),
+            text.set(["Put 150 Grams of cauliflower in 17.6 ounce stainless steel container"]),
+            text.set(["Put 50 Grams of shitake mushrooms in 17.6 ounce stainless steel container"]),
+            text.set(["Put 250 Grams of broccoli in 34 ounce stainless steel container"]),
         ];
     }
 }

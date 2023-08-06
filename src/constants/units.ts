@@ -19,6 +19,18 @@ export class Units {
         properName: 'none',
         equipmentUnits: [],
     };
+    public static readonly smallstainlesssteelcontainer: IUnitObj = {
+        name: '17 ounce stainless steel container',
+        isEquipment: true,
+        properName: '',
+        equipmentUnits: [],
+    };
+    public static readonly largestainlesssteelcontainer: IUnitObj = {
+        name: '34 ounce stainless steel container',
+        isEquipment: true,
+        properName: '',
+        equipmentUnits: [],
+    };
     public static readonly cup: IUnitObj = {
         name: 'cup',
         isEquipment: true,

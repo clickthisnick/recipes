@@ -13,7 +13,7 @@ export class MealRecipe extends RecipeContainer {
         this.recipeName = 'blueprint';
         this.recipeGroup = c.component;
         this.variations = [
-            SuperVeggie, NuttyPudding, NuttyPudding2Days, SweetPotato
+            SuperVeggie, NuttyPudding2Days, SweetPotato
         ]
     }
 }
@@ -52,21 +52,16 @@ class SuperVeggie extends Recipe {
         super();
 
         this.steps = [
-            e.strainer().add([
-                i.blackLentils(1, u.cup),
-            ]),
-            text.set(["Wash lentils with water and look for rocks"]),
             e.pot(0).add([
-                i.blackLentils(),
-                i.water(3, u.cup),
+                i.blackLentils(1, u.smallstainlesssteelcontainer), // 200 grams
+                i.water(1, u.smallstainlesssteelcontainer), // 3 cups
             ]),
             e.pot(0).cookWithLidSlightlyOff(21, 'm', 7, "lentils"), // 20 min for black/ 23 min for green total
                 text.set(['Drink a glass of water with morning pills']),
                 text.set(['Drink the green giant']),
                 e.pan().add([
-                    i.shitatkeMushroom(50, u.gram), // put in first so they defrost more
-                    i.broccoli(250, u.gram),
-                    i.cauliflower(150, u.gram),
+                    i.ingredient("broccoli/shitake mushroom", 1, u.smallstainlesssteelcontainer),
+                    i.broccoli(1, u.largestainlesssteelcontainer)
                 ]),
                 // Cook pan until lentils are done
                 e.pan().cookWithLid(14, 'm', 5, "broccoli"),
@@ -103,25 +98,6 @@ class NuttyPudding2Days extends Recipe {
                 // blend for 1 minute on low
                 i.strawberry(246, u.gram),
                 i.cherry(6, u.unit),
-                // blend for 1 minute on low
-            ]),
-            e.bulletMixer().mix(),
-        ];
-    }
-}
-
-class NuttyPudding extends Recipe {
-    constructor() {
-        super();
-
-        this.steps = [
-            e.bulletMixer().add([
-                i.pomegranateJuice(56.7, u.gram),
-                i.almondMilk(105, u.gram),
-                i.ingredient('NuttyPudding mixture'),
-                // blend for 1 minute on low
-                i.strawberry(123, u.gram),
-                i.cherry(3, u.unit),
                 // blend for 1 minute on low
             ]),
             e.bulletMixer().mix(),
