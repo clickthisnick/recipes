@@ -135,6 +135,19 @@ export class AnimalItems {
         nutrition: {},
     })
 
+    public static readonly halfAndHalf: IItem = (quantity = 0, unit: IUnitObj) => ({
+        name: 'Half and Half',
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity: quantity,
+        unit: unit || null,
+        wash: false,
+        isTakoutUnitable: false,
+        isMeatProduct: true,
+        nutrition: {},
+    })
+
     public static readonly pepperedSalami: IItem = (quantity = 0, unit: IUnitObj) => ({
         name: 'Peppered Salami',
         putAwayTime: 10,

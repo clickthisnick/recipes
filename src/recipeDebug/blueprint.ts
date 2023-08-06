@@ -64,7 +64,7 @@ class SuperVeggie extends Recipe {
                     i.broccoli(1, u.largestainlesssteelcontainer)
                 ]),
                 // Cook pan until lentils are done
-                e.pan().cookWithLid(14, 'm', 5, "broccoli"),
+                e.pan().cookWithLid(15, 'm', 5, "broccoli"),
                     text.set(['Do stretch routine.']),
                     // Alex
                     // e.pan(2).add([ // tmp for partner
