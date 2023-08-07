@@ -30,6 +30,7 @@ class SweetPotato extends Recipe {
             ]),
             e.pan().cook(30, 'm', 425),
             Timer.end(),
+            text.set(["300g of sweet potato per serving"]),
         ];
     }
 }
