@@ -76,13 +76,13 @@ class SuperVeggie extends Recipe {
             Timer.end(),
             i.ingredient('lentil').seasonWith([
                 i.cumin(1, u.tbsp),
-                i.lime(1, u.unit),
-                i.oliveOil(1, u.tbsp),
-                i.freshGinger(3, u.gram),
-                i.appleCiderVinegar(1, u.tbsp),
+                //i.lime(1, u.unit),
                 i.hempSeed(1, u.tbsp),
-                i.freshGinger(3, u.gram),
-                i.garlicClove(1, u.unit),
+                i.chiaSeed(2, u.tbsp),
+                //i.freshGinger(3, u.gram),
+                //i.garlicClove(1, u.unit),
+                i.oliveOil(1, u.tbsp),
+                i.appleCiderVinegar(1, u.tbsp),
             ])
         ];
     }

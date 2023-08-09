@@ -1,137 +1,131 @@
-import { IItem, Ingredient } from './ingredient';
+import { IItemObj, Ingredient } from './ingredient';
 import { IUnitObj, Units as u, Units } from '../../constants/units';
 import { CarbItems } from './carb';
 import { Stores } from '../../class/stores';
 
 export class FruitItems extends CarbItems {
-    public static readonly apple: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Apple',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Rinse and put measuring cup in dishwasher',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
 
-    public static readonly collagenPeptides = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Collagen Peptides', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            true, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
-            }, // purchase links
-        )
-    )
+    public static readonly apple = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Apple',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly cocoaFlavanols = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Cocoa Flavanols', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            true, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
-            }, // purchase links
-        )
-    )
+    public static readonly cocoaFlavanols = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Cocoa Flavanols',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: true,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly creatine = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Creatine', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            true, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
-            }, // purchase links
-        )
-    )
 
-    public static readonly chlorellaPowder = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Chlorella Powder', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            true, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
-            }, // purchase links
-        )
-    )
+    public static readonly creatine = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Creatine',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: true,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly aminoComplex = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Amino Complex', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            true, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
-            }, // purchase links
-        )
-    )
+    public static readonly chlorellaPowder = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Chlorella Powder',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: true,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly acaiFrozenMix = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Acai Frozen Mix', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            true, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
-            }, // purchase links
-        )
-    )
+    public static readonly aminoComplex = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Amino Complex',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: true,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly strawberry = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Strawberry', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
+    public static readonly acaiFrozenMix = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Acai Frozen Mix',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: true,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
+
+    public static readonly strawberry = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Strawberry',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: true,
+            purchaseLinks: {
                 [Stores.wholeFoods]: {
                     'organic': [
                         {
@@ -143,91 +137,97 @@ export class FruitItems extends CarbItems {
                         }
                     ]
                 }
-            }, // purchase links
-        )
-    )
+            },
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly banana = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'banana', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            true, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
-            }, // purchase links
-        )
-    )
+    public static readonly banana = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'banana',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: true,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly frozenStrawberry = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Frozen Strawberry', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            true, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
-            }, // purchase links
-        )
-    )
+    public static readonly frozenStrawberry = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Frozen Strawberry',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: true,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly frozenBlueberry = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Frozen Blueberry', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            true, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
-            }, // purchase links
-        )
-    )
+    public static readonly frozenBlueberry = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Frozen Blueberry',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: true,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly cherry = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Cherry', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            true, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
-            }, // purchase links
-        )
-    )
+    public static readonly cherry = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Cherry',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: true,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly macadamiaNut = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Macadamia Nut', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
+    public static readonly macadamiaNut = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Macadamia Nut',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {
                 [Stores.wholeFoods]: {
                     'organic': [
                         {
@@ -239,40 +239,61 @@ export class FruitItems extends CarbItems {
                         }
                     ]
                 }
-            }, // purchase links
-        )
-    )
+            },
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly hempSeed = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Hemp Seed', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            true, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
-            }, // purchase links
-        )
-    )
+    public static readonly hempSeed = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Hemp Seed',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly collagenPowder = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Collagen Powder', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            true, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
+    public static readonly chiaSeed = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Chia Seed',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
+
+    public static readonly collagenPowder = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Collagen Powder',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {
                 [Stores.amazon]: {
                     'Anthony\'s Collagen Peptide Powder, 1 lb, Pure Hydrolyzed, Gluten Free, Keto and Paleo Friendly, Grass Fed': [
                         {
@@ -287,23 +308,25 @@ export class FruitItems extends CarbItems {
                         }
                     ]
                 },
-            }, // purchase links
-        )
-    )
+            },
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly pittedDates = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Pitted Dates', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
+    public static readonly pittedDates = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Pitted Dates',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {
                 [Stores.wholeFoods]: {
                     '365 by Whole Foods Market, Dried Fruit, Pitted Dates': [
                         {
@@ -354,24 +377,26 @@ export class FruitItems extends CarbItems {
                         }
                     ]
                 },
-            }, // purchase links
-        )
-    )
+            },
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly peanutButter = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Peanut Butter', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {
-            }, // nutrition
-            unit, // unit
-            {
+    public static readonly peanutButter = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Peanut Butter',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            perishableLimit: undefined,
+            purchaseLinks: {
                 [Stores.wholeFoods]: {
                     '365 by Whole Foods Market, Organic Peanut Butter, Creamy': [
                         {
@@ -429,25 +454,24 @@ export class FruitItems extends CarbItems {
                         }
                     ],
                 },
-            }, // purchaseLinks
-            7, // perishableLimit
-        )
-    )
+            },
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly cashewButter = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Cashew Butter', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {
-            }, // nutrition
-            unit, // unit
-            {
+    public static readonly cashewButter = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Cashew Butter',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {
                 [Stores.wholeFoods]: {
                     'conventional': [
                         {
@@ -459,44 +483,55 @@ export class FruitItems extends CarbItems {
                         }
                     ]
                 },
-            }, // purchaseLinks
-            7, // perishableLimit
-        )
-    )
+            },
+            perishableLimit: 7,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly orangeJuice: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Orange Juice',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Rinse and put measuring cup in dishwasher',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {
-            [u.fluid_ounce.name]: {
-                servings: 8,
-                serving_size: 7,
-                calories: 110,
-                sodium: 0,
-                sugar: 22,
-                protein: 2,
-            }
-        },
-        link: 'https://www.amazon.com/gp/product/B074H6QW3S/ref=afx_dp_ingress?ie=UTF8&almBrandId=VUZHIFdob2xlIEZvb2Rz&fpw=alm'
-    })
+    public static readonly orangeJuice = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Orange Juice',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {
+                [u.fluid_ounce.name]: {
+                    servings: 8,
+                    serving_size: 7,
+                    calories: 110,
+                    sodium: 0,
+                    sugar: 22,
+                    protein: 2,
+                }
+            },
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly frozenBerries: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Frozen Berries',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly frozenBerries = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Frozen Berries',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 }

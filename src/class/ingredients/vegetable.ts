@@ -1,140 +1,184 @@
-import { IItem, Ingredient } from './ingredient';
+import { IItemObj, Ingredient } from './ingredient';
 import { IUnitObj, Units as u, Units } from '../../constants/units';
 import { SpiceItems } from './spice';
 import { Stores } from '../../class/stores';
 
 export class VegetableItems extends SpiceItems {
 
-    public static readonly vitalWheatGluten: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Vital Wheat Gluten',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Rinse and put measuring cup in dishwasher',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly vitalWheatGluten = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Vital Wheat Gluten',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly coffeeGrounds: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Coffee Grounds',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Rinse and put measuring cup in dishwasher',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly coffeeGrounds = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Coffee Grounds',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly bakingPowder: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Baking Powder',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Rinse and put measuring cup in dishwasher',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly bakingPowder = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Baking Powder',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly whiteVinegar: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'White Vinegar',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Rinse and put measuring cup in dishwasher',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly whiteVinegar = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'White Vinegar',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly frozenStirFryVeggies: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Frozen Stirfry Veggies',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Rinse and put measuring cup in dishwasher',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly frozenStirFryVeggies = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Frozen Stirfry Veggies',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly almondFlour: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Almond Flour',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly almondFlour = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Almond Flour',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly pankoBreadCrumbs: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Panko Bread Crumbs',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly pankoBreadCrumbs = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Panko Bread Crumbs',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly beyondBurger: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Beyond Burger',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Rinse and put measuring cup in dishwasher',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly beyondBurger = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Beyond Burger',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly briocheHamburgerBun: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Brioche Hamburger Bun',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Rinse and put measuring cup in dishwasher',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly briocheHamburgerBun = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Brioche Hamburger Bun',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly blackLentils = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Black Lentils', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
+    public static readonly blackLentils = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Black Lentils',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {
                 [Stores.wholeFoods]: {
                     'organic': [
                         {
@@ -146,112 +190,133 @@ export class VegetableItems extends SpiceItems {
                         }
                     ]
                 }
-            }, // purchase links
-        )
-    )
+            },
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly lentils: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Lentils',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly lentils = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Lentils',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly pizzaCrust: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Pizza Crust',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly pizzaCrust = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Pizza Crust',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly popcorn: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Popcorn',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly popcorn = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Popcorn',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly carrots = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Carrots', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            true, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
-            }, // purchase links
-        )
-    )
+    public static readonly carrots = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Carrots',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly celery = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Celery', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {
+    public static readonly celery = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Celery',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: 5,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-            }, // nutrition
-            unit, // unit
-            {
-            }, // purchaseLinks
-            5, // perishableLimit
-        )
-    )
+    public static readonly frozenTatorTots = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Frozen Tator Tots',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly frozenTatorTots: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Frozen Tator Tots',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
-
-    public static readonly hamburgerBun = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Hamburger Bun', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            true, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
+    public static readonly hamburgerBun = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Hamburger Bun',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks:             {
                 [Stores.wegmans]: {
                     'white': [
                         {
@@ -263,40 +328,43 @@ export class VegetableItems extends SpiceItems {
                         }
                     ]
                 },
-            }, // purchase links
-        )
-    )
+            },
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly sunflowerLechtin = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Sunflower Lechtin', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            true, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
-            }, // purchase links
-        )
-    )
+    public static readonly sunflowerLechtin = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Sunflower Lechtin',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly almondMilk = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Almond Milk', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            true, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
+    public static readonly almondMilk = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Almond Milk',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {
                 [Stores.wegmans]: {
                     'unsweetened': [
                         {
@@ -330,23 +398,25 @@ export class VegetableItems extends SpiceItems {
                         }
                     ]
                 },
-            }, // purchase links
-        )
-    )
+            },
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly kale = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Kale', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
+    public static readonly kale = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Kale',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {
                 [Stores.wholeFoods]: {
                     'organic': [
                         {
@@ -369,37 +439,43 @@ export class VegetableItems extends SpiceItems {
                         }
                     ]
                 }
-            }, // purchaseLinks
-            7, // perishableLimit
-        )
-    )
+            },
+            perishableLimit: 7,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly cookingSpray: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Cooking Spray',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly cookingSpray = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Cooking Spray',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly asparagus = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'asparagus', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
+    public static readonly asparagus = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'asparagus',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {
                 [Stores.wholeFoods]: {
                     'conventional': [
                         {
@@ -422,60 +498,61 @@ export class VegetableItems extends SpiceItems {
                         }
                     ]
                 }
-            }, // purchaseLinks
-            7, // perishableLimit
-        )
-    )
+            },
+            perishableLimit: 7,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly brusselSprouts = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Brussel Sprouts', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
-            }, // purchaseLinks
-            7, // perishableLimit
-        )
-    )
+    public static readonly brusselSprouts = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Brussel Sprouts',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: 7,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly romaineLettuce = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Romaine Lettuce', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
-            }, // purchaseLinks
-            7, // perishableLimit
-        )
-    )
+    public static readonly romaineLettuce = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Romaine Lettuce',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: 7,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly appleSauce = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Apple Sauce', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
+    public static readonly appleSauce = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Apple Sauce',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks:            {
                 [Stores.wholeFoods]: {
                     'conventional': [
                         {
@@ -487,105 +564,133 @@ export class VegetableItems extends SpiceItems {
                         }
                     ]
                 }
-            }, // purchaseLinks
-        )
-    )
+            },
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly timer: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Timer',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly timer = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Timer',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly water = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Water', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
-            }, // purchase links
-        )
-    )
+    public static readonly water = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Water',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly aminosCoconut: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Aminos Coconut',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly aminosCoconut = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Aminos Coconut',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly liquidSmoke: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Liquid Smoke',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly liquidSmoke = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Liquid Smoke',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly seasonedRiceVinegar: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Seasoned Rice Vinegar',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly seasonedRiceVinegar = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Seasoned Rice Vinegar',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly appleCiderVinegar: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Apple Cider Vinegar',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly appleCiderVinegar = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Apple Cider Vinegar',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly blackBeans = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Black Beans', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
+    public static readonly blackBeans = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Black Beans',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {
                 [Stores.wholeFoods]: {
                     'organic': [
                         {
@@ -606,112 +711,133 @@ export class VegetableItems extends SpiceItems {
                         }
                     ]
                 }
-            }, // purchase links
-        )
-    )
+            },
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly avocadoLarge = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Large avocado', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {
+    public static readonly avocadoLarge = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Large avocado',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-            }, // nutrition
-            unit, // unit
-            {
-            }, // purchaseLinks
-            5, // perishableLimit
-        )
-    )
+    public static readonly avocado = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'avocado',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly avocado: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'avocado',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: true,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly cauliflower = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Cauliflower',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly cauliflower: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Cauliflower',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: true,
-        isTakoutUnitable: true,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly leek = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Leek',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly leek: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Leek',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: true,
-        isTakoutUnitable: true,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly lime = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Lime',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly lime: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Lime',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: true,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly lemonJuice = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Lemon Juice',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly lemonJuice = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Lemon Juice', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
-            }, // purchaseLinks
-        )
-    )
-
-    public static readonly limeJuice = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Lime Juice', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
+    public static readonly limeJuice = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Lime Juice',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {
                 [Stores.wegmans]: {
                     'conventional': [
                         {
@@ -734,66 +860,79 @@ export class VegetableItems extends SpiceItems {
                         }
                     ]
                 }
-            }, // purchaseLinks
-        )
-    )
+            },
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly romaTomato: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Roma Tomato',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: true,
-        isTakoutUnitable: true,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly romaTomato = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Roma Tomato',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly pickleHotdogSlice: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Pickle',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: true,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly pickleHotdogSlice = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Pickle',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly freshGinger = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Fresh Ginger',
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
-            }, // purchaseLinks
-        )
-    )
+    public static readonly freshGinger = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Fresh Ginger',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly groundGinger = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Ground Ginger',
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
+    public static readonly groundGinger = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Ground Ginger',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {
                 [Stores.amazon]: {
                     'organic': [
                         {
@@ -805,120 +944,151 @@ export class VegetableItems extends SpiceItems {
                         }
                     ]
                 }
-            }, // purchaseLinks
-        )
-    )
+            },
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly shallot: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Shallot',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: true,
-        isTakoutUnitable: true,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly shallot = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Shallot',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly serranoChilli = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Serrano Chilli', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {
-            }, // nutrition
-            unit, // unit
-            {
-            }, // purchaseLinks
-        )
-    )
+    public static readonly serranoChilli = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Serrano Chilli',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly cilantro: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Cilantro',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: true,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly cilantro = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Cilantro',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly habanero: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Habanero',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: true,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly habanero = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Habanero',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly mango: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Mango',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: true,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly mango = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Mango',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly jalapeno: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Jalapeno',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: true,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly jalapeno = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Jalapeno',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly spiriliazer: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Spirilizer',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Rinse and put sprilizer in dishwasher',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly spiriliazer = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Spirilizer',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: 'Rinse and put sprilizer in dishwasher',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly pickleSpears = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Pickle Spears', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {
-            }, // nutrition
-            unit, // unit
-            {
+    public static readonly pickleSpears = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Pickle Spears',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {
                 [Stores.wegmans]: {
                     'spears': [
                         {
@@ -930,24 +1100,25 @@ export class VegetableItems extends SpiceItems {
                         }
                     ]
                 },
-            }, // purchaseLinks
-        )
-    )
+            },
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly pickleSlices = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Pickle Slices', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {
-            }, // nutrition
-            unit, // unit
-            {
+    public static readonly pickleSlices = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Pickle Slices',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {
                 [Stores.wegmans]: {
                     'slices': [
                         {
@@ -959,168 +1130,168 @@ export class VegetableItems extends SpiceItems {
                         }
                     ]
                 },
-            }, // purchaseLinks
-        )
-    )
+            },
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly breadFlour = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Bread Flour', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {
-            }, // nutrition
-            unit, // unit
-            {
-            }, // purchaseLinks
-        )
-    )
+    public static readonly breadFlour = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Bread Flour',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly wheatBreadFlour: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Wheat Bread Flour',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Put bread flour back in cupboard',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly wheatBreadFlour = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Wheat Bread Flour',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: 'Put bread flour back in cupboard',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly dryActiveYeast: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Active Dry Yeast',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Put dry active yeast back in refrigerator',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly dryActiveYeast = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Active Dry Yeast',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: 'Put dry active yeast back in refrigerator',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly brownSugar: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Brown Sugar',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Put brown sugar back in cupboard',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly brownSugar = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name:  'Brown Sugar',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: 'Put brown sugar back in cupboard',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
+    public static readonly greenOnion = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Green Onion',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly greenOnion = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Green Onion', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {
-            }, // nutrition
-            unit, // unit
-            {
-            }, // purchaseLinks
-        )
-    )
+    public static readonly frozenCorn = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Frozen Corn',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly frozenCorn = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Frozen Corn', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {
-            }, // nutrition
-            unit, // unit
-            {
-                // [Stores.amazonFresh]: {
-                //     'supremely spicy': [
-                //         {
-                //             price: 2.29,
-                //             quantity: 16,
-                //             quantity_unit: u.fluid_ounce,
-                //             link: 'https://www.amazon.com/Sabra-Supremely-Spicy-Hummus-17/dp/B00LME9DTM',
-                //         }
-                //     ]
-                // },
-            }, // purchaseLinks
-        )
-    )
+    public static readonly redPepperFlakes = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Red Pepper Flakes',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly redPepperFlakes: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Red Pepper Flakes',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: true,
-        isTakoutUnitable: true,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly spicyHummus = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Spicy Hummus',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly spicyHummus = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Spicy Hummus', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {
-            }, // nutrition
-            unit, // unit
-            {
-                // [Stores.amazonFresh]: {
-                //     'supremely spicy': [
-                //         {
-                //             price: 2.29,
-                //             quantity: 16,
-                //             quantity_unit: u.fluid_ounce,
-                //             link: 'https://www.amazon.com/Sabra-Supremely-Spicy-Hummus-17/dp/B00LME9DTM',
-                //         }
-                //     ]
-                // },
-            }, // purchaseLinks
-        )
-    )
-
-    public static readonly whiteOnion = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'White Onion', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {
-            }, // nutrition
-            unit, // unit
-            {
+    public static readonly whiteOnion = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'White Onion',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {
                 [Stores.wegmans]: {
                     'conventional bulk': [
                         {
@@ -1161,113 +1332,115 @@ export class VegetableItems extends SpiceItems {
                         }
                     ]
                 },
-            }, // purchaseLinks
-        )
-    )
+            },
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly yellowOnion = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Yellow Onion', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {
-            }, // nutrition
-            unit, // unit
-            {
-            }, // purchaseLinks
-        )
-    )
+    public static readonly yellowOnion = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Yellow Onion',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly redOnion = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Red Onion', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
-                // [Stores.wholeFoods]: {
-                //     'conventional': [
-                //         {
-                //             price: 6.89,
-                //             quantity: 10,
-                //             quantity_unit: u.pound,
-                //             link: 'https://www.amazon.com/Onion-Red-Conventional-1-Each/dp/B0787T926H/ref=sr_1_2_0g_wf',
-                //         }
-                //     ]
-                // },
-            }, // purchaseLinks
-            10, // perishableLimit
-        )
-    )
+    public static readonly redOnion = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Red Onion',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: 10,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly scallion: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Scallion',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: true,
-        isTakoutUnitable: true,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly scallion = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Scallion',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: 7,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly cannedHotCherryPepper: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Canned Hot Cherry Pepper',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: true,
-        isTakoutUnitable: true,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly cannedHotCherryPepper = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Canned Hot Cherry Pepper',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: 7,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly lemonZest = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Lemon Zest', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            true, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
-            }, // purchase links
-            // perishableLimit
-        )
-    )
+    public static readonly lemonZest = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Lemon Zest',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: 7,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly greenBellPepper = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Green Bell Pepper', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            true, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
+    public static readonly greenBellPepper = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Green Bell Pepper',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {
                 [Stores.wegmans]: {
                     'conventional': [
                         {
@@ -1283,69 +1456,79 @@ export class VegetableItems extends SpiceItems {
                 //     "conventional": ["https://www.amazon.com/Green-Bell-Pepper-Conventional-Each/dp/B07815JXHB/ref=sr_1_1_0g_wf"],
                 //     "organic": ["https://www.amazon.com/Green-Bell-Pepper-Organic-Each/dp/B07QYB5JNX/ref=sr_1_2_0g_wf"],
                 // }
-            }, // purchase links
-            7, // perishableLimit
-        )
-    )
+            },
+            perishableLimit: 7,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly redBellPepper = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Red Bell Pepper', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            true, // isMeatProduct
-            {}, // nutrition
-            unit, // unit
-            {
-            }, // purchase links
-            7, // perishableLimit
-        )
-    )
+    public static readonly redBellPepper = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Red Bell Pepper',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: 7,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly arrowRootStarch: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Arrow Root Starch',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: true,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly arrowRootStarch = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Arrow Root Starch',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly broccoli: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Broccoli',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: true,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly broccoli = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Broccoli',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: 7,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly tomatoPaste = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Tomato Paste', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            true, // isTakoutUnitable
-            false, // isMeatProduct
-            {
-            }, // nutrition
-            unit, // unit
-            {
+    public static readonly tomatoPaste = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Tomato Paste',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {
                 [Stores.wegmans]: {
                     'conventional': [
                         {
@@ -1377,51 +1560,61 @@ export class VegetableItems extends SpiceItems {
                         }
                     ]
                 }
-            }, // purchaseLinks
-        )
-    )
+            },
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly chipotlePepperInAdoboSauce: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Chipotle Pepper In Adobo Sauce',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: true,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly chipotlePepperInAdoboSauce = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Chipotle Pepper In Adobo Sauce',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: 7,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly driedOregano: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Dried Oregano',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: true,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly driedOregano = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Dried Oregano',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: 7,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly garlicClove = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Garlic Clove', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            true, // isTakoutUnitable
-            false, // isMeatProduct
-            {
-
-            }, // nutrition
-            unit, // unit
-            {
+    public static readonly garlicClove = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Garlic Clove',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {
                 [Stores.wegmans]: {
                     'conventional': [
                         {
@@ -1444,100 +1637,97 @@ export class VegetableItems extends SpiceItems {
                         }
                     ]
                 }
-            }, // purchaseLinks
-        )
-    )
+            },
+            perishableLimit: 7,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly basil = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Basil', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            true, // isTakoutUnitable
-            false, // isMeatProduct
-            {
+    public static readonly basil = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Basil',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: 7,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-            }, // nutrition
-            unit, // unit
-            {
-            }, // purchaseLinks
-        )
-    )
+    public static readonly whiteMushroom = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'White Mushroom',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: 7,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly whiteMushroom = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'White Mushroom', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {
-            }, // nutrition
-            unit, // unit
-            {
-            }, // purchaseLinks
-            7, // perishableLimit
-        )
-    )
+    public static readonly shitatkeMushroom = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Shitatke eMushroom',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: 7,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly shitatkeMushroom = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Shitatke eMushroom', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {
-            }, // nutrition
-            unit, // unit
-            {
-            }, // purchaseLinks
-            7, // perishableLimit
-        )
-    )
+    public static readonly cabbage = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Cabbage',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: 7,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly cabbage = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Cabbage', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {
-            }, // nutrition
-            unit, // unit
-            {
-            }, // purchaseLinks
-            7, // perishableLimit
-        )
-    )
-
-    public static readonly babyBellaMushroom = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Baby Bella Mushroom', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {
-            }, // nutrition
-            unit, // unit
-            {
+    public static readonly babyBellaMushroom = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Baby Bella Mushroom',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {
                 [Stores.wegmans]: {
                     'Wegmans Mushrooms, Baby Bella, Whole, FAMILY PACK': [
                         {
@@ -1578,40 +1768,46 @@ export class VegetableItems extends SpiceItems {
                         }
                     ]
                 }
-            }, // purchaseLinks
-            7, // perishableLimit
-        )
-    )
+            },
+            perishableLimit: 7,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly spinach = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Spinach', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {
-            }, // nutrition
-            unit, // unit
-            {
-            }, // purchaseLinks
-            7, // perishableLimit
-        )
-    )
+    public static readonly spinach = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Spinach',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: 7,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly zuchinni: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Zuchinni',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: true,
-        isTakoutUnitable: true,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly zuchinni = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Zuchinni',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 }

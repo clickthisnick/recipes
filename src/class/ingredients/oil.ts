@@ -1,71 +1,85 @@
-import { IItem, Ingredient } from './ingredient';
+import { IItemObj, Ingredient } from './ingredient';
 import { IUnitObj, Units as u, Units } from '../../constants/units';
 import { MeatItems } from './meat';
 import { Stores } from '../../class/stores';
 
 export class OilItems extends MeatItems {
-    public static readonly sesameOil: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Sesame Oil',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: 'Rinse and put measuring cup in dishwasher',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {}
-    })
 
-    public static readonly avocadoOil: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'avocado Oil',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: true,
-        isMeatProduct: false,
-        nutrition: {},
-    })
+    public static readonly sesameOil = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Sesame Oil',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: true,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly chilliOil: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Chilli Oil',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: true,
-        isTakoutUnitable: true,
-        isMeatProduct: false,
-        nutrition: {
-            [u.tbsp.name]: {
-                calories: 119.34,
-                sodium: .3,
+    public static readonly avocadoOil = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'avocado Oil',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: true,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
+
+    public static readonly chilliOil = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Chilli Oil',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: true,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {
+                [u.tbsp.name]: {
+                    calories: 119.34,
+                    sodium: .3,
+                },
+                [u.tsp.name]: {
+                    calories: 39.78,
+                    sodium: .1,
+                }
             },
-            [u.tsp.name]: {
-                calories: 39.78,
-                sodium: .1,
-            }
-        },
-    })
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly coconutOil = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Coconut Oil', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {
-            }, // nutrition
-            unit, // unit
-            {
+    public static readonly coconutOil = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Coconut Oil',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: true,
+            purchaseLinks: {
                 [Stores.amazon]: {
                     'BetterBody Foods Organic Naturally Refined Coconut Oil with Neutral Flavor and Aroma': [
                         {
@@ -103,32 +117,25 @@ export class OilItems extends MeatItems {
                         }
                     ]
                 },
-            }, // purchase links
-        )
-    )
+            },
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly oliveOil = (quantity = 0, unit: IUnitObj = Units.none) => (
-        new Ingredient(
-            'Olive Oil', // name
-            10, // putAwayTime
-            10, // takeOutTime
-            '',  // cleanSteps
-            quantity, // quantity
-            false, // wash
-            false, // isTakoutUnitable
-            false, // isMeatProduct
-            {
-                [u.tbsp.name]: {
-                    calories: 119.34,
-                    sodium: .3,
-                },
-                [u.tsp.name]: {
-                    calories: 39.78,
-                    sodium: .1,
-                }
-            }, // nutrition
-            unit, // unit
-            {
+    public static readonly oliveOil = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Olive Oil',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: true,
+            purchaseLinks: {
                 [Stores.wholeFoods]: {
                     'california': [
                         {
@@ -175,20 +182,37 @@ export class OilItems extends MeatItems {
                         }
                     ]
                 }
-            }, // purchase links
-        )
-    )
+            },
+            perishableLimit: undefined,
+            nutrition: {
+                [u.tbsp.name]: {
+                    calories: 119.34,
+                    sodium: .3,
+                },
+                [u.tsp.name]: {
+                    calories: 39.78,
+                    sodium: .1,
+                }
+            },
+        }
+        return new Ingredient(item)
+    }
 
-    public static readonly vegetableOil: IItem = (quantity = 0, unit: IUnitObj) => ({
-        name: 'Vegetable Oil',
-        putAwayTime: 10,
-        takeOutTime: 10,
-        cleanSteps: '',
-        quantity: quantity,
-        unit: unit || null,
-        wash: false,
-        isTakoutUnitable: false,
-        isMeatProduct: false,
-        nutrition: {}
-    })
+    public static readonly vegetableOil = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Vegetable Oil',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: true,
+            purchaseLinks: {},
+            perishableLimit: undefined,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
 }

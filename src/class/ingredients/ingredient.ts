@@ -4,6 +4,8 @@ import { Serializer as s } from '../serializer';
 import { Equipment as e } from '../equipment';
 
 export interface IEstimates {
+    servings?: number;
+    serving_size?: number;
     calories?: number;
     sodium?: number;
     sugar?: number;
@@ -53,11 +55,17 @@ export interface IItemObj {
     takeOutTime: number;
     cleanSteps: string;
     quantity: number;
-    unit: IUnitObj | null;
+    unit: IUnitObj;
     wash: boolean;
-    isTakoutUnitable: boolean;
+    isTakeoutUnitable: boolean;
     isMeatProduct: boolean;
+    purchaseLinks: IStorePurchaseLink;
+    perishableLimit: number | undefined;
     nutrition: INutrition;
+}
+
+export interface IMeatObj extends IItemObj {
+    isMeatProduct: true;
 }
 
 export interface IItem {
@@ -72,7 +80,7 @@ export class Ingredient {
     quantity: number
     unit: IUnitObj
     wash: boolean
-    isTakoutUnitable: boolean
+    isTakeoutUnitable: boolean
     isMeatProduct: boolean
     nutrition: any
     purchaseLinks: IStorePurchaseLink
@@ -80,31 +88,20 @@ export class Ingredient {
 
     // Containers are a singleton
     constructor(
-        name: string,
-        putAwayTime: number,
-        takeOutTime: number,
-        cleanSteps: string,
-        quantity: number,
-        wash: boolean,
-        isTakoutUnitable: boolean,
-        isMeatProduct: boolean,
-        nutrition: any,
-        unit: IUnitObj,
-        purchaseLinks: IStorePurchaseLink,
-        perishableLimit?: number,
+        item :IItemObj,
     ) {
-        this.name = name
-        this.putAwayTime = putAwayTime
-        this.takeOutTime = takeOutTime
-        this.cleanSteps = cleanSteps
-        this.quantity = quantity
-        this.wash = wash
-        this.isTakoutUnitable = isTakoutUnitable
-        this.isMeatProduct = isMeatProduct
-        this.nutrition = nutrition
-        this.unit = unit
-        this.purchaseLinks = purchaseLinks
-        this.perishableLimit = perishableLimit
+        this.name = item.name
+        this.putAwayTime = item.putAwayTime
+        this.takeOutTime = item.takeOutTime
+        this.cleanSteps = item.cleanSteps
+        this.quantity = item.quantity
+        this.wash = item.wash
+        this.isTakeoutUnitable = item.isTakeoutUnitable
+        this.isMeatProduct = item.isMeatProduct
+        this.nutrition = item.nutrition
+        this.unit = item.unit
+        this.purchaseLinks = item.purchaseLinks
+        this.perishableLimit = item.perishableLimit
     }
 
     public seasonWith(ingredients: any): IStep {
