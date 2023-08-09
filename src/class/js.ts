@@ -55,9 +55,49 @@ function selectMode(id) {
     hideElement('shoppingButton')
 }
 
+function deselectRecipe(recipeName) {
+    let idx = -1
+
+    for (let i = 0; i < selectedRecipeNames.length; i++) {
+        if (selectedRecipeNames[i] == recipeName) {
+            idx = i
+        }
+    }
+
+    if (idx >= 0) {
+        // TODO this might not be right in javascript
+        // its keeping the array as the same length without the objects
+        delete selectedRecipeNames[idx]
+        delete selectedRecipes[idx]
+    }
+
+    renderSelectedRecipes()
+}
+
+function renderSelectedRecipes() {
+    // Show all the selected recipes
+    let selectedRecipesHtml = ""
+    for (let i =0; i < selectedRecipeNames.length; i++) {
+        selectedRecipesHtml += `<button onclick="deselectRecipe('${selectedRecipeNames[i]}')">${selectedRecipeNames[i]}</button>`
+        selectedRecipesHtml += "<br>"
+    }
+
+    console.log('hi')
+    console.log(selectedRecipeNames)
+    console.log(selectedRecipesHtml)
+
+    const selectedDiv = document.getElementById("selectedrecipenames")
+    if (selectedDiv) {
+        selectedDiv.innerHTML = selectedRecipesHtml
+    } 
+    showElement('selected')
+}
+
 function selectRecipe(recipeName) {
     selectedRecipeNames.push(recipeName)
     selectedRecipes.push(recipes[recipeName])
+
+    renderSelectedRecipes()
 }
 
 function addStep(istep) {
@@ -150,6 +190,8 @@ function applyCreditCardDiscounts(store, pricePerQuantity) {
 }
 function doneSelectingRecipes() {
     hideElement('select')
+    hideElement('selected')
+    showElement('shoppingListButton')
     const shoppingDiv = document.getElementById('shopping')
 
     if (mode === 'shopping') {

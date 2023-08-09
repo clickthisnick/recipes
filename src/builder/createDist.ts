@@ -20,11 +20,11 @@ pageHtml += HTML.javascript();
 // Shopping mode allows you to select recipes and get all the ingredients needed for all recipes
 // Cooking mode allows you to select recipes and optimizes the cooking
 pageHtml += `<button id="shoppingButton" onclick="selectMode('shopping')">Shopping Mode</button><button id="cookingButton" onclick="selectMode('cooking')">Cooking Mode</button><br>`
-pageHtml += '<div id="shopping" style="display: none;">Shopping List<button onclick="saveShoppingUrl()">Save Shopping Url</button><br><span id="shoppingUrl"></span></div><br>'
+pageHtml += '<div id="shopping" style="display: none;">Shopping List<button id="shoppingListButton" style="display: none;" onclick="saveShoppingUrl()">Save Shopping Url</button><br><span id="shoppingUrl"></span></div><br>'
 pageHtml += '<div id="cooking" style="display: none;">Cooking List</div><br>'
 
 
-
+pageHtml += '<div id="selected" style="display: none;">Selected Recipes<div id="selectedrecipenames"></div><br></div>'
 pageHtml += '<div id="select" style="display: none;">Select Recipes<br>'
 // add all recipes to javascript variable
 pageHtml += `<button onclick="doneSelectingRecipes()">Done Selecting</button><br>`
