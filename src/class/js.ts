@@ -292,7 +292,7 @@ function doneSelectingRecipes() {
                 })
             }
 
-            shoppingDiv.innerHTML += '<div id="shopping-' + ingredient.name + '" class="panel" style="">' + '<span onclick="this.classList.toggle(' + "'completed'" + "); document.getElementById('shopping-" + ingredient.name  + "').remove(); delete ingredients['" + ingredient.name  + "'" + '];" >' + ingredient.name  + ' ' + ingredient.quantity + ' ' + ingredient.unit.name + '</span>' + links + '</div>'
+            shoppingDiv.innerHTML += '<div onclick="this.classList.toggle(' + "'completed'" + ');"' + 'id="shopping-' + ingredient.name + '" class="panel" style="">' + '<span' + "document.getElementById('shopping-" + ingredient.name  + "').remove(); delete ingredients['" + ingredient.name  + "'" + '];" >' + ingredient.name  + ' ' + ingredient.quantity + ' ' + ingredient.unit.name + '</span>' + links + '</div>'
         })
     } else {
         selectedRecipes.forEach(recipes => {
