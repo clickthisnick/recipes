@@ -25,39 +25,40 @@ export class RecipeContainer {
     //     {'veggie': ['mushroom']},
     // ];
 
-    private generateRecipeVariation(recipeClass, includeInVariation=false) {
+    private generateRecipeVariation(recipeGroup: string, recipeClass, includeInVariation=false) {
         const initRecipe: Recipe = new recipeClass();
         const recipeName = recipeClass.name;
 
         // Ensure the recipe is valid
-        initRecipe.validate(recipeName)
+        initRecipe.validate(recipeGroup, recipeName)
 
         // Adds the recipe to the javascript variable
-        this.recipeHtml += initRecipe.printRecipe(recipeName)
+        this.recipeHtml += initRecipe.printRecipe(recipeGroup, recipeName)
 
         if (includeInVariation) {
-            this.recipeHtml += `<button class="${this.recipeName}-group" style="display: none" `
+            this.recipeHtml += `<button class="${recipeGroup}-group" style="display: none" `
         } else {
             this.recipeHtml += `<button `
         }
 
-        this.recipeHtml += `onclick="selectRecipe('${recipeName}')">${recipeName}</button>`
+        this.recipeHtml += `onclick="selectRecipe('${recipeGroup}-${recipeName}')">${recipeName}</button>`
     }
 
-    public generateRecipeHtml() {
+    public generateRecipeHtml(filename: string) {
         let hideUnderRecipeGroup = false;
 
-        const recipeGroupName = this.recipeName;
+        // The file name which is unique but without the extension
+        // TODO make it space delimited on word (capitzliation)
+        const recipeGroup = filename.replace(".ts", "")
 
         if (this.variations.length > 1) {
-            // TODO something should check this is unique;
-            this.recipeHtml += `<div id='${recipeGroupName}-main'><button onclick="showElementsByClassName('${recipeGroupName}-group'); hideElement('${recipeGroupName}-main');">${recipeGroupName} ⇩</button></div>`
+            this.recipeHtml += `<div id='${recipeGroup}-main'><button onclick="showElementsByClassName('${recipeGroup}-group'); hideElement('${recipeGroup}-main');">${recipeGroup} ⇩</button></div>`
 
             hideUnderRecipeGroup = true
         }
 
         this.variations.forEach(variation => {
-            this.generateRecipeVariation(variation, hideUnderRecipeGroup)
+            this.generateRecipeVariation(recipeGroup, variation, hideUnderRecipeGroup)
         })
 
         // this.recipeHtml += '<br>'
@@ -115,7 +116,7 @@ export class Recipe {
         }
     }
 
-    public validate(recipeName) {
+    public validate(recipeGroup: string, recipeName: string) {
         const timers: any[] = []
         this.steps.forEach(stepz => {
             if (stepz.showTimer) {
@@ -126,7 +127,7 @@ export class Recipe {
         })
 
         if (timers.length > 0) {
-            console.log(recipeName)
+            console.log(`${recipeGroup} = ${recipeName}`)
             console.log(timers)
             throw new Error('Timers left open');
         }
@@ -192,7 +193,7 @@ export class Recipe {
         return equipment
     }
 
-    public printRecipe(recipeName): string {
+    public printRecipe(recipeGroup: string, recipeName: string): string {
         let html = ''
 
         // Add the ingredients from each step of the recipe into the main recipe as combined ingredients
@@ -230,7 +231,7 @@ export class Recipe {
             Units.setPricingTable(ingredient)
         })
 
-        html += `<script>setRecipe('${recipeName}', ${JSON.stringify(this)})</script>`
+        html += `<script>setRecipe('${recipeGroup}-${recipeName}', ${JSON.stringify(this)})</script>`
 
         return html
     }

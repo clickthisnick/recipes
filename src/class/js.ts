@@ -1,6 +1,6 @@
 const recipes = {}
 const selectedRecipes = []
-const selectedRecipeNames = []
+const selectedRecipeGroupNames = []
 const ingredients = {}
 let mode = ''
 const perishableItems = {}
@@ -34,12 +34,12 @@ const parseParams = (windowLocationSearch) => {
 
 const queryString = parseParams(window.location.search)
 
-function setRecipe(recipeName, recipe) {
+function setRecipe(recipeGroupName, recipe) {
     // Setting the recipe data into the recipe
-    if (recipes.hasOwnProperty(recipeName) === false) {
-        recipes[recipeName] = []
+    if (recipes.hasOwnProperty(recipeGroupName) === false) {
+        recipes[recipeGroupName] = []
     }
-    recipes[recipeName].push(recipe)
+    recipes[recipeGroupName].push(recipe)
 }
 
 function selectMode(id) {
@@ -55,11 +55,11 @@ function selectMode(id) {
     hideElement('shoppingButton')
 }
 
-function deselectRecipe(recipeName) {
+function deselectRecipe(recipeGroupName) {
     let idx = -1
 
-    for (let i = 0; i < selectedRecipeNames.length; i++) {
-        if (selectedRecipeNames[i] == recipeName) {
+    for (let i = 0; i < selectedRecipeGroupNames.length; i++) {
+        if (selectedRecipeGroupNames[i] == recipeGroupName) {
             idx = i
         }
     }
@@ -67,7 +67,7 @@ function deselectRecipe(recipeName) {
     if (idx >= 0) {
         // TODO this might not be right in javascript
         // its keeping the array as the same length without the objects
-        delete selectedRecipeNames[idx]
+        delete selectedRecipeGroupNames[idx]
         delete selectedRecipes[idx]
     }
 
@@ -77,25 +77,26 @@ function deselectRecipe(recipeName) {
 function renderSelectedRecipes() {
     // Show all the selected recipes
     let selectedRecipesHtml = ""
-    for (let i =0; i < selectedRecipeNames.length; i++) {
-        selectedRecipesHtml += `<button onclick="deselectRecipe('${selectedRecipeNames[i]}')">${selectedRecipeNames[i]}</button>`
+    for (let i =0; i < selectedRecipeGroupNames.length; i++) {
+        let recipeGroup = selectedRecipeGroupNames[i]
+        if (recipeGroup) {
+            recipeGroup = recipeGroup.split("-")[1]
+        }
+
+        selectedRecipesHtml += `<button onclick="deselectRecipe('${selectedRecipeGroupNames[i]}')">${recipeGroup}</button>`
         selectedRecipesHtml += "<br>"
     }
 
-    console.log('hi')
-    console.log(selectedRecipeNames)
-    console.log(selectedRecipesHtml)
-
-    const selectedDiv = document.getElementById("selectedrecipenames")
+    const selectedDiv = document.getElementById("selectedRecipeGroupNames")
     if (selectedDiv) {
         selectedDiv.innerHTML = selectedRecipesHtml
     } 
     showElement('selected')
 }
 
-function selectRecipe(recipeName) {
-    selectedRecipeNames.push(recipeName)
-    selectedRecipes.push(recipes[recipeName])
+function selectRecipe(recipeGroupName) {
+    selectedRecipeGroupNames.push(recipeGroupName)
+    selectedRecipes.push(recipes[recipeGroupName])
 
     renderSelectedRecipes()
 }
@@ -153,7 +154,7 @@ function saveShoppingUrl() {
     // <!--Converts ingredients to a url with query parameters-- >
     //    <!--query parameters = ? mode = shopping & asparagus=["tsb",% 201]-- >
     //        <!--ingredients = { asparagus: { tsb: 1 } } -->
-    let queryParamter = document.location.href.split('?')[0] + '?mode=shopping' + '&recipes=' + selectedRecipeNames
+    let queryParamter = document.location.href.split('?')[0] + '?mode=shopping' + '&recipes=' + selectedRecipeGroupNames
     Object.keys(ingredients).forEach(ingredient => {
         const unit = Object.keys(ingredients[ingredient]['units'])[0]
         // < !--url encode - example - replace any spaces with % 20 -- >
@@ -223,7 +224,7 @@ function doneSelectingRecipes() {
 
         // Show ingredients to the user
         shoppingDiv.innerHTML += '<br>'
-        shoppingDiv.innerHTML += selectedRecipeNames
+        shoppingDiv.innerHTML += selectedRecipeGroupNames
         shoppingDiv.innerHTML += '<br> Perishable Items: '
         shoppingDiv.innerHTML += JSON.stringify(perishableItems)
         shoppingDiv.innerHTML += '<br>'

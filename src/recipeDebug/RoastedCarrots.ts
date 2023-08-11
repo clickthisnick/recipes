@@ -10,7 +10,7 @@ export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
         this.recipeGroup = c.meal;
-        this.recipeName = 'CarrotsRoasted'
+        this.recipeName = 'RoastedCarrots'
         this.variations = [
             OneLbRoastedCarrots, TwoLbRoastedCarrots
         ]

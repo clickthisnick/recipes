@@ -24,21 +24,21 @@ pageHtml += '<div id="shopping" style="display: none;">Shopping List<button id="
 pageHtml += '<div id="cooking" style="display: none;">Cooking List</div><br>'
 
 
-pageHtml += '<div id="selected" style="display: none;">Selected Recipes<div id="selectedrecipenames"></div><br></div>'
+pageHtml += '<div id="selected" style="display: none;">Selected Recipes<div id="selectedRecipeGroupNames"></div><br></div>'
 pageHtml += '<div id="select" style="display: none;">Select Recipes<br>'
 // add all recipes to javascript variable
 pageHtml += `<button onclick="doneSelectingRecipes()">Done Selecting</button><br>`
 
 // This creates the html files in the dist folder
-function generateRecipe(file: string) {
-  const MealRecipe = require(`${cwd}/${testFolder}/${file}`).MealRecipe;
+function generateRecipe(filename) {
+  const MealRecipe = require(`${cwd}/${testFolder}/${filename}`).MealRecipe;
   const recipe = new MealRecipe();
 
-  if (recipe.variations.length > 1) {
-    if (recipe.recipeName === "") {
-      throw new Error(`No recipe name for many variations ${recipe.variations}`)
-    }
-  }
+  // if (recipe.variations.length > 1) {
+  //   if (recipe.recipeName === "") {
+  //     throw new Error(`No recipe name for many variations ${recipe.variations}`)
+  //   }
+  // }
 
   // Apply any transformations needed for recipes
   // For example we are going to convert all recipes to calculate prices for the ingredients
@@ -51,7 +51,7 @@ function generateRecipe(file: string) {
   //   console.log(ingredients.quantity_unit)
   // })
 
-  recipe.generateRecipeHtml();
+  recipe.generateRecipeHtml(filename);
 //   this.variations.forEach(variation => {
 //     this.generateRecipeVariation(variation, hideUnderRecipeGroup)
 // })
@@ -70,7 +70,7 @@ function run() {
     generateRecipe(file);
   }
 
-  const recipeName = 'main';
+  const outputFile = 'main';
 
   // Close the select div
   pageHtml += '</div><br>'
@@ -112,8 +112,8 @@ function run() {
         } else if (mode == 'cooking') {
           // /dist/main.html?mode=cooking&recipes=CleanWaterBottle
 
-          recipesSelected.forEach(recipeName => {
-            selectRecipe(recipeName)
+          recipesSelected.forEach(recipeGroupName => {
+            selectRecipe(recipeGroupName)
           })
         }
 
@@ -122,7 +122,7 @@ function run() {
     </script>`
 
   // Just setting to lowercase in case git isn't case sensitive (Like on osx/windows)
-  fs.writeFileSync(`${process.cwd()}/dist/${recipeName.toLowerCase()}.html`, pageHtml);
+  fs.writeFileSync(`${process.cwd()}/dist/${outputFile.toLowerCase()}.html`, pageHtml);
 
   // This creates the index
   // Index.generate();
