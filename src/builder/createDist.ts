@@ -34,12 +34,6 @@ function generateRecipe(filename) {
   const MealRecipe = require(`${cwd}/${testFolder}/${filename}`).MealRecipe;
   const recipe = new MealRecipe();
 
-  // if (recipe.variations.length > 1) {
-  //   if (recipe.recipeName === "") {
-  //     throw new Error(`No recipe name for many variations ${recipe.variations}`)
-  //   }
-  // }
-
   // Apply any transformations needed for recipes
   // For example we are going to convert all recipes to calculate prices for the ingredients
   // priceConversionTable

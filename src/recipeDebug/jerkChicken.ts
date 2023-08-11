@@ -8,8 +8,7 @@ import { Text as text } from '../class/text';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.recipeGroup = c.component;
-        this.recipeName = 'JerkChicken'
+        this.recipeType = c.component;
         this.variations = [
             JerkChicken1andHalfPound, JerkChicken3Lb
         ]

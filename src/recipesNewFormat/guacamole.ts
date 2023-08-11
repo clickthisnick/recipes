@@ -6,8 +6,7 @@ import { Units as u } from '../constants/units';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.recipeName = 'Guacamole'
-        this.recipeGroup = c.component;
+        this.recipeType = c.component;
         this.variations = [
             {'recipe': [Normal, MangoHabanero]},
         ]

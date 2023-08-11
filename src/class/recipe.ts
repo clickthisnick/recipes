@@ -9,8 +9,7 @@ export interface IVariation {
 
 export class RecipeContainer {
     public recipeHtml = '';
-    public recipeName = '';
-    public recipeGroup: string;
+    public recipeType: string;
     public variations: any[];
     // public recipeOptions: any;
     // Arbitrary key.

@@ -9,8 +9,7 @@ import { Equipment as e } from '../class/equipment';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.recipeName = 'SouvideSteak'
-        this.recipeGroup = c.meal;
+        this.recipeType = c.meal;
         this.variations = [
             NinjaSouvideSteak
         ]

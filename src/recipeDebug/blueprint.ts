@@ -10,8 +10,7 @@ import { Text as text} from '../class/text';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.recipeName = 'blueprint';
-        this.recipeGroup = c.component;
+        this.recipeType = c.component;
         this.variations = [
             SuperVeggie, NuttyPudding2Days, SweetPotato
         ]

@@ -5,7 +5,7 @@ import { Categories as c } from '../constants/categories';
 export class MealRecipe extends Recipe {
     constructor() {
         super();
-        this.recipeGroup = c.vegetables;
+        this.recipeType = c.vegetables;
         this.addIngredients([
             i.asparagus(),
             i.Groups.mushroom(),

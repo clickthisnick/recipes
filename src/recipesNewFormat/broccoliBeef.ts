@@ -9,7 +9,7 @@ import { Async } from '../class/async';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.recipeGroup = c.component;
+        this.recipeType = c.component;
         this.variations = [
             {'recipe': [BroccoliBeef]},
         ]
