@@ -56,6 +56,7 @@ class PillsMorningPrep extends Recipe {
             text.set(["1 Zinc"]),
             text.set(["1 Ca-AWG?? TODO"]),
         ];
+        this.hideFromCookingView = true;
     }
 }
 

@@ -42,7 +42,6 @@ class SweetPotato3Days extends Recipe {
         recipe.multiplyIngredients(3)
         
         this.steps = recipe.steps;
-        this.hideFromCookingView = true;
     }
 }
 

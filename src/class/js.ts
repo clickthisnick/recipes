@@ -58,7 +58,7 @@ function selectMode(id) {
     // This will make all the elements disappear by removing all the html/className
     // This is different than just setting the display to visible or non visible
     if (mode == 'cooking') {
-        setEmptyHtmlForElementsByClassName('hideFromCookingView')
+        console.log('hoohohoh')
         hideElementsByClassName('hideFromCookingView')
         removeAllClassNames('hideFromCookingView')
     }
@@ -239,6 +239,8 @@ function doneSelectingRecipes() {
         shoppingDiv.innerHTML += '<br> Perishable Items: '
         shoppingDiv.innerHTML += JSON.stringify(perishableItems)
         shoppingDiv.innerHTML += '<br>'
+        shoppingDiv.innerHTML += `<button class="wholeFoodsToggle" onclick="hideElementsByClassName('store-filter'); showElementsByClassName('whole-foods-filter')">Whole Foods</button>`
+        shoppingDiv.innerHTML += '<br>'
 
         Object.keys(ingredients).forEach(ingredientKey => {
             let commonUnit;
@@ -276,12 +278,12 @@ function doneSelectingRecipes() {
                                     let subscribePricePerQuantity = (pricePerQuantity*priceMultiple).toFixed(3)
 
                                     subscribePricePerQuantity = applyCreditCardDiscounts(store, subscribePricePerQuantity)
-
+                                    
                                     if (!linkByPrice.hasOwnProperty(subscribePricePerQuantity)) {
-                                        linkByPrice[subscribePricePerQuantity] = [`</br> ${store}: &nbsp;<a href="${item.link}" target="_blank">${storeDescription} - ${discountKey} ${subscribePricePerQuantity} - ${subscribePricePerQuantity}/${commonUnit}</a>`]
+                                        linkByPrice[subscribePricePerQuantity] = [`<span class="${store}-filter store-filter" ></br> ${store}: &nbsp;<a href="${item.link}" target="_blank">${storeDescription} - ${discountKey} ${subscribePricePerQuantity} - ${subscribePricePerQuantity}/${commonUnit}</a></span>`]
                                         priceKeys.push(subscribePricePerQuantity)
                                     } else {
-                                        linkByPrice[subscribePricePerQuantity].push(`</br> ${store}: &nbsp;<a href="${item.link}" target="_blank">${storeDescription} - ${discountKey} ${subscribePricePerQuantity} - ${subscribePricePerQuantity}/${commonUnit}</a>`)
+                                        linkByPrice[subscribePricePerQuantity].push(`<span class="${store}-filter store-filter" ></br> ${store}: &nbsp;<a href="${item.link}" target="_blank">${storeDescription} - ${discountKey} ${subscribePricePerQuantity} - ${subscribePricePerQuantity}/${commonUnit}</a></span>`)
                                     }
                                 })
                             }
@@ -289,10 +291,10 @@ function doneSelectingRecipes() {
                             pricePerQuantity = applyCreditCardDiscounts(store, pricePerQuantity)
 
                             if (!linkByPrice.hasOwnProperty(pricePerQuantity)) {
-                                linkByPrice[pricePerQuantity] = [`</br> ${store}: &nbsp;<a href="${item.link}" target="_blank">${storeDescription} - ${item.price} - ${pricePerQuantity}/${commonUnit}</a>`]
+                                linkByPrice[pricePerQuantity] = [`<span class="${store}-filter store-filter" > </br> ${store}: &nbsp;<a href="${item.link}" target="_blank">${storeDescription} - ${item.price} - ${pricePerQuantity}/${commonUnit}</a></span>`]
                                 priceKeys.push(pricePerQuantity)
                             } else {
-                                linkByPrice[pricePerQuantity].push(`</br> ${store}: &nbsp;<a href="${item.link}" target="_blank">${storeDescription} - ${item.price} - ${pricePerQuantity}/${commonUnit}</a>`)
+                                linkByPrice[pricePerQuantity].push(`<span class="${store}-filter store-filter" > </br> ${store}: &nbsp;<a href="${item.link}" target="_blank">${storeDescription} - ${item.price} - ${pricePerQuantity}/${commonUnit}</a></span>`)
                             }
 
 
@@ -324,7 +326,7 @@ function showElement(id) {
 function showElementsByClassName(className) {
     const elements = document.getElementsByClassName(className);
 
-    for (let i = elements.length - 1; elements.length >= 0; i--) {
+    for (let i = elements.length - 1; i >= 0; i--) {
         const element = elements[i];
         element.style.display = "inline";
     }
@@ -333,33 +335,18 @@ function showElementsByClassName(className) {
 function hideElementsByClassName(className) {
     const elements = document.getElementsByClassName(className);
 
-    for (let i = elements.length - 1; elements.length >= 0; i--) {
+    for (let i = elements.length - 1; i >= 0; i--) {
         const element = elements[i];
-        if (element) {
-            element.style.display = "none";
-        }
-    }
-}
-
-function setEmptyHtmlForElementsByClassName(className) {
-    const elements = document.getElementsByClassName(className);
-
-    for (let i = elements.length - 1; elements.length >= 0; i--) {
-        const element = elements[i];
-        if (element) {
-            element.innerHTML = ""
-        }
+        element.style.display = "none";
     }
 }
 
 function removeAllClassNames(className) {
     const elements = document.getElementsByClassName(className);
 
-    for (let i = elements.length - 1; elements.length >= 0; i--) {
+    for (let i = elements.length - 1; i >= 0; i--) {
         const element = elements[i];
-        if (element) {
-            element.className = ""
-        }
+        element.className = ""
     }
 }
 
