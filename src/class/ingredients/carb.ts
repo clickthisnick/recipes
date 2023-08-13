@@ -17,7 +17,7 @@ export class CarbItems extends AnimalItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -35,7 +35,7 @@ export class CarbItems extends AnimalItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -76,7 +76,7 @@ export class CarbItems extends AnimalItems {
                     ]
                 },
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -94,7 +94,7 @@ export class CarbItems extends AnimalItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {
                 [u.ounce.name]: {
                     servings: 2.5,
@@ -123,7 +123,7 @@ export class CarbItems extends AnimalItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -141,7 +141,7 @@ export class CarbItems extends AnimalItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -159,7 +159,7 @@ export class CarbItems extends AnimalItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -200,7 +200,7 @@ export class CarbItems extends AnimalItems {
                     ]
                 },
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -259,7 +259,7 @@ export class CarbItems extends AnimalItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {
                 [u.ounce.name]: {
                     calories: 100
@@ -304,7 +304,7 @@ export class CarbItems extends AnimalItems {
                     ]
                 },
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -681,7 +681,7 @@ export class CarbItems extends AnimalItems {
                     ]
                 }
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -699,7 +699,7 @@ export class CarbItems extends AnimalItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {
                 [u.cup.name]: {
                     calories: 678.96,

@@ -37,7 +37,9 @@ class FrenchPressCoffee extends Recipe {
     constructor() {
         super();
         this.steps = [
-            e.teapot().add(i.water(12, u.thousandSecondCounts)),
+            e.teapot().add([
+                i.water(12, u.thousandSecondCounts)
+            ]),
             Timer.set(8.5, 'm', 'Turn stove to "HIGH" (after 9) and wait for whistle'),
             text.set(['Put', i.coffeeGrounds(5, u.scoop), 'into french press bag']),
             text.set(['Put french press bag into french press']),

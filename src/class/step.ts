@@ -5,7 +5,7 @@ export interface IStep {
     time: number; // In seconds
     text: string;
     ingredients: Ingredient[]
-    equipment: any[]
+    equipment: string[]
     children: IStep[]
     style: string;
     disappearWhen: string

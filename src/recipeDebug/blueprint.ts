@@ -12,7 +12,7 @@ export class MealRecipe extends RecipeContainer {
         super();
         this.recipeType = c.component;
         this.variations = [
-            SuperVeggie, NuttyPudding2Days, SweetPotato
+            SuperVeggie, NuttyPudding2Days, SweetPotato, NuttyPudding8Days, SweetPotato8Days, SuperVeggie8Days
         ]
     }
 }
@@ -60,8 +60,8 @@ class SuperVeggie extends Recipe {
                 text.set(['Drink a glass of water with morning pills']),
                 text.set(['Drink the green giant']),
                 e.pan().add([
-                    i.ingredient("broccoli/shitake mushroom", 1, u.smallstainlesssteelcontainer),
-                    i.broccoli(1, u.largestainlesssteelcontainer)
+                    i.ingredient("frozen cauliflower/shitake mushroom", 1, u.smallstainlesssteelcontainer),
+                    i.frozenBroccoli(1, u.largestainlesssteelcontainer)
                 ]),
                 // Cook pan until lentils are done
                 e.pan().cookWithLid(15, 'm', 5, "broccoli"),
@@ -87,20 +87,64 @@ class SuperVeggie extends Recipe {
     }
 }
 
-class NuttyPudding2Days extends Recipe {
+class NuttyPudding1Days extends Recipe {
     constructor() {
         super();
         this.steps = [
             e.bulletMixer().add([
-                i.pomegranateJuice(113.4, u.gram),
-                i.almondMilk(210, u.gram),
+                i.pomegranateJuice(56.7, u.gram),
+                i.almondMilk(105, u.gram),
                 i.ingredient('NuttyPudding mixture'),
                 // blend for 1 minute on low
-                i.strawberry(246, u.gram),
-                i.cherry(6, u.unit),
+                i.strawberry(123, u.gram),
+                i.cherry(3, u.unit),
                 // blend for 1 minute on low
             ]),
             e.bulletMixer().mix(),
         ];
+    }
+}
+
+class NuttyPudding2Days extends Recipe {
+    constructor() {
+        super();
+
+        let recipe = new NuttyPudding1Days()
+        recipe.multiplyIngredients(2)
+        
+        this.steps = recipe.steps;
+    }
+}
+
+class SweetPotato8Days extends Recipe {
+    constructor() {
+        super();
+
+        let recipe = new SweetPotato()
+        recipe.multiplyIngredients(8)
+        
+        this.steps = recipe.steps;
+    }
+}
+
+class NuttyPudding8Days extends Recipe {
+    constructor() {
+        super();
+
+        let recipe = new NuttyPudding1Days()
+        recipe.multiplyIngredients(8)
+        
+        this.steps = recipe.steps;
+    }
+}
+
+class SuperVeggie8Days extends Recipe {
+    constructor() {
+        super();
+
+        let recipe = new SuperVeggie()
+        recipe.multiplyIngredients(8)
+        
+        this.steps = recipe.steps;
     }
 }

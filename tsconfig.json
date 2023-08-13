@@ -17,7 +17,7 @@
         "module": "commonjs",
         "moduleResolution": "node",
         "alwaysStrict": true,
-        "noImplicitAny": false,
+        "noImplicitAny": true,
         "noImplicitThis": true,
         "strictNullChecks": true,
         "target": "ES6"

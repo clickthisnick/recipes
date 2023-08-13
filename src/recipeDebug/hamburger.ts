@@ -21,7 +21,9 @@ class Hamburgers extends Recipe {
         super();
         this.steps = [
             text.set(['Form 2, 1 inch hamburgers with', i.groundBeef8020(1, u.pound)]),
-            e.pan().add(i.ingredient('hamburgers')),
+            e.pan().add([
+                i.ingredient('hamburgers')
+            ]),
             e.pan().cookWithLidSlightlyOff(5, 'm', 4),
             i.Groups.mushroom(5, u.slice).cutIntoStrips(),
             i.Groups.onion(5, u.slice).cutIntoStrips(),

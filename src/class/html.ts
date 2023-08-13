@@ -72,27 +72,6 @@ export class HTML {
         return `<script>${js}</script>`
     }
 
-    public static addOptions(recipeIds: string[], onlyOneVariation) {
-        // Adds each option
-        // default will get set when
-        let tmpHtml = '';
-
-        recipeIds.forEach((recipeId) => {
-            if (onlyOneVariation) {
-                // If there is only one option don't display the button
-                tmpHtml += `<button style="display: none;" onclick="this.classList.toggle('completed'); showRecipe()">${recipeId}</button>`;
-            } else {
-                tmpHtml += `<button onclick="this.classList.toggle('completed'); showRecipe()">${recipeId}</button>`;
-            }
-        });
-
-        return tmpHtml;
-
-    }
-
-    public static generateOptions(recipeIds: string[], onlyOneVariation) {
-        return this.addOptions(recipeIds, onlyOneVariation);
-    }
          // TODO: Could add a sound but browsers won't allow it like this
          // function beep() {
          // tslint:disable-next-line max-line-length

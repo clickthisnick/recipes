@@ -28,7 +28,9 @@ class PorkChops extends Recipe {
                 i.chilliPowder(2, u.dash),
             ]),
             Timer.end(),
-            e.ninja().add(i.porkRoast(4, u.unit)),
+            e.ninja().add([
+                i.porkRoast(4, u.unit)
+            ]),
             e.ninja().cook(8, 'm', 500),
             Timer.end(),
             text.set(['Flip', i.porkChops()]),

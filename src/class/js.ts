@@ -45,7 +45,6 @@ function setRecipe(recipeGroupName, recipe) {
 function selectMode(id) {
     showElement(id)
     showElement('select')
-    mode = id
 
     // Play the silent beep so ios lets us play it in the background later (after we change src)
     const audio = document.getElementById("beep")
@@ -53,6 +52,10 @@ function selectMode(id) {
 
     hideElement('cookingButton')
     hideElement('shoppingButton')
+
+    if (mode == 'cooking') {
+        hideElementsByClassName('hideFromCookingView')
+    }
 }
 
 function deselectRecipe(recipeGroupName) {
@@ -203,7 +206,9 @@ function doneSelectingRecipes() {
                 Object.keys(singleRecipe.ingredients).forEach(ingredientKey => {
                     const ingredient = singleRecipe.ingredients[ingredientKey];
 
-                    perishableItems[ingredient.name] = ingredient.perishableLimit
+                    if (ingredient.perishableLimit > 0) {
+                        perishableItems[ingredient.name] = ingredient.perishableLimit
+                    }
 
                     // If there are no previous ingredients, add the ingredient
                     if (!ingredients.hasOwnProperty(ingredient.name)) {
@@ -316,6 +321,15 @@ function showElementsByClassName(className) {
     for (let i = 0; i < elements.length; i++) {
         const element = elements[i];
         element.style.display = "inline";
+    }
+}
+
+function hideElementsByClassName(className) {
+    const elements = document.getElementsByClassName(className);
+
+    for (let i = 0; i < elements.length; i++) {
+        const element = elements[i];
+        element.style.display = "none";
     }
 }
 

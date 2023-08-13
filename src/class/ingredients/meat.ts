@@ -17,7 +17,7 @@ export class MeatItems extends FruitItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -35,7 +35,7 @@ export class MeatItems extends FruitItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -53,7 +53,7 @@ export class MeatItems extends FruitItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -71,7 +71,7 @@ export class MeatItems extends FruitItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -112,7 +112,7 @@ export class MeatItems extends FruitItems {
                     ]
                 }
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -163,7 +163,7 @@ export class MeatItems extends FruitItems {
                     ],
                 },
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -181,7 +181,7 @@ export class MeatItems extends FruitItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -199,7 +199,7 @@ export class MeatItems extends FruitItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {
                 [u.ounce.name]: {
                     calories: 46.666666666666667,
@@ -223,7 +223,7 @@ export class MeatItems extends FruitItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -241,7 +241,7 @@ export class MeatItems extends FruitItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -259,7 +259,7 @@ export class MeatItems extends FruitItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {
                 [u.unit.name]: {
                     calories: 160,

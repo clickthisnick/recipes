@@ -23,7 +23,9 @@ class PopCorn extends Recipe {
             Timer.end(),
             e.pan().preheat(6, 0),
             Timer.end(),
-            e.pan().add(i.popcorn(.5, u.cup)),
+            e.pan().add([
+                i.popcorn(.5, u.cup)
+            ]),
             e.pan().cook(3, 'm'),
             Timer.end(),
         ];

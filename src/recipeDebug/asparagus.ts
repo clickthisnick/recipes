@@ -20,11 +20,15 @@ class Asparagus extends Recipe {
         this.steps = [
             e.ninja().preheat(500),
             Timer.end(),
-            e.ninja().add(i.asparagus(.5, u.bunch)),
+            e.ninja().add([
+                i.asparagus(.5, u.bunch)
+            ]),
             text.set(['Brush', i.asparagus(), 'with', i.oliveOil(1, u.tsp)]),
             e.ninja().cook(4, 'm', 500),
             Timer.end(),
-            i.asparagus().seasonWith(i.dash(1, u.unit)),
+            i.asparagus().seasonWith([
+                i.dash(1, u.unit)
+            ]),
         ];
     }
 }

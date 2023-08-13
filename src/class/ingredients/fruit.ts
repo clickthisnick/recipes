@@ -17,7 +17,7 @@ export class FruitItems extends CarbItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -35,7 +35,7 @@ export class FruitItems extends CarbItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -54,7 +54,7 @@ export class FruitItems extends CarbItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -72,7 +72,7 @@ export class FruitItems extends CarbItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -90,7 +90,7 @@ export class FruitItems extends CarbItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -108,7 +108,7 @@ export class FruitItems extends CarbItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -138,7 +138,7 @@ export class FruitItems extends CarbItems {
                     ]
                 }
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -156,7 +156,7 @@ export class FruitItems extends CarbItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -174,7 +174,43 @@ export class FruitItems extends CarbItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
+
+    public static readonly frozenCauliflower = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Frozen Cauliflower',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: true,
+            purchaseLinks: {},
+            perishableLimit: 0,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
+
+    public static readonly frozenBroccoli = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Frozen Broccoli',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: true,
+            purchaseLinks: {},
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -192,7 +228,7 @@ export class FruitItems extends CarbItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -210,7 +246,7 @@ export class FruitItems extends CarbItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -240,7 +276,7 @@ export class FruitItems extends CarbItems {
                     ]
                 }
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -258,7 +294,7 @@ export class FruitItems extends CarbItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -276,7 +312,7 @@ export class FruitItems extends CarbItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -309,7 +345,7 @@ export class FruitItems extends CarbItems {
                     ]
                 },
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -378,7 +414,7 @@ export class FruitItems extends CarbItems {
                     ]
                 },
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -395,7 +431,7 @@ export class FruitItems extends CarbItems {
             wash: false,
             isTakeoutUnitable: false,
             isMeatProduct: false,
-            perishableLimit: undefined,
+            perishableLimit: 0,
             purchaseLinks: {
                 [Stores.wholeFoods]: {
                     '365 by Whole Foods Market, Organic Peanut Butter, Creamy': [
@@ -502,7 +538,7 @@ export class FruitItems extends CarbItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {
                 [u.fluid_ounce.name]: {
                     servings: 8,
@@ -529,7 +565,7 @@ export class FruitItems extends CarbItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)

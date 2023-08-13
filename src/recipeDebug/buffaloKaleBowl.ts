@@ -45,7 +45,9 @@ constructor() {
         Timer.set(5, 'm', 'release instant pot pressure'),
         Timer.end(),
         text.set(['Open steam valve']),
-        i.whiteRice().mixIn(i.curryPowder(.5, u.tbsp)),
+        i.whiteRice().mixIn([
+            i.curryPowder(.5, u.tbsp)
+        ]),
         text.set(['In a bowl mix', i.blackBeans(), i.brownRice(), i.kale(), i.wingTimeMediumBuffaloSauce(1.5, u.tbsp)]),
     ]
 }
@@ -80,7 +82,9 @@ class BuffaloKaleBowlWhiteRice extends Recipe {
             Timer.set(5, 'm', 'release instant pot pressure'),
             Timer.end(),
             text.set(['Open steam valve']),
-            i.whiteRice().mixIn(i.curryPowder(.5, u.tbsp)),
+            i.whiteRice().mixIn([
+                i.curryPowder(.5, u.tbsp)
+            ]),
             text.set(['In a bowl mix', i.blackBeans(), i.brownRice(), i.kale(), i.wingTimeMediumBuffaloSauce(1.5, u.tbsp)]),
         ]
     }

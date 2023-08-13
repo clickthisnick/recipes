@@ -11,7 +11,7 @@ export class MealRecipe extends RecipeContainer {
         super();
         this.recipeType = c.component;
         this.variations = [
-            GreenGiantPrep, SuperVeggiePrep, PillsMorningPrep, NuttyPudding2DaysPrep
+            GreenGiantPrep, SuperVeggiePrep, PillsMorningPrep, NuttyPudding2DaysPrep, NuttyPudding8Days, SuperVeggiePrep8DaysPrep
         ]
     }
 }
@@ -64,11 +64,38 @@ class SuperVeggiePrep extends Recipe {
         super();
 
         this.steps = [
-            text.set(["Put 200 Grams of black lentils in 17.6 ounce stainless steel container"]),
-            text.set(["Put 150 Grams of cauliflower in 17.6 ounce stainless steel container"]),
-            text.set(["Put 50 Grams of shitake mushrooms in 17.6 ounce stainless steel container"]),
-            text.set(["Put 250 Grams of broccoli in 34 ounce stainless steel container"]),
+            e.smallStainlessSteelContainer(0).add([
+                i.blackLentils(200, u.gram),
+            ]),
+            e.smallStainlessSteelContainer(1).add([
+                i.frozenCauliflower(150, u.gram),
+                i.frozenShitatkeMushroom(50, u.gram),
+            ]),
+            e.largeStainlessSteelContainer().add([
+                i.frozenBroccoli(250, u.gram)
+            ]),
         ];
+    }
+}
+
+class NuttyPudding1DayPrep extends Recipe {
+    constructor() {
+        super();
+
+        this.steps = [
+            e.bulletMixer().add([
+                i.macadamiaNut(23, u.gram), // 3 Tbsp ground macadamia nuts (20% off + free m-nut oil)
+                i.walnut(4.79, u.gram), // 2 tsp
+                i.brazilNut(1, u.quarter),
+                i.flaxSeed(1, u.tsp),
+                i.sunflowerLechtin(1, u.tsp),
+                i.cacaoPowderUnsweetened(1, u.tbsp), // 1 Tbsp non dutched cocoa
+                i.ceylonCinnamon(.5, u.tsp),
+                i.peaProtein(1, u.scoop),
+            ]),
+            e.bulletMixer().mix(),
+        ];
+        this.hideFromCookingView = true;
     }
 }
 
@@ -76,18 +103,33 @@ class NuttyPudding2DaysPrep extends Recipe {
     constructor() {
         super();
 
-        this.steps = [
-            e.bulletMixer().add([
-                i.macadamiaNut(46, u.gram), // 3 Tbsp ground macadamia nuts (20% off + free m-nut oil)
-                i.walnut(9.58, u.gram), // 2 tsp
-                i.brazilNut(1, u.half),
-                i.flaxSeed(2, u.tsp),
-                i.sunflowerLechtin(2, u.tsp),
-                i.cacaoPowderUnsweetened(2, u.tbsp), // 1 Tbsp non dutched cocoa
-                i.ceylonCinnamon(1, u.tsp),
-                i.peaProtein(2, u.scoop),
-            ]),
-            e.bulletMixer().mix(),
-        ];
+        let recipe = new NuttyPudding1DayPrep()
+        recipe.multiplyIngredients(2)
+        
+        this.steps = recipe.steps;
+    }
+}
+
+class NuttyPudding8Days extends Recipe {
+    constructor() {
+        super();
+        
+        let recipe = new NuttyPudding1DayPrep()
+        recipe.multiplyIngredients(8)
+        
+        this.steps = recipe.steps;
+        this.hideFromCookingView = true;
+    }
+}
+
+class SuperVeggiePrep8DaysPrep extends Recipe {
+    constructor() {
+        super();
+
+        let recipe = new SuperVeggiePrep()
+        recipe.multiplyIngredients(8)
+        
+        this.steps = recipe.steps;
+        this.hideFromCookingView = true;
     }
 }

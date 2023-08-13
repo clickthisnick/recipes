@@ -12,6 +12,10 @@ export interface Ingredients {
    [name: string]: Ingredient;
 }
 
+export interface ICount {
+    [count: string]: number;
+ }
+
 export class Units {
     public static readonly none: IUnitObj = {
         name: 'none',
@@ -303,11 +307,11 @@ export class Units {
     public static combineIngredientUnits(ingredient_1: Ingredient, ingredient_2: Ingredient) {
         // Returns the common unit and amount between two ingredients
 
-        function isWholeNumber(n) {
+        function isWholeNumber(n: number) {
             return (n - Math.floor(n)) === 0;
         }
 
-        function convert(conversion, ingredient) {
+        function convert(conversion: ICount, ingredient: Ingredient) {
             // This converts the ingredient to the same unit as the conversion
             return ingredient.quantity * conversion.count
         }

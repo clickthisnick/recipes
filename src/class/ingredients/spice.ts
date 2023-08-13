@@ -17,7 +17,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -35,7 +35,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -53,7 +53,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -71,7 +71,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -89,7 +89,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -107,7 +107,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -125,7 +125,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -143,7 +143,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -161,7 +161,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -195,7 +195,7 @@ export class SpiceItems extends SauceItems {
                     ],
                 }
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -213,7 +213,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -231,7 +231,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -249,7 +249,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -267,7 +267,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -285,7 +285,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -303,7 +303,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -321,7 +321,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -339,7 +339,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -357,7 +357,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -375,7 +375,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -393,7 +393,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -411,7 +411,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -429,7 +429,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -447,7 +447,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -502,7 +502,7 @@ export class SpiceItems extends SauceItems {
                     ]
                 },
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -520,7 +520,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -538,7 +538,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -556,7 +556,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -574,7 +574,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -592,7 +592,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -610,7 +610,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -628,7 +628,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -646,7 +646,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -664,7 +664,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -682,7 +682,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -716,7 +716,7 @@ export class SpiceItems extends SauceItems {
                     ],
                 }
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -734,7 +734,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -752,7 +752,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -770,7 +770,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -788,7 +788,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -806,7 +806,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -824,7 +824,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -842,7 +842,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -860,7 +860,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -878,7 +878,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -912,7 +912,7 @@ export class SpiceItems extends SauceItems {
                     ],
                 }
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -930,7 +930,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -948,7 +948,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -966,7 +966,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -984,7 +984,7 @@ export class SpiceItems extends SauceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)

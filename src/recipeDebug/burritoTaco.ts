@@ -20,7 +20,9 @@ class GroundBeefBurritoTaco extends Recipe {
     constructor() {
         super();
         this.steps = [
-            e.pan().add(i.groundBeef8020(1, u.pound)),
+            e.pan().add([
+                i.groundBeef8020(1, u.pound)
+            ]),
             e.pan().cook(6, 'm', 6),
                 i.Groups.onion(.5, u.unit).cutIntoThinSlices(),
             Timer.end(),
@@ -54,7 +56,9 @@ class GroundBeefBurritoTacoRomaine extends Recipe {
     constructor() {
         super();
         this.steps = [
-            e.pan().add(i.groundBeef8020(1, u.pound)),
+            e.pan().add([
+                i.groundBeef8020(1, u.pound)
+            ]),
             e.pan().cook(6, 'm', 6),
                 i.Groups.onion(.5, u.unit).cutIntoThinSlices(),
             Timer.end(),
@@ -88,7 +92,9 @@ class BeefEyeRoundSteakTaco extends Recipe {
     constructor() {
         super();
         this.steps = [
-            e.ninja().add(i.BeefEyeRoundSteak(1, u.pound)),
+            e.ninja().add([
+                i.BeefEyeRoundSteak(1, u.pound)
+            ]),
             e.ninja().cook(2.5, 'm', 450),
             text.set(['Dice', i.Groups.onion(.5, u.unit)]),
             Timer.end(),

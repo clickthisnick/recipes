@@ -35,7 +35,9 @@ class scrambledSteakEggsYams extends Recipe {
                 i.water(4, u.tbsp),
             ]),
             e.bowl().whisk(),
-            e.bowl().add(i.whiteOnion()),
+            e.bowl().add([
+                i.whiteOnion()
+            ]),
             e.pan(1).add([
                 i.oliveOil(2, u.tsp),
                 i.ingredient("egg mixture"),

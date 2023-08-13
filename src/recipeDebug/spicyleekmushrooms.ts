@@ -20,9 +20,9 @@ class LeekMushroom extends Recipe {
     constructor() {
         super();
         this.steps = [
-            e.pan().add(
+            e.pan().add([
                 i.avocadoOil(3, u.second)
-            ),
+            ]),
             e.pan().cook(2, 'm', 6),
             text.set(['Cut in half', i.leek(2, u.unit)]),
             text.set(['Cut leek in strips and soak in glass bowl of water']),

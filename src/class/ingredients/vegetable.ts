@@ -17,7 +17,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -35,7 +35,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -53,7 +53,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -71,7 +71,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -89,7 +89,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -107,7 +107,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -125,7 +125,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -143,7 +143,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -161,7 +161,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -191,7 +191,7 @@ export class VegetableItems extends SpiceItems {
                     ]
                 }
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -209,7 +209,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -227,7 +227,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -245,7 +245,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -263,7 +263,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -299,7 +299,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -329,7 +329,7 @@ export class VegetableItems extends SpiceItems {
                     ]
                 },
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -347,7 +347,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -399,7 +399,7 @@ export class VegetableItems extends SpiceItems {
                     ]
                 },
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -458,7 +458,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -565,7 +565,7 @@ export class VegetableItems extends SpiceItems {
                     ]
                 }
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -583,7 +583,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -601,7 +601,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -619,7 +619,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -637,7 +637,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -655,7 +655,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -673,7 +673,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -712,7 +712,7 @@ export class VegetableItems extends SpiceItems {
                     ]
                 }
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -730,7 +730,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -748,7 +748,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -766,7 +766,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -784,7 +784,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -802,7 +802,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -820,7 +820,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -861,7 +861,7 @@ export class VegetableItems extends SpiceItems {
                     ]
                 }
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -879,7 +879,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -897,7 +897,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -915,7 +915,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -945,7 +945,7 @@ export class VegetableItems extends SpiceItems {
                     ]
                 }
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -963,7 +963,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -981,7 +981,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -999,7 +999,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -1017,7 +1017,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -1035,7 +1035,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -1053,7 +1053,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -1071,7 +1071,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -1101,7 +1101,7 @@ export class VegetableItems extends SpiceItems {
                     ]
                 },
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -1131,7 +1131,7 @@ export class VegetableItems extends SpiceItems {
                     ]
                 },
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -1149,7 +1149,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -1167,7 +1167,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -1185,7 +1185,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -1203,7 +1203,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -1220,7 +1220,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -1238,7 +1238,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -1256,7 +1256,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -1274,7 +1274,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -1333,7 +1333,7 @@ export class VegetableItems extends SpiceItems {
                     ]
                 },
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -1351,7 +1351,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -1493,7 +1493,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -1561,7 +1561,7 @@ export class VegetableItems extends SpiceItems {
                     ]
                 }
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -1682,7 +1682,7 @@ export class VegetableItems extends SpiceItems {
 
     public static readonly shitatkeMushroom = (quantity = 0, unit: IUnitObj = Units.none) => {
         let item: IItemObj = {
-            name: 'Shitatke eMushroom',
+            name: 'Shitatke Mushroom',
             putAwayTime: 10,
             takeOutTime: 10,
             cleanSteps: '',
@@ -1693,6 +1693,24 @@ export class VegetableItems extends SpiceItems {
             isMeatProduct: false,
             purchaseLinks: {},
             perishableLimit: 7,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
+
+    public static readonly frozenShitatkeMushroom = (quantity = 0, unit: IUnitObj = Units.none) => {
+        let item: IItemObj = {
+            name: 'Frozen Shitatke Mushroom',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -1805,7 +1823,7 @@ export class VegetableItems extends SpiceItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)

@@ -17,7 +17,7 @@ export class OilItems extends MeatItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -35,7 +35,7 @@ export class OilItems extends MeatItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -53,7 +53,7 @@ export class OilItems extends MeatItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {
                 [u.tbsp.name]: {
                     calories: 119.34,
@@ -118,7 +118,7 @@ export class OilItems extends MeatItems {
                     ]
                 },
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -183,7 +183,7 @@ export class OilItems extends MeatItems {
                     ]
                 }
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {
                 [u.tbsp.name]: {
                     calories: 119.34,
@@ -210,7 +210,7 @@ export class OilItems extends MeatItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)

@@ -24,7 +24,9 @@ class BrusselSprouts extends Recipe {
                 i.oliveOil(1, u.tbsp),
             ]),
             Timer.end(),
-            e.ninja().add(i.brusselSprouts()),
+            e.ninja().add([
+                i.brusselSprouts()
+            ]),
             Timer.set(15, 'm', 'Wait for air fryer to be done'),
             Timer.end(),
         ];

@@ -1,11 +1,10 @@
-import { IItemObj, IMeatObj, Ingredient } from './ingredient';
+import { IStorePurchaseLink, IItemObj, IMeatObj, Ingredient } from './ingredient';
 import { IUnitObj, Units as u, Units } from '../../constants/units';
 import { Stores } from '../../class/stores';
 
 export class AnimalItems {
-
     // This is used in recipes i.ingredient('yeast mixture') - when you want an item, but there's not a specific one defined that fits
-    public static readonly ingredient = (name: string, quantity = 0, unit: any = null, purchaseLinks: any = {}) => {
+    public static readonly ingredient = (name: string, quantity = 0, unit: IUnitObj = Units.none, purchaseLinks: IStorePurchaseLink = {}) => {
         let item: IItemObj = {
             name: name,
             putAwayTime: 10,
@@ -17,7 +16,7 @@ export class AnimalItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: purchaseLinks,
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -136,7 +135,7 @@ export class AnimalItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -154,7 +153,7 @@ export class AnimalItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -172,7 +171,7 @@ export class AnimalItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -190,7 +189,7 @@ export class AnimalItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -208,7 +207,7 @@ export class AnimalItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -226,7 +225,7 @@ export class AnimalItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -244,7 +243,7 @@ export class AnimalItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -262,7 +261,7 @@ export class AnimalItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -303,7 +302,7 @@ export class AnimalItems {
                     ]
                 },
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -344,7 +343,7 @@ export class AnimalItems {
                     ]
                 },
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -362,7 +361,7 @@ export class AnimalItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -380,7 +379,7 @@ export class AnimalItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -437,7 +436,7 @@ export class AnimalItems {
                     ]
                 }
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -467,7 +466,7 @@ export class AnimalItems {
                     ]
                 }
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -485,7 +484,7 @@ export class AnimalItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -503,7 +502,7 @@ export class AnimalItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -521,7 +520,7 @@ export class AnimalItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -557,7 +556,7 @@ export class AnimalItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -616,7 +615,7 @@ export class AnimalItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -634,7 +633,7 @@ export class AnimalItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -652,7 +651,7 @@ export class AnimalItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -693,7 +692,7 @@ export class AnimalItems {
                     ]
                 }
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -711,7 +710,7 @@ export class AnimalItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -729,7 +728,7 @@ export class AnimalItems {
             isTakeoutUnitable: false,
             isMeatProduct: true,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)

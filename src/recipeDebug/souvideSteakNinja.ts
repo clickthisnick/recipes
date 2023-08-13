@@ -28,7 +28,9 @@ class NinjaSouvideSteak extends Recipe {
             Timer.end(),
             e.ninja().preheat(500),
             Timer.end(),
-            e.ninja().add(i.topSirloin()),
+            e.ninja().add([
+                i.topSirloin()
+            ]),
             e.ninja().cook(1.5, 'm', 500),
             Timer.end(),
             text.set(['Flip steak']),
@@ -36,7 +38,9 @@ class NinjaSouvideSteak extends Recipe {
             Timer.end(),
             Timer.set(15, 'm', 'Let steak rest'),
             Timer.end(),
-            i.topSirloin().seasonWith(i.steakSauce(1, u.unit))
+            i.topSirloin().seasonWith([
+                i.steakSauce(1, u.unit)
+            ])
         ];
     }
 }

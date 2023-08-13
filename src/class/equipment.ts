@@ -2,6 +2,7 @@ import { Time } from './time';
 import { Timer } from './timer';
 import { Serializer as s } from './serializer';
 import { IStep, istep } from './step';
+import { Ingredient } from './ingredients/ingredient';
 
 export interface IAllEquipment {
    [name: string]: number;
@@ -62,20 +63,19 @@ class Container {
         return mixStep
     }
 
-    // change to IItemObj | Item  once all ingredients are items
-    public add(ingredients: any[] | any | any[][]): IStep {
+    public add(ingredients: Ingredient[]): IStep {
 
-        function hydrateIStep(addIngredient, ingredient) {
-            addIngredient.text = ['•', s.turnIngObjIntoStr(ingredient, true)].join(' ')
+        function hydrateIStep(addIngredient: IStep, ingredient: Ingredient) {
             addIngredient.ingredients.push(ingredient)
+            addIngredient.text = [s.lazyIngredientIdx, addIngredient.ingredients.length-1].join(' ')
             addIngredient.time += ingredient.takeOutTime
             addIStep.children.push(addIngredient)
 
             // If the unit is an equipment like a cup, then add it to the equipment
-            if (ingredient.unit && ingredient.unit.isEquipment) {
-                const str_ = (ingredient.unit.equipmentUnits.includes(ingredient.unit.quantity)) ? `${ingredient.unit.quantity} ${ingredient.unit.properName}` : ingredient.unit.properName
-                addIngredient.equipment.push(str_)
-            }
+            // if (ingredient.unit && ingredient.unit.isEquipment) {
+            //     const str_ = (ingredient.unit.equipmentUnits.includes(ingredient.unit.quantity)) ? `${ingredient.unit.quantity} ${ingredient.unit.properName}` : ingredient.unit.properName
+            //     addIngredient.equipment.push(str_)
+            // }
         }
 
         const addIStep = istep()
@@ -91,45 +91,14 @@ class Container {
             this.firstAction = false;
         }
 
-        if (Array.isArray(ingredients)) {
-            addIStep.text = ['Add the following to', bindingWord, this.name].join(' ')
-            addIStep.disappearWhen = 'childrenGone'
-            ingredients.forEach((ingredient) => {
-                const addIngredient = istep()
-                if (Array.isArray(ingredient)) {
-                    ingredient.forEach((ingredientNText) => {
-                        if (typeof(ingredientNText) === 'object') {
-                            hydrateIStep(addIngredient, ingredient)
-                        } else {
-                            addIngredient.text += ' ' + ingredientNText
-                        }
-                    })
-                } else {
-                    hydrateIStep(addIngredient, ingredient)
-                }
-            })
-
-            return addIStep
-        }
-
-        addIStep.text = ['Add', s.turnIngObjIntoStr(ingredients, true), 'to', this.name].join(' ')
-        addIStep.ingredients.push(ingredients)
-        addIStep.equipment.push(this.name)
+        addIStep.text = ['Add the following to', bindingWord, this.name].join(' ')
+        addIStep.disappearWhen = 'childrenGone'
+        ingredients.forEach((ingredient) => {
+            const addIngredient = istep()
+            hydrateIStep(addIngredient, ingredient)
+        })
 
         return addIStep
-
-        // // If you are just adding one element which happens to be an ingredient with text
-        // let finalArray: any = []
-        // finalArray.push('Add')
-        // ingredients.forEach(element => {
-        //     finalArray.push(element);
-        // });
-        // finalArray.push('to')
-        // finalArray.push(this)
-
-        // return finalArray
-
-        // return ['Add', ingredients, 'to', bindingWord, this.name]
     }
 }
 
@@ -206,6 +175,20 @@ class ZiplockBag extends Container {
     }
 }
 
+class SmallStainlessSteelContainer extends Container {
+    // Containers are a singleton
+    constructor(id: number) {
+        super('17.6 ounce stainless steel container', id)
+    }    
+}
+
+class LargeStainlessSteelContainer extends Container {
+    // Containers are a singleton
+    constructor(id: number) {
+        super('34 ounce stainless steel container', id)
+    }    
+}
+
 
 class KitchenAidMixingBowl extends Container {
     // Containers are a singleton
@@ -233,7 +216,7 @@ class CookingContainer extends Container {
         super(name, id)
     }
 
-    public cook(duration: number, type: string, item: any, degrees: number) {
+    public cook(duration: number, type: string, item: number, degrees: number) {
         this.firstAction = false;
         console.log(`cook should be overloaded ${duration} ${type} ${item} ${degrees}`)
     }
@@ -302,20 +285,12 @@ class SaucePan extends CookingContainer {
     constructor(id: number) {
         super("sauce pan", id)
     }
-
-    // public cook(duration: number, type: string, item: any, heat: number, async: boolean = false) {
-    //     return [Timer.set(duration, type, `Cook ${sanitize(item)} in ${this.name} on heat ${heat}`, async)];
-    // }
 }
 
 class BakingSheet extends CookingContainer {
     constructor(id: number) {
         super("baking sheet", id)
     }
-
-    // public cook(duration: number, type: string, item: any, heat: number, async: boolean = false) {
-    //     return [Timer.set(duration, type, `Cook ${sanitize(item)} in ${this.name} on heat ${heat}`, async)];
-    // }
 }
 
 class Pot extends CookingContainer {
@@ -324,7 +299,7 @@ class Pot extends CookingContainer {
     }
     heat: number;
 
-    public _getHeat(heat) {
+    public _getHeat(heat: number) {
         if (heat < 1) {
             if (this.heat) {
                 return this.heat
@@ -387,10 +362,6 @@ class Teapot extends CookingContainer {
     constructor(id: number) {
         super("teapot", id)
     }
-
-    // public cook(duration: number, type: string, item: any, heat: number, async: boolean = false) {
-    //     return [Timer.set(duration, type, `Cook ${sanitize(item)} in ${this.name} on heat ${heat}`, async)];
-    // }
 }
 
 class FoodProcessor extends CookingContainer {
@@ -400,7 +371,6 @@ class FoodProcessor extends CookingContainer {
         super("food processor", id)
     }
 }
-
 
 class Pan extends CookingContainer {
     heat: number;
@@ -471,17 +441,17 @@ class InstantPot extends CookingContainer {
         const preheatStep = istep()
         preheatStep.time += Time.convert(preheat, type)
         preheatStep.text = `Put ${this.name} on high pressure for ${duration} minutes`
-        preheatStep.equipment.push(this)
+        preheatStep.equipment.push(this.name)
         preheatStep.disappearWhen = 'timerIsUp'
 
         const ensureSeal = istep()
         ensureSeal.text = `Ensure ${this.name} has sealed`
-        ensureSeal.equipment.push(this)
+        ensureSeal.equipment.push(this.name)
         ensureSeal.disappearWhen = 'clicked'
 
         const pressureCookStep = istep()
         pressureCookStep.time += Time.convert(duration, type)
-        pressureCookStep.equipment.push(this)
+        pressureCookStep.equipment.push(this.name)
         pressureCookStep.text = `Wait for ${this.name} to be done cooking`
         pressureCookStep.disappearWhen = 'timerIsUp'
 
@@ -503,16 +473,6 @@ class InstantPot extends CookingContainer {
 class CoffeeCup extends Container {
     constructor(id: number) {
         super("coffee cup", id)
-    }
-}
-
-class Blender extends Container {
-    constructor(id: number) {
-        super("blender", id)
-    }
-
-    public blend(duration, type) {
-        return Timer.set(duration, type, 'Blend', [this.name])
     }
 }
 
@@ -545,6 +505,13 @@ export class Equipment {
         new Pan(id)
     );
 
+    public static readonly smallStainlessSteelContainer = (id = 99) => (
+        new SmallStainlessSteelContainer(id)
+    );
+
+    public static readonly largeStainlessSteelContainer = (id = 99) => (
+        new LargeStainlessSteelContainer(id)
+    );
 
     public static readonly foodProcessor = (id = 99) => (
         new FoodProcessor(id)
@@ -589,10 +556,6 @@ export class Equipment {
     public static readonly coffeecup = (id = 99) => (
         new CoffeeCup(id)
     );
-
-    public static readonly blender = (id = 99) => (
-        new Blender(id)
-    )
 
     public static readonly bakingSheet = (id = 99) => (
         new BakingSheet(id)

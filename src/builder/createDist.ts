@@ -30,7 +30,7 @@ pageHtml += '<div id="select" style="display: none;">Select Recipes<br>'
 pageHtml += `<button onclick="doneSelectingRecipes()">Done Selecting</button><br>`
 
 // This creates the html files in the dist folder
-function generateRecipe(filename) {
+function generateRecipe(filename: string) {
   const MealRecipe = require(`${cwd}/${testFolder}/${filename}`).MealRecipe;
   const recipe = new MealRecipe();
 
@@ -58,10 +58,10 @@ function generateRecipe(filename) {
 
 function run() {
   // This loops through all the recipes
-  const files = fs.readdirSync(testFolder);
+  const filenames = fs.readdirSync(testFolder);
 
-  for (const file of files) {
-    generateRecipe(file);
+  for (const filename of filenames) {
+    generateRecipe(filename);
   }
 
   const outputFile = 'main';

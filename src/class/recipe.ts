@@ -2,29 +2,22 @@ import { IEstimates, IEstimatesMissing } from './ingredients/ingredient';
 import { Ingredients, Units } from '../constants/units';
 import { IStep } from './step';
 import { Text as text } from './text';
+import { Serializer as s } from './serializer';
 
 export interface IVariation {
     [details: string]: any[]; // Unititalized recipe
+}
+
+export interface IFoundEquipment {
+    [details: string]: boolean; // Unititalized recipe
 }
 
 export class RecipeContainer {
     public recipeHtml = '';
     public recipeType: string;
     public variations: any[];
-    // public recipeOptions: any;
-    // Arbitrary key.
-    // Values are added in order of keys to the recipe body html ID
-    // so just lentil spagehetti is id="lentil"
-    // lentil sausage is is id="lentilsasuage"
-    // lentil sausage mushroom is is id="lentilsasuagemushroom"
-    // This works because all recipes are precompiled
-    // this.recipeOptions = [
-    //     {'pasta': ['lentil']},
-    //     {'meat': ['sausage']},
-    //     {'veggie': ['mushroom']},
-    // ];
 
-    private generateRecipeVariation(recipeGroup: string, recipeClass, includeInVariation=false) {
+    private generateRecipeVariation(recipeGroup: string, recipeClass: any, includeInVariation=false) {
         const initRecipe: Recipe = new recipeClass();
         const recipeName = recipeClass.name;
 
@@ -34,10 +27,12 @@ export class RecipeContainer {
         // Adds the recipe to the javascript variable
         this.recipeHtml += initRecipe.printRecipe(recipeGroup, recipeName)
 
+        const hideFromCookingView = initRecipe.hideFromCookingView ? 'hideFromCookingView' : ''
+
         if (includeInVariation) {
-            this.recipeHtml += `<button class="${recipeGroup}-group" style="display: none" `
+            this.recipeHtml += `<button class="${recipeGroup}-group ${hideFromCookingView}" style="display: none" `
         } else {
-            this.recipeHtml += `<button `
+            this.recipeHtml += `<button class="${hideFromCookingView}" `
         }
 
         this.recipeHtml += `onclick="selectRecipe('${recipeGroup}-${recipeName}')">${recipeName}</button>`
@@ -51,7 +46,7 @@ export class RecipeContainer {
         const recipeGroup = filename.replace(".ts", "")
 
         if (this.variations.length > 1) {
-            this.recipeHtml += `<div id='${recipeGroup}-main'><button onclick="showElementsByClassName('${recipeGroup}-group'); hideElement('${recipeGroup}-main');">${recipeGroup} ⇩</button></div>`
+            this.recipeHtml += `<div id='${recipeGroup}-main'><button onclick="showElementsByClassName('${recipeGroup}-group'); hideElement('${recipeGroup}-main'); hideElementsByClassName('hideFromCookingView');">${recipeGroup} ⇩</button></div>`
 
             hideUnderRecipeGroup = true
         }
@@ -72,6 +67,7 @@ export class RecipeContainer {
 
 export class Recipe {
     public steps: IStep[] = [];
+    public hideFromCookingView: Boolean = false; 
     public ingredients: Ingredients = {};
     // public equipment: IAllEquipment = {};
     public vegan = true;
@@ -105,18 +101,8 @@ export class Recipe {
     // Useful if the recipe only has one option
     public autoShow = false;
 
-    private print(step: IStep) {
-        this.recipeHtml += ''
-
-        if (step.children) {
-            step.children.forEach(istepchild => {
-                this.print(istepchild)
-            })
-        }
-    }
-
     public validate(recipeGroup: string, recipeName: string) {
-        const timers: any[] = []
+        const timers: string[] = []
         this.steps.forEach(stepz => {
             if (stepz.showTimer) {
                 timers.push(stepz.text);
@@ -132,6 +118,29 @@ export class Recipe {
         }
     }
 
+
+    public multiplyIngredients(multiple: number) {
+        // This adds all the ingredients from each step into ingredients in the main recipe
+        // And also does any transformations like converting the ingredient to many different units
+
+        this.steps.forEach(step => {
+            if (step.hasOwnProperty("children")) {
+                step.children.forEach(child => {
+                   child.ingredients.forEach(ingredient => {
+                        if (ingredient.unit !== Units.none && ingredient.quantity > 0) {
+                            ingredient.quantity = ingredient.quantity * multiple
+                        }
+                    })
+                })
+            }
+            // Unit could be null, dont add ingredient whose unit is null - item('hamburger') is an example of that
+            step.ingredients.forEach(ingredient => {
+                if (ingredient.unit !== Units.none && ingredient.quantity > 0) {
+                    ingredient.quantity = ingredient.quantity * multiple
+                }
+            })
+        })
+    }
 
     private addIngredient(istep: IStep) {
         // This adds all the ingredients from each step into ingredients in the main recipe
@@ -172,9 +181,10 @@ export class Recipe {
         }
     }
 
-    private getStepEquipment(step: IStep, equipment: any[] = []) {
-        // Calculates all the equipment for the step (and its children steps)
+    private getStepEquipment(step: IStep) {
+        const equipment: string[] = []
 
+        // Calculates all the equipment for the step (and its children steps)
         if (step.equipment.length > 0) {
             step.equipment.forEach(equipmentItem => {
                 equipment.push(equipmentItem)
@@ -200,8 +210,11 @@ export class Recipe {
             this.addIngredient(stepz)
         })
 
+        // Lazy load the text
+        s.parseLazyLoad(this.steps)
+
         // Loop through steps backwards and add a step to put away equipment if its no longer used
-        const foundEquipment = {};
+        const foundEquipment: IFoundEquipment = {};
 
         // Since we are looping backwards we can add items to the array
         for (let i = this.steps.length - 1; i >= 0; --i) {

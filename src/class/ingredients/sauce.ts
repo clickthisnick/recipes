@@ -38,7 +38,7 @@ export class SauceItems extends OilItems {
                     ]
                 }
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -56,7 +56,7 @@ export class SauceItems extends OilItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -74,7 +74,7 @@ export class SauceItems extends OilItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -92,7 +92,7 @@ export class SauceItems extends OilItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -133,7 +133,7 @@ export class SauceItems extends OilItems {
                     ]
                 }
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -151,7 +151,7 @@ export class SauceItems extends OilItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -169,7 +169,7 @@ export class SauceItems extends OilItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -187,7 +187,7 @@ export class SauceItems extends OilItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {
                 [u.tsp.name]: {
                     calories: 0,
@@ -245,7 +245,7 @@ export class SauceItems extends OilItems {
                     ]
                 }
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -263,7 +263,7 @@ export class SauceItems extends OilItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -281,7 +281,7 @@ export class SauceItems extends OilItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -299,7 +299,7 @@ export class SauceItems extends OilItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -317,7 +317,7 @@ export class SauceItems extends OilItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -335,7 +335,7 @@ export class SauceItems extends OilItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -353,7 +353,7 @@ export class SauceItems extends OilItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -371,7 +371,7 @@ export class SauceItems extends OilItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -389,7 +389,7 @@ export class SauceItems extends OilItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)
@@ -428,7 +428,7 @@ export class SauceItems extends OilItems {
                     ]
                 }
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {
                 [u.cup.name]: {
                     servings: 6,
@@ -469,7 +469,7 @@ export class SauceItems extends OilItems {
                     ]
                 }
             },
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {
                 [u.tbsp.name]: {
                     calories: 25,
@@ -492,7 +492,7 @@ export class SauceItems extends OilItems {
             isTakeoutUnitable: false,
             isMeatProduct: false,
             purchaseLinks: {},
-            perishableLimit: undefined,
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)

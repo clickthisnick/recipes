@@ -27,7 +27,7 @@ interface INutrition {
    [unit: string]: IEstimates;
 }
 
-interface IStorePurchaseLink {
+export interface IStorePurchaseLink {
     [store: string]: IPurchaseLink,
 }
 
@@ -60,7 +60,7 @@ export interface IItemObj {
     isTakeoutUnitable: boolean;
     isMeatProduct: boolean;
     purchaseLinks: IStorePurchaseLink;
-    perishableLimit: number | undefined;
+    perishableLimit: number;
     nutrition: INutrition;
 }
 
@@ -70,6 +70,10 @@ export interface IMeatObj extends IItemObj {
 
 export interface IItem {
     (quantity?: number, unit?: IUnitObj): IItemObj;
+}
+
+export interface IIngredient{
+    Ingredient: Ingredient
 }
 
 export class Ingredient {
@@ -84,7 +88,7 @@ export class Ingredient {
     isMeatProduct: boolean
     nutrition: any
     purchaseLinks: IStorePurchaseLink
-    perishableLimit?: number // The number of days we want to keep the item before we should use it. The goal is to use before the perishable limit which may or may not be the expiration date.
+    perishableLimit: number // The number of days we want to keep the item before we should use it. The goal is to use before the perishable limit which may or may not be the expiration date.
 
     // Containers are a singleton
     constructor(
@@ -104,37 +108,38 @@ export class Ingredient {
         this.perishableLimit = item.perishableLimit
     }
 
-    public seasonWith(ingredients: any): IStep {
+    public seasonWith(ingredients: Ingredient[]): IStep {
         const addIStep = istep()
 
-        if (Array.isArray(ingredients)) {
-            addIStep.text = ['Season', s.turnIngObjIntoStr(this, true), 'with the following'].join(' ')
-            addIStep.ingredients.push(this)
-            addIStep.disappearWhen = 'childrenGone'
-            ingredients.forEach((ingredient) => {
-                const addIngredient = istep()
-                addIngredient.text = ['•', s.turnIngObjIntoStr(ingredient, true)].join(' ')
-                addIngredient.ingredients.push(ingredient)
-                addIngredient.time += ingredient.takeOutTime
-                addIStep.children.push(addIngredient)
-            })
+        addIStep.text = ['Season', s.turnIngObjIntoStr(this, true), 'with the following'].join(' ')
+        addIStep.ingredients.push(this)
+        addIStep.disappearWhen = 'childrenGone'
+        ingredients.forEach((ingredient) => {
+            const addIngredient = istep()
+            addIngredient.ingredients.push(ingredient)
+            addIngredient.text = [s.lazyIngredientIdx, addIngredient.ingredients.length-1].join(' ')                
+            addIngredient.time += ingredient.takeOutTime
+            addIStep.children.push(addIngredient)
+        })
 
-            return addIStep
-        }
-
-        addIStep.text = ['Season', this.name, 'with', s.turnIngObjIntoStr(ingredients)].join(' ')
-        addIStep.ingredients.push(ingredients)
         return addIStep
     }
 
-    public mixIn(ingredients: any): IStep {
+    public mixIn(ingredients: Ingredient[]): IStep {
         const addIStep = istep()
 
-        addIStep.text = ['Mix in', ingredients, 'with', this.name].join('' )
-
+        addIStep.text = ['Mix in', s.turnIngObjIntoStr(this, true), 'with the following'].join(' ')
         addIStep.ingredients.push(this)
-        addIStep.ingredients.push(ingredients)
-        return addIStep;
+        addIStep.disappearWhen = 'childrenGone'
+        ingredients.forEach((ingredient) => {
+            const addIngredient = istep()
+            addIngredient.ingredients.push(ingredient)
+            addIngredient.text = [s.lazyIngredientIdx, addIngredient.ingredients.length-1].join(' ')                
+            addIngredient.time += ingredient.takeOutTime
+            addIStep.children.push(addIngredient)
+        })
+
+        return addIStep
     }
 
     public flip(): IStep {
