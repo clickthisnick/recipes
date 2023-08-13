@@ -78,7 +78,6 @@ function run() {
         let mode = queryString['mode']
         delete queryString['mode'];
 
-        console.log(queryString)
         if (queryString.hasOwnProperty('recipes')) {
           const recipesSelectedStr = queryString['recipes']
           recipesSelected = recipesSelectedStr.split(',')

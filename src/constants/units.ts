@@ -337,11 +337,6 @@ export class Units {
         let quantity = 0;
         let unit = ingredient_1.unit;
 
-        // console.log(`unit_two_amount ${unit_two_amount}`)
-        // console.log(`unit_two_amount whole ${isWholeNumber(unit_two_amount)}`)
-        // console.log(`unit_one_amount ${unit_one_amount}`)
-        // console.log(`unit_one_amount whole ${isWholeNumber(unit_one_amount)}`)
-
         // Use whatever unit is a whole number and the least amount
         if (isWholeNumber(unit_two_amount) && isWholeNumber(unit_one_amount)) {
             if (unit_two_amount < unit_one_amount) {

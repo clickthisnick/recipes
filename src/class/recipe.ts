@@ -46,7 +46,7 @@ export class RecipeContainer {
         const recipeGroup = filename.replace(".ts", "")
 
         if (this.variations.length > 1) {
-            this.recipeHtml += `<div id='${recipeGroup}-main'><button onclick="showElementsByClassName('${recipeGroup}-group'); hideElement('${recipeGroup}-main'); hideElementsByClassName('hideFromCookingView');">${recipeGroup} ⇩</button></div>`
+            this.recipeHtml += `<div id='${recipeGroup}-main'><button onclick="showElementsByClassName('${recipeGroup}-group'); hideElement('${recipeGroup}-main');">${recipeGroup} ⇩</button></div>`
 
             hideUnderRecipeGroup = true
         }
@@ -58,10 +58,6 @@ export class RecipeContainer {
         // this.recipeHtml += '<br>'
         this.recipeHtml += '<div id="root">'
         this.recipeHtml += '</div id="root">'
-    }
-
-    constructor() {
-        // this.recipeHtml += generateBackToRecipes();
     }
 }
 
@@ -112,6 +108,7 @@ export class Recipe {
         })
 
         if (timers.length > 0) {
+            // This is during validate - console.log is good here
             console.log(`${recipeGroup} = ${recipeName}`)
             console.log(timers)
             throw new Error('Timers left open');

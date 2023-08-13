@@ -43,6 +43,7 @@ function setRecipe(recipeGroupName, recipe) {
 }
 
 function selectMode(id) {
+    mode = id
     showElement(id)
     showElement('select')
 
@@ -53,8 +54,13 @@ function selectMode(id) {
     hideElement('cookingButton')
     hideElement('shoppingButton')
 
+    
+    // This will make all the elements disappear by removing all the html/className
+    // This is different than just setting the display to visible or non visible
     if (mode == 'cooking') {
+        setEmptyHtmlForElementsByClassName('hideFromCookingView')
         hideElementsByClassName('hideFromCookingView')
+        removeAllClassNames('hideFromCookingView')
     }
 }
 
@@ -318,7 +324,7 @@ function showElement(id) {
 function showElementsByClassName(className) {
     const elements = document.getElementsByClassName(className);
 
-    for (let i = 0; i < elements.length; i++) {
+    for (let i = elements.length - 1; elements.length >= 0; i--) {
         const element = elements[i];
         element.style.display = "inline";
     }
@@ -327,9 +333,33 @@ function showElementsByClassName(className) {
 function hideElementsByClassName(className) {
     const elements = document.getElementsByClassName(className);
 
-    for (let i = 0; i < elements.length; i++) {
+    for (let i = elements.length - 1; elements.length >= 0; i--) {
         const element = elements[i];
-        element.style.display = "none";
+        if (element) {
+            element.style.display = "none";
+        }
+    }
+}
+
+function setEmptyHtmlForElementsByClassName(className) {
+    const elements = document.getElementsByClassName(className);
+
+    for (let i = elements.length - 1; elements.length >= 0; i--) {
+        const element = elements[i];
+        if (element) {
+            element.innerHTML = ""
+        }
+    }
+}
+
+function removeAllClassNames(className) {
+    const elements = document.getElementsByClassName(className);
+
+    for (let i = elements.length - 1; elements.length >= 0; i--) {
+        const element = elements[i];
+        if (element) {
+            element.className = ""
+        }
     }
 }
 

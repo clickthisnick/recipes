@@ -12,25 +12,37 @@ export class MealRecipe extends RecipeContainer {
         super();
         this.recipeType = c.component;
         this.variations = [
-            SuperVeggie, NuttyPudding2Days, SweetPotato, NuttyPudding8Days, SweetPotato8Days, SuperVeggie8Days
+            SuperVeggie, NuttyPudding2Days, SweetPotato3Days, NuttyPudding8Days, SweetPotato8Days, SuperVeggie8Days
         ]
     }
 }
 
-class SweetPotato extends Recipe {
+class SweetPotato1Days extends Recipe {
     constructor() {
         super();
         this.steps = [
             e.oven().preheat(425),
             Timer.end(),
             e.pan().add([
-                i.sweetPotatoes(4, u.unit),
-                i.oliveOil(3, u.tbsp),
+                i.sweetPotatoes(300, u.gram),
+                i.oliveOil(1, u.tbsp),
             ]),
             e.pan().cook(30, 'm', 425),
             Timer.end(),
             text.set(["300g of sweet potato per serving"]),
         ];
+    }
+}
+
+class SweetPotato3Days extends Recipe {
+    constructor() {
+        super();
+
+        let recipe = new SweetPotato1Days()
+        recipe.multiplyIngredients(3)
+        
+        this.steps = recipe.steps;
+        this.hideFromCookingView = true;
     }
 }
 
@@ -120,10 +132,11 @@ class SweetPotato8Days extends Recipe {
     constructor() {
         super();
 
-        let recipe = new SweetPotato()
+        let recipe = new SweetPotato1Days()
         recipe.multiplyIngredients(8)
         
         this.steps = recipe.steps;
+        this.hideFromCookingView = true;
     }
 }
 
@@ -135,6 +148,7 @@ class NuttyPudding8Days extends Recipe {
         recipe.multiplyIngredients(8)
         
         this.steps = recipe.steps;
+        this.hideFromCookingView = true;
     }
 }
 
@@ -146,5 +160,6 @@ class SuperVeggie8Days extends Recipe {
         recipe.multiplyIngredients(8)
         
         this.steps = recipe.steps;
+        this.hideFromCookingView = true;
     }
 }
