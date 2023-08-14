@@ -1,7 +1,6 @@
 import { Recipe, RecipeContainer } from '../class/recipe';
 import { Items as i } from '../constants/items';
 import { Equipment as e } from '../class/equipment';
-import { Categories as c } from '../constants/categories';
 import { Units as u } from '../constants/units';
 import { Timer } from '../class/timer';
 import { Text as text} from '../class/text';
@@ -10,7 +9,6 @@ import { Text as text} from '../class/text';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.recipeType = c.component;
         this.variations = [
             SuperVeggie, NuttyPudding2Days, SweetPotato3Days, NuttyPudding8Days, SweetPotato8Days, SuperVeggie8Days
         ]
@@ -45,7 +43,6 @@ class SweetPotato3Days extends Recipe {
     }
 }
 
-// TODO needs some work but is basically right
  // Lentils - 600 Calories
  // Olive Oil - 120 Calories
  // Hemp - 60 Calories

@@ -1,6 +1,5 @@
 import { Recipe, RecipeContainer } from '../class/recipe';
 import { Items as i } from '../constants/items';
-import { Categories as c } from '../constants/categories';
 import { Units as u } from '../constants/units';
 import { Timer } from '../class/timer';
 import { Equipment as e } from '../class/equipment';
@@ -8,7 +7,6 @@ import { Equipment as e } from '../class/equipment';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.recipeType = c.meal;
         this.variations = [
             scrambledSteakEggsYams
          ]
