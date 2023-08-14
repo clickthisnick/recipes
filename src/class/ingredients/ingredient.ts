@@ -31,7 +31,7 @@ export interface IStorePurchaseLink {
     [store: string]: IPurchaseLink,
 }
 
-interface IPurchaseLink {
+export interface IPurchaseLink {
     [store: string]: IPurchaseItem[],
 }
 

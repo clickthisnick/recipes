@@ -6,7 +6,7 @@ import { Stores } from '../../class/stores';
 export class VegetableItems extends SpiceItems {
 
     public static readonly vitalWheatGluten = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Vital Wheat Gluten',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -24,7 +24,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly coffeeGrounds = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Coffee Grounds',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -42,7 +42,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly bakingPowder = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Baking Powder',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -60,7 +60,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly whiteVinegar = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'White Vinegar',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -78,7 +78,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly frozenStirFryVeggies = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Frozen Stirfry Veggies',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -96,7 +96,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly almondFlour = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Almond Flour',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -114,7 +114,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly pankoBreadCrumbs = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Panko Bread Crumbs',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -132,7 +132,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly beyondBurger = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Beyond Burger',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -150,7 +150,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly briocheHamburgerBun = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Brioche Hamburger Bun',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -168,7 +168,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly blackLentils = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Black Lentils',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -198,7 +198,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly lentils = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Lentils',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -216,7 +216,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly pizzaCrust = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Pizza Crust',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -234,7 +234,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly popcorn = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Popcorn',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -252,7 +252,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly carrots = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Carrots',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -270,7 +270,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly celery = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Celery',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -288,7 +288,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly frozenTatorTots = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Frozen Tator Tots',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -306,7 +306,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly hamburgerBun = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Hamburger Bun',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -336,7 +336,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly sunflowerLechtin = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Sunflower Lechtin',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -354,7 +354,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly almondMilk = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Almond Milk',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -406,7 +406,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly kale = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Kale',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -447,7 +447,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly cookingSpray = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Cooking Spray',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -465,7 +465,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly asparagus = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'asparagus',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -506,7 +506,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly brusselSprouts = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Brussel Sprouts',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -524,7 +524,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly romaineLettuce = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Romaine Lettuce',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -542,7 +542,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly appleSauce = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Apple Sauce',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -572,7 +572,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly timer = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Timer',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -590,7 +590,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly water = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Water',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -608,7 +608,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly aminosCoconut = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Aminos Coconut',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -626,7 +626,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly liquidSmoke = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Liquid Smoke',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -644,7 +644,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly seasonedRiceVinegar = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Seasoned Rice Vinegar',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -662,7 +662,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly appleCiderVinegar = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Apple Cider Vinegar',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -680,7 +680,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly blackBeans = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Black Beans',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -719,7 +719,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly avocadoLarge = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Large avocado',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -737,7 +737,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly avocado = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'avocado',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -755,7 +755,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly cauliflower = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Cauliflower',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -773,7 +773,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly leek = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Leek',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -791,7 +791,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly lime = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Lime',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -809,7 +809,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly lemonJuice = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Lemon Juice',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -827,7 +827,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly limeJuice = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Lime Juice',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -868,7 +868,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly romaTomato = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Roma Tomato',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -886,7 +886,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly pickleHotdogSlice = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Pickle',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -904,7 +904,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly freshGinger = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Fresh Ginger',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -922,7 +922,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly groundGinger = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Ground Ginger',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -952,7 +952,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly shallot = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Shallot',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -970,7 +970,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly serranoChilli = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Serrano Chilli',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -988,7 +988,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly cilantro = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Cilantro',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1006,7 +1006,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly habanero = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Habanero',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1024,7 +1024,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly mango = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Mango',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1042,7 +1042,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly jalapeno = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Jalapeno',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1060,7 +1060,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly spiriliazer = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Spirilizer',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1078,7 +1078,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly pickleSpears = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Pickle Spears',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1108,7 +1108,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly pickleSlices = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Pickle Slices',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1138,7 +1138,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly breadFlour = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Bread Flour',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1156,7 +1156,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly wheatBreadFlour = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Wheat Bread Flour',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1174,7 +1174,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly dryActiveYeast = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Active Dry Yeast',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1192,7 +1192,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly brownSugar = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name:  'Brown Sugar',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1209,7 +1209,7 @@ export class VegetableItems extends SpiceItems {
         return new Ingredient(item)
     }
     public static readonly greenOnion = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Green Onion',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1227,7 +1227,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly frozenCorn = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Frozen Corn',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1245,7 +1245,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly redPepperFlakes = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Red Pepper Flakes',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1263,7 +1263,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly spicyHummus = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Spicy Hummus',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1281,7 +1281,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly whiteOnion = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'White Onion',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1340,7 +1340,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly yellowOnion = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Yellow Onion',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1358,7 +1358,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly redOnion = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Red Onion',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1376,7 +1376,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly scallion = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Scallion',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1394,7 +1394,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly cannedHotCherryPepper = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Canned Hot Cherry Pepper',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1412,7 +1412,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly lemonZest = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Lemon Zest',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1430,7 +1430,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly greenBellPepper = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Green Bell Pepper',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1464,7 +1464,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly redBellPepper = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Red Bell Pepper',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1482,7 +1482,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly arrowRootStarch = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Arrow Root Starch',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1500,7 +1500,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly broccoli = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Broccoli',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1518,7 +1518,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly tomatoPaste = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Tomato Paste',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1568,7 +1568,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly chipotlePepperInAdoboSauce = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Chipotle Pepper In Adobo Sauce',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1586,7 +1586,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly driedOregano = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Dried Oregano',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1604,7 +1604,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly garlicClove = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Garlic Clove',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1645,7 +1645,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly basil = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Basil',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1663,7 +1663,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly whiteMushroom = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'White Mushroom',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1681,7 +1681,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly shitatkeMushroom = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Shitatke Mushroom',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1699,7 +1699,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly frozenShitatkeMushroom = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Frozen Shitatke Mushroom',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1717,7 +1717,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly cabbage = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Cabbage',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1735,7 +1735,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly babyBellaMushroom = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Baby Bella Mushroom',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1794,7 +1794,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly spinach = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Spinach',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -1812,7 +1812,7 @@ export class VegetableItems extends SpiceItems {
     }
 
     public static readonly zuchinni = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Zuchinni',
             putAwayTime: 10,
             takeOutTime: 10,

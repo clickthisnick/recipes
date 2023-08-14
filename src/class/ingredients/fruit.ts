@@ -6,7 +6,7 @@ import { Stores } from '../../class/stores';
 export class FruitItems extends CarbItems {
 
     public static readonly apple = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Apple',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -24,7 +24,7 @@ export class FruitItems extends CarbItems {
     }
 
     public static readonly cocoaFlavanols = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Cocoa Flavanols',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -43,7 +43,7 @@ export class FruitItems extends CarbItems {
 
 
     public static readonly creatine = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Creatine',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -61,7 +61,7 @@ export class FruitItems extends CarbItems {
     }
 
     public static readonly chlorellaPowder = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Chlorella Powder',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -79,7 +79,7 @@ export class FruitItems extends CarbItems {
     }
 
     public static readonly aminoComplex = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Amino Complex',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -97,7 +97,7 @@ export class FruitItems extends CarbItems {
     }
 
     public static readonly acaiFrozenMix = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Acai Frozen Mix',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -115,7 +115,7 @@ export class FruitItems extends CarbItems {
     }
 
     public static readonly strawberry = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Strawberry',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -145,7 +145,7 @@ export class FruitItems extends CarbItems {
     }
 
     public static readonly banana = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'banana',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -163,7 +163,7 @@ export class FruitItems extends CarbItems {
     }
 
     public static readonly frozenStrawberry = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Frozen Strawberry',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -181,7 +181,7 @@ export class FruitItems extends CarbItems {
     }
 
     public static readonly frozenCauliflower = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Frozen Cauliflower',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -199,7 +199,7 @@ export class FruitItems extends CarbItems {
     }
 
     public static readonly frozenBroccoli = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Frozen Broccoli',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -217,7 +217,7 @@ export class FruitItems extends CarbItems {
     }
 
     public static readonly frozenBlueberry = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Frozen Blueberry',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -235,7 +235,7 @@ export class FruitItems extends CarbItems {
     }
 
     public static readonly cherry = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Cherry',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -253,7 +253,7 @@ export class FruitItems extends CarbItems {
     }
 
     public static readonly macadamiaNut = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Macadamia Nut',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -283,7 +283,7 @@ export class FruitItems extends CarbItems {
     }
 
     public static readonly hempSeed = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Hemp Seed',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -301,7 +301,7 @@ export class FruitItems extends CarbItems {
     }
 
     public static readonly chiaSeed = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Chia Seed',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -319,7 +319,7 @@ export class FruitItems extends CarbItems {
     }
 
     public static readonly collagenPowder = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Collagen Powder',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -352,7 +352,7 @@ export class FruitItems extends CarbItems {
     }
 
     public static readonly pittedDates = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Pitted Dates',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -421,7 +421,7 @@ export class FruitItems extends CarbItems {
     }
 
     public static readonly peanutButter = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Peanut Butter',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -497,7 +497,7 @@ export class FruitItems extends CarbItems {
     }
 
     public static readonly cashewButter = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Cashew Butter',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -527,7 +527,7 @@ export class FruitItems extends CarbItems {
     }
 
     public static readonly orangeJuice = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Orange Juice',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -554,7 +554,7 @@ export class FruitItems extends CarbItems {
     }
 
     public static readonly frozenBerries = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Frozen Berries',
             putAwayTime: 10,
             takeOutTime: 10,

@@ -4,7 +4,7 @@ import { Time } from "./time";
 // Start at some number that is much higher than all recipes... for now at least
 // TODO think of something better
 let id = 1000000
-let ids: number[] = []
+const ids: number[] = []
 
 function getITimerId() {
     ids.push(id)
@@ -32,7 +32,7 @@ export class Timer {
 
     public static end(equipment = ['']): IStep {
         const step = istep()
-        let endId = ids.pop()
+        const endId = ids.pop()
 
         if (endId) {
             step.id = endId * 2

@@ -101,7 +101,7 @@ class NuttyPudding2DaysPrep extends Recipe {
     constructor() {
         super();
 
-        let recipe = new NuttyPudding1DayPrep()
+        const recipe = new NuttyPudding1DayPrep()
         recipe.multiplyIngredients(2)
         
         this.steps = recipe.steps;
@@ -112,7 +112,7 @@ class NuttyPudding8Days extends Recipe {
     constructor() {
         super();
         
-        let recipe = new NuttyPudding1DayPrep()
+        const recipe = new NuttyPudding1DayPrep()
         recipe.multiplyIngredients(8)
         
         this.steps = recipe.steps;
@@ -124,7 +124,7 @@ class SuperVeggiePrep8DaysPrep extends Recipe {
     constructor() {
         super();
 
-        let recipe = new SuperVeggiePrep()
+        const recipe = new SuperVeggiePrep()
         recipe.multiplyIngredients(8)
         
         this.steps = recipe.steps;

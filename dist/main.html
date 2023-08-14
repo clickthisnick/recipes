@@ -65,10 +65,13 @@ const perishableItems = {}
 
 function playSound() {
     const audio = document.getElementById("beep")
-    // overrides the empty sound already played on the object
-    // this is so ios will asynchronously play the sounds
-    audio.src = "../src/sounds/pager-beep.mp3"
-    audio.play()
+
+    if (audio) {
+        // overrides the empty sound already played on the object
+        // this is so ios will asynchronously play the sounds
+        audio.src = "../src/sounds/pager-beep.mp3"
+        audio.play()
+    }
 }
 
 const parseParams = (windowLocationSearch) => {
@@ -435,6 +438,15 @@ const timerClicks = {};
 function startTimer(duration, stepId, stepIdxToShow, async) {
     const timerPanelId = "panel-" + stepId
     const timerElement = document.getElementById(timerPanelId);
+
+    if (!timerElement) {
+        throw new Error("timerElement is faled")
+    }
+
+    // if (!timerClicks) {
+    //     return
+    // }
+
     if (timerClicks.hasOwnProperty(timerPanelId)) {
         timerClicks[timerPanelId] += 1
     } else {
@@ -479,8 +491,15 @@ function startTimer(duration, stepId, stepIdxToShow, async) {
             timerElement.classList.toggle('timer');
             timerElement.classList.toggle('completed');
             if (async == false) {
-                document.getElementById(timerPanelId).style.display = 'none';
-                document.getElementById("panel-" + stepIdxToShow).style.display = 'block';
+                const timerPanelIdElement = document.getElementById(timerPanelId)
+                if (timerPanelIdElement) {
+                    timerPanelIdElement.style.display = 'none';
+                }
+
+                const panelStepIdxToShow = document.getElementById("panel-" + stepIdxToShow)
+                if (panelStepIdxToShow) {
+                    panelStepIdxToShow.style.display = 'block';
+                }
             }
 
             if (document.getElementById(timerPanelId).style.display != 'none') {

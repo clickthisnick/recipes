@@ -5,7 +5,7 @@ import { Stores } from '../../class/stores';
 export class AnimalItems {
     // This is used in recipes i.ingredient('yeast mixture') - when you want an item, but there's not a specific one defined that fits
     public static readonly ingredient = (name: string, quantity = 0, unit: IUnitObj = Units.none, purchaseLinks: IStorePurchaseLink = {}) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: name,
             putAwayTime: 10,
             takeOutTime: 10,
@@ -23,7 +23,7 @@ export class AnimalItems {
     }
 
     public static readonly chickenDrumsticks = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Chicken Drumsticks',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -53,7 +53,7 @@ export class AnimalItems {
     }
 
     public static readonly chickenBreast = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Chicken Breast',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -94,7 +94,7 @@ export class AnimalItems {
     }
 
     public static readonly chickenThigh = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Chicken Thigh',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -124,7 +124,7 @@ export class AnimalItems {
     }
 
     public static readonly chickenStock = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Chicken Stock',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -142,7 +142,7 @@ export class AnimalItems {
     }
 
     public static readonly halfAndHalf = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Half and Half',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -160,7 +160,7 @@ export class AnimalItems {
     }
 
     public static readonly collagenPeptides = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Collagen Peptides',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -178,7 +178,7 @@ export class AnimalItems {
     }
 
     public static readonly pepperedSalami = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Peppered Salami',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -196,7 +196,7 @@ export class AnimalItems {
     }
 
     public static readonly salmon = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Salmon',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -214,7 +214,7 @@ export class AnimalItems {
     }
 
     public static readonly frozenChickenWings = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Frozen Chicken Wings',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -232,7 +232,7 @@ export class AnimalItems {
     }
 
     public static readonly homemadeItalianSausage = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Homemade Italian Sausage',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -250,7 +250,7 @@ export class AnimalItems {
     }
 
     public static readonly sausage = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Sausage',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -268,7 +268,7 @@ export class AnimalItems {
     }
 
     public static readonly italianSausage = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Italian Sausage',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -309,7 +309,7 @@ export class AnimalItems {
     }
 
     public static readonly mozzarellaCheese = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Mozzarella Cheese',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -350,7 +350,7 @@ export class AnimalItems {
     }
 
     public static readonly ricottaCheese = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Ricotta Cheese',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -368,7 +368,7 @@ export class AnimalItems {
     }
 
     public static readonly plainYogurt = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Plain Yogurt',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -386,7 +386,7 @@ export class AnimalItems {
     }
 
     public static readonly parmesanCheese = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Parmesan Cheese',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -443,7 +443,7 @@ export class AnimalItems {
     }
 
     public static readonly cheddarCheese = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Cheddar Cheese',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -473,7 +473,7 @@ export class AnimalItems {
     }
 
     public static readonly pepperJackCheese = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Pepper Jack Cheese',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -491,7 +491,7 @@ export class AnimalItems {
     }
 
     public static readonly montereyJackCheese = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Monterey Jack Cheese',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -509,7 +509,7 @@ export class AnimalItems {
     }
 
     public static readonly porkRoast = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Pork Roast',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -527,7 +527,7 @@ export class AnimalItems {
     }
 
     public static readonly porkChops = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Pork Chops',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -545,7 +545,7 @@ export class AnimalItems {
     }
 
     public static readonly bonelessRibClubSteak = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Boneless Rib Club Steak',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -563,7 +563,7 @@ export class AnimalItems {
     }
 
     public static readonly egg = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Egg',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -604,7 +604,7 @@ export class AnimalItems {
     }
 
     public static readonly eggWhite = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Egg White',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -622,7 +622,7 @@ export class AnimalItems {
     }
 
     public static readonly ham = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Ham',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -640,7 +640,7 @@ export class AnimalItems {
     }
 
     public static readonly honey = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Honey',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -658,7 +658,7 @@ export class AnimalItems {
     }
 
     public static readonly butter = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Butter',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -699,7 +699,7 @@ export class AnimalItems {
     }
 
     public static readonly bacon = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Bacon',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -717,7 +717,7 @@ export class AnimalItems {
     }
 
     public static readonly eggPasta = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Egg Pasta',
             putAwayTime: 10,
             takeOutTime: 10,

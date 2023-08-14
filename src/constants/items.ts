@@ -3,14 +3,14 @@
 import { VegetableItems } from '../class/ingredients/vegetable';
 import { IUnitObj, Units } from './units';
 import { Items as i } from './items';
-import { Ingredient } from '../class/ingredients/ingredient';
+import { IPurchaseLink, Ingredient } from '../class/ingredients/ingredient';
 
 function returnItem(itemName: string, quantity: number, unit: IUnitObj, subItems: Ingredient[]) {
     // This functions attempts to take a group of items, and returns a singular item back
     // The reason why it exists is if you have a recipe that just needs "meat" but you don't care if its chickenThighs or beef
     // Then you can use this to just return meat, then in shopping mode - you get all the options for "meat" and you can choose the one you best see fit at the time
     const mainItem = i.ingredient(itemName, quantity, unit)
-    let lowestPerishableLimit: number = 0;
+    let lowestPerishableLimit = 0;
 
     for (let idx = 0; idx < subItems.length; idx++) {
         const ingredient = subItems[idx];
@@ -45,7 +45,7 @@ function returnItem(itemName: string, quantity: number, unit: IUnitObj, subItems
 
                     Object.keys(puchaseLinks[store]).forEach(key => {
                         if (mainItem.purchaseLinks) {
-                            const mainItemPurchaseLinks: any = mainItem.purchaseLinks[store];
+                            const mainItemPurchaseLinks: IPurchaseLink = mainItem.purchaseLinks[store];
                             const itemKey = ingredient.name + ' ' + key
                             mainItemPurchaseLinks[itemKey] = puchaseLinks[store][key];
                         }

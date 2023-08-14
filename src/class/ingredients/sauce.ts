@@ -6,7 +6,7 @@ import { Stores } from '../../class/stores';
 export class SauceItems extends OilItems {
 
     public static readonly coconutCream = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Coconut Cream',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -45,7 +45,7 @@ export class SauceItems extends OilItems {
     }
 
     public static readonly coconutMilk = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Coconut Milk',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -63,7 +63,7 @@ export class SauceItems extends OilItems {
     }
 
     public static readonly ketchup = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Ketchup',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -81,7 +81,7 @@ export class SauceItems extends OilItems {
     }
 
     public static readonly steakSauce = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'steak sauce',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -99,7 +99,7 @@ export class SauceItems extends OilItems {
     }
 
     public static readonly salsa = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'salsa',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -140,7 +140,7 @@ export class SauceItems extends OilItems {
     }
 
     public static readonly hotSauce = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'hot sauce',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -158,7 +158,7 @@ export class SauceItems extends OilItems {
     }
 
     public static readonly sourCream = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'sour cream',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -176,7 +176,7 @@ export class SauceItems extends OilItems {
     }
 
     public static readonly dijonMustard = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Dijon Mustard',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -202,7 +202,7 @@ export class SauceItems extends OilItems {
     }
 
     public static readonly germanMustard = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'German Mustard',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -252,7 +252,7 @@ export class SauceItems extends OilItems {
     }
 
     public static readonly peanutOil = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Peanut Oil',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -270,7 +270,7 @@ export class SauceItems extends OilItems {
     }
 
     public static readonly oysterSauce = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Oyster Sauce',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -288,7 +288,7 @@ export class SauceItems extends OilItems {
     }
 
     public static readonly soySauce = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Soy Sauce',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -306,7 +306,7 @@ export class SauceItems extends OilItems {
     }
 
     public static readonly padThaiSauce = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Pad Thai Sauce',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -324,7 +324,7 @@ export class SauceItems extends OilItems {
     }
 
     public static readonly barbecueSauce = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Barbecue Sauce',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -342,7 +342,7 @@ export class SauceItems extends OilItems {
     }
 
     public static readonly pizzaSauce = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Pizza Sauce',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -360,7 +360,7 @@ export class SauceItems extends OilItems {
     }
 
     public static readonly sirachaSauce = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Siracha Sauce',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -378,7 +378,7 @@ export class SauceItems extends OilItems {
     }
 
     public static readonly hoisonSauce = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Hoison Sauce',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -396,7 +396,7 @@ export class SauceItems extends OilItems {
     }
 
     public static readonly spaghettiSauce = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Spaghetti Sauce',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -446,7 +446,7 @@ export class SauceItems extends OilItems {
     }
 
     public static readonly wingTimeMediumBuffaloSauce = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Buffalo Sauce',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -481,7 +481,7 @@ export class SauceItems extends OilItems {
     }
 
     public static readonly buffaloSauce = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Buffalo Sauce',
             putAwayTime: 10,
             takeOutTime: 10,

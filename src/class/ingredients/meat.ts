@@ -6,7 +6,7 @@ import { Stores } from '../../class/stores';
 export class MeatItems extends FruitItems {
 
     public static readonly flankSteak = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Flank Steak',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -24,7 +24,7 @@ export class MeatItems extends FruitItems {
     }
 
     public static readonly gelatin = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Gelatin',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -42,7 +42,7 @@ export class MeatItems extends FruitItems {
     }
 
     public static readonly groundBeef = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Ground Beef',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -60,7 +60,7 @@ export class MeatItems extends FruitItems {
     }
 
     public static readonly BeefEyeRoundSteak = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Beef Eye Round Steak',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -78,7 +78,7 @@ export class MeatItems extends FruitItems {
     }
 
     public static readonly groundBeef8020 = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Ground Beef 80/20',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -119,7 +119,7 @@ export class MeatItems extends FruitItems {
     }
 
     public static readonly premadePizza = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Premade Pizza',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -170,7 +170,7 @@ export class MeatItems extends FruitItems {
     }
 
     public static readonly londonBroil = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'London Broil',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -188,7 +188,7 @@ export class MeatItems extends FruitItems {
     }
 
     public static readonly spiralCutHam = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Spiral Cut Ham',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -212,7 +212,7 @@ export class MeatItems extends FruitItems {
     }
 
     public static readonly topSirloin = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'top sirloin',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -230,7 +230,7 @@ export class MeatItems extends FruitItems {
     }
 
     public static readonly babyBackRibs = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Baby Back Ribs',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -248,7 +248,7 @@ export class MeatItems extends FruitItems {
     }
 
     public static readonly sausageAidellsCajun = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IMeatObj = {
+        const item: IMeatObj = {
             name: 'Aidells Cajun Sausage',
             putAwayTime: 10,
             takeOutTime: 10,

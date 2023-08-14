@@ -6,7 +6,7 @@ import { Stores } from '../../class/stores';
 export class OilItems extends MeatItems {
 
     public static readonly sesameOil = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Sesame Oil',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -24,7 +24,7 @@ export class OilItems extends MeatItems {
     }
 
     public static readonly avocadoOil = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'avocado Oil',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -42,7 +42,7 @@ export class OilItems extends MeatItems {
     }
 
     public static readonly chilliOil = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Chilli Oil',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -69,7 +69,7 @@ export class OilItems extends MeatItems {
     }
 
     public static readonly coconutOil = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Coconut Oil',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -125,7 +125,7 @@ export class OilItems extends MeatItems {
     }
 
     public static readonly oliveOil = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Olive Oil',
             putAwayTime: 10,
             takeOutTime: 10,
@@ -199,7 +199,7 @@ export class OilItems extends MeatItems {
     }
 
     public static readonly vegetableOil = (quantity = 0, unit: IUnitObj = Units.none) => {
-        let item: IItemObj = {
+        const item: IItemObj = {
             name: 'Vegetable Oil',
             putAwayTime: 10,
             takeOutTime: 10,

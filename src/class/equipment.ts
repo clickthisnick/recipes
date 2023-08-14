@@ -12,6 +12,10 @@ export interface IEquipmentObj {
     name: string;
 }
 
+export interface IContainersObj {
+    [name: string]: string;
+}
+
 export interface IEquipment {
     // Id is the identifier of the equipment
     // If you need/reuse equipment then use this
@@ -325,7 +329,7 @@ class Pot extends CookingContainer {
         return this._cookStr(`Cook ${this.name} without lid`, duration, type, heat)
     }
 
-    public cookWithLid(duration: number, type: string, heat: number, text: string = ""): IStep {
+    public cookWithLid(duration: number, type: string, heat: number, text = ""): IStep {
         heat = this._getHeat(heat)
         if (text) {
             text = text + " "
@@ -333,7 +337,7 @@ class Pot extends CookingContainer {
         return this._cookStr(`Cook ${this.name} with lid`, duration, type, heat)
     }
 
-    public cookWithLidSlightlyOff(duration: number, type: string, heat: number, text: string = ""): IStep {
+    public cookWithLidSlightlyOff(duration: number, type: string, heat: number, text = ""): IStep {
         heat = this._getHeat(heat)
         if (text) {
             text = text + " "
@@ -423,7 +427,7 @@ class Pan extends CookingContainer {
         return this._cookStr(`Cook on heat ${heat} with lid slightly off`, duration, type, heat)
     }
 
-    public cookWithLid(duration: number, type: string, heat: number = 0, text: string = ""): IStep {
+    public cookWithLid(duration: number, type: string, heat = 0, text = ""): IStep {
         if (text) {
             text = text + " "
         }
