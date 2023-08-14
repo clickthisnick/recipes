@@ -1,14 +1,8 @@
 import * as fs from 'fs';
 import { HTML } from '../class/html';
-// import { IAllIngredientUnits } from '../constants/units';
-
-//import { Index } from '../class/index';
-//import { IStep } from '../class/step';
 
 // This is the path from root (package.json runs this)
-const testFolder = 'src/recipeDebug';
-// const testFolder = 'src/recipeDebug';
-// const testFolder = 'src/recipesNewFormat';
+const testFolder = 'src/recipes';
 const cwd = process.cwd();
 
 let pageHtml = ''
