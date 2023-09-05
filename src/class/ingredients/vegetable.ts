@@ -395,7 +395,14 @@ export class VegetableItems extends SpiceItems {
                             quantity_unit: u.fluid_ounce,
                             link: 'https://www.wholefoodsmarket.com/product/365-by-whole-foods-market-organic-unsweetened-almond-milk-96-fl-oz-b08tsqr1cs',
                             organic: true,
-                        }
+                        },
+                        {
+                            price: 4.99,
+                            quantity: 96,
+                            quantity_unit: u.fluid_ounce,
+                            link: 'https://www.amazon.com/365-WFM-Organic-Unsweetened-Almond/dp/B08TSQR1CS',
+                            organic: true,
+                        },
                     ]
                 },
             },

@@ -134,6 +134,13 @@ export class FruitItems extends CarbItems {
                             quantity_unit: u.ounce,
                             link: 'https://www.wholefoodsmarket.com/product/365-by-whole-foods-market-365-whole-foods-market-organic-whole-strawberries-b09gcp3jng',
                             organic: true,
+                        },
+                        {
+                            price: 6.69,
+                            quantity: 32,
+                            quantity_unit: u.ounce,
+                            link: 'https://www.amazon.com/365-WFM-Organic-Whole-Strawberries/dp/B09GCP3JNG',
+                            organic: true,
                         }
                     ]
                 }
@@ -252,6 +259,7 @@ export class FruitItems extends CarbItems {
         return new Ingredient(item)
     }
 
+    // https://www.amazon.com/365-Whole-Foods-Market-Macadamia/dp/B086HK83YF/
     public static readonly macadamiaNut = (quantity = 0, unit: IUnitObj = Units.none) => {
         const item: IItemObj = {
             name: 'Macadamia Nut',

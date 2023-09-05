@@ -838,12 +838,24 @@ export class CarbItems extends AnimalItems {
                 [Stores.wholeFoods]: {
                     'organic': [
                         {
-                            price: 10.49,
+                            price: 15.49,
                             quantity: 32,
                             quantity_unit: u.fluid_ounce,
-                            link: 'https://www.wholefoodsmarket.com/product/rw-knudsen-family-rw-knudsen-just-pomegranate-juice-32-fl-oz-b001o8mi4ss',
+                            link: 'https://www.amazon.com/Lakewood-Organic-Pomegranate-Juice-32oz/dp/B000RELFGC',
                             organic: true,
-                        }
+                        },
+                        
+                    ]
+                },
+                [Stores.amazon]: {
+                    'organic': [
+                        {
+                            price: 52.99,
+                            quantity: 202.8,
+                            quantity_unit: u.fluid_ounce,
+                            link: 'https://www.amazon.com/gp/product/B01M8I4G2L/',
+                            organic: true,
+                        },
                     ]
                 }
             },

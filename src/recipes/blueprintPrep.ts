@@ -52,7 +52,13 @@ class PillsMorningPrep extends Recipe {
             text.set(["1 Ashwaganda"]),
             text.set(["1 BroccoMax"]),
             text.set(["1 Zinc"]),
-            text.set(["1 Ca-AWG?? TODO"]),
+            //text.set(["1 Ca-AWG?? TODO"]),
+            text.set(['2 N-Acetyl-L-Cysteine pills']),
+            text.set(['1 DHEA']),
+            text.set(['2 Kyolic Garlic']),
+            //text.set(['1 Proferrin Clear']),
+            text.set(['1 Viviscalman']),
+            text.set(['.25 Super B Complex x2 a week']),
         ];
     }
 }
