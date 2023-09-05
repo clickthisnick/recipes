@@ -64,7 +64,7 @@ class SuperVeggie extends Recipe {
                 i.blackLentils(1, u.smallstainlesssteelcontainer), // 200 grams
                 i.water(1, u.smallstainlesssteelcontainer), // 3 cups
             ]),
-            e.pot(0).cookWithLidSlightlyOff(21, 'm', 7, "lentils"), // 20 min for black/ 23 min for green total
+            e.pot(0).cookWithLidSlightlyOff(21, 'm', 7, "lentils", "clicked"), // 20 min for black/ 23 min for green total
                 text.set(['Drink a glass of water with morning pills']),
                 text.set(['Drink the green giant']),
                 e.pan().add([
@@ -72,7 +72,7 @@ class SuperVeggie extends Recipe {
                     i.frozenBroccoli(1, u.largestainlesssteelcontainer)
                 ]),
                 // Cook pan until lentils are done
-                e.pan().cookWithLid(15, 'm', 5, "broccoli"),
+                e.pan().cookWithLid(15, 'm', 5, "broccoli", "clicked"),
                     text.set(['Do stretch routine.']),
                     // Alex
                     // e.pan(2).add([ // tmp for partner

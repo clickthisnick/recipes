@@ -5,13 +5,17 @@ const ingredients = {}
 let mode = ''
 const perishableItems = {}
 
-function playSound() {
+function playSound(duration=4) {
     const audio = document.getElementById("beep")
 
     if (audio) {
         // overrides the empty sound already played on the object
         // this is so ios will asynchronously play the sounds
-        audio.src = "../src/sounds/pager-beep.mp3"
+        if (duration == 4) {
+            audio.src = "../src/sounds/pager-beep.mp3"
+        } else {
+            audio.src = "../src/sounds/1sec.m4a"
+        }
         audio.play()
     }
 }
@@ -137,7 +141,9 @@ function addStep(istep) {
         divStep += istep.time
         divStep += ", "
         divStep += istep.id
-        divStep += ");"
+        divStep += ", '"
+        divStep += istep.disappearWhen
+        divStep += "');"
     } else {
         cookingDiv.innerHTML += "";
         // <!--Only double quote should be around the onclick-- >
@@ -368,12 +374,18 @@ function setStepVisibility(idxToShow, idxToHide) {
 
 const timerClicks = {};
 
-function startTimer(duration, stepId, stepIdxToShow, async) {
+function startTimer(duration, stepId, disappearWhen) {
     const timerPanelId = "panel-" + stepId
     const timerElement = document.getElementById(timerPanelId);
 
     if (!timerElement) {
-        throw new Error("timerElement is faled")
+        throw new Error("timerElement is failed")
+    }
+
+    // If clicking an element thats already green
+    if (timerElement.classList.contains('timerCompletedButShowing')) {
+        timerElement.classList.toggle('timerCompletedButShowing');
+        timerElement.classList.toggle('completed');
     }
 
     // if (!timerClicks) {
@@ -419,33 +431,57 @@ function startTimer(duration, stepId, stepIdxToShow, async) {
 
         timerElement.innerHTML = minutes + ":" + seconds + " " + originalTimerHtml;
 
-        if (--duration < 0) {
-            window.clearInterval(intervalID);
-            timerElement.classList.toggle('timer');
-            timerElement.classList.toggle('completed');
-            if (async == false) {
-                const timerPanelIdElement = document.getElementById(timerPanelId)
-                if (timerPanelIdElement) {
-                    timerPanelIdElement.style.display = 'none';
+        if (--duration < 0) {            
+            if (disappearWhen == "timerIsUp") {
+                timerElement.classList.toggle('timer');
+                window.clearInterval(intervalID);
+                timerElement.classList.toggle('completed');
+                // if (async == false) {
+                //     const timerPanelIdElement = document.getElementById(timerPanelId)
+                //     if (timerPanelIdElement) {
+                //         timerPanelIdElement.style.display = 'none';
+                //     }
+    
+                //     // const panelStepIdxToShow = document.getElementById("panel-" + stepIdxToShow)
+                //     // if (panelStepIdxToShow) {
+                //     //     panelStepIdxToShow.style.display = 'block';
+                //     // }
+                // }
+    
+                if (document.getElementById(timerPanelId).style.display != 'none') {
+                    // our end timers are always x2 our start timer id
+                    document.getElementById(`panel-${stepId * 2}`)?.remove();
+                    playSound()
                 }
+            } else if (disappearWhen == "clicked") {
+                const ttimerPanelId = "panel-" + stepId
+                const ttimerElement = document.getElementById(ttimerPanelId);
 
-                const panelStepIdxToShow = document.getElementById("panel-" + stepIdxToShow)
-                if (panelStepIdxToShow) {
-                    panelStepIdxToShow.style.display = 'block';
+                console.log("panel-" + stepId)
+                console.log(ttimerElement.style.display)
+                console.log(ttimerElement.style)
+                console.log(ttimerElement)
+
+                if (!timerElement.classList.contains('completed')) {
+                    if (!timerElement.classList.contains('timerCompletedButShowing')) {
+                        timerElement.classList.toggle('timer');
+                        timerElement.classList.toggle('timerCompletedButShowing');
+                    } 
+
+                    playSound(1)
+                } else {
+                    // our end timers are always x2 our start timer id
+                    // document.getElementById(`panel-${stepId * 2}`)?.remove();
+
+                    window.clearInterval(intervalID);
                 }
-            }
-
-            if (document.getElementById(timerPanelId).style.display != 'none') {
-                // our end timers are always x2 our start timer id
-                document.getElementById(`panel-${stepId * 2}`)?.remove();
-                playSound()
             }
         }
     }, 1000);
 }
 
-function loadTimer(seconds, stepId, stepIdxToShow, async) {
-    startTimer(seconds, stepId, stepIdxToShow, async);
+function loadTimer(seconds, stepId, disappearWhen) {
+    startTimer(seconds, stepId, disappearWhen);
 }
 
 let shownId = '';

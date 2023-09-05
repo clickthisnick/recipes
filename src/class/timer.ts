@@ -13,13 +13,13 @@ function getITimerId() {
 }
 
 export class Timer {
-    public static set(duration: number, type: string, text = '', equipment = ['']): IStep {
+    public static set(duration: number, type: string, text = '', equipment = [''], disappearWhen: string = 'timerIsUp'): IStep {
         const step = istep()
         step.id = getITimerId()
         step.time = Time.convert(duration, type),
         step.showTimer = true
         step.text = text + ` for ${duration} ${type}`
-        step.disappearWhen = 'timerIsUp'
+        step.disappearWhen = disappearWhen
 
         // get rid of [""]
         equipment = equipment.filter(n => n)

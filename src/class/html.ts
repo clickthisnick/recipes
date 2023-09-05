@@ -53,6 +53,11 @@ export class HTML {
         display: none;
     }
 
+    .timerCompletedButShowing {
+        background-color:green;
+        color: black;
+    }
+
     .timer {
         background-color:yellow;
         color: black;
