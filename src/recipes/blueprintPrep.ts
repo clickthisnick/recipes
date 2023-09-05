@@ -52,6 +52,7 @@ class PillsMorningPrep extends Recipe {
             text.set(["1 Ashwaganda"]),
             text.set(["1 BroccoMax"]),
             text.set(["1 Zinc"]),
+            text.set(["1 Vitamin E"]),
             //text.set(["1 Ca-AWG?? TODO"]),
             text.set(['2 N-Acetyl-L-Cysteine pills']),
             text.set(['1 DHEA']),
