@@ -195,12 +195,10 @@ function addStep(istep) {
         divStep += `style="${istep.style}" `
     }
 
-    divStep += 'onclick="this.classList.toggle('
-    divStep += "'timer'"
 
     if (istep.showTimer) {
         // <!--Only double quote should be around the onclick-- >
-        divStep += "); loadTimer("
+        divStep += 'onclick="loadTimer('
         divStep += istep.time
         divStep += ", "
         divStep += istep.id
@@ -209,6 +207,8 @@ function addStep(istep) {
         divStep += "');"
     } else {
         cookingDiv.innerHTML += "";
+        divStep += 'onclick="this.classList.toggle('
+        divStep += "'timer'"
         // <!--Only double quote should be around the onclick-- >
         divStep += "); document.getElementById('panel-"
         divStep += istep.id
@@ -441,6 +441,12 @@ function startTimer(duration, stepId, disappearWhen) {
     const timerPanelId = "panel-" + stepId
     const timerElement = document.getElementById(timerPanelId);
 
+    // Toggle the timer if the class doesn't already have it
+    // We only do this once
+    if (!timerElement.classList.contains('timer')) {
+        timerElement.classList.toggle('timer');
+    }
+
     if (!timerElement) {
         throw new Error("timerElement is failed")
     }
@@ -451,38 +457,25 @@ function startTimer(duration, stepId, disappearWhen) {
         timerElement.classList.toggle('completed');
     }
 
-    // if (!timerClicks) {
-    //     return
-    // }
-
     if (timerClicks.hasOwnProperty(timerPanelId)) {
         timerClicks[timerPanelId] += 1
     } else {
-        timerClicks[timerPanelId] = 0
+        timerClicks[timerPanelId] = 1
     }
 
     if (timerElement && timerElement.getAttribute('class')) {
         const timerClass = timerElement.getAttribute('class');
         if (timerClass && timerClass.includes('timer')) {
             // <!--If you click block 2 times after timer started, then you can skip-- >
-            if (timerClicks[timerPanelId] >= 2) {
-                //<!--Only show next element if not an async timer-- >
-                // if (async == false) {
-                //     document.getElementById("panel-" + stepIdxToShow).style.display = 'block';
-                // }
+            // We use 2 clicks because its easy to accidentally click one
+            if (timerClicks[timerPanelId] >= 3) {
                 document.getElementById(timerPanelId).style.display = 'none';
+            } if (timerClicks[timerPanelId] >= 2) {
+                // Do nothing aside from increment the counter on the 2nd click
+                return
             }
         }
     }
-
-    //     return
-    // } else {
-    //     document.getElementById(timerPanelId).classList.toggle('timer')
-    // }
-
-    // if (async) {
-    //     document.getElementById("panel-" + stepIdxToShow).style.display = 'block';
-    // }
 
     const originalTimerHtml = timerElement.innerHTML;
     const intervalID = window.setInterval(function () {
