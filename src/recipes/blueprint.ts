@@ -65,6 +65,7 @@ class SuperVeggie extends Recipe {
                 i.water(1, u.smallstainlesssteelcontainer), // 3 cups
             ]),
             e.pot(0).cookWithLidSlightlyOff(21, 'm', 7, "lentils", "clicked"), // 20 min for black/ 23 min for green total
+                text.set(['Put on redlight therapy cap.']),
                 text.set(['Drink a glass of water with morning pills']),
                 text.set(['Drink the green giant']),
                 e.pan().add([
