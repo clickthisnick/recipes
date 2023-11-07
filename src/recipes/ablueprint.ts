@@ -64,16 +64,18 @@ class SuperVeggie extends Recipe {
                 i.blackLentils(1, u.smallstainlesssteelcontainer), // 200 grams
                 i.water(1, u.smallstainlesssteelcontainer), // 3 cups
             ]),
+            e.oven(0).preheat(425),
+            Timer.end(),
             e.pot(0).cookWithLidSlightlyOff(21, 'm', 7, "lentils", "clicked"), // 20 min for black/ 23 min for green total
                 text.set(['Put on redlight therapy cap.']),
                 text.set(['Drink a glass of water with morning pills']),
                 text.set(['Drink the green giant']),
-                e.pan().add([
+                e.pan(0).add([
                     i.ingredient("frozen cauliflower/shitake mushroom", 1, u.smallstainlesssteelcontainer),
                     i.frozenBroccoli(1, u.largestainlesssteelcontainer)
                 ]),
                 // Cook pan until lentils are done
-                e.pan().cookWithLid(15, 'm', 5, "broccoli", "clicked"),
+                e.pan(0).cookWithLid(15, 'm', 5, "broccoli", "clicked"),
                     text.set(['Do stretch routine.']),
                     // Alex
                     // e.pan(2).add([ // tmp for partner
@@ -91,7 +93,14 @@ class SuperVeggie extends Recipe {
                 //i.garlicClove(1, u.unit),
                 i.oliveOil(1, u.tbsp),
                 i.appleCiderVinegar(1, u.tbsp),
-            ])
+            ]),
+            e.pan(1).add([
+                i.sweetPotatoes(300, u.gram),
+                i.oliveOil(1, u.tbsp),
+            ]),
+            e.pan(1).cook(25, 'm', 425),
+            Timer.end(),
+            text.set(["300g of sweet potato per serving"]),
         ];
     }
 }
