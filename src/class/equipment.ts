@@ -243,10 +243,16 @@ class Oven extends CookingContainer {
             return Timer.set(5, 'm', `Preheat ${this.name} to 350°`, [], disappearWhen);
         }
 
+        if (heat === 425) {
+            // Return how long preheating pan takes
+            // This is a guess.. should test it out
+            return Timer.set(15, 'm', `Preheat ${this.name} to 425°`);
+        }
+
         if (heat === 500) {
             // Return how long preheating pan takes
             // This is a guess.. should test it out
-            return Timer.set(8, 'm', `Preheat ${this.name} to 500°`);
+            return Timer.set(16, 'm', `Preheat ${this.name} to 500°`);
         }
 
         return Timer.set(5, 'm', `Preheat ${this.name} on heat ${heat}`);

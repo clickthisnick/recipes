@@ -68,8 +68,8 @@ class SuperVeggie extends Recipe {
             Timer.end(),
             e.pot(0).cookWithLidSlightlyOff(21, 'm', 7, "lentils", "clicked"), // 20 min for black/ 23 min for green total
                 text.set(['Put on redlight therapy cap.']),
-                text.set(['Drink a glass of water with morning pills']),
                 text.set(['Drink the green giant']),
+                text.set(['Drink a glass of water with morning pills']),
                 e.pan(0).add([
                     i.ingredient("frozen cauliflower/shitake mushroom", 1, u.smallstainlesssteelcontainer),
                     i.frozenBroccoli(1, u.largestainlesssteelcontainer)
