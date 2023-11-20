@@ -9,7 +9,7 @@ export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
         this.variations = [
-            GreenGiantPrep, SuperVeggiePrep, PillsMorningPrep, NuttyPudding2DaysPrep, NuttyPudding8Days, SuperVeggiePrep8DaysPrep
+            SuperVeggiePrep, PillsMorningPrep, NuttyPudding2DaysPrep, NuttyPudding8Days, SuperVeggiePrep8DaysPrep
         ]
     }
 }
@@ -21,23 +21,7 @@ export class MealRecipe extends RecipeContainer {
 // Creatine - ?
 // Chlorella - 48 Calories
 // 155 Calories
-class GreenGiantPrep extends Recipe {
-    constructor() {
-        super();
-        this.steps = [
-            e.mug().add([
-                // 2 Tbsp chlorella powder, yielding 13.5mg spermidine
-                i.chlorellaPowder(4, u.halftbsp),
-                i.cinnamon(1, u.tsp),
-                i.ingredient('20 grams of collagen peptides (about 6 half tsbp)'), //i.collagenPeptides(20, u.gram),
-                i.aminoComplex(7.6, u.gram),
-                i.creatine(2.5, u.gram),
-                i.ingredient('.5 grams of cocoa flavanols (2 measurements with the obtuse (rounded) end brushed off)'), // i.cocoaFlavanols(.5, u.gram),
-                i.water(8, u.ounce),
-            ])
-        ];
-    }
-}
+
 
 
 class PillsMorningPrep extends Recipe {
@@ -94,8 +78,12 @@ class NuttyPudding1DayPrep extends Recipe {
                 i.brazilNut(1, u.quarter),
                 i.flaxSeed(1, u.tsp),
                 i.sunflowerLechtin(1, u.tsp),
+                i.collagenPeptides(20, u.gram),
+                i.ingredient('collagen peptides (about 6 half tsbp)'),
                 i.cacaoPowderUnsweetened(1, u.tbsp), // 1 Tbsp non dutched cocoa
-                i.ceylonCinnamon(.5, u.tsp),
+                i.ceylonCinnamon(1.5, u.tsp),
+                i.cocoaFlavanols(.5, u.gram),
+                i.ingredient('cocoa flavanols - (2 measurements with the obtuse (rounded) end brushed off)'), // i.cocoaFlavanols(.5, u.gram),
                 i.peaProtein(1, u.scoop),
             ]),
             e.bulletMixer().mix(),

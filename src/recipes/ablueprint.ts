@@ -10,7 +10,7 @@ export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
         this.variations = [
-            SuperVeggie, NuttyPudding2Days, SweetPotato3Days, NuttyPudding8Days, SweetPotato8Days, SuperVeggie8Days
+            GreenGiant, SuperVeggie, NuttyPudding2Days, SweetPotato3Days, NuttyPudding8Days, SweetPotato8Days, SuperVeggie8Days
         ]
     }
 }
@@ -43,6 +43,21 @@ class SweetPotato3Days extends Recipe {
     }
 }
 
+class GreenGiant extends Recipe {
+    constructor() {
+        super();
+        this.steps = [
+            e.mug().add([
+                // 2 Tbsp chlorella powder, yielding 13.5mg spermidine
+                i.chlorellaPowder(4, u.halftbsp),
+                i.aminoComplex(7.6, u.gram),
+                i.creatine(2.5, u.gram),
+                i.water(8, u.ounce),
+            ])
+        ];
+    }
+}
+
  // Lentils - 600 Calories
  // Olive Oil - 120 Calories
  // Hemp - 60 Calories
@@ -68,7 +83,6 @@ class SuperVeggie extends Recipe {
             Timer.end(),
             e.pot(0).cookWithLidSlightlyOff(21, 'm', 7, "lentils", "clicked"), // 20 min for black/ 23 min for green total
                 text.set(['Put on redlight therapy cap.']),
-                text.set(['Drink the green giant']),
                 text.set(['Drink a glass of water with morning pills']),
                 e.pan(0).add([
                     i.ingredient("frozen cauliflower/shitake mushroom", 1, u.smallstainlesssteelcontainer),
