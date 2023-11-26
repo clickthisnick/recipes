@@ -133,6 +133,7 @@ class NuttyPudding1Days extends Recipe {
                 // blend for 1 minute on low
             ]),
             e.bulletMixer().mix(),
+            text.set(["Put 375g into blue iron flask"]),
         ];
     }
 }
