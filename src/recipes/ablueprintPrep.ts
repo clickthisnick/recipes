@@ -33,7 +33,7 @@ class PillsMorningPrep extends Recipe {
             text.set(["2 Ginger Root"]),
             text.set(["1 Turmeric"]),
             text.set(["1 Vitamin D"]),
-            text.set(["2 Ashwaganda"]),
+            text.set(["2 Ashwaganda Pills - ( 600 mg )"]),
             text.set(["1 BroccoMax"]),
             text.set(["1 Zinc"]),
             text.set(["1 Vitamin E"]),
