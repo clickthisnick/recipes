@@ -6,14 +6,14 @@ export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
         this.variations = [
-            sixPounds
+            catFoodSevenPounds
         ]
     }
 }
 
 
 
-class sixPounds extends Recipe {
+class catFoodSevenPounds extends Recipe {
     constructor() {
         super();
 
@@ -26,7 +26,7 @@ class sixPounds extends Recipe {
             text.set(["13.02 g lite salt"]),
             text.set(["7 pounds chicken thighs - 25% bone removed"]),
             text.set(["310 g chicken liver"]),
-            text.set(["620 chicken hearts"]),
+            text.set(["620 g chicken hearts"]),
             text.set(["6 eggs"]),
         ];
     }

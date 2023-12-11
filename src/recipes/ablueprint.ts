@@ -49,7 +49,7 @@ class GreenGiant extends Recipe {
         this.steps = [
             e.mug().add([
                 // 2 Tbsp chlorella powder, yielding 13.5mg spermidine
-                i.chlorellaPowder(4, u.halftbsp),
+                i.chlorellaPowder(4, u.halftbsp), // 60 tablets https://www.plantpills.co.uk/chlorella-tablets
                 i.aminoComplex(7.6, u.gram),
                 i.creatine(2.5, u.gram),
                 i.water(8, u.ounce),
