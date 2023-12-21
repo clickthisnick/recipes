@@ -125,13 +125,18 @@ class NuttyPudding1Days extends Recipe {
         this.steps = [
             e.bulletMixer().add([
                 i.pomegranateJuice(56.7, u.gram),
-                i.almondMilk(105, u.gram),
+                i.almondMilk(120, u.gram),
                 i.ingredient('NuttyPudding mixture'),
-                // blend for 1 minute on low
-                i.strawberry(123, u.gram),
                 i.cherry(3, u.unit),
                 // blend for 1 minute on low
+                // blend for 1 minute on low
             ]),
+            text.set(["Blend for 30 seconds on low"]),
+            e.bulletMixer().mix(),
+            e.bulletMixer().add([
+                i.strawberry(61.5, u.gram), //i.strawberry(123, u.gram),
+            ]),
+            text.set(["Blend for 30 seconds on low"]),
             e.bulletMixer().mix(),
             text.set(["Put 375g into blue iron flask"]),
         ];
