@@ -84,7 +84,7 @@ class NuttyPudding1DayPrep extends Recipe {
                 i.collagenPeptides(20, u.gram),
                 i.ingredient('collagen peptides (about 6 half tsbp)'),
                 i.cacaoPowderUnsweetened(1, u.tbsp), // 1 Tbsp non dutched cocoa
-                i.ceylonCinnamon(1.5, u.tsp),
+                i.ceylonCinnamon(1, u.halftbsp),
                 i.cocoaFlavanols(.5, u.gram),
                 i.ingredient('cocoa flavanols - (2 measurements with the obtuse (rounded) end brushed off)'), // i.cocoaFlavanols(.5, u.gram),
                 i.peaProtein(1, u.scoop),
