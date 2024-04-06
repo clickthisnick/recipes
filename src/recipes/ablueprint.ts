@@ -101,8 +101,9 @@ class SuperVeggie extends Recipe {
             i.ingredient('lentil').seasonWith([
                 i.cumin(1, u.tbsp),
                 //i.lime(1, u.unit),
-                i.hempSeed(1, u.tbsp),
-                i.chiaSeed(2, u.tbsp),
+                // These are now in nutty pudding
+                // i.hempSeed(1, u.tbsp),
+                // i.chiaSeed(2, u.tbsp),
                 //i.freshGinger(3, u.gram),
                 //i.garlicClove(1, u.unit),
                 i.oliveOil(1, u.tbsp),

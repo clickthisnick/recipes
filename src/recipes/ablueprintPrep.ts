@@ -80,6 +80,8 @@ class NuttyPudding1DayPrep extends Recipe {
                 i.walnut(4.79, u.gram), // 2 tsp
                 i.brazilNut(1, u.quarter),
                 i.flaxSeed(1, u.tsp),
+                i.chiaSeed(2, u.tsp),
+                i.hempSeed(1, u.tsp),
                 i.sunflowerLechtin(1, u.tsp),
                 i.collagenPeptides(20, u.gram),
                 i.ingredient('collagen peptides (about 6 half tsbp)'),
