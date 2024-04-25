@@ -149,6 +149,18 @@ export class Units {
         properName: 'gram',
         equipmentUnits: [],
     };
+    public static readonly iu: IUnitObj = {
+        name: 'iu',
+        isEquipment: false,
+        properName: 'iu',
+        equipmentUnits: [],
+    };
+    public static readonly milligram: IUnitObj = {
+        name: 'mg',
+        isEquipment: false,
+        properName: 'mg',
+        equipmentUnits: [],
+    };
     public static readonly fluid_ounce: IUnitObj = {
         name: 'fluid ounce',
         isEquipment: false,

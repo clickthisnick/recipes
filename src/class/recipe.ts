@@ -155,15 +155,18 @@ export class Recipe {
                     if (this.ingredients[ingredient.name].unit.name == ingredient.unit.name) {
                         this.ingredients[ingredient.name].quantity += ingredient.quantity
                     } else {
-                        const units = Units.combineIngredientUnits(this.ingredients[ingredient.name], ingredient)
+                        // TODO you can uncomment but then make option to skip this for recipes
+                        // like cat food I don't want to change the units
+                        // const units = Units.combineIngredientUnits(this.ingredients[ingredient.name], ingredient)
 
-                        if (units) {
-                            // update the ingredents unit and quantity
-                            this.ingredients[ingredient.name].unit = units.unit;
-                            this.ingredients[ingredient.name].quantity = units.quantity;
-                        } else { // If no units could be combined, just add the ingredient to the list under a different name
-                            this.ingredients[`${ingredient.name} - ${ingredient.unit}`] = ingredient
-                        }
+                        // if (units) {
+                        //     // update the ingredents unit and quantity
+                        //     this.ingredients[ingredient.name].unit = units.unit;
+                        //     this.ingredients[ingredient.name].quantity = units.quantity;
+                        // } else { // If no units could be combined, just add the ingredient to the list under a different name
+                        //     this.ingredients[`${ingredient.name} - ${ingredient.unit}`] = ingredient
+                        // }
+                        this.ingredients[`${ingredient.name} - ${ingredient.unit}`] = ingredient
                     }
                 } else {
                     this.ingredients[ingredient.name] = ingredient

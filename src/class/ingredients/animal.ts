@@ -123,6 +123,42 @@ export class AnimalItems {
         return new Ingredient(item)
     }
 
+    public static readonly chickenLiver = (quantity = 0, unit: IUnitObj = Units.none) => {
+        const item: IMeatObj = {
+            name: 'Chicken Liver',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: true,
+            purchaseLinks: {},
+            perishableLimit: 0,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
+
+    public static readonly chickenHeart = (quantity = 0, unit: IUnitObj = Units.none) => {
+        const item: IMeatObj = {
+            name: 'Chicken Heart',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: true,
+            purchaseLinks: {},
+            perishableLimit: 0,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
+
     public static readonly chickenStock = (quantity = 0, unit: IUnitObj = Units.none) => {
         const item: IMeatObj = {
             name: 'Chicken Stock',
@@ -598,6 +634,24 @@ export class AnimalItems {
                 }
             },
             perishableLimit: 14,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
+
+    public static readonly eggyolk = (quantity = 0, unit: IUnitObj = Units.none) => {
+        const item: IMeatObj = {
+            name: 'Egg Yolk',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: 'Put egg yolks back in refrigerator',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: true,
+            purchaseLinks: {},
+            perishableLimit: 0,
             nutrition: {}
         }
         return new Ingredient(item)

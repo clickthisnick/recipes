@@ -291,6 +291,18 @@ class Ninja extends CookingContainer {
     }
 }
 
+class Grinder extends CookingContainer {
+    constructor(id: number) {
+        super("grinder", id)
+    }
+}
+
+class Glass extends CookingContainer {
+    constructor(id: number) {
+        super("glass", id)
+    }
+}
+
 class SaucePan extends CookingContainer {
     constructor(id: number) {
         super("sauce pan", id)
@@ -505,6 +517,14 @@ export class Equipment {
 
     public static readonly ninja = (id = 99) => (
         new Ninja(id)
+    );
+
+    public static readonly grinder = (id = 99) => (
+        new Grinder(id)
+    );
+
+    public static readonly glass = (id = 99) => (
+        new Glass(id)
     );
 
     public static readonly saucePan = (id = 99) => (
