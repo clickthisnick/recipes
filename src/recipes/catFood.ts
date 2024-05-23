@@ -10,6 +10,7 @@ export class MealRecipe extends RecipeContainer {
         super();
         this.variations = [
             catFoodRecipe,
+            catFoodThreeHalfPounds,
             catFoodSevenPounds
         ]
     }
@@ -66,6 +67,17 @@ class catFoodSevenPounds extends Recipe {
 
         const recipe = new catFoodRecipe()
         recipe.multiplyIngredients(1.555)
+        
+        this.steps = recipe.steps;
+    }
+}
+
+class catFoodThreeHalfPounds extends Recipe {
+    constructor() {
+        super();
+
+        const recipe = new catFoodRecipe()
+        recipe.multiplyIngredients(0.7775)
         
         this.steps = recipe.steps;
     }
