@@ -42,9 +42,9 @@ class catFoodRecipe extends Recipe {
             ]),
             text.set(['Remove 25% of the bones and 50% of the skin from the chicken thighs']),
             e.grinder().add([
-                i.chickenThigh(4.5, u.pound),
-                i.chickenLiver(200, u.gram),
                 i.chickenHeart(400, u.gram),
+                i.chickenLiver(200, u.gram),
+                i.chickenThigh(4.5, u.pound),
                 //i.chickenLiver(7, u.ounce),
                 //i.chickenHeart(14, u.ounce),
             ])
