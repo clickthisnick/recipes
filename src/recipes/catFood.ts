@@ -28,6 +28,7 @@ class catFoodRecipe extends Recipe {
         // 8 oz water
 
         this.steps = [
+            text.set(["NOTE 1.5 ounces water is 1/4 cup, 2 ounces water is 1/3 cup"]),
             e.glass(0).add([
                 i.waterFirst(1, u.ounce),
                 i.taurine(2000, u.milligram),
