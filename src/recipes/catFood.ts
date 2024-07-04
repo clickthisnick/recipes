@@ -29,11 +29,12 @@ class catFoodRecipe extends Recipe {
 
         this.steps = [
             text.set(["NOTE 1.5 ounces water is 1/4 cup, 2 ounces water is 1/3 cup"]),
-            e.glass(0).add([
+            e.glass(0).add([ 
+                //  These are all pills, easier to disolve then to try and break open
+                // We could try powder/droppers if that is available as well
                 i.waterFirst(1, u.ounce),
                 i.taurine(2000, u.milligram),
                 i.salmonOil(4000, u.milligram),
-                i.vitaminBComplex(200, u.milligram),
                 i.vitaminE(200, u.iu),
             ]),
             text.set(["Get out 2 sets of gloves"]),
@@ -49,6 +50,7 @@ class catFoodRecipe extends Recipe {
             text.set(["Open grinder"]),
             e.bowl(1).add([
                 i.water(9, u.ounce), // This is an additional 2 ounces
+                i.vitaminBComplex(200, u.milligram), // Put here since its a powder
                 i.litesalt(8.4, u.gram),
                 i.eggyolk(4, u.unit),
             ]),
