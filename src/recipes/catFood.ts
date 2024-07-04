@@ -36,11 +36,8 @@ class catFoodRecipe extends Recipe {
                 i.vitaminBComplex(200, u.milligram),
                 i.vitaminE(200, u.iu),
             ]),
-            e.glass(1).add([
-                i.water(9, u.ounce), // This is an additional 2 ounces
-                i.litesalt(8.4, u.gram),
-                i.eggyolk(4, u.unit),
-            ]),
+            text.set(["Get out 2 sets of gloves"]),
+            text.set(["Get out all meat packages and open them"]),
             text.set(['Remove 25% of the bones and 50% of the skin from the chicken thighs']),
             e.grinder().add([
                 i.chickenHeart(400, u.gram),
@@ -48,7 +45,14 @@ class catFoodRecipe extends Recipe {
                 i.chickenThigh(4.5, u.pound),
                 //i.chickenLiver(7, u.ounce),
                 //i.chickenHeart(14, u.ounce),
-            ])
+            ]),
+            text.set(["Open grinder"]),
+            e.bowl(1).add([
+                i.water(9, u.ounce), // This is an additional 2 ounces
+                i.litesalt(8.4, u.gram),
+                i.eggyolk(4, u.unit),
+            ]),
+            text.set(["Put 2.3 ounces into containers."]),
             // text.set(["3100 mg taurine - (6 - Thorne 500mg pills)"]),
             // text.set(["6200 mg salmon oil - (2 - Salmon Oil pills)"]),
             // text.set(["310 IU vitamin e - (3 Solgar pills)"]),
