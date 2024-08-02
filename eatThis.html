@@ -1,0 +1,64 @@
+
+<style>
+
+
+    table {
+        color: #333;
+        /* Lighten up font color */
+        font-family: Helvetica, Arial, sans-serif;
+        /* Nicer font */
+        width: 640px;
+        border-collapse: collapse;
+        border-spacing: 0;
+    }
+
+    td,
+    th {
+        border: 1px solid #CCC;
+        height: 30px;
+    }
+
+    /* Make cells a bit taller */
+
+    th {
+        background: #F3F3F3;
+        /* Light grey background */
+        font-weight: bold;
+        /* Make sure they're bold */
+    }
+
+    td {
+        /* Lighter grey background */
+        text-align: left;
+        /* Center our text */
+        padding-left: 1rem;
+    }
+
+    .completed {
+        background-color:green;
+        color: white;
+    }
+
+    a:visited {
+        color:blue;
+    }
+
+    body {
+        padding: 1rem;
+    }
+
+</style>
+
+Healthy Alternative Table:</br>
+<table>
+    <th>Eat This</th>
+    <th>Not That</th>
+    <tr onclick="this.classList.toggle('completed')">
+        <td>Altoids</td>
+        <td>Candy</td>
+    </tr>
+    <tr onclick="this.classList.toggle('completed')">
+        <td>Sugar Free Chobani Yogurt</td>
+        <td>Kefir</td>
+    </tr>
+</table>
