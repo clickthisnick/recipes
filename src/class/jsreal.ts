@@ -1,4 +1,4 @@
-// ts thats converted to js
+// ts that's converted to js
 
 function removeAllClassNames(className: string) {
     const elements = document.getElementsByClassName(className);

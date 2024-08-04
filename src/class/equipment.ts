@@ -183,14 +183,14 @@ class SmallStainlessSteelContainer extends Container {
     // Containers are a singleton
     constructor(id: number) {
         super('17.6 ounce stainless steel container', id)
-    }    
+    }
 }
 
 class LargeStainlessSteelContainer extends Container {
     // Containers are a singleton
     constructor(id: number) {
         super('34 ounce stainless steel container', id)
-    }    
+    }
 }
 
 

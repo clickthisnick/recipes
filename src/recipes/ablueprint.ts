@@ -38,7 +38,7 @@ class SweetPotato3Days extends Recipe {
 
         const recipe = new SweetPotato1Days()
         recipe.multiplyIngredients(3)
-        
+
         this.steps = recipe.steps;
     }
 }
@@ -151,7 +151,7 @@ class NuttyPudding2Days extends Recipe {
 
         const recipe = new NuttyPudding1Days()
         recipe.multiplyIngredients(2)
-        
+
         this.steps = recipe.steps;
     }
 }
@@ -162,7 +162,7 @@ class SweetPotato8Days extends Recipe {
 
         const recipe = new SweetPotato1Days()
         recipe.multiplyIngredients(8)
-        
+
         this.steps = recipe.steps;
         this.hideFromCookingView = true;
     }
@@ -174,7 +174,7 @@ class NuttyPudding8Days extends Recipe {
 
         const recipe = new NuttyPudding1Days()
         recipe.multiplyIngredients(8)
-        
+
         this.steps = recipe.steps;
         this.hideFromCookingView = true;
     }
@@ -186,7 +186,7 @@ class SuperVeggie8Days extends Recipe {
 
         const recipe = new SuperVeggie()
         recipe.multiplyIngredients(8)
-        
+
         this.steps = recipe.steps;
         this.hideFromCookingView = true;
     }

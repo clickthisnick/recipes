@@ -1,6 +1,6 @@
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0  # Use the ref you want to point at
+    rev: v4.6.0  # Use the ref you want to point at
     hooks:
     -   id: check-added-large-files
     -   id: check-ast
@@ -28,28 +28,28 @@ repos:
     -   id: mixed-line-ending
     -   id: name-tests-test
     -   id: no-commit-to-branch
-    -   id: pretty-format-json
-    -   id: sort-simple-yaml
+    # -   id: pretty-format-json
+    # -   id: sort-simple-yaml
     -   id: trailing-whitespace
 -   repo: https://github.com/psf/black
-    rev: 23.3.0
+    rev: 24.8.0
     hooks:
     -   id: black
 -   repo: https://github.com/codespell-project/codespell
-    rev: v2.2.4
+    rev: v2.3.0
     hooks:
     -   id: codespell
-        args: []
+        args: ["-L bu"]
 -   repo: https://github.com/PyCQA/pylint
-    rev: v3.0.0a6
+    rev: v3.2.6
     hooks:
     -   id: pylint
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.3.0
+    rev: v1.11.1
     hooks:
     -   id: mypy
 -   repo: https://github.com/pre-commit/mirrors-eslint
-    rev: 'v8.41.0'  # Use the sha / tag you want to point at
+    rev: 'v9.8.0'  # Use the sha / tag you want to point at
     hooks:
     -   id: eslint
         files: \.[jt]sx?$  # *.js, *.jsx, *.ts and *.tsx

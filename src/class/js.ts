@@ -61,7 +61,7 @@ function selectMode(id) {
     hideElement('cookingButton')
     hideElement('shoppingButton')
 
-    
+
     // This will make all the elements disappear by removing all the html/className
     // This is different than just setting the display to visible or non visible
     if (mode == 'cooking') {
@@ -106,7 +106,7 @@ function renderSelectedRecipes() {
     const selectedDiv = document.getElementById("selectedRecipeGroupNames")
     if (selectedDiv) {
         selectedDiv.innerHTML = selectedRecipesHtml
-    } 
+    }
     showElement('selected')
 }
 
@@ -287,7 +287,7 @@ function doneSelectingRecipes() {
                                     let subscribePricePerQuantity = (pricePerQuantity*priceMultiple).toFixed(3)
 
                                     subscribePricePerQuantity = applyCreditCardDiscounts(store, subscribePricePerQuantity)
-                                    
+
                                     if (!linkByPrice.hasOwnProperty(subscribePricePerQuantity)) {
                                         linkByPrice[subscribePricePerQuantity] = [`<span class="${store}-filter store-filter" ></br> ${store}: &nbsp;<a href="${item.link}" target="_blank">${storeDescription} - ${discountKey} ${subscribePricePerQuantity} - ${subscribePricePerQuantity}/${commonUnit}</a></span>`]
                                         priceKeys.push(subscribePricePerQuantity)
@@ -388,7 +388,7 @@ function startTimer(duration, stepId, disappearWhen) {
         throw new Error("timerElement is failed")
     }
 
-    // If clicking an element thats already green
+    // If clicking an element that's already green
     if (timerElement.classList.contains('timerCompletedButShowing')) {
         timerElement.classList.toggle('timerCompletedButShowing');
         timerElement.classList.toggle('completed');
@@ -424,7 +424,7 @@ function startTimer(duration, stepId, disappearWhen) {
 
         timerElement.innerHTML = minutes + ":" + seconds + " " + originalTimerHtml;
 
-        if (--duration < 0) {            
+        if (--duration < 0) {
             if (disappearWhen == "timerIsUp") {
                 timerElement.classList.toggle('timer');
                 window.clearInterval(intervalID);
@@ -434,13 +434,13 @@ function startTimer(duration, stepId, disappearWhen) {
                 //     if (timerPanelIdElement) {
                 //         timerPanelIdElement.style.display = 'none';
                 //     }
-    
+
                 //     // const panelStepIdxToShow = document.getElementById("panel-" + stepIdxToShow)
                 //     // if (panelStepIdxToShow) {
                 //     //     panelStepIdxToShow.style.display = 'block';
                 //     // }
                 // }
-    
+
                 if (document.getElementById(timerPanelId).style.display != 'none') {
                     // our end timers are always x2 our start timer id
                     document.getElementById(`panel-${stepId * 2}`)?.remove();
@@ -459,7 +459,7 @@ function startTimer(duration, stepId, disappearWhen) {
                     if (!timerElement.classList.contains('timerCompletedButShowing')) {
                         timerElement.classList.toggle('timer');
                         timerElement.classList.toggle('timerCompletedButShowing');
-                    } 
+                    }
 
                     playSound(1)
                 } else {

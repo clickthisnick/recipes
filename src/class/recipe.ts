@@ -63,7 +63,7 @@ export class RecipeContainer {
 
 export class Recipe {
     public steps: IStep[] = [];
-    public hideFromCookingView = false; 
+    public hideFromCookingView = false;
     public ingredients: Ingredients = {};
     // public equipment: IAllEquipment = {};
     public vegan = true;

@@ -22,15 +22,15 @@ class catFoodRecipe extends Recipe {
         super();
 
         // Original Recipe
-        // 4.5 lb bone-in chicken thights
+        // 4.5 lb bone-in chicken thighs
         // 7 oz raw chicken liver
         // 14 oz raw chicken hearts
         // 8 oz water
 
         this.steps = [
             text.set(["NOTE 1.5 ounces water is 1/4 cup, 2 ounces water is 1/3 cup"]),
-            e.glass(0).add([ 
-                //  These are all pills, easier to disolve then to try and break open
+            e.glass(0).add([
+                //  These are all pills, easier to dissolve then to try and break open
                 // We could try powder/droppers if that is available as well
                 i.waterFirst(1, u.ounce),
                 i.taurine(2000, u.milligram),
@@ -74,7 +74,7 @@ class catFoodSevenPounds extends Recipe {
 
         const recipe = new catFoodRecipe()
         recipe.multiplyIngredients(1.555)
-        
+
         this.steps = recipe.steps;
     }
 }
@@ -85,7 +85,7 @@ class catFoodThreeHalfPounds extends Recipe {
 
         const recipe = new catFoodRecipe()
         recipe.multiplyIngredients(0.7775)
-        
+
         this.steps = recipe.steps;
     }
 }
@@ -95,7 +95,7 @@ class catFoodThreeHalfPounds extends Recipe {
 //         super();
 
 //         // Original Recipe
-//         // 4.5 lb bone-in chicken thights
+//         // 4.5 lb bone-in chicken thighs
 //         // 7 oz raw chicken liver
 //         // 14 oz raw chicken hearts
 //         // 8 oz water

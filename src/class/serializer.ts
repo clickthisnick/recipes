@@ -103,7 +103,7 @@ export class Serializer {
   //             addIngredient.equipment.push(str_)
   //         }
   //     }
-      
+
   //     let bindingWord = 'the'
   //     // If its the first
   //     if (this.firstAction) {

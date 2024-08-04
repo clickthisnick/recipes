@@ -646,7 +646,7 @@ export class CarbItems extends AnimalItems {
             wash: false,
             isTakeoutUnitable: false,
             isMeatProduct: false,
-            purchaseLinks: {               
+            purchaseLinks: {
                 [Stores.wegmans]: {
                     'organic': [
                         {
@@ -844,7 +844,7 @@ export class CarbItems extends AnimalItems {
                             link: 'https://www.amazon.com/Lakewood-Organic-Pomegranate-Juice-32oz/dp/B000RELFGC',
                             organic: true,
                         },
-                        
+
                     ]
                 },
                 [Stores.amazon]: {

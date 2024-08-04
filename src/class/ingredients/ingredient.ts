@@ -117,7 +117,7 @@ export class Ingredient {
         ingredients.forEach((ingredient) => {
             const addIngredient = istep()
             addIngredient.ingredients.push(ingredient)
-            addIngredient.text = [s.lazyIngredientIdx, addIngredient.ingredients.length-1].join(' ')                
+            addIngredient.text = [s.lazyIngredientIdx, addIngredient.ingredients.length-1].join(' ')
             addIngredient.time += ingredient.takeOutTime
             addIStep.children.push(addIngredient)
         })
@@ -134,7 +134,7 @@ export class Ingredient {
         ingredients.forEach((ingredient) => {
             const addIngredient = istep()
             addIngredient.ingredients.push(ingredient)
-            addIngredient.text = [s.lazyIngredientIdx, addIngredient.ingredients.length-1].join(' ')                
+            addIngredient.text = [s.lazyIngredientIdx, addIngredient.ingredients.length-1].join(' ')
             addIngredient.time += ingredient.takeOutTime
             addIStep.children.push(addIngredient)
         })
