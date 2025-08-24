@@ -59,6 +59,24 @@ export class VegetableItems extends SpiceItems {
         return new Ingredient(item)
     }
 
+    public static readonly balsamicVinegar = (quantity = 0, unit: IUnitObj = Units.none) => {
+        const item: IItemObj = {
+            name: 'White Vinegar',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: 0,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
+
     public static readonly whiteVinegar = (quantity = 0, unit: IUnitObj = Units.none) => {
         const item: IItemObj = {
             name: 'White Vinegar',
@@ -1258,6 +1276,25 @@ export class VegetableItems extends SpiceItems {
             putAwayTime: 10,
             takeOutTime: 10,
             cleanSteps: 'Put bread flour back in cupboard',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: 0,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
+
+
+    public static readonly nutritionalYeast = (quantity = 0, unit: IUnitObj = Units.none) => {
+        const item: IItemObj = {
+            name: 'Active Dry Yeast',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: 'Put dry active yeast back in refrigerator',
             quantity: quantity,
             unit: unit,
             wash: false,

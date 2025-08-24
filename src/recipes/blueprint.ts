@@ -10,7 +10,8 @@ export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
         this.variations = [
-            GreenGiant, SuperVeggie, NuttyPudding2Days, SweetPotato3Days, NuttyPudding8Days, SweetPotato8Days, SuperVeggie8Days
+            // GreenGiant, SuperVeggie, NuttyPudding2Days, SweetPotato3Days, NuttyPudding8Days, SweetPotato8Days, SuperVeggie8Days
+            SuperVeggie, SweetPotato3Days, SweetPotato8Days, SuperVeggie8Days
         ]
     }
 }
@@ -43,20 +44,20 @@ class SweetPotato3Days extends Recipe {
     }
 }
 
-class GreenGiant extends Recipe {
-    constructor() {
-        super();
-        this.steps = [
-            e.mug().add([
-                // 2 Tbsp chlorella powder, yielding 13.5mg spermidine
-                i.chlorellaPowder(4, u.halftbsp), // 60 tablets https://www.plantpills.co.uk/chlorella-tablets
-                i.aminoComplex(7.6, u.gram),
-                i.creatine(2.5, u.gram),
-                i.water(8, u.ounce),
-            ])
-        ];
-    }
-}
+// class GreenGiant extends Recipe {
+//     constructor() {
+//         super();
+//         this.steps = [
+//             e.mug().add([
+//                 // 2 Tbsp chlorella powder, yielding 13.5mg spermidine
+//                 i.chlorellaPowder(4, u.halftbsp), // 60 tablets https://www.plantpills.co.uk/chlorella-tablets
+//                 i.aminoComplex(7.6, u.gram),
+//                 i.creatine(2.5, u.gram),
+//                 i.water(8, u.ounce),
+//             ])
+//         ];
+//     }
+// }
 
  // Lentils - 600 Calories
  // Olive Oil - 120 Calories
@@ -76,12 +77,12 @@ class SuperVeggie extends Recipe {
 
         this.steps = [
             e.pot(0).add([
-                i.blackLentils(1, u.smallstainlesssteelcontainer), // 200 grams
+                i.blackLentils(1, u.smallstainlesssteelcontainer), // 65 grams
                 i.water(1, u.smallstainlesssteelcontainer), // 3 cups
             ]),
             e.oven(0).preheat(425),
             Timer.end(),
-            e.pot(0).cookWithLidSlightlyOff(21, 'm', 7, "lentils", "clicked"), // 20 min for black/ 23 min for green total
+            e.pot(0).cookWithLidSlightlyOff(32, 'm', 7, "lentils", "clicked"), // 20 min for black/ 23 min for green total
                 text.set(['Put on redlight therapy cap.']),
                 text.set(['Drink a glass of water with morning pills']),
                 e.pan(0).add([
@@ -100,14 +101,14 @@ class SuperVeggie extends Recipe {
             Timer.end(),
             i.ingredient('lentil').seasonWith([
                 i.cumin(1, u.tbsp),
-                //i.lime(1, u.unit),
+                i.lime(1, u.unit),
                 // These are now in nutty pudding
-                // i.hempSeed(1, u.tbsp),
-                // i.chiaSeed(2, u.tbsp),
-                //i.freshGinger(3, u.gram),
-                //i.garlicClove(1, u.unit),
-                i.oliveOil(1, u.tbsp),
-                i.appleCiderVinegar(1, u.tbsp),
+                i.hempSeed(1, u.tbsp),
+                i.chiaSeed(2, u.tbsp),
+                i.freshGinger(3, u.gram),
+                i.garlicClove(1, u.unit),
+                //i.oliveOil(1, u.tbsp),
+                //i.appleCiderVinegar(1, u.tbsp),
             ]),
             e.pan(1).add([
                 i.sweetPotatoes(300, u.gram),
@@ -120,41 +121,41 @@ class SuperVeggie extends Recipe {
     }
 }
 
-class NuttyPudding1Days extends Recipe {
-    constructor() {
-        super();
-        this.steps = [
-            e.bulletMixer().add([
-                i.pomegranateJuice(56.7, u.gram),
-                i.almondMilk(125, u.gram),
-                i.water(30, u.gram),
-                i.ingredient('NuttyPudding mixture'),
-                i.cherry(3, u.unit),
-                // blend for 1 minute on low
-                // blend for 1 minute on low
-            ]),
-            text.set(["Blend for 30 seconds on low"]),
-            e.bulletMixer().mix(),
-            e.bulletMixer().add([
-                i.strawberry(61.5, u.gram), //i.strawberry(123, u.gram),
-            ]),
-            text.set(["Blend for 30 seconds on low"]),
-            e.bulletMixer().mix(),
-            text.set(["Put 410g into blue iron flask"]),
-        ];
-    }
-}
+// class NuttyPudding1Days extends Recipe {
+//     constructor() {
+//         super();
+//         this.steps = [
+//             e.bulletMixer().add([
+//                 i.pomegranateJuice(56.7, u.gram),
+//                 i.almondMilk(125, u.gram),
+//                 i.water(30, u.gram),
+//                 i.ingredient('NuttyPudding mixture'),
+//                 i.cherry(3, u.unit),
+//                 // blend for 1 minute on low
+//                 // blend for 1 minute on low
+//             ]),
+//             text.set(["Blend for 30 seconds on low"]),
+//             e.bulletMixer().mix(),
+//             e.bulletMixer().add([
+//                 i.strawberry(61.5, u.gram), //i.strawberry(123, u.gram),
+//             ]),
+//             text.set(["Blend for 30 seconds on low"]),
+//             e.bulletMixer().mix(),
+//             text.set(["Put 410g into blue iron flask"]),
+//         ];
+//     }
+// }
 
-class NuttyPudding2Days extends Recipe {
-    constructor() {
-        super();
+// class NuttyPudding2Days extends Recipe {
+//     constructor() {
+//         super();
 
-        const recipe = new NuttyPudding1Days()
-        recipe.multiplyIngredients(2)
+//         const recipe = new NuttyPudding1Days()
+//         recipe.multiplyIngredients(2)
 
-        this.steps = recipe.steps;
-    }
-}
+//         this.steps = recipe.steps;
+//     }
+// }
 
 class SweetPotato8Days extends Recipe {
     constructor() {
@@ -168,17 +169,17 @@ class SweetPotato8Days extends Recipe {
     }
 }
 
-class NuttyPudding8Days extends Recipe {
-    constructor() {
-        super();
+// class NuttyPudding8Days extends Recipe {
+//     constructor() {
+//         super();
 
-        const recipe = new NuttyPudding1Days()
-        recipe.multiplyIngredients(8)
+//         const recipe = new NuttyPudding1Days()
+//         recipe.multiplyIngredients(8)
 
-        this.steps = recipe.steps;
-        this.hideFromCookingView = true;
-    }
-}
+//         this.steps = recipe.steps;
+//         this.hideFromCookingView = true;
+//     }
+// }
 
 class SuperVeggie8Days extends Recipe {
     constructor() {

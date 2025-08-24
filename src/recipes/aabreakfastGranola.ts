@@ -17,9 +17,9 @@ class Guacamole extends Recipe {
     constructor() {
         super();
         this.steps = [
-            text.set(['Cut', i.avocadoLarge(1, u.unit), 'in half and remove the put']),
+            text.set(['Cut', i.avocadoLarge(2, u.unit), '(or 3 medium) in half and remove the put']),
             e.largeBowl().add([i.avocadoLarge()]),
-            text.set(['Mash the avacado with a fork to be as smooth or as chunk as you want']),
+            text.set(['Mash the avocado with a fork to be as smooth or as chunk as you want']),
             text.set(['Chop the', i.romaTomato(2, u.unit), i.yellowOnion(.5, u.unit), i.cilantro(3, u.tbsp), i.jalapeno(1, u.unit), i.garlicClove(2, u.clove), i.lime(1, u.unit), i.seaSalt(.5, u.tsp)]),
             text.set(['Mix all the ingredients together']),
         ];

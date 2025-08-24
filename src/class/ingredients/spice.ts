@@ -149,6 +149,24 @@ export class SpiceItems extends SauceItems {
         return new Ingredient(item)
     }
 
+        public static readonly driedThyme = (quantity = 0, unit: IUnitObj = Units.none) => {
+        const item: IItemObj = {
+            name: 'Turmeric',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: 0,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
+
     public static readonly turmeric = (quantity = 0, unit: IUnitObj = Units.none) => {
         const item: IItemObj = {
             name: 'Turmeric',
@@ -258,6 +276,25 @@ export class SpiceItems extends SauceItems {
     public static readonly monkFruit = (quantity = 0, unit: IUnitObj = Units.none) => {
         const item: IItemObj = {
             name: 'Monk Fruit',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: 0,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
+
+
+    public static readonly sweetPaprika = (quantity = 0, unit: IUnitObj = Units.none) => {
+        const item: IItemObj = {
+            name: 'Smoked Paprika',
             putAwayTime: 10,
             takeOutTime: 10,
             cleanSteps: '',

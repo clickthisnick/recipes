@@ -4,7 +4,6 @@ import { Equipment as e } from '../class/equipment';
 import { Units as u } from '../constants/units';
 import { Text as text} from '../class/text';
 
-// 1570 Calories - Green Giant / Super Veggie / Nutty Pudding
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
@@ -13,16 +12,6 @@ export class MealRecipe extends RecipeContainer {
         ]
     }
 }
-
-// Collagen - 70 Calories
-// Cocoa Falvanoids - 6 Calories
-// Amino Complex - 25 Calories
-// Cinnamon - 6 Calories
-// Creatine - ?
-// Chlorella - 48 Calories
-// 155 Calories
-
-
 
 class PillsMorningPrep extends Recipe {
     constructor() {
@@ -57,7 +46,7 @@ class SuperVeggiePrep extends Recipe {
 
         this.steps = [
             e.smallStainlessSteelContainer(0).add([
-                i.blackLentils(200, u.gram),
+                i.blackLentils(65, u.gram),
             ]),
             e.smallStainlessSteelContainer(1).add([
                 i.frozenCauliflower(150, u.gram),
@@ -75,23 +64,11 @@ class NuttyPudding1DayPrep extends Recipe {
         super();
 
         this.steps = [
-            e.bulletMixer().add([
-                i.macadamiaNut(23, u.gram), // 3 Tbsp ground macadamia nuts (20% off + free m-nut oil)
-                i.walnut(4.79, u.gram), // 2 tsp
-                i.brazilNut(1, u.quarter),
-                i.flaxSeed(1, u.tsp),
-                i.chiaSeed(2, u.tsp),
-                i.hempSeed(1, u.tsp),
-                i.sunflowerLechtin(1, u.tsp),
-                i.collagenPeptides(20, u.gram),
-                i.ingredient('collagen peptides (about 6 half tsbp)'),
-                i.cacaoPowderUnsweetened(1, u.tbsp), // 1 Tbsp non dutched cocoa
-                i.ceylonCinnamon(1, u.halftbsp),
-                i.cocoaFlavanols(.5, u.gram),
-                i.ingredient('cocoa flavanols - (2 measurements with the obtuse (rounded) end brushed off)'), // i.cocoaFlavanols(.5, u.gram),
-                i.peaProtein(1, u.scoop),
+            e.smallStainlessSteelContainer().add([
+                i.blueprintNuttyPudding(2, u.scoop),
+                i.blueprintCacao(1, u.tbsp),
+                i.blueprintBlueberryWalnut(1, u.scoop),
             ]),
-            e.bulletMixer().mix(),
         ];
         this.hideFromCookingView = true;
     }

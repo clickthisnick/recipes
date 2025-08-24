@@ -19,7 +19,13 @@ export class Serializer {
         if (ingObj.unit) {
           if (ingObj.unit.name === u.unit.name) {
             if (ingObj.quantity > 1) {
+              const nameSplit = ingObj.name.split(' ')
+              // Special plural spelling
+              if (["tomato"].includes(nameSplit[nameSplit.length - 1])) {
+                return `${ingObj.quantity} ${ingObj.name}es`;
+              } else {
                 return `${ingObj.quantity} ${ingObj.name}s`;
+              }
             }
 
             return `${ingObj.name}`;

@@ -259,6 +259,60 @@ export class FruitItems extends CarbItems {
         return new Ingredient(item)
     }
 
+    public static readonly blueprintBlueberryWalnut = (quantity = 0, unit: IUnitObj = Units.none) => {
+        const item: IItemObj = {
+            name: 'Blueprint Blueberry Walnut',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: 0,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
+
+    public static readonly blueprintCacao = (quantity = 0, unit: IUnitObj = Units.none) => {
+        const item: IItemObj = {
+            name: 'Blueprint Cacao',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: 0,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
+
+    public static readonly blueprintNuttyPudding = (quantity = 0, unit: IUnitObj = Units.none) => {
+        const item: IItemObj = {
+            name: 'Blueprint Nutty Pudding',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: 0,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
+
     // https://www.amazon.com/365-Whole-Foods-Market-Macadamia/dp/B086HK83YF/
     public static readonly macadamiaNut = (quantity = 0, unit: IUnitObj = Units.none) => {
         const item: IItemObj = {
