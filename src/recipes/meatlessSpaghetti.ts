@@ -13,6 +13,8 @@ export class MealRecipe extends RecipeContainer {
     }
 }
 
+const PAN_TEMPERATURE=7
+
 class MeatlessSpaghetti extends Recipe {
     constructor() {
         super();
@@ -20,32 +22,32 @@ class MeatlessSpaghetti extends Recipe {
             e.pan().add([
                 i.oliveOil(1, u.tbsp),
             ]),
-            e.pan().cook(1, 'm', 6),
+            e.pan().cook(1, 'm', PAN_TEMPERATURE),
             Timer.end(),
             e.pan().add([
                 i.whiteOnion(1, u.unit),
             ]),
-            e.pan().cook(5, 'm', 6),
+            e.pan().cook(5, 'm', PAN_TEMPERATURE),
             Timer.end(),
             e.pan().add([
                 i.garlicClove(3, u.clove),
             ]),
-            e.pan().cook(1, 'm', 6),
+            e.pan().cook(1, 'm', PAN_TEMPERATURE),
             Timer.end(),
-            e.pot().cookWithLid(12, 'm', 6),
+            e.pot().add([
+                i.lentilSpaghetti(),
+                i.water(16, u.ounce),
+            ]),
+            e.pot().cookWithLid(12, 'm', 9),
                 e.pan().add([
                     i.shitatkeMushroom(8, u.ounce),
                 ]),
-                e.pan().cook(9, 'm', 6),
+                e.pan().cook(9, 'm', PAN_TEMPERATURE),
                 Timer.end(),
-                e.pot().add([
-                    i.lentilSpaghetti(),
-                    i.water(16, u.ounce),
-                ]),
                 e.pan().add([
                     i.walnut(.33, u.cup),
                 ]),
-                e.pan().cook(2, 'm', 6),
+                e.pan().cook(2, 'm', PAN_TEMPERATURE),
                 Timer.end(),
                 e.pan().add([
                     i.wholeFennelSeeds(1.5, u.tsp),
@@ -59,7 +61,7 @@ class MeatlessSpaghetti extends Recipe {
                     i.blackPepper(.25, u.tsp),
                     i.kosherSalt(.5, u.tsp),
                 ]),
-                e.pan().cook(30, 's', 6),
+                e.pan().cook(30, 's', PAN_TEMPERATURE),
                 Timer.end(),
                 e.pan().add([
                     i.soySauce(2, u.tsp),
@@ -68,7 +70,7 @@ class MeatlessSpaghetti extends Recipe {
                     i.spaghettiSauce(1, u.unit),
                 ]),
             Timer.end(),
-            e.pan().cook(8, 'm', 6),
+            e.pan().cook(8, 'm', PAN_TEMPERATURE),
             Timer.end(),
             e.pan().add([
                 i.lentilSpaghetti(),
