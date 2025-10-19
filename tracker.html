@@ -57,19 +57,30 @@
 
     .selected-foods {
       display: flex;
-      flex-wrap: wrap;
+      flex-direction: column;
       gap: 0.5rem;
     }
 
     .food-tag {
       background-color: #e0e0e0;
       padding: 0.4rem 0.8rem;
-      border-radius: 20px;
-      cursor: pointer;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 500px;
     }
 
-    .food-tag:hover {
-      background-color: #ccc;
+    .food-controls {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .food-controls button {
+      padding: 0.2rem 0.6rem;
+      font-size: 1rem;
+      cursor: pointer;
     }
 
     table {
@@ -108,7 +119,7 @@
   <label for="foodSelect">Select foods:</label>
   <select id="foodSelect">
     <option value="">-- Choose a food --</option>
-    <option value="apple">Apple</option>
+    <option value="raspberry_bar">Raspberry Bar</option>
     <option value="banana">Banana</option>
     <option value="chicken_breast">Chicken Breast</option>
     <option value="rice">White Rice</option>
@@ -163,13 +174,50 @@
   };
 
   const foodData = {
-    apple: { name: "Apple", calories: 95, protein: 0.5, carbs: 25, fat: 0.3, fiber: 4.4, sugar: 19, sodium: 2 },
-    banana: { name: "Banana", calories: 105, protein: 1.3, carbs: 27, fat: 0.3, fiber: 3.1, sugar: 14, sodium: 1 },
-    chicken_breast: { name: "Chicken Breast (100g)", calories: 165, protein: 31, carbs: 0, fat: 3.6, fiber: 0, sugar: 0, sodium: 74 },
-    rice: { name: "White Rice (1 cup)", calories: 205, protein: 4.3, carbs: 45, fat: 0.4, fiber: 0.6, sugar: 0.1, sodium: 1 }
+    raspberry_bar: {
+      name: "Raspberry Bar",
+      calories: 160,
+      protein: 9,
+      carbs: 4,
+      fat: 12,
+      fiber: 1,
+      sugar: 1,
+      sodium: 190
+    },
+    banana: {
+      name: "Banana",
+      calories: 105,
+      protein: 1.3,
+      carbs: 27,
+      fat: 0.3,
+      fiber: 3.1,
+      sugar: 14,
+      sodium: 1
+    },
+    chicken_breast: {
+      name: "Chicken Breast (100g)",
+      calories: 165,
+      protein: 31,
+      carbs: 0,
+      fat: 3.6,
+      fiber: 0,
+      sugar: 0,
+      sodium: 74
+    },
+    rice: {
+      name: "White Rice (1 cup)",
+      calories: 205,
+      protein: 4.3,
+      carbs: 45,
+      fat: 0.4,
+      fiber: 0.6,
+      sugar: 0.1,
+      sodium: 1
+    }
   };
 
-  let selectedFoods = [];
+  // Selected foods and quantities
+  let selectedFoods = {};
 
   function showTab(tabId) {
     document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
@@ -180,8 +228,12 @@
 
   document.getElementById('foodSelect').addEventListener('change', function () {
     const food = this.value;
-    if (food && !selectedFoods.includes(food)) {
-      selectedFoods.push(food);
+    if (food) {
+      if (!selectedFoods[food]) {
+        selectedFoods[food] = 1;
+      } else {
+        selectedFoods[food] += 1;
+      }
       renderSelectedFoods();
     }
     this.value = '';
@@ -190,14 +242,37 @@
   function renderSelectedFoods() {
     const container = document.getElementById('selectedFoods');
     container.innerHTML = '';
-    selectedFoods.forEach(food => {
+
+    Object.entries(selectedFoods).forEach(([food, qty]) => {
       const tag = document.createElement('div');
       tag.className = 'food-tag';
-      tag.textContent = foodData[food]?.name || food;
-      tag.onclick = () => {
-        selectedFoods = selectedFoods.filter(f => f !== food);
+
+      const name = document.createElement('span');
+      name.textContent = `${foodData[food]?.name || food} (x${qty})`;
+
+      const controls = document.createElement('div');
+      controls.className = 'food-controls';
+
+      const plusBtn = document.createElement('button');
+      plusBtn.textContent = '+';
+      plusBtn.onclick = () => {
+        selectedFoods[food]++;
         renderSelectedFoods();
       };
+
+      const minusBtn = document.createElement('button');
+      minusBtn.textContent = '-';
+      minusBtn.onclick = () => {
+        selectedFoods[food]--;
+        if (selectedFoods[food] <= 0) delete selectedFoods[food];
+        renderSelectedFoods();
+      };
+
+      controls.appendChild(minusBtn);
+      controls.appendChild(plusBtn);
+
+      tag.appendChild(name);
+      tag.appendChild(controls);
       container.appendChild(tag);
     });
   }
@@ -206,11 +281,11 @@
     const totals = {};
     nutrients.forEach(n => totals[n] = 0);
 
-    selectedFoods.forEach(food => {
+    Object.entries(selectedFoods).forEach(([food, qty]) => {
       const data = foodData[food];
       if (data) {
         nutrients.forEach(n => {
-          totals[n] += data[n] || 0;
+          totals[n] += (data[n] || 0) * qty;
         });
       }
     });
