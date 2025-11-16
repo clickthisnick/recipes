@@ -125,9 +125,7 @@ class MeatlessSpaghettiNoMushrooms extends Recipe {
                 e.pan().cook(30, 's', PAN_TEMPERATURE),
                 Timer.end(),
                 e.pan().add([
-                    i.soySauce(2, u.tsp),
                     i.nutritionalYeast(1, u.tbsp),
-                    i.balsamicVinegar(.5, u.tsp),
                     i.spaghettiSauce(1, u.unit),
                 ]),
             Timer.end(),
