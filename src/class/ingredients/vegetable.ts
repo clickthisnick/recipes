@@ -1796,6 +1796,60 @@ export class VegetableItems extends SpiceItems {
         return new Ingredient(item)
     }
 
+    public static readonly rosemary = (quantity = 0, unit: IUnitObj = Units.none) => {
+        const item: IItemObj = {
+            name: 'Rosemary',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: 7,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
+
+    public static readonly sage = (quantity = 0, unit: IUnitObj = Units.none) => {
+        const item: IItemObj = {
+            name: 'Sage',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: 7,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
+
+    public static readonly redPotatoes = (quantity = 0, unit: IUnitObj = Units.none) => {
+        const item: IItemObj = {
+            name: 'Red Potatoes',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: 7,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
+
     public static readonly whiteMushroom = (quantity = 0, unit: IUnitObj = Units.none) => {
         const item: IItemObj = {
             name: 'White Mushroom',
