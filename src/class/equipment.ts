@@ -231,6 +231,46 @@ class CookingContainer extends Container {
     }
 }
 
+class ToasterOven extends CookingContainer {
+    constructor(id: number) {
+        super("toasteroven", id)
+    }
+
+    public preheat(heat: number, disappearWhen = 'timerIsUp'): IStep {
+        if (heat === 350) {
+            // Return how long preheating pan takes
+            // This is a guess.. should test it out
+            return Timer.set(10, 's', `Preheat ${this.name} to 350°`, [], disappearWhen);
+        }
+
+        if (heat === 425) {
+            // Return how long preheating pan takes
+            // This is a guess.. should test it out
+            return Timer.set(15, 's', `Preheat ${this.name} to 425°`);
+        }
+
+        if (heat === 500) {
+            // Return how long preheating pan takes
+            // This is a guess.. should test it out
+            return Timer.set(16, 's', `Preheat ${this.name} to 500°`);
+        }
+
+        return Timer.set(5, 's', `Preheat ${this.name} on heat ${heat}`);
+    }
+
+    public cook(duration: number, type: string, degrees: number, disappearWhen = 'timerIsUp'): IStep {
+        return Timer.set(duration, type, `Cook ${this.name} @ ${degrees}°`, [], disappearWhen);
+    }
+
+    public roast(duration: number, type: string, degrees: number, disappearWhen = 'timerIsUp'): IStep {
+        return Timer.set(duration, type, `Roast ${this.name} @ ${degrees}°`, [], disappearWhen);
+    }
+
+    public broil(duration: number, type: string, degrees: number, disappearWhen = 'timerIsUp'): IStep {
+        return Timer.set(duration, type, `Broil ${this.name} @ ${degrees}°`, [], disappearWhen);
+    }
+}
+
 class Oven extends CookingContainer {
     constructor(id: number) {
         super("oven", id)
@@ -553,6 +593,10 @@ export class Equipment {
 
     public static readonly oven = (id = 99) => (
         new Oven(id)
+    );
+
+    public static readonly toasterOven = (id = 99) => (
+        new ToasterOven(id)
     );
 
     public static readonly kitchenAidMixingBowl = (id = 99) => (

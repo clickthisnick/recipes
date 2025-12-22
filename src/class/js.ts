@@ -20,24 +20,36 @@ function playSound(duration=4) {
     }
 }
 
-const parseParams = (windowLocationSearch) => {
+/**
+ * Parses a URL query string into a plain JavaScript object.
+ *
+ * - Single query parameters are returned as strings
+ * - Repeated query parameters are returned as arrays of strings
+ *
+ * Examples:
+ *   parseParams('?foo=1&bar=2')
+ *   → { foo: '1', bar: '2' }
+ *
+ *   parseParams('?foo=1&foo=2&bar=3')
+ *   → { foo: ['1', '2'], bar: '3' }
+ *
+ * @param {string} search - The URL query string (e.g. window.location.search)
+ * @returns {Object<string, string | string[]>} Parsed query parameters
+ */
+const parseParams = (search) => {
+  const params = new URLSearchParams(search);
+  const result = {};
 
-    // parse query string
-    const params = new URLSearchParams(windowLocationSearch);
-
-    const obj = {};
-
-    // iterate over all keys
-    for (const key of params.keys()) {
-        if (params.getAll(key).length > 1) {
-            obj[key] = params.getAll(key);
-        } else {
-            obj[key] = params.get(key);
-        }
+  for (const [key, value] of params) {
+    if (key in result) {
+      result[key] = [].concat(result[key], value);
+    } else {
+      result[key] = value;
     }
+  }
 
-    return obj;
-}
+  return result;
+};
 
 const queryString = parseParams(window.location.search)
 
@@ -198,15 +210,19 @@ function generateLinks(linkByPrice, priceKeys) {
 }
 
 function applyCreditCardDiscounts(store, pricePerQuantity) {
-    // Include any discounts on the price per quantity
-    if (store.startsWith("amazon")) {
-        return (pricePerQuantity * .95).toFixed(3)
-    } else if (store.startsWith("whole")) {
-        return (pricePerQuantity * .95).toFixed(3)
-    } else {
-        return (pricePerQuantity * .98).toFixed(3)
-    }
+  const discounts = {
+    amazon: 0.95,
+    whole: 0.95
+  };
+
+  const rate =
+    Object.entries(discounts).find(([key]) =>
+      store.startsWith(key)
+    )?.[1] ?? 0.98;
+
+  return (pricePerQuantity * rate).toFixed(3);
 }
+
 function doneSelectingRecipes() {
     hideElement('select')
     hideElement('selected')
@@ -333,21 +349,19 @@ function showElement(id) {
 }
 
 function showElementsByClassName(className) {
-    const elements = document.getElementsByClassName(className);
-
-    for (let i = elements.length - 1; i >= 0; i--) {
-        const element = elements[i];
-        element.style.display = "inline";
-    }
+  document
+    .querySelectorAll(`.${className}`)
+    .forEach(el => {
+      el.style.display = "inline";
+    });
 }
 
 function hideElementsByClassName(className) {
-    const elements = document.getElementsByClassName(className);
-
-    for (let i = elements.length - 1; i >= 0; i--) {
-        const element = elements[i];
-        element.style.display = "none";
-    }
+  document
+    .querySelectorAll(`.${className}`)
+    .forEach(el => {
+      el.style.display = "none";
+    });
 }
 
 function hideElement(id) {
