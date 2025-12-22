@@ -129,69 +129,108 @@ function selectRecipe(recipeGroupName) {
     renderSelectedRecipes()
 }
 
+/**
+ * Adds a cooking step as a div panel to the #cooking container.
+ *
+ * Each step can:
+ *   - Have a custom style
+ *   - Trigger a timer via `loadTimer(time, id, disappearWhen)` on click
+ *   - Toggle a 'timer' class and remove itself if no timer is required
+ *   - Recursively add child steps
+ *
+ * @param {Object} istep - Step object containing the step data
+ * @param {number|string} istep.id - Unique identifier for the step
+ * @param {string} istep.text - Text content of the step
+ * @param {string} [istep.style] - Optional CSS styles for the div
+ * @param {boolean} [istep.showTimer] - Whether to show a timer
+ * @param {number} [istep.time] - Timer duration (required if showTimer is true)
+ * @param {string} [istep.disappearWhen] - Optional parameter for loadTimer
+ * @param {Object[]} [istep.children] - Optional array of child steps
+ * @returns {void}
+ */
 function addStep(istep) {
-    const cookingDiv = document.getElementById('cooking')
-    if (!cookingDiv) {
-        alert('Cannot find cooking element id')
-        return;
-    }
+  const cookingDiv = document.getElementById('cooking');
+  if (!cookingDiv) {
+    alert('Cannot find cooking element with id "cooking"');
+    return;
+  }
 
-    let divStep = ''
-    divStep += "<div class='panel' id='panel-"
-    divStep += istep.id + "' "
+  // Create the panel div
+  const divStep = document.createElement('div');
+  divStep.className = 'panel';
+  divStep.id = `panel-${istep.id}`;
 
-    if (istep.style) {
-        divStep += `style="${istep.style}" `
-    }
+  if (istep.style) {
+    divStep.style.cssText = istep.style;
+  }
 
+  // Add a span for the step ID
+  const span = document.createElement('span');
+  span.id = istep.id;
+  divStep.appendChild(span);
 
-    if (istep.showTimer) {
-        // <!--Only double quote should be around the onclick-- >
-        divStep += 'onclick="loadTimer('
-        divStep += istep.time
-        divStep += ", "
-        divStep += istep.id
-        divStep += ", '"
-        divStep += istep.disappearWhen
-        divStep += "');"
-    } else {
-        cookingDiv.innerHTML += "";
-        divStep += 'onclick="this.classList.toggle('
-        divStep += "'timer'"
-        // <!--Only double quote should be around the onclick-- >
-        divStep += "); document.getElementById('panel-"
-        divStep += istep.id
-        divStep += "').remove();"
-    }
+  // Add the text content
+  divStep.appendChild(document.createTextNode(istep.text));
 
-    divStep += '"><span id='
-    divStep += "'"
-    divStep += istep.id
-    divStep += "'></span>"
-    divStep += istep.text
-    divStep += "</div>";
+  // Set click behavior
+  if (istep.showTimer) {
+    divStep.onclick = () => loadTimer(istep.time, istep.id, istep.disappearWhen);
+  } else {
+    divStep.onclick = () => {
+      divStep.classList.toggle('timer');
+      divStep.remove();
+    };
+  }
 
-    cookingDiv.innerHTML += divStep
+  // Append the panel to the cooking container
+  cookingDiv.appendChild(divStep);
 
-    if (istep.children && istep.children.length > 0) {
-        istep.children.forEach(child => {
-            addStep(child);
-        })
-    }
+  // Recursively add child steps if any
+  if (istep.children && istep.children.length > 0) {
+    istep.children.forEach(addStep);
+  }
 }
 
-function saveShoppingUrl() {
-    // <!--Converts ingredients to a url with query parameters-- >
-    //    <!--query parameters = ? mode = shopping & asparagus=["tsb",% 201]-- >
-    //        <!--ingredients = { asparagus: { tsb: 1 } } -->
-    let queryParamter = document.location.href.split('?')[0] + '?mode=shopping' + '&recipes=' + selectedRecipeGroupNames
-    Object.keys(ingredients).forEach(ingredient => {
-        const unit = Object.keys(ingredients[ingredient]['units'])[0]
-        // < !--url encode - example - replace any spaces with % 20 -- >
-        queryParamter += '&' + encodeURI(ingredient) + '=["' + unit + '", %20' + ingredients[ingredient]['units'][unit] + ']'
-    })
 
-    document.getElementById('shoppingUrl').innerHTML = queryParamter + "<br>"
+/**
+ * Generates a shopping URL based on the selected recipes and their ingredients,
+ * then displays it in the element with ID "shoppingUrl".
+ *
+ * The generated URL includes:
+ *   - `mode=shopping` as a fixed query parameter
+ *   - `recipes` as a comma-separated list of selected recipe group names
+ *   - Each ingredient as a query parameter in the format:
+ *       ingredient=["unit", quantity]
+ *     where both the ingredient and unit are URL-encoded.
+ *
+ * Example output:
+ *   https://example.com?mode=shopping&recipes=Salad,Pasta&asparagus=["tsb", 1]&tomato=["cup", 2]
+ *
+ * @returns {void}
+ */
+function saveShoppingUrl() {
+  // Base URL without query string
+  const baseUrl = document.location.href.split('?')[0];
+
+  // Start query parameters
+  const params = new URLSearchParams();
+  params.set('mode', 'shopping');
+  params.set('recipes', selectedRecipeGroupNames);
+
+  // Add each ingredient
+  for (const [ingredient, data] of Object.entries(ingredients)) {
+    const unit = Object.keys(data.units)[0];
+    const quantity = data.units[unit];
+
+    // Format as ["unit", quantity] and encode as string
+    const value = `["${unit}", ${quantity}]`;
+    params.set(ingredient, value);
+  }
+
+  const shoppingUrl = `${baseUrl}?${params.toString()}`;
+
+  // Display the generated URL
+  document.getElementById('shoppingUrl').innerHTML = shoppingUrl + '<br>';
 }
 
 function generateLinks(linkByPrice, priceKeys) {

@@ -442,9 +442,29 @@ export class CarbItems extends AnimalItems {
             wash: false,
             isTakeoutUnitable: false,
             isMeatProduct: false,
-            purchaseLinks: {},
+            purchaseLinks:            {
+                [Stores.wholeFoods]: {
+                    'conventional': [
+                        {
+                            price: 4.99,
+                            quantity: 4,
+                            quantity_unit: u.unit,
+                            link: 'https://www.amazon.com/365-Whole-Foods-Market-Mushroom/dp/B0CJJZ9VPF',
+                            organic: true,
+                        }
+                    ]
+                }
+            },
             perishableLimit: 0,
-            nutrition: {}
+            nutrition: {
+                [u.unit.name]: {                    
+                    calories: 140,
+                    sodium: 330,
+                    protein: 7,
+                    fiber: 4,
+                    sugar: 0.99,
+                }
+            }
         }
         return new Ingredient(item)
     }
