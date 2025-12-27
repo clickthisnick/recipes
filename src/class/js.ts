@@ -84,22 +84,14 @@ function selectMode(id) {
 }
 
 function deselectRecipe(recipeGroupName) {
-    let idx = -1
-
-    for (let i = 0; i < selectedRecipeGroupNames.length; i++) {
-        if (selectedRecipeGroupNames[i] == recipeGroupName) {
-            idx = i
-        }
-    }
+    const idx = selectedRecipeGroupNames.indexOf(recipeGroupName);
 
     if (idx >= 0) {
-        // TODO this might not be right in javascript
-        // its keeping the array as the same length without the objects
-        delete selectedRecipeGroupNames[idx]
-        delete selectedRecipes[idx]
+        selectedRecipeGroupNames.splice(idx, 1);
+        selectedRecipes.splice(idx, 1);
     }
 
-    renderSelectedRecipes()
+    renderSelectedRecipes();
 }
 
 function renderSelectedRecipes() {

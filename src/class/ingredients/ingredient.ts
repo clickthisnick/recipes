@@ -160,7 +160,7 @@ export class Ingredient {
             addIStep.text = ['Cut the', this.name, 'in half'].join(' ')
         }
         addIStep.ingredients.push(this)
-        addIStep.equipment.push(e.cuttinBoard())
+        addIStep.equipment.push(e.cuttingBoard())
         addIStep.equipment.push(e.knife())
 
         return addIStep;
@@ -190,7 +190,7 @@ export class Ingredient {
         }
 
         addIStep.ingredients.push(this)
-        addIStep.equipment.push(e.cuttinBoard())
+        addIStep.equipment.push(e.cuttingBoard())
         addIStep.equipment.push(e.knife())
 
         return addIStep;
@@ -206,7 +206,7 @@ export class Ingredient {
         }
 
         addIStep.ingredients.push(this)
-        addIStep.equipment.push(e.cuttinBoard())
+        addIStep.equipment.push(e.cuttingBoard())
         addIStep.equipment.push(e.knife())
 
         return addIStep;
@@ -220,7 +220,7 @@ export class Ingredient {
         } else {
             addIStep.text = ['Cut the', this.name, 'into strips'].join(' ')
         }
-        addIStep.equipment.push(e.cuttinBoard())
+        addIStep.equipment.push(e.cuttingBoard())
         addIStep.equipment.push(e.knife())
 
         return addIStep;
@@ -234,24 +234,27 @@ export class Ingredient {
         } else {
             addIStep.text = ['Cut the', this.name, 'into half inch strips'].join(' ')
         }
-        addIStep.equipment.push(e.cuttinBoard())
+        addIStep.equipment.push(e.cuttingBoard())
         addIStep.equipment.push(e.knife())
 
         return addIStep;
     }
 
     public cutIntoThinSlices(): IStep {
-        const addIStep = istep()
+        const step = istep();
 
-        if (this.unit) {
-            addIStep.text = ['Slice',  this.quantity, this.unit.name, this.name, 'thinly'].join(' ')
-        } else {
-            addIStep.text = ['Slice', this.name, 'thinly'].join(' ')
+        // Build the text dynamically
+        const parts = ['Slice'];
+        if (this.quantity && this.unit) {
+            parts.push(this.quantity.toString(), this.unit.name);
         }
-        addIStep.equipment.push(e.cuttinBoard())
-        addIStep.equipment.push(e.knife())
+        parts.push(this.name, 'thinly');
+        step.text = parts.join(' ');
 
-        return addIStep;
+        // Add required equipment
+        step.equipment.push(e.cuttingBoard(), e.knife());
+
+        return step;
     }
 
     public cutIntoSlices(): IStep {
@@ -262,7 +265,7 @@ export class Ingredient {
         } else {
             addIStep.text = ['Cut the', this.name, 'into slices'].join(' ')
         }
-        addIStep.equipment.push(e.cuttinBoard())
+        addIStep.equipment.push(e.cuttingBoard())
         addIStep.equipment.push(e.knife())
 
         return addIStep;

@@ -546,7 +546,7 @@ export class Equipment {
         return 'knife'
     }
 
-    public static readonly cuttinBoard = () => {
+    public static readonly cuttingBoard = () => {
         return 'cutting board'
     }
 

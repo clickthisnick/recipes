@@ -47,52 +47,47 @@ export class Serializer {
     }
 
     public static convertUnitIntoStr(unit: string, quantity: number): string {
-        // Dont return a quantity or unit if you just want the name using 0
-        if (quantity === 0) {
-          return '';
+        if (quantity === 0) return '';
+
+        // Map of fractions to Unicode characters
+        const fractionMap: Record<number, string> = {
+            0.125: '⅛',
+            0.25: '¼',
+            0.33: '⅓',
+            0.3333333333333333: '⅓',
+            0.5: '½',
+            0.75: '¾',
+        };
+
+        // Map of units with irregular plurals
+        const differentSpellingMap: Record<string, string> = {
+            dash: 'dashes',
+        };
+
+        // Split quantity into integer and fractional part
+        const integerPart = Math.floor(quantity);
+        const fractionPart = quantity - integerPart;
+
+        // Find closest fraction
+        let fractionStr = '';
+        for (const [key, value] of Object.entries(fractionMap)) {
+            if (Math.abs(fractionPart - Number(key)) < 0.01) {
+                fractionStr = value;
+                break;
+            }
         }
 
-        const sDifferentSpellingMap: IsDifferentSpellingMap  = {
-          "dash": "dashes",
-        }
+        // Build quantity string and remove leading zero if present
+        const quantityString = `${integerPart}${fractionStr}`.replace(/^0/, '');
 
-        let quantityString = `${quantity}`;
+        // Handle pluralization
+        let unitString = quantity > 1
+            ? differentSpellingMap[unit] || `${unit}s`
+            : unit;
 
-        if (`${quantity}`.endsWith('.75')) {
-          quantityString = `${quantity-.75}¾`;
-        }
-        if (`${quantity}`.endsWith('.5')) {
-          quantityString = `${quantity-.5}½`;
-        }
-        if (`${quantity}`.endsWith('.33')) {
-          quantityString = `${quantity-.33}⅓`;
-        }
-        if (`${quantity}`.endsWith('.3333333333333333')) {
-          quantityString = `${quantity-.3333333333333333}⅓`;
-        }
-        if (`${quantity}`.endsWith('.25')) {
-          quantityString = `${quantity-.25}¼`;
-        }
-        if (`${quantity}`.endsWith('.125')) {
-          quantityString = `${quantity-.125}⅛`;
-        }
+        return `${quantityString} ${unitString}`.trim();
+    }
 
-        if (quantityString.startsWith('0')) {
-          quantityString = quantityString.substring(1);
-        }
-
-        let unitString: string = unit;
-
-        if (quantity > 1) {
-          if (unitString in sDifferentSpellingMap) {
-              unitString = sDifferentSpellingMap[unitString];
-          } else {
-            unitString = `${unitString}s`
-          }
-        }
-
-        return `${quantityString} ${unitString}`;
-     }
 
   //   public static genericAddArray(ingredients: Ingredient[], ): IStep {
   //     const addIStep = istep()
