@@ -303,6 +303,24 @@ export class AnimalItems {
         return new Ingredient(item)
     }
 
+    public static readonly mayonaise = (quantity = 0, unit: IUnitObj = Units.none) => {
+        const item: IMeatObj = {
+            name: 'Mayonaise',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: true,
+            purchaseLinks: {},
+            perishableLimit: 0,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
+
     public static readonly italianSausage = (quantity = 0, unit: IUnitObj = Units.none) => {
         const item: IMeatObj = {
             name: 'Italian Sausage',

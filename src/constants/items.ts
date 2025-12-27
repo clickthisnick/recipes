@@ -64,30 +64,30 @@ function returnItem(itemName: string, quantity: number, unit: IUnitObj, subItems
 }
 
 export class Items extends VegetableItems {
-    public static readonly Groups = {
-        chicken: (quantity = 0, unit: IUnitObj = Units.none) => {
-            return returnItem('chicken', quantity, unit, [
-                i.chickenBreast(),
-                i.chickenThigh(),
-            ])
-        },
-        mushroom: (quantity = 0, unit: IUnitObj = Units.none) => {
-            return returnItem('mushroom', quantity, unit, [
-                i.whiteMushroom(),
-                i.babyBellaMushroom(),
-            ])
-        },
-        onion: (quantity = 0, unit: IUnitObj = Units.none) => {
-            return returnItem('onion', quantity, unit, [
-                i.whiteOnion(),
-                i.redOnion(),
-            ])
-        },
-        cheese: (quantity = 0, unit: IUnitObj = Units.none) => {
-            return returnItem('cheese', quantity, unit, [
-                i.cheddarCheese(),
-                i.mozzarellaCheese(),
-            ])
-        }
+    private static createGroup(
+        name: string,
+        options: () => any[]
+    ) {
+        return (quantity = 0, unit: IUnitObj = Units.none) => 
+            returnItem(name, quantity, unit, options());
     }
+
+    public static readonly Groups = {
+        chicken: Items.createGroup('chicken', () => [
+            i.chickenBreast(),
+            i.chickenThigh(),
+        ]),
+        mushroom: Items.createGroup('mushroom', () => [
+            i.whiteMushroom(),
+            i.babyBellaMushroom(),
+        ]),
+        onion: Items.createGroup('onion', () => [
+            i.whiteOnion(),
+            i.redOnion(),
+        ]),
+        cheese: Items.createGroup('cheese', () => [
+            i.cheddarCheese(),
+            i.mozzarellaCheese(),
+        ]),
+    };
 }
