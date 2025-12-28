@@ -126,7 +126,7 @@ class Plate extends Container {
         super(name, id)
     }
 
-    public microwave(duration: number, unit = "", disappearWhen = 'timerIsUp'): IStep {
+    public microwave(duration: number, unit: TimeUnit, disappearWhen = 'timerIsUp'): IStep {
         let humanUnit = "minutes"
 
         if (unit == "s") {
@@ -150,7 +150,7 @@ class Bowl extends Container {
         super(name, id)
     }
 
-    public microwave(duration: number, unit = "", disappearWhen = 'timerIsUp'): IStep {
+    public microwave(duration: number, unit: TimeUnit, disappearWhen = 'timerIsUp'): IStep {
         let humanUnit = "minutes"
 
         if (unit == "s") {
@@ -220,7 +220,7 @@ class CookingContainer extends Container {
         super(name, id)
     }
 
-    public cook(duration: number, type: string, degrees: number, disappearWhen: string = 'timerIsUp') {
+    public cook(duration: number, type: TimeUnit, degrees: number, disappearWhen: string = 'timerIsUp') {
         this.firstAction = false;
         console.log(`cook should be overloaded ${duration} ${type} ${degrees} ${disappearWhen}`)
     }
@@ -258,15 +258,15 @@ class ToasterOven extends CookingContainer {
         return Timer.set(5, 's', `Preheat ${this.name} on heat ${heat}`);
     }
 
-    public cook(duration: number, type: string, degrees: number, disappearWhen = 'timerIsUp'): IStep {
+    public cook(duration: number, type: TimeUnit, degrees: number, disappearWhen = 'timerIsUp'): IStep {
         return Timer.set(duration, type, `Cook ${this.name} @ ${degrees}°`, [], disappearWhen);
     }
 
-    public roast(duration: number, type: string, degrees: number, disappearWhen = 'timerIsUp'): IStep {
+    public roast(duration: number, type: TimeUnit, degrees: number, disappearWhen = 'timerIsUp'): IStep {
         return Timer.set(duration, type, `Roast ${this.name} @ ${degrees}°`, [], disappearWhen);
     }
 
-    public broil(duration: number, type: string, degrees: number, disappearWhen = 'timerIsUp'): IStep {
+    public broil(duration: number, type: TimeUnit, degrees: number, disappearWhen = 'timerIsUp'): IStep {
         return Timer.set(duration, type, `Broil ${this.name} @ ${degrees}°`, [], disappearWhen);
     }
 }
@@ -298,11 +298,11 @@ class Oven extends CookingContainer {
         return Timer.set(5, 'm', `Preheat ${this.name} on heat ${heat}`);
     }
 
-    public cook(duration: number, type: string, degrees: number, disappearWhen = 'timerIsUp'): IStep {
+    public cook(duration: number, type: TimeUnit, degrees: number, disappearWhen = 'timerIsUp'): IStep {
         return Timer.set(duration, type, `Cook ${this.name} @ ${degrees}°`, [], disappearWhen);
     }
 
-    public roast(duration: number, type: string, degrees: number, disappearWhen = 'timerIsUp'): IStep {
+    public roast(duration: number, type: TimeUnit, degrees: number, disappearWhen = 'timerIsUp'): IStep {
         return Timer.set(duration, type, `Roast ${this.name} @ ${degrees}°`, [], disappearWhen);
     }
 }
@@ -326,8 +326,12 @@ class Ninja extends CookingContainer {
         return Timer.set(5, 'm', `Turn ${this.name} airfry setting to ${minutes} minutes`, [], disappearWhen);
     }
 
-    public cook(duration: number, type: string, degrees: number, disappearWhen = 'timerIsUp'): IStep {
+    public cook(duration: number, type: TimeUnit, degrees: number, disappearWhen = 'timerIsUp'): IStep {
         return Timer.set(duration, type, `Cook ${this.name} @ ${degrees}°`, [], disappearWhen);
+    }
+
+    public airFry(duration: number, type: TimeUnit, degrees: number, disappearWhen = 'timerIsUp'): IStep {
+        return Timer.set(duration, type, `Airfry ${this.name} @ ${degrees}°`, [], disappearWhen);
     }
 }
 
@@ -372,22 +376,22 @@ class Pot extends CookingContainer {
         return heat
     }
 
-    public _cookStr(text: string, duration: number, type: string, heat: number, disappearWhen = 'timerIsUp'): IStep {
+    public _cookStr(text: string, duration: number, type: TimeUnit, heat: number, disappearWhen = 'timerIsUp'): IStep {
         heat = this._getHeat(heat)
         return Timer.set(duration, type, text, [this.name], disappearWhen)
     }
 
-    public cook(duration: number, type: string, heat: number, disappearWhen = 'timerIsUp'): IStep {
+    public cook(duration: number, type: TimeUnit, heat: number, disappearWhen = 'timerIsUp'): IStep {
         heat = this._getHeat(heat)
         return this._cookStr(`Cook ${this.name}`, duration, type, heat, disappearWhen)
     }
 
-    public cookWithoutLid(duration: number, type: string, heat: number, disappearWhen = 'timerIsUp'): IStep {
+    public cookWithoutLid(duration: number, type: TimeUnit, heat: number, disappearWhen = 'timerIsUp'): IStep {
         heat = this._getHeat(heat)
         return this._cookStr(`Cook ${this.name} without lid`, duration, type, heat, disappearWhen)
     }
 
-    public cookWithLid(duration: number, type: string, heat: number, text = "", disappearWhen = 'timerIsUp'): IStep {
+    public cookWithLid(duration: number, type: TimeUnit, heat: number, text = "", disappearWhen = 'timerIsUp'): IStep {
         heat = this._getHeat(heat)
         if (text) {
             text = text + " "
@@ -395,7 +399,7 @@ class Pot extends CookingContainer {
         return this._cookStr(`Cook ${this.name} with lid`, duration, type, heat, disappearWhen)
     }
 
-    public cookWithLidSlightlyOff(duration: number, type: string, heat: number, text = "", disappearWhen = 'timerIsUp'): IStep {
+    public cookWithLidSlightlyOff(duration: number, type: TimeUnit, heat: number, text = "", disappearWhen = 'timerIsUp'): IStep {
         heat = this._getHeat(heat)
         if (text) {
             text = text + " "
@@ -403,7 +407,7 @@ class Pot extends CookingContainer {
         return this._cookStr(`Cook ${text}${this.name} with lid slightly off`, duration, type, heat, disappearWhen)
     }
 
-    public boilWithLid(duration: number, type: string, heat: number, disappearWhen = 'timerIsUp'): IStep {
+    public boilWithLid(duration: number, type: TimeUnit, heat: number, disappearWhen = 'timerIsUp'): IStep {
         heat = this._getHeat(heat)
         return this._cookStr(`Boil ${this.name} contents on heat ${heat} with lid on`, duration, type, heat, disappearWhen)
     }
@@ -415,7 +419,7 @@ class Strainer extends CookingContainer {
         super("strainer", id)
     }
 
-    public wash(text: string, duration: number, type: string, disappearWhen = 'timerIsUp'): IStep {
+    public wash(text: string, duration: number, type: TimeUnit, disappearWhen = 'timerIsUp'): IStep {
         return Timer.set(duration, type, text, [this.name], disappearWhen)
     }
 }
@@ -469,23 +473,23 @@ class Pan extends CookingContainer {
         return heat
     }
 
-    public _cookStr(text: string, duration: number, type: string, heat = 0, disappearWhen = 'timerIsUp'): IStep {
+    public _cookStr(text: string, duration: number, type: TimeUnit, heat = 0, disappearWhen = 'timerIsUp'): IStep {
         heat = this._getHeat(heat)
         return Timer.set(duration, type, text, [this.name], disappearWhen)
     }
 
-    public cook(duration: number, type: string, heat = 0, disappearWhen = 'timerIsUp'): IStep {
+    public cook(duration: number, type: TimeUnit, heat = 0, disappearWhen = 'timerIsUp'): IStep {
         heat = this._getHeat(heat)
         return this._cookStr(`Cook on heat ${heat}`, duration, type, heat, disappearWhen)
     }
 
 
-    public cookWithLidSlightlyOff(duration: number, type: string, heat = 0, disappearWhen = 'timerIsUp'): IStep {
+    public cookWithLidSlightlyOff(duration: number, type: TimeUnit, heat = 0, disappearWhen = 'timerIsUp'): IStep {
         heat = this._getHeat(heat)
         return this._cookStr(`Cook on heat ${heat} with lid slightly off`, duration, type, heat, disappearWhen)
     }
 
-    public cookWithLid(duration: number, type: string, heat = 0, text = "", disappearWhen = 'timerIsUp'): IStep {
+    public cookWithLid(duration: number, type: TimeUnit, heat = 0, text = "", disappearWhen = 'timerIsUp'): IStep {
         if (text) {
             text = text + " "
         }
@@ -523,11 +527,11 @@ class InstantPot extends CookingContainer {
         return preheatStep
     }
 
-    public sautee(duration: number, type: string, disappearWhen = 'timerIsUp'): IStep {
+    public sautee(duration: number, type: TimeUnit, disappearWhen = 'timerIsUp'): IStep {
         return Timer.set(duration, type, `Sautee on high`, [], disappearWhen)
     }
 
-    public pressureRelease(duration: number, type: string, disappearWhen = 'timerIsUp'): IStep {
+    public pressureRelease(duration: number, type: TimeUnit, disappearWhen = 'timerIsUp'): IStep {
         return Timer.set(duration, type, 'Let pressure release', [], disappearWhen)
     }
 }

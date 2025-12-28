@@ -27,7 +27,7 @@ export class WholeWheatBread extends Recipe {
             e.bowl().add([
                 i.water(2.5, u.cup),
             ]),
-            e.bowl().microwave(1.05),
+            e.bowl().microwave(1.05, 'm'),
             Timer.end(),
             e.kitchenAidMixingBowl().add([
                 i.ingredient('Microwaved water')
