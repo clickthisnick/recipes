@@ -1,4 +1,4 @@
-import { Time } from './time';
+import { Time, TimeUnit } from './time';
 import { Timer } from './timer';
 import { Serializer as s } from './serializer';
 import { IStep, istep } from './step';
@@ -499,7 +499,7 @@ class InstantPot extends CookingContainer {
             super("instant pot", id)
         }
 
-    public pressureCook(preheat: number, duration: number, type: string, disappearWhen = 'timerIsUp'): IStep {
+    public pressureCook(preheat: number, duration: number, type: TimeUnit, disappearWhen = 'timerIsUp'): IStep {
         const preheatStep = istep()
         preheatStep.time += Time.convert(preheat, type)
         preheatStep.text = `Put ${this.name} on high pressure for ${duration} minutes`

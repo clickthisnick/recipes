@@ -1,13 +1,12 @@
+export type TimeUnit = 's' | 'm';
+
 export class Time {
-    public static convert(duration: number, type: string): number {
-        if (type === 's') {
-            return duration
-        }
+    private static readonly factors: Record<TimeUnit, number> = {
+        s: 1,
+        m: 60,
+    };
 
-        if (type === 'm') {
-            return duration * 60
-        }
-
-        return duration
+    static convert(duration: number, unit: TimeUnit): number {
+        return duration * Time.factors[unit];
     }
 }

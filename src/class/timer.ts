@@ -1,5 +1,5 @@
 import { IStep, istep } from "./step";
-import { Time } from "./time";
+import { Time, TimeUnit } from "./time";
 
 // Start at some number that is much higher than all recipes... for now at least
 // TODO think of something better
@@ -13,7 +13,7 @@ function getITimerId() {
 }
 
 export class Timer {
-    public static set(duration: number, type: string, text = '', equipment = [''], disappearWhen: string = 'timerIsUp'): IStep {
+    public static set(duration: number, type: TimeUnit, text = '', equipment = [''], disappearWhen: string = 'timerIsUp'): IStep {
         const step = istep()
         step.id = getITimerId()
         step.time = Time.convert(duration, type),
