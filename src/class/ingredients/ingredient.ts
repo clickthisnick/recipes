@@ -180,6 +180,22 @@ export class Ingredient {
         return addIStep;
     }
 
+    public rinse(): IStep {
+        const addIStep = istep()
+
+        if (this.quantity && this.unit && this.unit.name) {
+            addIStep.text = ['Rinse', this.quantity, this.unit.name, this.name].join(' ')
+        } else {
+            addIStep.text = ['Rinse the', this.name].join(' ')
+        }
+
+        addIStep.ingredients.push(this)
+        addIStep.equipment.push(e.cuttingBoard())
+        addIStep.equipment.push(e.knife())
+
+        return addIStep;
+    }
+
     public dice(): IStep {
         const addIStep = istep()
 

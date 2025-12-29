@@ -794,6 +794,25 @@ export class VegetableItems extends SpiceItems {
         return new Ingredient(item)
     }
 
+    public static readonly organicBlackKamalataOlives = (quantity = 0, unit: IUnitObj = Units.none) => {
+        const item: IItemObj = {
+            name: 'Black Olives',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {
+            },
+            perishableLimit: 0,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
+
     public static readonly blackBeans = (quantity = 0, unit: IUnitObj = Units.none) => {
         const item: IItemObj = {
             name: 'Black Beans',
