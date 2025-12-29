@@ -21,7 +21,7 @@ class MeatlessTaco extends Recipe {
         this.steps = [
            i.whiteMushroom(8, u.ounce).cutIntoSlices(),
            i.blackBeans(13, u.ounce).rinse(),
-           i.organicBlackKamalataOlives(16, u.unit).cutInHalf(),
+           i.organicBlackKalamataOlives(16, u.unit).cutInHalf(),
            e.pan().add([
                 i.whiteMushroom(),
                 i.oliveOil(2, u.tsp),
@@ -34,7 +34,7 @@ class MeatlessTaco extends Recipe {
            Timer.end(),
            e.pan().add([
 
-                i.organicBlackKamalataOlives()
+                i.organicBlackKalamataOlives()
            ]),
            e.pan().cook(30, 's', 6),
            Timer.end(),
