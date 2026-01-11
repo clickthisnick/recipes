@@ -933,6 +933,24 @@ export class CarbItems extends AnimalItems {
         return new Ingredient(item)
     }
 
+    public static readonly pomegraniteSeeds = (quantity = 0, unit: IUnitObj = Units.none) => {
+        const item: IItemObj = {
+            name: 'Pomegranite Seeds',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: 'Rinse and put measuring cup in dishwasher',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: 0,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
+
     public static readonly brazilNut = (quantity = 0, unit: IUnitObj = Units.none) => {
         const item: IItemObj = {
             name: 'Brazil Nut',
