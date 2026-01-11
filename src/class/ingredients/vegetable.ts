@@ -942,6 +942,24 @@ export class VegetableItems extends SpiceItems {
         return new Ingredient(item)
     }
 
+    public static readonly macadamiaNutMilk = (quantity = 0, unit: IUnitObj = Units.none) => {
+        const item: IItemObj = {
+            name: 'Macadamia Nut Milk',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: 0,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
+
     public static readonly lemonJuice = (quantity = 0, unit: IUnitObj = Units.none) => {
         const item: IItemObj = {
             name: 'Lemon Juice',
@@ -1610,6 +1628,25 @@ export class VegetableItems extends SpiceItems {
                 //     "organic": ["https://www.amazon.com/Green-Bell-Pepper-Organic-Each/dp/B07QYB5JNX/ref=sr_1_2_0g_wf"],
                 // }
             },
+            perishableLimit: 7,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
+
+
+    public static readonly greenBeans = (quantity = 0, unit: IUnitObj = Units.none) => {
+        const item: IItemObj = {
+            name: 'Green Beans',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
             perishableLimit: 7,
             nutrition: {}
         }

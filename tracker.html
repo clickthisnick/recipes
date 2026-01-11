@@ -1,113 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Nutrition Tracker</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Nutrition Tracker</title>
 
-    header {
-      background-color: #4CAF50;
-      color: white;
-      padding: 1rem;
-      text-align: center;
-    }
+<style>
+body { font-family: Arial, sans-serif; margin:0; }
+header { background:#4CAF50; color:white; padding:1rem; text-align:center; }
 
-    .tabs {
-      display: flex;
-      background-color: #f1f1f1;
-    }
+.tabs { display:flex; background:#f1f1f1; }
+.tab-button { flex:1; padding:1rem; border:none; cursor:pointer; background:#ddd; }
+.tab-button.active { background:#bbb; font-weight:bold; }
 
-    .tab-button {
-      flex: 1;
-      padding: 1rem;
-      cursor: pointer;
-      text-align: center;
-      background-color: #ddd;
-      border: none;
-      outline: none;
-    }
+.tab-content { display:none; padding:1rem; }
+.tab-content.active { display:block; }
 
-    .tab-button.active {
-      background-color: #bbb;
-      font-weight: bold;
-    }
+button,input,textarea { margin:1rem 0; padding:.5rem; width:100%; max-width:500px; }
 
-    .tab-content {
-      display: none;
-      padding: 1rem;
-    }
+/* ===== DROPDOWN (GRAYSCALE SAFE) ===== */
 
-    .tab-content.active {
-      display: block;
-    }
+.dropdown { position:relative; max-width:500px; }
+.dropdown-toggle {
+  padding:.5rem;
+  border:1px solid #999;
+  background:#fff;
+  cursor:pointer;
+}
 
-    select, input, button, textarea {
-      display: block;
-      margin: 1rem 0;
-      padding: 0.5rem;
-      width: 100%;
-      max-width: 500px;
-    }
+.dropdown-menu {
+  position:absolute;
+  top:100%;
+  left:0;
+  width:100%;
+  border:1px solid #999;
+  background:#fff;
+  display:none;
+  z-index:10;
+}
 
-    .selected-foods {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
+.dropdown.open .dropdown-menu { display:block; }
 
-    .food-tag {
-      background-color: #e0e0e0;
-      padding: 0.4rem 0.8rem;
-      border-radius: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      max-width: 500px;
-    }
+.category {
+  font-weight:bold;
+  padding:.5rem;
+  background:#eee;
+  border-bottom:1px solid #ccc;
+  position:relative;
+}
 
-    .food-controls {
-      display: flex;
-      gap: 0.5rem;
-      align-items: center;
-    }
+.category::after {
+  content:"▶";
+  position:absolute;
+  right:8px;
+}
 
-    .food-controls button {
-      padding: 0.2rem 0.6rem;
-      font-size: 1rem;
-      cursor: pointer;
-    }
+.category-items {
+  display:none;
+  position:absolute;
+  top:0;
+  left:100%;
+  min-width:260px;
+  background:#fff;
+  border:1px solid #999;
+}
 
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      max-width: 800px;
-      margin-top: 1rem;
-    }
+.category:hover .category-items { display:block; }
 
-    th, td {
-      border: 1px solid #ccc;
-      padding: 0.5rem;
-      text-align: center;
-    }
+.sub-item {
+  padding:.45rem .6rem;
+  border-left:4px solid #888;
+  cursor:pointer;
+}
 
-    @media (max-width: 600px) {
-      .tabs {
-        flex-direction: column;
-      }
-    }
-  </style>
+.sub-item:hover { background:#f3f3f3; }
+
+.standalone {
+  padding:.45rem .6rem;
+  cursor:pointer;
+  border-bottom:1px dashed #ccc;
+}
+
+.standalone::before {
+  content:"• ";
+  font-weight:bold;
+}
+
+.standalone:hover { background:#f5f5f5; }
+
+/* ===== SELECTED ===== */
+
+.selected-foods { display:flex; flex-direction:column; gap:.5rem; }
+
+.food-tag {
+  background:#e5e5e5;
+  padding:.4rem .8rem;
+  border-radius:6px;
+  display:flex;
+  justify-content:space-between;
+  max-width:500px;
+}
+
+.food-controls button { padding:.2rem .6rem; }
+
+/* ===== TABLE ===== */
+
+table {
+  border-collapse:collapse;
+  width:100%;
+  max-width:800px;
+  margin-top:1rem;
+}
+
+th,td {
+  border:1px solid #aaa;
+  padding:.5rem;
+  text-align:center;
+}
+</style>
 </head>
+
 <body>
 
-<header>
-  <h1>Nutrition App</h1>
-</header>
+<header><h1>Nutrition App</h1></header>
 
 <div class="tabs">
   <button class="tab-button active" onclick="showTab('tracker')">Nutrition Tracker</button>
@@ -116,184 +131,393 @@
 
 <div id="tracker" class="tab-content active">
   <h2>Nutrition Tracker</h2>
-  <label for="foodSelect">Select foods:</label>
-  <select id="foodSelect">
-    <option value="">-- Choose a food --</option>
-  </select>
+
+  <div class="dropdown" id="foodDropdown">
+    <div class="dropdown-toggle">Choose a food ▾</div>
+    <div class="dropdown-menu" id="dropdownMenu"></div>
+  </div>
 
   <div class="selected-foods" id="selectedFoods"></div>
-
   <button onclick="updateNutrition()">Update Nutrition</button>
 
   <table id="nutritionTable" style="display:none;">
     <thead>
-      <tr>
-        <th>Nutrient</th>
-        <th>Your Intake</th>
-        <th>FDA Daily Limit</th>
-      </tr>
+      <tr><th>Nutrient</th><th>Your Intake</th><th>FDA Daily Limit</th></tr>
     </thead>
     <tbody id="nutritionBody"></tbody>
   </table>
 </div>
 
-<div id="custom" class="tab-content">
-  <h2>Add Custom Food</h2>
-  <form id="customFoodForm">
-    <input type="text" id="foodName" placeholder="Food Name" required />
-    <input type="number" min="0" id="calories" placeholder="Calories" required />
-    <input type="number" min="0" id="protein" placeholder="Protein (g)" required />
-    <input type="number" min="0" id="carbs" placeholder="Carbohydrates (g)" required />
-    <input type="number" min="0" id="total_fat" placeholder="Total Fat (g)" required />
-    <input type="number" min="0" id="saturated_fat" placeholder="Saturated Fat (g)" required />
-    <input type="number" min="0" id="fiber" placeholder="Fiber (g)" required />
-    <input type="number" min="0" id="sugar" placeholder="Sugar (g)" required />
-    <input type="number" min="0" id="sodium" placeholder="Sodium (mg)" required />
-    <button type="submit">Generate JSON</button>
-  </form>
-
-  <textarea id="jsonOutput" rows="10" readonly placeholder="JSON will appear here..."></textarea>
-  <button onclick="copyJSON()">Copy to Clipboard</button>
-  <p><em>Copy this JSON and manually add it to your foods list in your app repo.</em></p>
-</div>
-
 <script>
-  const nutrients = ['calories', 'protein', 'carbs', 'total_fat', 'saturated_fat', 'fiber', 'sugar', 'sodium'];
+/* ================= CONSTANTS ================= */
 
-  const fdaLimits = {
-    calories: 2700,
-    protein: 75,
-    carbs: 412,
-    total_fat: 117,
-    saturated_fat: 30,
-    fiber: 34,
-    sugar: 50,
-    sodium: 2300
-  };
+const units = { c:"cal", g:"g", mg:"mg" };
 
-  const foodData = {
-    bp_longevity_mix: { name: "Blueprint Longevity Mix", calories: 110, protein: 20, carbs: 3, total_fat: 0, saturated_fat: 0, fiber: 0, sugar: 0, sodium: 0 },
-    bp_bananna_protein: { name: "Blueprint Bananna Protein", calories: 270, protein: 27, carbs: 24, total_fat: 9, saturated_fat: 4.5, fiber: 7, sugar: 7, sodium: 160 },
-    bp_longevity_protein: { name: "Blueprint Longevity Protein", calories: 845, protein: 32, carbs: 29, total_fat: 74, saturated_fat: 12, fiber: 7, sugar: 6, sodium: 215 },
-    bp_longevity_protein_with_super_shrooms: { name: "Blueprint Longevity Protein With Super Shrooms", calories: 860, protein: 32, carbs: 33, total_fat: 74, saturated_fat: 12, fiber: 9, sugar: 6, sodium: 265 },
-    raspberry_bar: { name: "Raspberry Bar", calories: 160, protein: 9, carbs: 4, total_fat: 12, saturated_fat: 0, fiber: 1, sugar: 1, sodium: 190 },
-    bp_teriyaki_beef: { name: "Blueprint Teriyaki Beef", calories: 324, protein: 29, carbs: 25, total_fat: 13, saturated_fat: 3, fiber: 7, sugar: 9, sodium: 268 },
-    tablespoon_psyllium_husks: { name: "Tablespoon Whole Foods Organic Psyllium Husks", calories: 20, protein: 0, carbs: 8, total_fat: 0, saturated_fat: 0, fiber: 7, sugar: 0, sodium: 0 },
-    grams_65_black_lentils_dry: { name: "365 Organic Black Lentils (65g dry)", calories: 260, protein: 20, carbs: 45, total_fat: 2, saturated_fat: 0, fiber: 14, sugar: 0, sodium: 0 },
-  };
+const fdaLimits = {
+  calories:{ value:2700, unit:units.c },
+  protein:{ value:75, unit:units.g },
+  carbs:{ value:412, unit:units.g },
+  total_fat:{ value:117, unit:units.g },
+  saturated_fat:{ value:30, unit:units.g },
+  fiber:{ value:34, unit:units.g },
+  sugar:{ value:50, unit:units.g },
+  sodium:{ value:2300, unit:units.mg }
+};
 
-  let selectedFoods = {};
+const NUTRIENTS = Object.keys(fdaLimits);
 
-  function showTab(tabId) {
-    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-    document.querySelector(`.tab-button[onclick="showTab('${tabId}')"]`).classList.add('active');
-    document.getElementById(tabId).classList.add('active');
+/* ================= COMPONENTS ================= */
+
+const components = {
+  "Blueprint_Bananna_Protein": {
+    calories:{value:270,unit:units.c},
+    protein:{value:27,unit:units.g},
+    carbs:{value:24,unit:units.g},
+    total_fat:{value:9,unit:units.g},
+    saturated_fat:{value:4.5,unit:units.g},
+    fiber:{value:7,unit:units.g},
+    sugar:{value:7,unit:units.g},
+    sodium:{value:160,unit:units.mg},
+  },
+  "4_Kalamata_Olives": {
+    calories:{value:45,unit:units.c},
+    protein:{value:0,unit:units.g},
+    carbs:{value:0,unit:units.g},
+    total_fat:{value:4.5,unit:units.g},
+    saturated_fat:{value:0.5,unit:units.g},
+    fiber:{value:0,unit:units.g},
+    sugar:{value:0,unit:units.g},
+    sodium:{value:190,unit:units.mg},
+  },
+  "Blueprint_Cocoa": {
+    calories:{value:15,unit:units.c},
+    protein:{value:1,unit:units.g},
+    carbs:{value:3,unit:units.g},
+    total_fat:{value:.5,unit:units.g},
+    saturated_fat:{value:0,unit:units.g},
+    fiber:{value:1,unit:units.g},
+    sugar:{value:0,unit:units.g},
+    sodium:{value:0,unit:units.mg},
+  },
+  "Blueprint_Blueberry_Nut_Mix": {
+    calories:{value:70,unit:units.c},
+    protein:{value:1,unit:units.g},
+    carbs:{value:8,unit:units.g},
+    total_fat:{value:4.5,unit:units.g},
+    saturated_fat:{value:.5,unit:units.g},
+    fiber:{value:2,unit:units.g},
+    sugar:{value:5,unit:units.g},
+    sodium:{value:0,unit:units.mg},
+  },
+  "Blueprint_Longevity_Protein": {
+    calories:{value:200,unit:units.c},
+    protein:{value:26,unit:units.g},
+    carbs:{value:12,unit:units.g},
+    total_fat:{value:6,unit:units.g},
+    saturated_fat:{value:1,unit:units.g},
+    fiber:{value:3,unit:units.g},
+    sugar:{value:0,unit:units.g},
+    sodium:{value:190,unit:units.mg},
+  },
+  "Blueprint_Macadamia_Puree": {
+    calories:{value:190,unit:units.c},
+    protein:{value:2,unit:units.g},
+    carbs:{value:3,unit:units.g},
+    total_fat:{value:20,unit:units.g},
+    saturated_fat:{value:3.5,unit:units.g},
+    fiber:{value:2,unit:units.g},
+    sugar:{value:1,unit:units.g},
+    sodium:{value:25,unit:units.mg},
+  },
+  "Blueprint_Olive_Oil_Tbsp": {
+    calories:{value:120,unit:units.c},
+    protein:{value:0,unit:units.g},
+    carbs:{value:0,unit:units.g},
+    total_fat:{value:14,unit:units.g},
+    saturated_fat:{value:2,unit:units.g},
+    fiber:{value:0,unit:units.g},
+    sugar:{value:0,unit:units.g},
+    sodium:{value:0,unit:units.mg},
+  },
+  "Blueprint_Longevity_Vitamin_Mix": {
+    calories:{value:110,unit:units.c},
+    protein:{value:20,unit:units.g},
+    carbs:{value:3,unit:units.g},
+    total_fat:{value:0,unit:units.g},
+    saturated_fat:{value:0,unit:units.g},
+    fiber:{value:0,unit:units.g},
+    sugar:{value:0,unit:units.g},
+    sodium:{value:0,unit:units.mg},
+  },
+};
+
+// Add components
+components.medium_avocado = {
+  calories: { value: 240, unit: units.c },
+  protein: { value: 3, unit: units.g },
+  carbs: { value: 12, unit: units.g },
+  total_fat: { value: 22, unit: units.g },
+  saturated_fat: { value: 3, unit: units.g },
+  fiber: { value: 10, unit: units.g },
+  sugar: { value: 1, unit: units.g },
+  sodium: { value: 10, unit: units.mg }
+};
+
+components.sixteenth_tsp_salt = {
+  calories: { value: 0, unit: units.c },
+  protein: { value: 0, unit: units.g },
+  carbs: { value: 0, unit: units.g },
+  total_fat: { value: 0, unit: units.g },
+  saturated_fat: { value: 0, unit: units.g },
+  fiber: { value: 0, unit: units.g },
+  sugar: { value: 0, unit: units.g },
+  sodium: { value: 375, unit: units.mg }
+};
+
+/* ================= FOOD DATA ================= */
+
+const foodData = {
+
+  bp_longevity_vitamin_mix: {
+    name:"Blueprint_Longevity_Vitamin_Mix",
+    components:[
+      { key:"Blueprint_Longevity_Vitamin_Mix", quantity:1 },
+    ]
+  },
+
+  bp_longevity_protein: {
+    name:"Blueprint Longevity Protein",
+    components:[
+      { key:"Blueprint_Longevity_Protein", quantity:1 },
+      { key:"Blueprint_Blueberry_Nut_Mix", quantity:1 },
+      { key:"Blueprint_Cocoa", quantity:1 },
+      { key:"Blueprint_Olive_Oil_Tbsp", quantity:2 },
+      { key:"Blueprint_Macadamia_Puree", quantity:1 },
+    ]
+  },
+
+  bp_longevity_protein_without_macadamia: {
+    name:"Blueprint Longevity Protein (No Macadamia)",
+    components:[
+      { key:"Blueprint_Longevity_Protein", quantity:1 },
+      { key:"Blueprint_Blueberry_Nut_Mix", quantity:1 },
+      { key:"Blueprint_Cocoa", quantity:1 },
+      { key:"Blueprint_Olive_Oil_Tbsp", quantity:2 },
+    ]
+  },
+
+  avocado_with_olives: {
+    name:"Medium Avocado + 4 Kalamata Olives",
+    components:[
+      { key:"medium_avocado", quantity:1 },
+      { key:"kalamata_olives_4", quantity:1 }
+    ]
+  },
+
+  blueprint_bananna_protein: {
+    name:"Blueprint Bananna Protein",
+    components:[
+      { key:"Blueprint_Bananna_Protein", quantity:1 },
+    ]
+  },
+
+  grams_65_black_lentils_dry: {
+    name:"365 Organic Black Lentils (65g dry)",
+    calories:{value:260,unit:units.c},
+    protein:{value:20,unit:units.g},
+    carbs:{value:45,unit:units.g},
+    total_fat:{value:2,unit:units.g},
+    saturated_fat:{value:0,unit:units.g},
+    fiber:{value:14,unit:units.g},
+    sugar:{value:0,unit:units.g},
+    sodium:{value:0,unit:units.mg}
+  },
+
+  psyillium_husks: {
+    name:"Tablespoon Whole Foods Organic Psyllium Husks",
+    calories:{value:20,unit:units.c},
+    protein:{value:0,unit:units.g},
+    carbs:{value:8,unit:units.g},
+    total_fat:{value:0,unit:units.g},
+    saturated_fat:{value:0,unit:units.g},
+    fiber:{value:7,unit:units.g},
+    sugar:{value:0,unit:units.g},
+    sodium:{value:0,unit:units.mg}
+  },
+
+  custom_sweet_grens_super_green_goddess: {
+    name:"Sweet Greens: Super Green Goddess w/Extra Virgin Olive Oil",
+    calories:{value:415,unit:units.c},
+    protein:{value:11,unit:units.g},
+    carbs:{value:35,unit:units.g},
+    total_fat:{value:26,unit:units.g},
+    saturated_fat:{value:0,unit:units.g},
+    fiber:{value:0,unit:units.g},
+    sugar:{value:0,unit:units.g},
+    sodium:{value:0,unit:units.mg}
+  },
+
+  raspberry_bar: {
+    name:"Raspberry Bar",
+    calories:{value:160,unit:units.c},
+    protein:{value:9,unit:units.g},
+    carbs:{value:4,unit:units.g},
+    total_fat:{value:12,unit:units.g},
+    saturated_fat:{value:0,unit:units.g},
+    fiber:{value:1,unit:units.g},
+    sugar:{value:1,unit:units.g},
+    sodium:{value:190,unit:units.mg}
   }
+};
 
-  // Populate food select dynamically
-  function populateFoodSelect() {
-    const select = document.getElementById('foodSelect');
-    Object.entries(foodData).forEach(([key, value]) => {
-      const option = document.createElement('option');
-      option.value = key;
-      option.textContent = value.name;
-      select.appendChild(option);
+/* ================= COMPONENT CALC ================= */
+
+function calculateFromComponents(list){
+  const totals={};
+  NUTRIENTS.forEach(n=>totals[n]={value:0,unit:fdaLimits[n].unit});
+
+  list.forEach(({key,quantity})=>{
+    const c=components[key];
+    if(!c) return;
+    NUTRIENTS.forEach(n=>{
+      totals[n].value += (c[n]?.value||0)*quantity;
     });
+  });
+  return totals;
+}
+
+Object.values(foodData).forEach(f=>{
+  if(f.components){
+    f.nutrition = calculateFromComponents(f.components);
+  }
+});
+
+/* ================= MENU MODEL ================= */
+
+const menuModel = [
+  {
+    type:"category",
+    label:"Blueprint Longevity Protein",
+    items:[
+      "bp_longevity_protein",
+      "bp_longevity_protein_without_macadamia",
+    ]
+  },
+  { type:"item", key:"bp_longevity_vitamin_mix" },
+  { type:"item", key:"grams_65_black_lentils_dry" },
+  { type:"item", key:"avocado_with_olives" },
+  { type:"item", key:"raspberry_bar" },
+  { type:"item", key:"custom_sweet_grens_super_green_goddess" },
+  { type:"item", key:"psyillium_husks" },
+  { type:"item", key:"blueprint_bananna_protein" },
+  
+];
+
+/* ================= UI ================= */
+
+let selectedFoods={};
+
+function showTab(id){
+  document.querySelectorAll('.tab-button').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelector(`[onclick="showTab('${id}')"]`).classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+
+const dropdown=document.getElementById('foodDropdown');
+const menu=document.getElementById('dropdownMenu');
+
+dropdown.querySelector('.dropdown-toggle').onclick=
+  ()=>dropdown.classList.toggle('open');
+
+menuModel.forEach(entry=>{
+  if(entry.type==="category"){
+    const c=document.createElement('div');
+    c.className='category';
+    c.textContent=entry.label;
+
+    const box=document.createElement('div');
+    box.className='category-items';
+
+    entry.items.forEach(k=>{
+      const i=document.createElement('div');
+      i.className='sub-item';
+      i.textContent=foodData[k].name;
+      i.onclick=()=>addFood(k);
+      box.appendChild(i);
+    });
+
+    c.appendChild(box);
+    menu.appendChild(c);
   }
 
-  populateFoodSelect();
+  if(entry.type==="item"){
+    const i=document.createElement('div');
+    i.className='standalone';
+    i.textContent=foodData[entry.key].name;
+    i.onclick=()=>addFood(entry.key);
+    menu.appendChild(i);
+  }
+});
 
-  document.getElementById('foodSelect').addEventListener('change', function () {
-    const food = this.value;
-    if (food) {
-      if (!selectedFoods[food]) selectedFoods[food] = 1;
-      else selectedFoods[food] += 1;
-      renderSelectedFoods();
-    }
-    this.value = '';
+function addFood(k){
+  selectedFoods[k]=(selectedFoods[k]||0)+1;
+  renderSelectedFoods();
+  dropdown.classList.remove('open');
+}
+
+/* ================= SELECTED ================= */
+
+function renderSelectedFoods(){
+  const c=document.getElementById('selectedFoods');
+  c.innerHTML='';
+  Object.entries(selectedFoods).forEach(([k,q])=>{
+    const d=document.createElement('div');
+    d.className='food-tag';
+    d.innerHTML=`
+      <span>${foodData[k].name} (x${q})</span>
+      <div class="food-controls">
+        <button onclick="changeQty('${k}',-1)">-</button>
+        <button onclick="changeQty('${k}',1)">+</button>
+      </div>
+    `;
+    c.appendChild(d);
+  });
+}
+
+function changeQty(k,d){
+  selectedFoods[k]+=d;
+  if(selectedFoods[k]<=0) delete selectedFoods[k];
+  renderSelectedFoods();
+}
+
+/* ================= TOTALS ================= */
+
+function updateNutrition(){
+  const totals={};
+  NUTRIENTS.forEach(n=>totals[n]={value:0,unit:fdaLimits[n].unit});
+
+  Object.entries(selectedFoods).forEach(([k,q])=>{
+    const src=foodData[k].nutrition||foodData[k];
+    NUTRIENTS.forEach(n=>{
+      totals[n].value += (src[n]?.value||0)*q;
+    });
   });
 
-  function renderSelectedFoods() {
-    const container = document.getElementById('selectedFoods');
-    container.innerHTML = '';
-
-    Object.entries(selectedFoods).forEach(([food, qty]) => {
-      const tag = document.createElement('div');
-      tag.className = 'food-tag';
-
-      const name = document.createElement('span');
-      name.textContent = `${foodData[food]?.name || food} (x${qty})`;
-
-      const controls = document.createElement('div');
-      controls.className = 'food-controls';
-
-      const plusBtn = document.createElement('button');
-      plusBtn.textContent = '+';
-      plusBtn.onclick = () => { selectedFoods[food]++; renderSelectedFoods(); };
-
-      const minusBtn = document.createElement('button');
-      minusBtn.textContent = '-';
-      minusBtn.onclick = () => { selectedFoods[food]--; if (selectedFoods[food] <= 0) delete selectedFoods[food]; renderSelectedFoods(); };
-
-      controls.appendChild(minusBtn);
-      controls.appendChild(plusBtn);
-
-      tag.appendChild(name);
-      tag.appendChild(controls);
-      container.appendChild(tag);
-    });
-  }
-
-  function formatNutrientName(name) {
-    return name.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-  }
-
-  function updateNutrition() {
-    const totals = {};
-    nutrients.forEach(n => totals[n] = 0);
-
-    Object.entries(selectedFoods).forEach(([food, qty]) => {
-      const data = foodData[food];
-      if (data) nutrients.forEach(n => totals[n] += (data[n] || 0) * qty);
-    });
-
-    const tbody = document.getElementById('nutritionBody');
-    tbody.innerHTML = '';
-
-    nutrients.forEach(nutrient => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${formatNutrientName(nutrient)}</td>
-        <td>${totals[nutrient].toFixed(1)}</td>
-        <td>${fdaLimits[nutrient]}</td>
-      `;
-      tbody.appendChild(tr);
-    });
-
-    document.getElementById('nutritionTable').style.display = 'table';
-  }
-
-  document.getElementById('customFoodForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const food = { name: document.getElementById('foodName').value.trim() };
-    let isValid = food.name.length > 0;
-
-    nutrients.forEach(n => {
-      const val = parseFloat(document.getElementById(n).value);
-      if (isNaN(val) || val < 0) isValid = false;
-      food[n] = val;
-    });
-
-    if (!isValid) return alert("Please fill out all fields with valid numbers.");
-    document.getElementById('jsonOutput').value = JSON.stringify(food, null, 2);
+  const tbody=document.getElementById('nutritionBody');
+  tbody.innerHTML='';
+  NUTRIENTS.forEach(n=>{
+    tbody.innerHTML+=`
+      <tr>
+        <td>${n.replace('_',' ')}</td>
+        <td>${totals[n].value.toFixed(1)} ${totals[n].unit}</td>
+        <td>${fdaLimits[n].value} ${fdaLimits[n].unit}</td>
+      </tr>
+    `;
   });
 
-  function copyJSON() {
-    const text = document.getElementById('jsonOutput').value;
-    navigator.clipboard.writeText(text).then(() => alert('JSON copied!')).catch(err => alert('Failed to copy: ' + err));
-  }
+  document.getElementById('nutritionTable').style.display='table';
+}
 </script>
-
 </body>
 </html>

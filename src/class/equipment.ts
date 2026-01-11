@@ -363,6 +363,7 @@ class Pot extends CookingContainer {
     constructor(id: number) {
         super("pot", id)
     }
+
     heat: number;
 
     public _getHeat(heat: number) {

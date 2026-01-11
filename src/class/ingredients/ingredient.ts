@@ -180,6 +180,49 @@ export class Ingredient {
         return addIStep;
     }
 
+
+    public juice(): IStep {
+        const addIStep = istep()
+
+        if (this.unit) {
+            addIStep.text = ['Juice', this.quantity, this.unit.name, this.name].join(' ')
+        } else {
+            addIStep.text = ['Juice the', this.name].join(' ')
+        }
+        addIStep.ingredients.push(this)
+        addIStep.equipment.push(e.knife())
+
+        return addIStep;
+    }
+
+    public chop(): IStep {
+        const addIStep = istep()
+
+        if (this.unit) {
+            addIStep.text = ['Chop', this.quantity, this.unit.name, this.name].join(' ')
+        } else {
+            addIStep.text = ['Chop the', this.name].join(' ')
+        }
+        addIStep.ingredients.push(this)
+        addIStep.equipment.push(e.knife())
+
+        return addIStep;
+    }
+
+    public cube(): IStep {
+        const addIStep = istep()
+
+        if (this.unit) {
+            addIStep.text = ['Cube', this.quantity, this.unit.name, this.name].join(' ')
+        } else {
+            addIStep.text = ['Cube the', this.name].join(' ')
+        }
+        addIStep.ingredients.push(this)
+        addIStep.equipment.push(e.knife())
+
+        return addIStep;
+    }
+
     public rinse(): IStep {
         const addIStep = istep()
 
@@ -235,6 +278,20 @@ export class Ingredient {
             addIStep.text = ['Cut',  this.quantity, this.unit.name, this.name, 'into strips'].join(' ')
         } else {
             addIStep.text = ['Cut the', this.name, 'into strips'].join(' ')
+        }
+        addIStep.equipment.push(e.cuttingBoard())
+        addIStep.equipment.push(e.knife())
+
+        return addIStep;
+    }
+
+    public cutIntoOneInchPieces(): IStep {
+        const addIStep = istep()
+
+        if (this.unit) {
+            addIStep.text = ['Cut',  this.quantity, this.unit.name, this.name, 'into one inch pieces'].join(' ')
+        } else {
+            addIStep.text = ['Cut the', this.name, 'into one inch pieces'].join(' ')
         }
         addIStep.equipment.push(e.cuttingBoard())
         addIStep.equipment.push(e.knife())
