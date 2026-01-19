@@ -3,6 +3,7 @@ import { Items as i } from '../constants/items';
 import { Units as u } from '../constants/units';
 import { Text as text} from '../class/text';
 import { Equipment as e } from '../class/equipment';
+import { Timer } from '../class/timer';
 
 export class MealRecipe extends RecipeContainer {
     constructor() {
@@ -22,9 +23,9 @@ class BlueprintSmoothie extends Recipe {
                 i.banana(1, u.unit), // Preferrably frozen
                 i.macadamiaNut(.25, u.cup),
                 i.cherry(3, u.unit), // 3 dark frozen pitted cherries
-                i.pomegraniteSeeds(.5, u.cup),
+                i.pomegraniteSeeds(.5, u.cup), // Or 1/2 cup frozen antioxidant blend + 1 tsp cocoa nibs or 1/2 cup frozen raspberries + 1 tsp cocoa nibs
                 i.hempSeed(1, u.tbsp),
-                i.wheatGrassPowder(1, u.tsp),
+                // i.wheatGrassPowder(1, u.tsp),
                 i.vanillaExtract(.25, u.tsp),
                 i.chiaSeed(1, u.tsp),
                 i.lemonJuice(.5, u.unit),
@@ -32,8 +33,11 @@ class BlueprintSmoothie extends Recipe {
             ]),
             e.bulletMixer().mix(),
             e.bulletMixer().add([
-                i.spinach(1, u.handful)
+                i.spinach(1, u.handful),
+                i.kale(1, u.handful)
             ]),
+            Timer.set(30, 's', 'Let mixer settle so liquid goes down'),
+            Timer.end(),
             e.bulletMixer().mix(),
             text.set(["Garnish with strawberry and mint"]),
         ]
