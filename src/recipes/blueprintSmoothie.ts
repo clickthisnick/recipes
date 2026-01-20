@@ -23,7 +23,9 @@ class BlueprintSmoothie extends Recipe {
                 i.banana(1, u.unit), // Preferrably frozen
                 i.macadamiaNut(.25, u.cup),
                 i.cherry(3, u.unit), // 3 dark frozen pitted cherries
-                i.pomegraniteSeeds(.5, u.cup), // Or 1/2 cup frozen antioxidant blend + 1 tsp cocoa nibs or 1/2 cup frozen raspberries + 1 tsp cocoa nibs
+                i.antiOxidantBerryBlend(.5, u.cup),
+                i.cocoaNibs(1, u.tsp),
+                // i.pomegraniteSeeds(.5, u.cup), // Or 1/2 cup frozen antioxidant blend + 1 tsp cocoa nibs or 1/2 cup frozen raspberries + 1 tsp cocoa nibs
                 i.hempSeed(1, u.tbsp),
                 // i.wheatGrassPowder(1, u.tsp),
                 i.vanillaExtract(.25, u.tsp),

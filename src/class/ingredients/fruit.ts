@@ -241,6 +241,42 @@ export class FruitItems extends CarbItems {
         return new Ingredient(item)
     }
 
+    public static readonly cocoaNibs = (quantity = 0, unit: IUnitObj = Units.none) => {
+        const item: IItemObj = {
+            name: 'Cocoa Nibs',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: true,
+            purchaseLinks: {},
+            perishableLimit: 0,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
+    
+    public static readonly antiOxidantBerryBlend = (quantity = 0, unit: IUnitObj = Units.none) => {
+        const item: IItemObj = {
+            name: 'Anti-Oxidant Berry Blend',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: 0,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
+
     public static readonly cherry = (quantity = 0, unit: IUnitObj = Units.none) => {
         const item: IItemObj = {
             name: 'Cherry',
@@ -251,7 +287,7 @@ export class FruitItems extends CarbItems {
             unit: unit,
             wash: false,
             isTakeoutUnitable: false,
-            isMeatProduct: true,
+            isMeatProduct: false,
             purchaseLinks: {},
             perishableLimit: 0,
             nutrition: {}
