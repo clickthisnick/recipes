@@ -61,6 +61,12 @@ function setRecipe(recipeGroupName, recipe) {
     recipes[recipeGroupName].push(recipe)
 }
 
+function removeAllClassNames(className) {
+  document.querySelectorAll(`.${className}`).forEach(element => {
+    element.className = '';
+  });
+}
+
 function selectMode(id) {
     mode = id
     showElement(id)
@@ -73,6 +79,11 @@ function selectMode(id) {
     hideElement('cookingButton')
     hideElement('shoppingButton')
 
+    const url = new URL(window.location)
+
+    url.searchParams.set("mode", mode)
+
+    history.pushState({}, "", url)
 
     // This will make all the elements disappear by removing all the html/className
     // This is different than just setting the display to visible or non visible
@@ -114,9 +125,27 @@ function renderSelectedRecipes() {
     showElement('selected')
 }
 
+function setRecipesParamLast(recipesValue) {
+  const url = new URL(window.location.href);
+
+  // normalize to comma-separated string
+  const recipesStr = Array.isArray(recipesValue)
+    ? recipesValue.join(",")
+    : String(recipesValue ?? "");
+
+  // remove then append so it becomes the last param
+  url.searchParams.delete("recipes");
+  if (recipesStr) url.searchParams.append("recipes", recipesStr);
+
+  history.pushState({}, "", url.toString());
+}
+
 function selectRecipe(recipeGroupName) {
     selectedRecipeGroupNames.push(recipeGroupName)
     selectedRecipes.push(recipes[recipeGroupName])
+
+    // Set query param for recipe(s)
+    setRecipesParamLast(recipeGroupName);
 
     renderSelectedRecipes()
 }

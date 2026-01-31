@@ -98,7 +98,8 @@ function run() {
           })
         } else if (mode == 'cooking') {
           // /dist/main.html?mode=cooking&recipes=CleanWaterBottle
-
+          console.log('hi')
+          console.log(recipesSelected)
           recipesSelected.forEach(recipeGroupName => {
             selectRecipe(recipeGroupName)
           })

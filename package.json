@@ -14,7 +14,6 @@
     "removeDist": "./src/builder/removeDist.sh",
     "prebuild": "npm run removeDist",
     "build": "./node_modules/ts-node/dist/bin.js ./src/builder/createDist.ts --inspect",
-    "TODO": "./node_modules/ts-node/dist/bin.js ./src/class/jsreal.ts",
     "postbuild": "npm run createExpirationCalculator",
     "createExpirationCalculator": "./node_modules/ts-node/dist/bin.js ./src/expirationCalculator/expirationCalculator.ts"
   },
