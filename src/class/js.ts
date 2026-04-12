@@ -1,3 +1,26 @@
+document.addEventListener("click", () => {
+    const audio = document.getElementById("beep")
+
+    if (!audio) {
+        console.log("❌ No audio element found during unlock")
+        return
+    }
+
+    console.log("👆 User interaction detected, attempting unlock...")
+
+    audio.play()
+        .then(() => {
+            console.log("✅ Audio unlocked successfully")
+
+            audio.pause()
+            audio.currentTime = 0
+        })
+        .catch(err => {
+            console.log("❌ Unlock failed:", err.name, err.message)
+        })
+
+}, { once: true })
+
 const recipes = {}
 const selectedRecipes = []
 const selectedRecipeGroupNames = []
@@ -5,19 +28,31 @@ const ingredients = {}
 let mode = ''
 const perishableItems = {}
 
-function playSound(duration=4) {
+function playSound(duration = 4) {
     const audio = document.getElementById("beep")
 
-    if (audio) {
-        // overrides the empty sound already played on the object
-        // this is so ios will asynchronously play the sounds
-        if (duration == 4) {
-            audio.src = "../src/sounds/pager-beep.mp3"
-        } else {
-            audio.src = "../src/sounds/1sec.m4a"
-        }
-        audio.play()
+    if (!audio) {
+        console.log("❌ No audio element found")
+        return
     }
+
+    audio.src = duration === 4
+        ? "../src/sounds/pager-beep.mp3"
+        : "../src/sounds/1sec.m4a"
+
+    console.log("Full URL:", audio.src)
+
+    audio.load()
+
+    console.log("Trying to play...")
+
+    audio.play()
+        .then(() => {
+            console.log("✅ Sound played")
+        })
+        .catch(err => {
+            console.log("❌ Play failed:", err.name, err.message)
+        })
 }
 
 /**

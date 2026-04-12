@@ -19,6 +19,8 @@ class BreadedMushrooms extends Recipe {
         super();
         this.steps = [
             text.set(["Preheat oven to 450"]),
+            Timer.set(1, 's', 'Cook panko'),
+            Timer.end(),
             Timer.set(5, 'm', 'Cook panko'),
             Timer.end(),
             e.bowl().add([
