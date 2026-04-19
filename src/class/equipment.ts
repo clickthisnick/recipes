@@ -481,13 +481,13 @@ class Pan extends CookingContainer {
 
     public cook(duration: number, type: TimeUnit, heat = 0, disappearWhen = 'timerIsUp'): IStep {
         heat = this._getHeat(heat)
-        return this._cookStr(`Cook on heat ${heat}`, duration, type, heat, disappearWhen)
+        return this._cookStr(`Cook ${this.name} on heat ${heat}`, duration, type, heat, disappearWhen)
     }
 
 
     public cookWithLidSlightlyOff(duration: number, type: TimeUnit, heat = 0, disappearWhen = 'timerIsUp'): IStep {
         heat = this._getHeat(heat)
-        return this._cookStr(`Cook on heat ${heat} with lid slightly off`, duration, type, heat, disappearWhen)
+        return this._cookStr(`Cook ${this.name} on heat ${heat} with lid slightly off`, duration, type, heat, disappearWhen)
     }
 
     public cookWithLid(duration: number, type: TimeUnit, heat = 0, text = "", disappearWhen = 'timerIsUp'): IStep {

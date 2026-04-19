@@ -25,7 +25,7 @@ class AbbotPeaProteinSpaghetti extends Recipe {
             e.pot().add([
                 i.water(30, u.ounce),
             ]),
-            e.pan().cook(6, 'm', 9),
+            e.pot().cook(6, 'm', 9),
                 e.pan().add([
                     i.avocadoOil(1, u.spray),
                     i.abbotPeaItalianSausage(1, u.bag)
@@ -34,15 +34,19 @@ class AbbotPeaProteinSpaghetti extends Recipe {
                 Timer.end(),    
             Timer.end(),
             text.set(['Break', i.lentilSpaghetti(8, u.ounce), 'into 3 even sections']),
-            e.pan().cook(14, 'm', 7),
-                e.pan().cook(10, 'm', 7),
+            e.pan().cook(10, 'm', 7),
+                e.pot().cook(7, 'm', 7),
                 Timer.end(),
-                e.pan().add([
-                    i.spaghettiSauce(1, u.bag),
-                ]),
-                e.pan().cook(2, 'm', 7),
+                e.pot().stir(),
+                e.pot().cook(7, 'm', 7),
                 Timer.end(),
             Timer.end(),
+            e.pan().add([
+                i.spaghettiSauce(1, u.bag),
+            ]),
+            e.pan().cook(5, 'm', 7),
+            Timer.end(),
+            
         ];
     }
 }
