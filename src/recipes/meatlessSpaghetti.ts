@@ -3,20 +3,51 @@ import { Items as i } from '../constants/items';
 import { Units as u } from '../constants/units';
 import { Equipment as e } from '../class/equipment';
 import { Timer} from '../class/timer';
+import { Text as text} from '../class/text';
 
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
         this.variations = [
-            MeatlessSpaghetti,
-            MeatlessSpaghettiNoMushrooms,
+            AbbotPeaProteinSpaghetti,
+            WalnutMeatlessSpaghetti,
+            WalnutMeatlessSpaghettiNoMushrooms,
         ]
     }
 }
 
 const PAN_TEMPERATURE=7
 
-class MeatlessSpaghetti extends Recipe {
+class AbbotPeaProteinSpaghetti extends Recipe {
+    constructor() {
+        super();
+        this.steps = [
+            e.pot().add([
+                i.water(30, u.ounce),
+            ]),
+            e.pan().cook(6, 'm', 9),
+                e.pan().add([
+                    i.avocadoOil(1, u.spray),
+                    i.abbotPeaItalianSausage(1, u.bag)
+                ]),
+                e.pan().cook(5, 'm', 5),
+                Timer.end(),    
+            Timer.end(),
+            text.set(['Break', i.lentilSpaghetti(8, u.ounce), 'into 3 even sections']),
+            e.pan().cook(14, 'm', 7),
+                e.pan().cook(10, 'm', 7),
+                Timer.end(),
+                e.pan().add([
+                    i.spaghettiSauce(1, u.bag),
+                ]),
+                e.pan().cook(2, 'm', 7),
+                Timer.end(),
+            Timer.end(),
+        ];
+    }
+}
+
+class WalnutMeatlessSpaghetti extends Recipe {
     constructor() {
         super();
         this.steps = [
@@ -81,7 +112,7 @@ class MeatlessSpaghetti extends Recipe {
 }
 
 
-class MeatlessSpaghettiNoMushrooms extends Recipe {
+class WalnutMeatlessSpaghettiNoMushrooms extends Recipe {
     constructor() {
         super();
         this.steps = [

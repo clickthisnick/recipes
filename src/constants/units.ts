@@ -59,6 +59,12 @@ export class Units {
         properName: 'container',
         equipmentUnits: [''],
     };
+    public static readonly spray: IUnitObj = {
+        name: 'spray',
+        isEquipment: false,
+        properName: 'spray',
+        equipmentUnits: [],
+    };
     public static readonly sprigs: IUnitObj = {
         name: 'sprigs',
         isEquipment: false,

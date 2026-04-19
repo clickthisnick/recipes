@@ -41,6 +41,24 @@ export class CarbItems extends AnimalItems {
         return new Ingredient(item)
     }
 
+        public static readonly abbotPeaItalianSausage = (quantity = 0, unit: IUnitObj = Units.none) => {
+        const item: IItemObj = {
+            name: 'Abbot Pea Italian Sausage',
+            putAwayTime: 10,
+            takeOutTime: 10,
+            cleanSteps: '',
+            quantity: quantity,
+            unit: unit,
+            wash: false,
+            isTakeoutUnitable: false,
+            isMeatProduct: false,
+            purchaseLinks: {},
+            perishableLimit: 0,
+            nutrition: {}
+        }
+        return new Ingredient(item)
+    }
+
     public static readonly lentilSpaghetti = (quantity = 0, unit: IUnitObj = Units.none) => {
         const item: IItemObj = {
             name: 'Lentil Spaghetti',
