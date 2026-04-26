@@ -8,7 +8,7 @@ const cwd = process.cwd();
 let pageHtml = ''
 pageHtml += HTML.mobileViewport;
 pageHtml += HTML.audio;
-pageHtml += HTML.chartSet;
+pageHtml += HTML.charset;
 pageHtml += HTML.css;
 pageHtml += HTML.javascript();
 // Shopping mode allows you to select recipes and get all the ingredients needed for all recipes

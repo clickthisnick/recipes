@@ -28,16 +28,17 @@ class BreadedMushrooms extends Recipe {
 
     this.steps = [
       oven.preheat(OVEN_TEMP),
+      Timer.end(),
 
       Timer.set(PANKO_TOAST_MINUTES, 'm', 'Toast panko'),
       Timer.end(),
 
       bowl.add([
-        i.cassavaFlour(0.5, u.cup),
-        i.cornstarch(2, u.tbsp),
         i.water(7, u.ounce),
         i.salt(0.5, u.tsp),
         i.garlicPowder(0.5, u.tsp),
+        i.cornstarch(2, u.tbsp),
+        i.cassavaFlour(0.5, u.cup),        
       ]),
 
       text.set(['Slice 3–4 king oyster mushrooms']),
