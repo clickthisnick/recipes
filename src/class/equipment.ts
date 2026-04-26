@@ -248,6 +248,7 @@ class Oven extends CookingContainer {
         const preheatTimes: Record<number, number> = {
             350: 5,
             425: 15,
+            450: 15,
             500: 16,
         };
         const minutes = preheatTimes[heat] ?? 5;
@@ -261,6 +262,10 @@ class Oven extends CookingContainer {
 
     public roast(duration: number, type: TimeUnit, degrees: number, disappearWhen = 'timerIsUp'): IStep {
         return Timer.set(duration, type, `Roast ${this.name} @ ${degrees}°`, [], disappearWhen);
+    }
+
+    public broil(duration: number, type: TimeUnit, degrees: number, disappearWhen = 'timerIsUp'): IStep {
+        return Timer.set(duration, type, `Broil ${this.name} @ ${degrees}°`, [], disappearWhen);
     }
 }
 

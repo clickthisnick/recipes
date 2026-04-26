@@ -1,77 +1,85 @@
 import * as fs from 'fs';
+import * as path from 'path';
 
 export class HTML {
-    public static headerStart = '<h1>';
-    public static headerEnd = '</h1>';
-    public static mobileViewport = '<meta name="viewport" content="width=device-width, initial-scale=1">';
-    public static chartSet = '<meta charset="utf-8">';
-    public static audio = `<!-- https://stackoverflow.com/a/68107904 -->
-    <audio id="beep" preload="auto"></audio>
-    `
+  public static readonly headerStart = '<h1>';
+  public static readonly headerEnd = '</h1>';
 
-    public static css = `<style>
+  public static readonly mobileViewport =
+    '<meta name="viewport" content="width=device-width, initial-scale=1">';
 
-    a {
-        color:orange;
-        text-decoration:none;
-    }
+  public static readonly charset =
+    '<meta charset="utf-8">';
 
-    html {
-        background-color: #000000;
-    }
+  public static readonly audio = `
+<audio id="beep" preload="auto"></audio>`;
 
-    div, h1, h2 {
-        background-color: #000000;
-        border: none;
-        color: #FFFFFF;
-    }
+  public static readonly css = `<style>
+a {
+  color: orange;
+  text-decoration: none;
+}
 
-    button {
-        display: inline-block;
-        border-radius: 4px;
-        background-color: #f4511e;
-        border: none;
-        color: #FFFFFF;
-        text-align: center;
-        font-size: 28px;
-        padding: 20px;
-        width: 400px;
-        transition: all 0.5s;
-        cursor: pointer;
-        margin: 5px;
-    }
+html,
+body {
+  background-color: #000;
+  color: #fff;
+}
 
-    #ingredients {
+div,
+h1,
+h2 {
+  background-color: #000;
+  border: none;
+  color: #fff;
+}
 
-    }
+button {
+  display: inline-block;
+  border-radius: 4px;
+  background-color: #f4511e;
+  border: none;
+  color: #fff;
+  text-align: center;
+  font-size: 28px;
+  padding: 20px;
+  width: 400px;
+  transition: all 0.5s;
+  cursor: pointer;
+  margin: 5px;
+}
 
-    .completed {
-        background-color:green;
-        color: white;
-        display: none;
-    }
+.completed {
+  background-color: green;
+  color: white;
+  display: none;
+}
 
-    .timerCompletedButShowing {
-        background-color:green;
-        color: black;
-    }
+.timerCompletedButShowing {
+  background-color: green;
+  color: black;
+}
 
-    .timer {
-        background-color:yellow;
-        color: black;
-    }
+.timer {
+  background-color: yellow;
+  color: black;
+}
 
-    .panel {
-        border-right-style: solid;
-        border-bottom-style: solid;
-        border-left-style: solid;
-        padding: 25px;
-        border-width: 1px;
-    }
-    </style>`;
+.panel {
+  border: 1px solid #fff;
+  border-top: none;
+  padding: 25px;
+}
+</style>`;
 
-    public static javascript = () => {
-        const js = fs.readFileSync('src/class/js.ts')
-        return `<script>${js}</script>`
-    }
+  public static javascript(): string {
+    const jsPath = path.resolve(__dirname, 'js.ts');
+    const js = fs.readFileSync(jsPath, 'utf8');
+
+    return `<script>${HTML.escapeScript(js)}</script>`;
+  }
+
+  private static escapeScript(script: string): string {
+    return script.replace(/<\/script>/gi, '<\\/script>');
+  }
 }
