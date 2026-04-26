@@ -1,4 +1,5 @@
 import { Recipe, RecipeContainer } from '../class/recipe';
+import { Text as text} from '../class/text';
 import { Timer } from '../class/timer';
 
 export class MealRecipe extends RecipeContainer {
@@ -36,6 +37,7 @@ class MorningStretch extends Recipe {
             Timer.end(),
             Timer.set(duration, 's', 'Two Leg Down'),
             Timer.end(),
+            text.set(['25 Push ups']),
         ];
     }
 }
