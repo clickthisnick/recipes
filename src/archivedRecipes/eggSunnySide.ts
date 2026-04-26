@@ -20,7 +20,7 @@ class EggSunnySide extends Recipe {
     constructor() {
         super();
         this.steps = [
-            e.pan().preheat(4, 2),
+            e.pan().preheat(4),
             Timer.end(),
             e.pan().add([
                 i.egg(2, u.unit),

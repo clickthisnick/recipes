@@ -36,7 +36,7 @@ class ThaiBasil2Servings extends Recipe {
             e.pan().add([
                 i.peanutOil(2, u.tbsp),
             ]),
-            e.pan().preheat(7, 1),
+            e.pan().preheat(7),
             e.plate().add([
                 i.garlicClove(),
                 i.serranoChilli(),
@@ -97,7 +97,7 @@ class ThaiBasil extends Recipe {
             e.pan().add([
                 i.peanutOil(1.5, u.tbsp),
             ]),
-            e.pan().preheat(7, 1),
+            e.pan().preheat(7),
             i.chickenBreast(.5, u.pound).dice(),
             Timer.end(),
             e.pan().add([
@@ -147,7 +147,7 @@ class ThaiBasilNoFreshIngredients extends Recipe {
             e.pan().add([
                 i.peanutOil(1.5, u.tbsp),
             ]),
-            e.pan().preheat(7, 1),
+            e.pan().preheat(7),
             i.chickenBreast(.5, u.pound).dice(),
             Timer.end(),
             Timer.set(2, 'm'),

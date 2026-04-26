@@ -17,7 +17,7 @@ class TacoTenderLoin extends Recipe {
     constructor() {
         super();
         this.steps = [
-            e.pan().preheat(5, 2),
+            e.pan().preheat(5),
             Timer.end(),
             e.pan().add([
                 i.ingredient("Marinated Tenderloin")

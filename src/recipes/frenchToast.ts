@@ -19,7 +19,7 @@ class FrenchToast extends Recipe {
         super();
         this.steps = [
             text.set(['This makes 5 french toast slices']),
-            e.pan().preheat(4, 4),
+            e.pan().preheat(4),
             e.bowl().add([
                 i.egg(3, u.unit),
                 i.oatMilk(3, u.tbsp),

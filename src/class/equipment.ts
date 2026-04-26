@@ -5,11 +5,12 @@ import { IStep, istep } from './step';
 import { Ingredient } from './ingredients/ingredient';
 
 export interface IAllEquipment {
-   [name: string]: number;
+    [name: string]: number;
 }
 
 export interface IEquipmentObj {
     name: string;
+    id: number;
 }
 
 export interface IContainersObj {
@@ -17,245 +18,212 @@ export interface IContainersObj {
 }
 
 export interface IEquipment {
-    // Id is the identifier of the equipment
-    // If you need/reuse equipment then use this
+    // Id is the identifier of the equipment.
+    // If you need/reuse equipment, pass the same id.
     (id?: number): IEquipmentObj;
 }
 
-const containers: any = {}
+function classNameToDisplayName(value: string): string {
+    return value
+        .replace(/([a-z])([A-Z])/g, '$1 $2')
+        .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
+        .toLowerCase();
+}
 
-class Container {
-    name: string;
-    id: number;
-    firstAction: boolean;
+const containers: Record<string, Container> = {};
 
-    // Containers are a singleton
-    constructor(name: string, id: number) {
-        const objectKey = `${name}${id}`
-        if (containers.hasOwnProperty(objectKey)) {
-            return containers[objectKey]
+abstract class Container {
+    public readonly key!: string;
+    public readonly name!: string;
+    public readonly id!: number;
+    protected firstAction!: boolean;
+
+    // Containers are singletons by class/name + id.
+    protected constructor(id: number, name?: string) {
+        const key = this.constructor.name;
+        const displayName = name ?? classNameToDisplayName(key);
+        const objectKey = `${key}:${displayName}:${id}`;
+
+        if (Object.prototype.hasOwnProperty.call(containers, objectKey)) {
+            return containers[objectKey] as this;
         }
 
-        this.name = name;
+        this.key = key;
+        this.name = displayName;
         this.id = id;
         this.firstAction = true;
-        containers[`${name}${id}`] = this;
+        containers[objectKey] = this;
     }
 
     public done(): IStep {
         this.firstAction = false;
-        const stirStep = istep()
-        stirStep.equipment.push(this.name)
-        // just have empty step for now
-        stirStep.text = ''
-        return stirStep
+        const doneStep = istep();
+        doneStep.equipment.push(this.name);
+        doneStep.text = '';
+        return doneStep;
     }
 
     public stir(): IStep {
         this.firstAction = false;
-        const stirStep = istep()
-        stirStep.equipment.push(this.name)
-        stirStep.text = `Stir ${this.name}`
-        return stirStep
+        const stirStep = istep();
+        stirStep.equipment.push(this.name);
+        stirStep.text = `Stir ${this.name}`;
+        return stirStep;
     }
 
     public mix(): IStep {
         this.firstAction = false;
-        const mixStep = istep()
-        mixStep.equipment.push(this.name)
-        mixStep.text = `Mix ${this.name}`
-        return mixStep
+        const mixStep = istep();
+        mixStep.equipment.push(this.name);
+        mixStep.text = `Mix ${this.name}`;
+        return mixStep;
+    }
+
+    public microwave(duration: number, unit: TimeUnit, disappearWhen = 'timerIsUp'): IStep {
+        const humanUnit = unit === 's' ? 'seconds' : 'minutes';
+        return Timer.set(duration, unit, `Microwave ${this.name} for ${duration} ${humanUnit}`, [], disappearWhen);
     }
 
     public add(ingredients: Ingredient[]): IStep {
+        const addIStep = istep();
 
-        function hydrateIStep(addIngredient: IStep, ingredient: Ingredient) {
-            addIngredient.ingredients.push(ingredient)
-            addIngredient.text = [s.lazyIngredientIdx, addIngredient.ingredients.length-1].join(' ')
-            addIngredient.time += ingredient.takeOutTime
-            addIStep.children.push(addIngredient)
+        const hydrateIStep = (parentStep: IStep, addIngredient: IStep, ingredient: Ingredient): void => {
+            addIngredient.ingredients.push(ingredient);
+            addIngredient.text = [s.lazyIngredientIdx, addIngredient.ingredients.length - 1].join(' ');
+            addIngredient.time += ingredient.takeOutTime;
+            parentStep.children.push(addIngredient);
 
-            // If the unit is an equipment like a cup, then add it to the equipment
+            // If the unit is equipment like a cup, it could be added here.
             // if (ingredient.unit && ingredient.unit.isEquipment) {
-            //     const str_ = (ingredient.unit.equipmentUnits.includes(ingredient.unit.quantity)) ? `${ingredient.unit.quantity} ${ingredient.unit.properName}` : ingredient.unit.properName
-            //     addIngredient.equipment.push(str_)
+            //     const equipmentName = ingredient.unit.equipmentUnits.includes(ingredient.unit.quantity)
+            //         ? `${ingredient.unit.quantity} ${ingredient.unit.properName}`
+            //         : ingredient.unit.properName;
+            //     addIngredient.equipment.push(equipmentName);
             // }
-        }
+        };
 
-        const addIStep = istep()
-
-        let bindingWord = 'the'
-        // If its the first
+        let bindingWord = 'the';
         if (this.firstAction) {
-            if (['a','e','i','o','u'].includes(this.name[0])) {
-                bindingWord = 'an'
-            } else {
-                bindingWord = 'a'
-            }
+            bindingWord = /^[aeiou]/i.test(this.name) ? 'an' : 'a';
             this.firstAction = false;
         }
 
-        addIStep.text = ['Add the following to', bindingWord, this.name].join(' ')
-        addIStep.disappearWhen = 'childrenGone'
-        ingredients.forEach((ingredient) => {
-            const addIngredient = istep()
-            hydrateIStep(addIngredient, ingredient)
-        })
+        addIStep.text = ['Add the following to', bindingWord, this.name].join(' ');
+        addIStep.disappearWhen = 'childrenGone';
 
-        return addIStep
+        ingredients.forEach((ingredient) => {
+            const addIngredient = istep();
+            hydrateIStep(addIStep, addIngredient, ingredient);
+        });
+
+        return addIStep;
     }
 }
 
 class StandMixer extends Container {
-    // Containers are a singleton
-    constructor(id: number) {
-        super('stand mixer', id)
+    constructor(id = 99) {
+        super(id);
     }
 }
 
 class BulletMixer extends Container {
-    // Containers are a singleton
-    constructor(id: number) {
-        super('bullet mixer', id)
+    constructor(id = 99) {
+        super(id);
     }
 }
 
 class Plate extends Container {
-    // Containers are a singleton
-    constructor(id: number, name="plate") {
-        super(name, id)
-    }
-
-    public microwave(duration: number, unit: TimeUnit, disappearWhen = 'timerIsUp'): IStep {
-        let humanUnit = "minutes"
-
-        if (unit == "s") {
-            humanUnit = "seconds"
-        }
-
-        return Timer.set(duration, unit, `Microwave ${this.name} for ${duration} ${humanUnit}`, [], disappearWhen);
+    constructor(id = 99) {
+        super(id);
     }
 }
 
 class Mug extends Container {
-    // Containers are a singleton
-    constructor(id: number, name="mug") {
-        super(name, id)
+    constructor(id = 99) {
+        super(id);
     }
 }
 
 class Bowl extends Container {
-    // Containers are a singleton
-    constructor(id: number, name="bowl") {
-        super(name, id)
-    }
-
-    public microwave(duration: number, unit: TimeUnit, disappearWhen = 'timerIsUp'): IStep {
-        let humanUnit = "minutes"
-
-        if (unit == "s") {
-            humanUnit = "seconds"
-        }
-
-        return Timer.set(duration, unit, `Microwave ${this.name} for ${duration} ${humanUnit}`, [], disappearWhen);
+    constructor(id = 99) {
+        super(id);
     }
 
     public whisk(disappearWhen = 'timerIsUp'): IStep {
-        return Timer.set(1, "m", "Whisk contents of the bowl", [], disappearWhen);
+        return Timer.set(1, 'm', 'Whisk contents of the bowl', [], disappearWhen);
     }
 }
 
 class LargeBowl extends Bowl {
-    constructor(id: number) {
-        super(id, "largebowl")
+    constructor(id = 99) {
+        super(id);
     }
 }
 
-
 class ZiplockBag extends Container {
-    // Containers are a singleton
     constructor(id: number) {
-        super('ziplockBag', id)
+        super(id, 'ziplock bag');
     }
 }
 
 class SmallStainlessSteelContainer extends Container {
-    // Containers are a singleton
     constructor(id: number) {
-        super('17.6 ounce stainless steel container', id)
+        super(id, '17.6 ounce stainless steel container');
     }
 }
 
 class LargeStainlessSteelContainer extends Container {
-    // Containers are a singleton
     constructor(id: number) {
-        super('34 ounce stainless steel container', id)
+        super(id, '34 ounce stainless steel container');
     }
 }
 
-
 class KitchenAidMixingBowl extends Container {
-    // Containers are a singleton
     constructor(id: number) {
-        super('KitchenAid Mixing Bowl', id)
+        super(id, 'KitchenAid mixing bowl');
     }
 
     public mixWithDoughHook(speed: number, minutes: number, disappearWhen = 'timerIsUp'): IStep {
-        return Timer.set(minutes, 'm', `Mix with dough hook on ${speed} for speed ${minutes} minutes`, [], disappearWhen);
+        return Timer.set(minutes, 'm', `Mix with dough hook on speed ${speed} for ${minutes} minutes`, [], disappearWhen);
     }
 
     public mixWithFlatBeater(speed: number, minutes: number, disappearWhen = 'timerIsUp'): IStep {
         return Timer.set(minutes, 'm', `Mix with flat beater attachment on speed ${speed} for ${minutes} minutes`, [], disappearWhen);
     }
 
-    public mixWithWhisk( speed: number, minutes: number, disappearWhen = 'timerIsUp'): IStep {
+    public mixWithWhisk(speed: number, minutes: number, disappearWhen = 'timerIsUp'): IStep {
         return Timer.set(minutes, 'm', `Mix with whisk attachment on speed ${speed} for ${minutes} minutes`, [], disappearWhen);
     }
 }
 
-
-class CookingContainer extends Container {
-    // Containers are a singleton
-    constructor(name: string, id: number) {
-        super(name, id)
+abstract class CookingContainer extends Container {
+    protected constructor(id: number, name?: string) {
+        super(id, name);
     }
 
-    public cook(duration: number, type: TimeUnit, degrees: number, disappearWhen: string = 'timerIsUp') {
-        this.firstAction = false;
-        console.log(`cook should be overloaded ${duration} ${type} ${degrees} ${disappearWhen}`)
+    public cook(_duration: number, _type: TimeUnit, _degrees: number, _disappearWhen = 'timerIsUp'): IStep {
+        throw new Error(`${this.constructor.name}.cook() must be implemented by subclass`);
     }
 
-    public preheat(heat: number) {
-        this.firstAction = false;
-        console.log(`Preheat should be overloaded ${heat}`)
+    public preheat(_heat: number, _disappearWhen = 'timerIsUp'): IStep {
+        throw new Error(`${this.constructor.name}.preheat() must be implemented by subclass`);
     }
 }
 
 class ToasterOven extends CookingContainer {
-    constructor(id: number) {
-        super("toasteroven", id)
+    constructor(id = 99) {
+        super(id);
     }
 
     public preheat(heat: number, disappearWhen = 'timerIsUp'): IStep {
-        if (heat === 350) {
-            // Return how long preheating pan takes
-            // This is a guess.. should test it out
-            return Timer.set(10, 's', `Preheat ${this.name} to 350°`, [], disappearWhen);
-        }
-
-        if (heat === 425) {
-            // Return how long preheating pan takes
-            // This is a guess.. should test it out
-            return Timer.set(15, 's', `Preheat ${this.name} to 425°`);
-        }
-
-        if (heat === 500) {
-            // Return how long preheating pan takes
-            // This is a guess.. should test it out
-            return Timer.set(16, 's', `Preheat ${this.name} to 500°`);
-        }
-
-        return Timer.set(5, 's', `Preheat ${this.name} on heat ${heat}`);
+        const preheatTimes: Record<number, number> = {
+            350: 10,
+            425: 15,
+            500: 16,
+        };
+        const seconds = preheatTimes[heat] ?? 5;
+        const heatText = preheatTimes[heat] ? `to ${heat}°` : `on heat ${heat}`;
+        return Timer.set(seconds, 's', `Preheat ${this.name} ${heatText}`, [], disappearWhen);
     }
 
     public cook(duration: number, type: TimeUnit, degrees: number, disappearWhen = 'timerIsUp'): IStep {
@@ -272,30 +240,19 @@ class ToasterOven extends CookingContainer {
 }
 
 class Oven extends CookingContainer {
-    constructor(id: number) {
-        super("oven", id)
+    constructor(id = 99) {
+        super(id);
     }
 
     public preheat(heat: number, disappearWhen = 'timerIsUp'): IStep {
-        if (heat === 350) {
-            // Return how long preheating pan takes
-            // This is a guess.. should test it out
-            return Timer.set(5, 'm', `Preheat ${this.name} to 350°`, [], disappearWhen);
-        }
-
-        if (heat === 425) {
-            // Return how long preheating pan takes
-            // This is a guess.. should test it out
-            return Timer.set(15, 'm', `Preheat ${this.name} to 425°`);
-        }
-
-        if (heat === 500) {
-            // Return how long preheating pan takes
-            // This is a guess.. should test it out
-            return Timer.set(16, 'm', `Preheat ${this.name} to 500°`);
-        }
-
-        return Timer.set(5, 'm', `Preheat ${this.name} on heat ${heat}`);
+        const preheatTimes: Record<number, number> = {
+            350: 5,
+            425: 15,
+            500: 16,
+        };
+        const minutes = preheatTimes[heat] ?? 5;
+        const heatText = preheatTimes[heat] ? `to ${heat}°` : `on heat ${heat}`;
+        return Timer.set(minutes, 'm', `Preheat ${this.name} ${heatText}`, [], disappearWhen);
     }
 
     public cook(duration: number, type: TimeUnit, degrees: number, disappearWhen = 'timerIsUp'): IStep {
@@ -308,22 +265,20 @@ class Oven extends CookingContainer {
 }
 
 class Ninja extends CookingContainer {
-    constructor(id: number) {
-        super("ninja", id)
+    constructor(id = 99) {
+        super(id);
     }
 
     public preheat(heat: number, disappearWhen = 'timerIsUp'): IStep {
         if (heat === 500) {
-            // Return how long preheating pan takes
-            // This is a guess.. should test it out
-            return Timer.set(8, 'm', `Preheat ${this.name} to 500°`);
+            return Timer.set(8, 'm', `Preheat ${this.name} to 500°`, [], disappearWhen);
         }
 
         return Timer.set(5, 'm', `Preheat ${this.name} on heat ${heat}`, [], disappearWhen);
     }
 
     public preheatAirFry(minutes: number, disappearWhen = 'timerIsUp'): IStep {
-        return Timer.set(5, 'm', `Turn ${this.name} airfry setting to ${minutes} minutes`, [], disappearWhen);
+        return Timer.set(5, 'm', `Turn ${this.name} air fry setting to ${minutes} minutes`, [], disappearWhen);
     }
 
     public cook(duration: number, type: TimeUnit, degrees: number, disappearWhen = 'timerIsUp'): IStep {
@@ -331,343 +286,291 @@ class Ninja extends CookingContainer {
     }
 
     public airFry(duration: number, type: TimeUnit, degrees: number, disappearWhen = 'timerIsUp'): IStep {
-        return Timer.set(duration, type, `Airfry ${this.name} @ ${degrees}°`, [], disappearWhen);
+        return Timer.set(duration, type, `Air fry ${this.name} @ ${degrees}°`, [], disappearWhen);
     }
 }
 
 class Grinder extends CookingContainer {
-    constructor(id: number) {
-        super("grinder", id)
-    }
+  constructor(id = 99) {
+    super(id);
+  }
 }
 
 class Glass extends CookingContainer {
-    constructor(id: number) {
-        super("glass", id)
-    }
+  constructor(id = 99) {
+    super(id);
+  }
 }
 
 class SaucePan extends CookingContainer {
-    constructor(id: number) {
-        super("sauce pan", id)
-    }
+  constructor(id = 99) {
+    super(id);
+  }
 }
 
 class BakingSheet extends CookingContainer {
-    constructor(id: number) {
-        super("baking sheet", id)
-    }
+  constructor(id = 99) {
+    super(id);
+  }
 }
 
 class Pot extends CookingContainer {
-    constructor(id: number) {
-        super("pot", id)
+    constructor(id = 99) {
+        super(id);
     }
 
-    heat: number;
+    private heat?: number;
 
-    public _getHeat(heat: number) {
+    public setHeat(heat: number): void {
+        if (heat <= 0) {
+            throw new Error('Heat must be greater than 0');
+        }
+        this.heat = heat;
+    }
+
+    private getHeat(heat: number): number {
         if (heat < 1) {
             if (this.heat) {
-                return this.heat
-            } else {
-                throw new Error('Heat cannot be 0')
+                return this.heat;
             }
+            throw new Error('Heat cannot be 0');
         }
-        return heat
+        return heat;
     }
 
-    public _cookStr(text: string, duration: number, type: TimeUnit, heat: number, disappearWhen = 'timerIsUp'): IStep {
-        heat = this._getHeat(heat)
-        return Timer.set(duration, type, text, [this.name], disappearWhen)
+    private cookStr(text: string, duration: number, type: TimeUnit, heat: number, disappearWhen = 'timerIsUp'): IStep {
+        this.getHeat(heat);
+        return Timer.set(duration, type, text, [this.name], disappearWhen);
     }
 
     public cook(duration: number, type: TimeUnit, heat: number, disappearWhen = 'timerIsUp'): IStep {
-        heat = this._getHeat(heat)
-        return this._cookStr(`Cook ${this.name}`, duration, type, heat, disappearWhen)
+        const resolvedHeat = this.getHeat(heat);
+        return this.cookStr(`Cook ${this.name} on heat ${resolvedHeat}`, duration, type, resolvedHeat, disappearWhen);
     }
 
     public cookWithoutLid(duration: number, type: TimeUnit, heat: number, disappearWhen = 'timerIsUp'): IStep {
-        heat = this._getHeat(heat)
-        return this._cookStr(`Cook ${this.name} without lid`, duration, type, heat, disappearWhen)
+        const resolvedHeat = this.getHeat(heat);
+        return this.cookStr(`Cook ${this.name} without lid on heat ${resolvedHeat}`, duration, type, resolvedHeat, disappearWhen);
     }
 
-    public cookWithLid(duration: number, type: TimeUnit, heat: number, text = "", disappearWhen = 'timerIsUp'): IStep {
-        heat = this._getHeat(heat)
-        if (text) {
-            text = text + " "
-        }
-        return this._cookStr(`Cook ${this.name} with lid`, duration, type, heat, disappearWhen)
+    public cookWithLid(duration: number, type: TimeUnit, heat: number, text = '', disappearWhen = 'timerIsUp'): IStep {
+        const resolvedHeat = this.getHeat(heat);
+        const prefix = text ? `${text} ` : '';
+        return this.cookStr(`Cook ${prefix}${this.name} with lid on heat ${resolvedHeat}`, duration, type, resolvedHeat, disappearWhen);
     }
 
-    public cookWithLidSlightlyOff(duration: number, type: TimeUnit, heat: number, text = "", disappearWhen = 'timerIsUp'): IStep {
-        heat = this._getHeat(heat)
-        if (text) {
-            text = text + " "
-        }
-        return this._cookStr(`Cook ${text}${this.name} with lid slightly off`, duration, type, heat, disappearWhen)
+    public cookWithLidSlightlyOff(duration: number, type: TimeUnit, heat: number, text = '', disappearWhen = 'timerIsUp'): IStep {
+        const resolvedHeat = this.getHeat(heat);
+        const prefix = text ? `${text} ` : '';
+        return this.cookStr(`Cook ${prefix}${this.name} with lid slightly off on heat ${resolvedHeat}`, duration, type, resolvedHeat, disappearWhen);
     }
 
     public boilWithLid(duration: number, type: TimeUnit, heat: number, disappearWhen = 'timerIsUp'): IStep {
-        heat = this._getHeat(heat)
-        return this._cookStr(`Boil ${this.name} contents on heat ${heat} with lid on`, duration, type, heat, disappearWhen)
+        const resolvedHeat = this.getHeat(heat);
+        return this.cookStr(`Boil ${this.name} contents on heat ${resolvedHeat} with lid on`, duration, type, resolvedHeat, disappearWhen);
     }
 }
 
-
 class Strainer extends CookingContainer {
-    constructor(id: number) {
-        super("strainer", id)
+    constructor(id = 99) {
+        super(id);
     }
 
     public wash(text: string, duration: number, type: TimeUnit, disappearWhen = 'timerIsUp'): IStep {
-        return Timer.set(duration, type, text, [this.name], disappearWhen)
+        return Timer.set(duration, type, text, [this.name], disappearWhen);
     }
 }
 
 class Teapot extends CookingContainer {
-    constructor(id: number) {
-        super("teapot", id)
+    constructor(id = 99) {
+        super(id);
     }
 }
 
 class FoodProcessor extends CookingContainer {
-    heat: number;
-
-    constructor(id: number) {
-        super("food processor", id)
+    constructor(id = 99) {
+        super(id);
     }
 }
 
 class Pan extends CookingContainer {
-    heat: number;
-
-    constructor(id: number) {
-        super("pan", id)
+    constructor(id = 99) {
+        super(id);
     }
 
-    public preheat(heat: number, minutes = 0, disappearWhen = 'timerIsUp'): IStep {
-        // This is a guess.. should test it out
-        this.heat = heat
+    private heat?: number;
+
+    public preheat(heat: number, disappearWhen = 'timerIsUp'): IStep {
+        this.heat = heat;
 
         if (heat === 5) {
-            // Return how long preheating pan takes
             return Timer.set(2, 'm', `Preheat ${this.name} on heat ${heat}`, [this.name], disappearWhen);
         }
 
         if (heat === 7) {
-            // Return how long preheating pan takes
             return Timer.set(4, 'm', `Preheat ${this.name} on heat ${heat}`, [this.name], disappearWhen);
         }
 
-        return Timer.set(minutes, 'm', `Preheat ${this.name} on heat ${heat}`, [this.name]);
+        return Timer.set(5, 'm', `Preheat ${this.name} on heat ${heat}`, [this.name], disappearWhen);
     }
 
-    public _getHeat(heat = 0) {
+    private getHeat(heat = 0): number {
         if (heat === 0) {
             if (this.heat) {
-                return this.heat
-            } else {
-                throw new Error('Heat cannot be 0')
+                return this.heat;
             }
+            throw new Error('Heat cannot be 0');
         }
-        return heat
+        return heat;
     }
 
-    public _cookStr(text: string, duration: number, type: TimeUnit, heat = 0, disappearWhen = 'timerIsUp'): IStep {
-        heat = this._getHeat(heat)
-        return Timer.set(duration, type, text, [this.name], disappearWhen)
+    private cookStr(text: string, duration: number, type: TimeUnit, heat = 0, disappearWhen = 'timerIsUp'): IStep {
+        this.getHeat(heat);
+        return Timer.set(duration, type, text, [this.name], disappearWhen);
     }
 
     public cook(duration: number, type: TimeUnit, heat = 0, disappearWhen = 'timerIsUp'): IStep {
-        heat = this._getHeat(heat)
-        return this._cookStr(`Cook ${this.name} on heat ${heat}`, duration, type, heat, disappearWhen)
+        const resolvedHeat = this.getHeat(heat);
+        return this.cookStr(`Cook ${this.name} on heat ${resolvedHeat}`, duration, type, resolvedHeat, disappearWhen);
     }
-
 
     public cookWithLidSlightlyOff(duration: number, type: TimeUnit, heat = 0, disappearWhen = 'timerIsUp'): IStep {
-        heat = this._getHeat(heat)
-        return this._cookStr(`Cook ${this.name} on heat ${heat} with lid slightly off`, duration, type, heat, disappearWhen)
+        const resolvedHeat = this.getHeat(heat);
+        return this.cookStr(`Cook ${this.name} on heat ${resolvedHeat} with lid slightly off`, duration, type, resolvedHeat, disappearWhen);
     }
 
-    public cookWithLid(duration: number, type: TimeUnit, heat = 0, text = "", disappearWhen = 'timerIsUp'): IStep {
-        if (text) {
-            text = text + " "
-        }
-        heat = this._getHeat(heat)
-        return this._cookStr(`Cook ${text}pan on heat ${heat} with lid`, duration, type, heat, disappearWhen)
+    public cookWithLid(duration: number, type: TimeUnit, heat = 0, text = '', disappearWhen = 'timerIsUp'): IStep {
+        const prefix = text ? `${text} ` : '';
+        const resolvedHeat = this.getHeat(heat);
+        return this.cookStr(`Cook ${prefix}${this.name} on heat ${resolvedHeat} with lid`, duration, type, resolvedHeat, disappearWhen);
     }
 }
 
 class InstantPot extends CookingContainer {
-    constructor(id: number) {
-            super("instant pot", id)
-        }
-
-    public pressureCook(preheat: number, duration: number, type: TimeUnit, disappearWhen = 'timerIsUp'): IStep {
-        const preheatStep = istep()
-        preheatStep.time += Time.convert(preheat, type)
-        preheatStep.text = `Put ${this.name} on high pressure for ${duration} minutes`
-        preheatStep.equipment.push(this.name)
-        preheatStep.disappearWhen = disappearWhen
-
-        const ensureSeal = istep()
-        ensureSeal.text = `Ensure ${this.name} has sealed`
-        ensureSeal.equipment.push(this.name)
-        ensureSeal.disappearWhen = 'clicked'
-
-        const pressureCookStep = istep()
-        pressureCookStep.time += Time.convert(duration, type)
-        pressureCookStep.equipment.push(this.name)
-        pressureCookStep.text = `Wait for ${this.name} to be done cooking`
-        pressureCookStep.disappearWhen = disappearWhen
-
-        preheatStep.children.push(ensureSeal)
-        preheatStep.children.push(pressureCookStep)
-
-        return preheatStep
+    constructor(id = 99) {
+        super(id);
     }
 
+    public pressureCook(preheat: number, duration: number, type: TimeUnit, disappearWhen = 'timerIsUp'): IStep {
+        const preheatStep = istep();
+        preheatStep.time += Time.convert(preheat, type);
+        preheatStep.text = `Put ${this.name} on high pressure for ${duration} minutes`;
+        preheatStep.equipment.push(this.name);
+        preheatStep.disappearWhen = disappearWhen;
+
+        const ensureSeal = istep();
+        ensureSeal.text = `Ensure ${this.name} has sealed`;
+        ensureSeal.equipment.push(this.name);
+        ensureSeal.disappearWhen = 'clicked';
+
+        const pressureCookStep = istep();
+        pressureCookStep.time += Time.convert(duration, type);
+        pressureCookStep.equipment.push(this.name);
+        pressureCookStep.text = `Wait for ${this.name} to be done cooking`;
+        pressureCookStep.disappearWhen = disappearWhen;
+
+        preheatStep.children.push(ensureSeal);
+        preheatStep.children.push(pressureCookStep);
+
+        return preheatStep;
+    }
+
+    public saute(duration: number, type: TimeUnit, disappearWhen = 'timerIsUp'): IStep {
+        return Timer.set(duration, type, 'Saute on high', [], disappearWhen);
+    }
+
+    // Backward-compatible misspelling.
     public sautee(duration: number, type: TimeUnit, disappearWhen = 'timerIsUp'): IStep {
-        return Timer.set(duration, type, `Sautee on high`, [], disappearWhen)
+        return this.saute(duration, type, disappearWhen);
     }
 
     public pressureRelease(duration: number, type: TimeUnit, disappearWhen = 'timerIsUp'): IStep {
-        return Timer.set(duration, type, 'Let pressure release', [], disappearWhen)
+        return Timer.set(duration, type, 'Let pressure release', [], disappearWhen);
     }
 }
 
 class CoffeeCup extends Container {
-    constructor(id: number) {
-        super("coffee cup", id)
+    constructor(id = 99) {
+        super(id);
     }
 }
 
 export class Equipment {
-    // 99 is just an identifier that doesn't start with 0/1/2
-    // By default we assume that equipment is reused throughout the recipe
+    // 99 is just an identifier that does not start with 0/1/2.
+    // By default, equipment is reused throughout the recipe.
 
-    public static readonly knife = () => {
-        return 'knife'
-    }
+    public static readonly knife = () => 'knife';
 
-    public static readonly cuttingBoard = () => {
-        return 'cutting board'
-    }
+    public static readonly cuttingBoard = () => 'cutting board';
 
+    public static readonly peeler = () => 'peeler';
 
-    public static readonly peeler = () => {
-        return 'peeler'
-    }
+    public static readonly ninja = (id = 99) => new Ninja(id);
 
-    public static readonly ninja = (id = 99) => (
-        new Ninja(id)
-    );
+    public static readonly grinder = (id = 99) => new Grinder(id);
 
-    public static readonly grinder = (id = 99) => (
-        new Grinder(id)
-    );
+    public static readonly glass = (id = 99) => new Glass(id);
 
-    public static readonly glass = (id = 99) => (
-        new Glass(id)
-    );
+    public static readonly saucePan = (id = 99) => new SaucePan(id);
 
-    public static readonly saucePan = (id = 99) => (
-        new SaucePan(id)
-    );
+    public static readonly pan = (id = 99) => new Pan(id);
 
-    public static readonly pan = (id = 99) => (
-        new Pan(id)
-    );
+    public static readonly smallStainlessSteelContainer = (id = 99) => new SmallStainlessSteelContainer(id);
 
-    public static readonly smallStainlessSteelContainer = (id = 99) => (
-        new SmallStainlessSteelContainer(id)
-    );
+    public static readonly largeStainlessSteelContainer = (id = 99) => new LargeStainlessSteelContainer(id);
 
-    public static readonly largeStainlessSteelContainer = (id = 99) => (
-        new LargeStainlessSteelContainer(id)
-    );
+    public static readonly foodProcessor = (id = 99) => new FoodProcessor(id);
 
-    public static readonly foodProcessor = (id = 99) => (
-        new FoodProcessor(id)
-    );
+    public static readonly plate = (id = 99) => new Plate(id);
 
-    public static readonly plate = (id = 99) => (
-        new Plate(id)
-    );
+    public static readonly oven = (id = 99) => new Oven(id);
 
-    public static readonly oven = (id = 99) => (
-        new Oven(id)
-    );
+    public static readonly toasterOven = (id = 99) => new ToasterOven(id);
 
-    public static readonly toasterOven = (id = 99) => (
-        new ToasterOven(id)
-    );
+    public static readonly kitchenAidMixingBowl = (id = 99) => new KitchenAidMixingBowl(id);
 
-    public static readonly kitchenAidMixingBowl = (id = 99) => (
-        new KitchenAidMixingBowl(id)
-    );
+    public static readonly ziplockBag = (id = 99) => new ZiplockBag(id);
 
-    public static readonly ziplockBag = (id = 99) => (
-        new ZiplockBag(id)
-    );
+    public static readonly bowl = (id = 99) => new Bowl(id);
 
-    public static readonly bowl = (id = 99) => (
-        new Bowl(id)
-    );
+    public static readonly mug = (id = 99) => new Mug(id);
 
-    public static readonly mug = (id = 99) => (
-        new Mug(id)
-    );
+    public static readonly largeBowl = (id = 99) => new LargeBowl(id);
 
-    public static readonly largeBowl = (id = 99) => (
-        new LargeBowl(id)
-    );
+    public static readonly standMixer = (id = 99) => new StandMixer(id);
 
-    public static readonly standMixer = (id = 99) => (
-        new StandMixer(id)
-    );
+    public static readonly bulletMixer = (id = 99) => new BulletMixer(id);
 
-    public static readonly bulletMixer = (id = 99) => (
-        new BulletMixer(id)
-    );
+    public static readonly coffeeCup = (id = 99) => new CoffeeCup(id);
 
-    public static readonly coffeecup = (id = 99) => (
-        new CoffeeCup(id)
-    );
+    // Backward-compatible old name.
+    public static readonly coffeecup = Equipment.coffeeCup;
 
-    public static readonly bakingSheet = (id = 99) => (
-        new BakingSheet(id)
-    );
+    public static readonly bakingSheet = (id = 99) => new BakingSheet(id);
 
-    public static readonly teapot = (id = 99) => (
-        new Teapot(id)
-    );
+    public static readonly teapot = (id = 99) => new Teapot(id);
 
-    public static readonly pot = (id = 99) => (
-        new Pot(id)
-    );
+    public static readonly pot = (id = 99) => new Pot(id);
 
-    public static readonly strainer = (id = 99) => (
-        new Strainer(id)
-    );
+    public static readonly strainer = (id = 99) => new Strainer(id);
 
-    public static readonly instantPot = (id = 99) => (
-        new InstantPot(id)
-    );
+    public static readonly instantPot = (id = 99) => new InstantPot(id);
 
-    public static readonly souvide: IEquipment = (id = 99) => ({
-        name: 'souvide',
-        id: id
+    public static readonly sousVide: IEquipment = (id = 99) => ({
+        name: 'sous vide',
+        id,
     });
+
+    // Backward-compatible old spelling.
+    public static readonly souvide = Equipment.sousVide;
 
     public static readonly woodenSpoon: IEquipment = (id = 99) => ({
         name: 'wooden spoon',
-        id: id
+        id,
     });
 
     public static readonly spoon: IEquipment = (id = 99) => ({
         name: 'spoon',
-        id: id
+        id,
     });
 }

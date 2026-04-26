@@ -17,9 +17,9 @@ class PopCorn extends Recipe {
     constructor() {
         super();
         this.steps = [
-            e.pan().preheat(7, 3),
+            e.pan().preheat(7),
             Timer.end(),
-            e.pan().preheat(6, 0),
+            e.pan().preheat(6),
             Timer.end(),
             e.pan().add([
                 i.popcorn(.5, u.cup)

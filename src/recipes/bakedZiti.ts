@@ -31,7 +31,7 @@ class BakedZiti extends Recipe {
                 i.oliveOil(1, u.tbsp),
             ]),
             e.pot().cookWithLid(13, 'm', 7),
-                e.pan().preheat(7, 2),
+                e.pan().preheat(7),
                 Timer.end(),
                 text.set(['Preheat oven to 350']),
                 e.pan().add([

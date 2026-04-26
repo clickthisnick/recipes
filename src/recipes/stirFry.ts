@@ -19,7 +19,7 @@ class SitrFryChicken extends Recipe {
     constructor() {
         super();
         this.steps = [
-            e.pan().preheat(4, 2),
+            e.pan().preheat(4),
             i.chickenThigh(1, u.pound).cutIntoSlices(),
             Timer.end(),
             e.pan().add([
@@ -53,7 +53,7 @@ class StirFryVegan extends Recipe {
     constructor() {
         super();
         this.steps = [
-            e.pan().preheat(4, 2),
+            e.pan().preheat(4),
             text.set(["Peel and cut", i.carrots(2, u.unit)]),
             Timer.end(),
             e.pan().add([
