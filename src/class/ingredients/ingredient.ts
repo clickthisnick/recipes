@@ -77,282 +77,195 @@ export interface IIngredient{
 }
 
 export class Ingredient {
-    name: string
-    putAwayTime: number
-    takeOutTime: number
-    cleanSteps: string
-    quantity: number
-    unit: IUnitObj
-    wash: boolean
-    isTakeoutUnitable: boolean
-    isMeatProduct: boolean
-    nutrition: any
-    purchaseLinks: IStorePurchaseLink
-    perishableLimit: number // The number of days we want to keep the item before we should use it. The goal is to use before the perishable limit which may or may not be the expiration date.
+    name!: string
+    putAwayTime!: number
+    takeOutTime!: number
+    cleanSteps!: string
+    quantity!: number
+    unit!: IUnitObj
+    wash!: boolean
+    isTakeoutUnitable!: boolean
+    isMeatProduct!: boolean
+    nutrition!: any
+    purchaseLinks!: IStorePurchaseLink
+    perishableLimit!: number
 
-    // Containers are a singleton
-    constructor(
-        item :IItemObj,
-    ) {
-        this.name = item.name
-        this.putAwayTime = item.putAwayTime
-        this.takeOutTime = item.takeOutTime
-        this.cleanSteps = item.cleanSteps
-        this.quantity = item.quantity
-        this.wash = item.wash
-        this.isTakeoutUnitable = item.isTakeoutUnitable
-        this.isMeatProduct = item.isMeatProduct
-        this.nutrition = item.nutrition
-        this.unit = item.unit
-        this.purchaseLinks = item.purchaseLinks
-        this.perishableLimit = item.perishableLimit
+    constructor(item: any) {
+        Object.assign(this, item)
     }
 
-    public seasonWith(ingredients: Ingredient[]): IStep {
-        const addIStep = istep()
+    // ------------------------
+    // HELPERS
+    // ------------------------
 
-        addIStep.text = ['Season', s.turnIngObjIntoStr(this, true), 'with the following'].join(' ')
-        addIStep.ingredients.push(this)
-        addIStep.disappearWhen = 'childrenGone'
+    private hasAmount(): boolean {
+        return !!(this.quantity && this.unit && this.unit.name)
+    }
+
+    private formatName(): string {
+        return this.hasAmount()
+            ? `${this.quantity} ${this.unit.name} ${this.name}`
+            : `the ${this.name}`
+    }
+
+    private createStep(
+        textParts: (string | number)[],
+        opts?: {
+            includeSelf?: boolean
+            equipment?: any[]
+        }
+    ): IStep {
+        const step = istep()
+
+        step.text = textParts.join(' ').replace(/\s+/g, ' ').trim()
+
+        if (opts?.includeSelf !== false) {
+            step.ingredients.push(this)
+        }
+
+        if (opts?.equipment) {
+            step.equipment.push(...opts.equipment)
+        }
+
+        return step
+    }
+
+    private knifeTools() {
+        return [e.cuttingBoard(), e.knife()]
+    }
+
+    private combineAction(action: string, ingredients: Ingredient[]): IStep {
+        const step = istep()
+
+        step.text = `${action} ${s.turnIngObjIntoStr(this, true)} with the following`
+        step.ingredients.push(this)
+        step.disappearWhen = 'childrenGone'
+
         ingredients.forEach((ingredient) => {
-            const addIngredient = istep()
-            addIngredient.ingredients.push(ingredient)
-            addIngredient.text = [s.lazyIngredientIdx, addIngredient.ingredients.length-1].join(' ')
-            addIngredient.time += ingredient.takeOutTime
-            addIStep.children.push(addIngredient)
+            const child = istep()
+            child.ingredients.push(ingredient)
+            child.text = `${s.lazyIngredientIdx} ${child.ingredients.length - 1}`
+            child.time += ingredient.takeOutTime
+            step.children.push(child)
         })
 
-        return addIStep
+        return step
+    }
+
+    // ------------------------
+    // GROUP ACTIONS
+    // ------------------------
+
+    public seasonWith(ingredients: Ingredient[]): IStep {
+        return this.combineAction('Season', ingredients)
     }
 
     public mixIn(ingredients: Ingredient[]): IStep {
-        const addIStep = istep()
-
-        addIStep.text = ['Mix in', s.turnIngObjIntoStr(this, true), 'with the following'].join(' ')
-        addIStep.ingredients.push(this)
-        addIStep.disappearWhen = 'childrenGone'
-        ingredients.forEach((ingredient) => {
-            const addIngredient = istep()
-            addIngredient.ingredients.push(ingredient)
-            addIngredient.text = [s.lazyIngredientIdx, addIngredient.ingredients.length-1].join(' ')
-            addIngredient.time += ingredient.takeOutTime
-            addIStep.children.push(addIngredient)
-        })
-
-        return addIStep
+        return this.combineAction('Mix in', ingredients)
     }
 
+    // ------------------------
+    // SIMPLE ACTIONS
+    // ------------------------
+
     public flip(): IStep {
-        const addIStep = istep()
-
-        addIStep.text = ['Flip the', this.name].join('' )
-
-        addIStep.ingredients.push(this)
-        return addIStep;
+        return this.createStep(['Flip the', this.name])
     }
 
     public cutInHalf(): IStep {
-        const addIStep = istep()
-
-        if (this.unit) {
-            addIStep.text = ['Cut', this.quantity, this.unit.name, this.name, 'in half'].join(' ')
-        } else {
-            addIStep.text = ['Cut the', this.name, 'in half'].join(' ')
-        }
-        addIStep.ingredients.push(this)
-        addIStep.equipment.push(e.cuttingBoard())
-        addIStep.equipment.push(e.knife())
-
-        return addIStep;
+        return this.createStep(
+            ['Cut', this.formatName(), 'in half'],
+            { equipment: this.knifeTools() }
+        )
     }
 
     public peel(): IStep {
-        const addIStep = istep()
-
-        if (this.unit) {
-            addIStep.text = ['Peel', this.quantity, this.unit.name, this.name].join(' ')
-        } else {
-            addIStep.text = ['Peel the', this.name].join(' ')
-        }
-        addIStep.ingredients.push(this)
-        addIStep.equipment.push(e.peeler())
-
-        return addIStep;
+        return this.createStep(
+            ['Peel', this.formatName()],
+            { equipment: [e.peeler()] }
+        )
     }
 
-
     public juice(): IStep {
-        const addIStep = istep()
-
-        if (this.unit) {
-            addIStep.text = ['Juice', this.quantity, this.unit.name, this.name].join(' ')
-        } else {
-            addIStep.text = ['Juice the', this.name].join(' ')
-        }
-        addIStep.ingredients.push(this)
-        addIStep.equipment.push(e.knife())
-
-        return addIStep;
+        return this.createStep(
+            ['Juice', this.formatName()],
+            { equipment: [e.knife()] }
+        )
     }
 
     public chop(): IStep {
-        const addIStep = istep()
-
-        if (this.unit) {
-            addIStep.text = ['Chop', this.quantity, this.unit.name, this.name].join(' ')
-        } else {
-            addIStep.text = ['Chop the', this.name].join(' ')
-        }
-        addIStep.ingredients.push(this)
-        addIStep.equipment.push(e.knife())
-
-        return addIStep;
+        return this.createStep(
+            ['Chop', this.formatName()],
+            { equipment: this.knifeTools() }
+        )
     }
 
     public cube(): IStep {
-        const addIStep = istep()
-
-        if (this.unit) {
-            addIStep.text = ['Cube', this.quantity, this.unit.name, this.name].join(' ')
-        } else {
-            addIStep.text = ['Cube the', this.name].join(' ')
-        }
-        addIStep.ingredients.push(this)
-        addIStep.equipment.push(e.knife())
-
-        return addIStep;
+        return this.createStep(
+            ['Cube', this.formatName()],
+            { equipment: this.knifeTools() }
+        )
     }
 
     public rinse(): IStep {
-        const addIStep = istep()
-
-        if (this.quantity && this.unit && this.unit.name) {
-            addIStep.text = ['Rinse', this.quantity, this.unit.name, this.name].join(' ')
-        } else {
-            addIStep.text = ['Rinse the', this.name].join(' ')
-        }
-
-        addIStep.ingredients.push(this)
-        addIStep.equipment.push(e.cuttingBoard())
-        addIStep.equipment.push(e.knife())
-
-        return addIStep;
+        return this.createStep(
+            ['Rinse', this.formatName()],
+            { equipment: this.knifeTools() }
+        )
     }
 
     public dice(): IStep {
-        const addIStep = istep()
-
-        if (this.quantity && this.unit && this.unit.name) {
-            addIStep.text = ['Dice', this.quantity, this.unit.name, this.name].join(' ')
-        } else {
-            addIStep.text = ['Dice the', this.name].join(' ')
-        }
-
-        addIStep.ingredients.push(this)
-        addIStep.equipment.push(e.cuttingBoard())
-        addIStep.equipment.push(e.knife())
-
-        return addIStep;
+        return this.createStep(
+            ['Dice', this.formatName()],
+            { equipment: this.knifeTools() }
+        )
     }
 
     public mince(): IStep {
-        const addIStep = istep()
-
-        if (this.quantity && this.unit && this.unit.name) {
-            addIStep.text = ['Mince', this.quantity, this.unit.name, this.name].join(' ')
-        } else {
-            addIStep.text = ['Mince the', this.name].join(' ')
-        }
-
-        addIStep.ingredients.push(this)
-        addIStep.equipment.push(e.cuttingBoard())
-        addIStep.equipment.push(e.knife())
-
-        return addIStep;
+        return this.createStep(
+            ['Mince', this.formatName()],
+            { equipment: this.knifeTools() }
+        )
     }
 
     public cutIntoStrips(): IStep {
-        const addIStep = istep()
-
-        if (this.unit) {
-            addIStep.text = ['Cut',  this.quantity, this.unit.name, this.name, 'into strips'].join(' ')
-        } else {
-            addIStep.text = ['Cut the', this.name, 'into strips'].join(' ')
-        }
-        addIStep.equipment.push(e.cuttingBoard())
-        addIStep.equipment.push(e.knife())
-
-        return addIStep;
+        return this.createStep(
+            ['Cut', this.formatName(), 'into strips'],
+            { equipment: this.knifeTools() }
+        )
     }
 
     public cutIntoOneInchPieces(): IStep {
-        const addIStep = istep()
-
-        if (this.unit) {
-            addIStep.text = ['Cut',  this.quantity, this.unit.name, this.name, 'into one inch pieces'].join(' ')
-        } else {
-            addIStep.text = ['Cut the', this.name, 'into one inch pieces'].join(' ')
-        }
-        addIStep.equipment.push(e.cuttingBoard())
-        addIStep.equipment.push(e.knife())
-
-        return addIStep;
+        return this.createStep(
+            ['Cut', this.formatName(), 'into one inch pieces'],
+            { equipment: this.knifeTools() }
+        )
     }
 
     public cutIntoHalfInchStrips(): IStep {
-        const addIStep = istep()
-
-        if (this.unit) {
-            addIStep.text = ['Cut',  this.quantity, this.unit.name, this.name, 'into half inch strips'].join(' ')
-        } else {
-            addIStep.text = ['Cut the', this.name, 'into half inch strips'].join(' ')
-        }
-        addIStep.equipment.push(e.cuttingBoard())
-        addIStep.equipment.push(e.knife())
-
-        return addIStep;
+        return this.createStep(
+            ['Cut', this.formatName(), 'into half inch strips'],
+            { equipment: this.knifeTools() }
+        )
     }
 
     public cutIntoThinSlices(): IStep {
-        const step = istep();
-
-        // Build the text dynamically
-        const parts = ['Slice'];
-        if (this.quantity && this.unit) {
-            parts.push(this.quantity.toString(), this.unit.name);
-        }
-        parts.push(this.name, 'thinly');
-        step.text = parts.join(' ');
-
-        // Add required equipment
-        step.equipment.push(e.cuttingBoard(), e.knife());
-
-        return step;
+        return this.createStep(
+            ['Slice', this.formatName(), 'thinly'],
+            { equipment: this.knifeTools() }
+        )
     }
 
     public cutIntoSlices(): IStep {
-        const addIStep = istep()
-
-        if (this.unit) {
-            addIStep.text = ['Cut',  this.quantity, this.unit.name, this.name, 'into slices'].join(' ')
-        } else {
-            addIStep.text = ['Cut the', this.name, 'into slices'].join(' ')
-        }
-        addIStep.equipment.push(e.cuttingBoard())
-        addIStep.equipment.push(e.knife())
-
-        return addIStep;
+        return this.createStep(
+            ['Cut', this.formatName(), 'into slices'],
+            { equipment: this.knifeTools() }
+        )
     }
 
     public patDry(): IStep {
-        const addIStep = istep()
-
-        if (this.unit) {
-            addIStep.text = ['Pat',  this.quantity, this.unit.name, this.name, 'dry with paper towels'].join(' ')
-        } else {
-            addIStep.text = ['Pat', this.name, 'dry with paper towels'].join(' ')
-        }
-
-        return addIStep;
+        return this.createStep(
+            ['Pat', this.formatName(), 'dry with paper towels']
+        )
     }
 }

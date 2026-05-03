@@ -1,119 +1,162 @@
 import * as fs from 'fs';
+import * as path from 'path';
 import { HTML } from '../class/html';
 
-// This is the path from root (package.json runs this)
-const testFolder = 'src/recipes';
-const cwd = process.cwd();
+const recipeFolder = path.join(process.cwd(), 'src/recipes');
+const distFolder = path.join(process.cwd(), 'dist');
+const outputFile = path.join(distFolder, 'main.html');
 
-let pageHtml = ''
-pageHtml += HTML.mobileViewport;
-pageHtml += HTML.audio;
-pageHtml += HTML.charset;
-pageHtml += HTML.css;
-pageHtml += HTML.javascript();
-// Shopping mode allows you to select recipes and get all the ingredients needed for all recipes
-// Cooking mode allows you to select recipes and optimizes the cooking
-pageHtml += `<button id="shoppingButton" onclick="selectMode('shopping')">Shopping Mode</button><button id="cookingButton" onclick="selectMode('cooking')">Cooking Mode</button><br>`
-pageHtml += '<div id="shopping" style="display: none;">Shopping List<button id="shoppingListButton" style="display: none;" onclick="saveShoppingUrl()">Save Shopping Url</button><br><span id="shoppingUrl"></span></div><br>'
-pageHtml += '<div id="cooking" style="display: none;">Cooking List</div><br>'
+function getBaseHtml(): string {
+  return [
+    HTML.mobileViewport,
+    HTML.audio,
+    HTML.charset,
+    HTML.css,
+    HTML.javascript(),
 
+    `
+<button id="shoppingButton" onclick="selectMode('shopping')">Shopping Mode</button>
+<button id="cookingButton" onclick="selectMode('cooking')">Cooking Mode</button>
+<br>
 
-pageHtml += '<div id="selected" style="display: none;">Selected Recipes<div id="selectedRecipeGroupNames"></div><br></div>'
-pageHtml += '<div id="select" style="display: none;">Select Recipes<br>'
-// add all recipes to javascript variable
-pageHtml += `<button onclick="doneSelectingRecipes()">Done Selecting</button><br>`
+<div id="shopping" style="display: none;">
+  Shopping List
+  <button id="shoppingListButton" style="display: none;" onclick="saveShoppingUrl()">Save Shopping Url</button>
+  <br>
+  <span id="shoppingUrl"></span>
+</div>
+<br>
 
-// This creates the html files in the dist folder
-function generateRecipe(filename: string) {
-  const MealRecipe = require(`${cwd}/${testFolder}/${filename}`).MealRecipe;
-  const recipe = new MealRecipe();
+<div id="cooking" style="display: none;">Cooking List</div>
+<br>
 
-  // Apply any transformations needed for recipes
-  // For example we are going to convert all recipes to calculate prices for the ingredients
-  // priceConversionTable
-  // TODO nick
-  // This is just casting the ingredients
-  // console.log(recipe);
-  // const recipeIngredients: IAllIngredientUnits[] = recipe.ingredients
-  // recipeIngredients.forEach(ingredients => {
-  //   console.log(ingredients.quantity_unit)
-  // })
+<div id="selected" style="display: none;">
+  Selected Recipes
+  <div id="selectedRecipeGroupNames"></div>
+  <br>
+</div>
 
-  recipe.generateRecipeHtml(filename);
-//   this.variations.forEach(variation => {
-//     this.generateRecipeVariation(variation, hideUnderRecipeGroup)
-// })
-
-  // const initRecipe: Recipe = new recipeClass();
-  // const recipeName = recipeClass.name;
-
-  pageHtml += recipe.recipeHtml
+<div id="select" style="display: none;">
+  Select Recipes<br>
+  <button onclick="doneSelectingRecipes()">Done Selecting</button><br>
+`
+  ].join('');
 }
 
-function run() {
-  // This loops through all the recipes
-  const filenames = fs.readdirSync(testFolder);
+function getStartupScript(): string {
+  return `
+</div><br>
 
-  for (const filename of filenames) {
-    generateRecipe(filename);
+<script>
+(function () {
+  var recipesSelected = [];
+
+  if (!queryString || !Object.prototype.hasOwnProperty.call(queryString, 'mode')) {
+    return;
   }
 
-  const outputFile = 'main';
+  var mode = queryString.mode;
+  delete queryString.mode;
 
-  // Close the select div
-  pageHtml += '</div><br>'
+  if (Object.prototype.hasOwnProperty.call(queryString, 'recipes')) {
+    recipesSelected = String(queryString.recipes)
+      .split(',')
+      .map(function (recipe) {
+        return recipe.trim();
+      })
+      .filter(Boolean);
 
-    // Parse any queryStrings
-    pageHtml += `
-    <script>
-    let recipesSelected = []
+    delete queryString.recipes;
+  }
 
-    if (queryString.hasOwnProperty('mode')) {
-        let mode = queryString['mode']
-        delete queryString['mode'];
+  selectMode(mode);
 
-        if (queryString.hasOwnProperty('recipes')) {
-          const recipesSelectedStr = queryString['recipes']
-          recipesSelected = recipesSelectedStr.split(',')
-          delete queryString['recipes'];
-        }
+  if (mode === 'shopping') {
+    var shoppingEl = document.getElementById('shopping');
 
-        selectMode(mode)
-
-        if (mode == 'shopping') {
-          // TODO make this work again later
-          document.getElementById('shopping').innerHTML += recipes
-          Object.keys(queryString).forEach(key => {
-            // [unit, quantity]
-            let item = JSON.parse(queryString[key]);
-
-            ingredients[key] = {}
-
-            // Put the units and values in the correct spot
-            // The assumption here is if you are clicking the link you are going somewhere to buy
-            // Whereas when you originally generate the link you get the online purchase options
-            ingredients[key]['units'] = {}
-            ingredients[key]['units'][item[0]] = item[1]
-
-          })
-        } else if (mode == 'cooking') {
-          // /dist/main.html?mode=cooking&recipes=CleanWaterBottle
-          console.log('hi')
-          console.log(recipesSelected)
-          recipesSelected.forEach(recipeGroupName => {
-            selectRecipe(recipeGroupName)
-          })
-        }
-
-        doneSelectingRecipes()
+    if (shoppingEl && typeof recipes !== 'undefined') {
+      shoppingEl.innerHTML += recipes;
     }
-    </script>`
 
-  // Just setting to lowercase in case git isn't case sensitive (Like on osx/windows)
-  fs.writeFileSync(`${process.cwd()}/dist/${outputFile.toLowerCase()}.html`, pageHtml);
+    Object.keys(queryString).forEach(function (key) {
+      var item;
 
-  // This creates the index
-  // Index.generate();
+      try {
+        item = JSON.parse(queryString[key]);
+      } catch (e) {
+        console.warn('Skipping invalid shopping item:', key, queryString[key]);
+        return;
+      }
+
+      // Backwards-compatible expected format:
+      // ?apple=["g",100]
+      if (!Array.isArray(item) || item.length < 2) {
+        console.warn('Skipping malformed shopping item:', key, item);
+        return;
+      }
+
+      var unit = item[0];
+      var quantity = item[1];
+
+      if (!ingredients[key]) {
+        ingredients[key] = {};
+      }
+
+      if (!ingredients[key].units) {
+        ingredients[key].units = {};
+      }
+
+      ingredients[key].units[unit] = quantity;
+    });
+  } else if (mode === 'cooking') {
+    recipesSelected.forEach(function (recipeGroupName) {
+      selectRecipe(recipeGroupName);
+    });
+  }
+
+  doneSelectingRecipes();
+})();
+</script>`;
+}
+
+function isRecipeFile(filename: string): boolean {
+  return filename.endsWith('.ts') || filename.endsWith('.js');
+}
+
+function generateRecipeHtml(filename: string): string {
+  const recipePath = path.join(recipeFolder, filename);
+  const recipeModule = require(recipePath);
+
+  if (!recipeModule.MealRecipe) {
+    console.warn('Skipping recipe without MealRecipe export:', filename);
+    return '';
+  }
+
+  const recipe = new recipeModule.MealRecipe();
+
+  recipe.generateRecipeHtml(filename);
+
+  return recipe.recipeHtml || '';
+}
+
+function run(): void {
+  let pageHtml = getBaseHtml();
+
+  const filenames = fs
+    .readdirSync(recipeFolder)
+    .filter(isRecipeFile)
+    .sort(function (a, b) {
+      return a.localeCompare(b);
+    });
+
+  filenames.forEach(function (filename) {
+    pageHtml += generateRecipeHtml(filename);
+  });
+
+  pageHtml += getStartupScript();
+
+  fs.mkdirSync(distFolder, { recursive: true });
+  fs.writeFileSync(outputFile, pageHtml);
 }
 
 run();

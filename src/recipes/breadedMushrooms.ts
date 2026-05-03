@@ -6,6 +6,7 @@ import { Text as text } from '../class/text';
 import { Timer } from '../class/timer';
 
 const oven = e.oven();
+const pan = e.pan();
 const bowl = e.bowl();
 
 const OVEN_TEMP = 450;
@@ -30,7 +31,11 @@ class BreadedMushrooms extends Recipe {
       oven.preheat(OVEN_TEMP),
       Timer.end(),
 
-      Timer.set(PANKO_TOAST_MINUTES, 'm', 'Toast panko'),
+      pan.add([
+        i.pankoBreadCrumbs(3, u.cup),
+      ]),
+
+      pan.cook(PANKO_TOAST_MINUTES, 'm'),
       Timer.end(),
 
       bowl.add([
