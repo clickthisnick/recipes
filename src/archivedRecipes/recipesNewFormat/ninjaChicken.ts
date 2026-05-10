@@ -8,19 +8,17 @@ export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
         this.recipeType = c.meal;
-        this.variations = [
-            {'recipe': [NinjaChickenDrumsticks, NinjaChickenThighs]},
-        ]
-     }
+        this.variations = [{ recipe: [NinjaChickenDrumsticks, NinjaChickenThighs] }];
+    }
 }
 
 class NinjaChickenThighs extends Recipe {
     constructor() {
         super();
         this.steps = [
-            ['Season dry rub', i.chickenThigh(1, u.pound),],
-            [Timer.ninjaCook(10, 'm', 'Cook Chicken, flip at 5 min mark', 400)]
-        ]
+            ['Season dry rub', i.chickenThigh(1, u.pound)],
+            [Timer.ninjaCook(10, 'm', 'Cook Chicken, flip at 5 min mark', 400)],
+        ];
     }
 }
 
@@ -30,7 +28,7 @@ class NinjaChickenDrumsticks extends Recipe {
         this.steps = [
             ['(optional) Season dry rub', i.chickenDrumstickPackage(1, u.pound)],
             [Timer.ninjaCook(18, 'm', 'Cook Chicken, flip at 9 min mark', 450)],
-            ['(optional) Add drumsticks + sauce in a container and shake']
-        ]
+            ['(optional) Add drumsticks + sauce in a container and shake'],
+        ];
     }
 }

@@ -7,9 +7,7 @@ import { Text as text } from '../class/text';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.variations = [
-            JerkChicken1andHalfPound, JerkChicken3Lb
-        ]
+        this.variations = [JerkChicken1andHalfPound, JerkChicken3Lb];
     }
 }
 
@@ -43,23 +41,26 @@ class JerkChicken1andHalfPound extends Recipe {
             text.set(['Cut top of habenero']),
             text.set(['Take skin off ginger as good as you can without wasting the ginger']),
             text.set(['Cut the ginger into diced onion pieces']),
-            e.foodProcessor().add([
-                i.greenOnion(3, u.unit),
-                i.garlicClove(2, u.unit),
-                i.habanero(1, u.unit),
-                i.freshGinger(.75, u.inches),
-                i.limeJuice(.1667, u.cup),
-                i.soySauce(.123, u.cup),
-                i.coconutSugar(2.25, u.tsp),
-                i.thyme(1.5, u.tsp),
-                i.blackPepper(.5, u.tsp),
-                i.allSpice(.5, u.tsp),
-                i.cinnamon(.25, u.tsp),
-                i.nutmeg(.25, u.tsp),
-            ]),
+            e
+                .foodProcessor()
+                .add([
+                    i.greenOnion(3, u.unit),
+                    i.garlicClove(2, u.unit),
+                    i.habanero(1, u.unit),
+                    i.freshGinger(0.75, u.inches),
+                    i.limeJuice(0.1667, u.cup),
+                    i.soySauce(0.123, u.cup),
+                    i.coconutSugar(2.25, u.tsp),
+                    i.thyme(1.5, u.tsp),
+                    i.blackPepper(0.5, u.tsp),
+                    i.allSpice(0.5, u.tsp),
+                    i.cinnamon(0.25, u.tsp),
+                    i.nutmeg(0.25, u.tsp),
+                ]),
             e.foodProcessor().mix(),
-            text.set(['Pour mixture and about 1.5 pounds (5 pieces) of chicken thighs/drumsticks into ziplock bag'])
-
+            text.set([
+                'Pour mixture and about 1.5 pounds (5 pieces) of chicken thighs/drumsticks into ziplock bag',
+            ]),
         ];
     }
 }
@@ -71,22 +72,26 @@ class JerkChicken3Lb extends Recipe {
             text.set(['Cut top of habenero']),
             text.set(['Take skin off ginger as good as you can without wasting the ginger']),
             text.set(['Cut the ginger into diced onion size']),
-            e.foodProcessor().add([
-                i.greenOnion(6, u.unit),
-                i.garlicClove(4, u.unit),
-                i.habanero(2, u.unit),
-                i.freshGinger(1.5, u.inches),
-                i.limeJuice(3, u.unit),
-                i.soySauce(.25, u.cup),
-                i.coconutSugar(1.5, u.tbsp),
-                i.thyme(1, u.tbsp),
-                i.blackPepper(1, u.tsp),
-                i.allSpice(1, u.tsp),
-                i.cinnamon(.5, u.tsp),
-                i.nutmeg(.5, u.tsp),
-            ]),
+            e
+                .foodProcessor()
+                .add([
+                    i.greenOnion(6, u.unit),
+                    i.garlicClove(4, u.unit),
+                    i.habanero(2, u.unit),
+                    i.freshGinger(1.5, u.inches),
+                    i.limeJuice(3, u.unit),
+                    i.soySauce(0.25, u.cup),
+                    i.coconutSugar(1.5, u.tbsp),
+                    i.thyme(1, u.tbsp),
+                    i.blackPepper(1, u.tsp),
+                    i.allSpice(1, u.tsp),
+                    i.cinnamon(0.5, u.tsp),
+                    i.nutmeg(0.5, u.tsp),
+                ]),
             e.foodProcessor().mix(),
-            text.set(['Pour mixture and about 3 pounds (4 pieces) of chicken thighs/drumsticks into ziplock bag'])
+            text.set([
+                'Pour mixture and about 3 pounds (4 pieces) of chicken thighs/drumsticks into ziplock bag',
+            ]),
         ];
     }
 }

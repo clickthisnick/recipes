@@ -21,7 +21,13 @@ export class MealRecipe extends Recipe {
         this.prep();
         this.addSteps([
             ['Put the', this.get(i.instaPot()), 'on sear and put in', this.get(i.sesameOil())],
-            ['Put', this.get(i.salt()), this.get(i.blackPepper()), this.get(i.chilliPowder()), 'on all sides of pork'],
+            [
+                'Put',
+                this.get(i.salt()),
+                this.get(i.blackPepper()),
+                this.get(i.chilliPowder()),
+                'on all sides of pork',
+            ],
             ['Sear 4 minutes on every side'],
             ['Put in metal riser'],
             ['Put in 1 Cup of water'],

@@ -9,14 +9,12 @@ export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
         this.recipeType = c.component;
-        this.variations = [
-            {'recipe': [BabyBackRibs]},
-         ]
-     }
+        this.variations = [{ recipe: [BabyBackRibs] }];
+    }
 
-     public init() {
+    public init() {
         this.generateRecipes();
-     }
+    }
 }
 
 class BabyBackRibs extends Recipe {
@@ -28,7 +26,7 @@ class BabyBackRibs extends Recipe {
             i.babyBackRibs(1.5, u.pound),
             i.water(1.5, u.cup),
             i.liquidSmoke(3, u.tbsp),
-            i.appleCiderVinegar(.33, u.cup),
+            i.appleCiderVinegar(0.33, u.cup),
             i.barbecueSauce(1, u.cup),
         ]);
 
@@ -40,11 +38,11 @@ class BabyBackRibs extends Recipe {
             ['Put', i.babyBackRibs(), 'meat side facing outer edge of instant pot'],
             [Timer.pressureCook(9.5, 25, 'm', true)],
             [Timer.naturalPressRelease(10, 'm', true)],
-                [Async.step, 'Preheat oven to broil on 400 degrees'],
+            [Async.step, 'Preheat oven to broil on 400 degrees'],
             ['Release instant pot pressure'],
             ['Take inner instant pot bowl out and put on stove. Put away instant pot.'],
             ['Rub', i.barbecueSauce(), 'over', i.babyBackRibs(0)],
-            [Timer.set(2, 'm', 'Broil ribs')]
+            [Timer.set(2, 'm', 'Broil ribs')],
         ]);
     }
 }

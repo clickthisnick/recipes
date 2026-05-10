@@ -13,7 +13,7 @@ export class MealRecipe extends Recipe {
             i.water(1, u.cup),
             i.honey(4, u.tsp),
             i.oliveOil(4, u.tsp),
-            i.kosherSalt(1/2, u.tsp),
+            i.kosherSalt(1 / 2, u.tsp),
             i.dryActiveYeast(2, u.tsp),
         ]);
     }
@@ -30,7 +30,9 @@ export class MealRecipe extends Recipe {
             ['Put in', this.get(i.kosherSalt())],
             ['Put in', this.get(i.honey())],
             ['Put in center the', this.get(i.dryActiveYeast())],
-            ['Put bread maker on bread setting (menu item 1) with medium crust and 2 lb loaf and hit start'],
+            [
+                'Put bread maker on bread setting (menu item 1) with medium crust and 2 lb loaf and hit start',
+            ],
             ['Let bread cool for 20 minutes'],
             ['Slice bread'],
         ]);

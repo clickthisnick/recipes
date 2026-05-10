@@ -8,9 +8,7 @@ import { Timer } from '../class/timer';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.variations = [
-            KitchenAidNoodles1Lb, KitchenAidNoodles2Lb
-        ]
+        this.variations = [KitchenAidNoodles1Lb, KitchenAidNoodles2Lb];
     }
 }
 
@@ -18,19 +16,10 @@ export class KitchenAidNoodles1Lb extends Recipe {
     constructor() {
         super();
         this.steps = [
-            e.bowl().add([
-                i.egg(4, u.unit),
-            ]),
-            text.set([
-                'Add water into bowl, until mixture is 207 ml'
-            ]),
-            e.bowl().add([
-                i.water(1, u.tsp)
-            ]),
-            e.standMixer().add([
-                i.allPurposeFlour(3.5, u.cup),
-                i.salt(1, u.tsp),
-            ]),
+            e.bowl().add([i.egg(4, u.unit)]),
+            text.set(['Add water into bowl, until mixture is 207 ml']),
+            e.bowl().add([i.water(1, u.tsp)]),
+            e.standMixer().add([i.allPurposeFlour(3.5, u.cup), i.salt(1, u.tsp)]),
             text.set(['Attach flat beater to kitchenaid mixer']),
             text.set(['Set mixer to speed 2']),
             text.set(['Gradually add eggs and water']),
@@ -53,8 +42,6 @@ export class KitchenAidNoodles1Lb extends Recipe {
 export class KitchenAidNoodles2Lb extends Recipe {
     constructor() {
         super();
-        this.steps = [
-            text.set(['Make 1 lb noodles at a time.']),
-        ];
+        this.steps = [text.set(['Make 1 lb noodles at a time.'])];
     }
 }

@@ -7,9 +7,7 @@ import { Timer } from '../class/timer';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.variations = [
-            TacoTenderLoin
-        ]
+        this.variations = [TacoTenderLoin];
     }
 }
 
@@ -19,9 +17,7 @@ class TacoTenderLoin extends Recipe {
         this.steps = [
             e.pan().preheat(5),
             Timer.end(),
-            e.pan().add([
-                i.ingredient("Marinated Tenderloin")
-            ]),
+            e.pan().add([i.ingredient('Marinated Tenderloin')]),
             e.pan().cookWithLid(5, 'm', 10),
             Timer.end(),
         ];

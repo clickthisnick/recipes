@@ -8,10 +8,7 @@ export class MealRecipe extends Recipe {
     constructor() {
         super();
         this.recipeType = c.chicken;
-        this.addIngredients([
-            i.chickenDrumstickPackage(1, u.unit),
-            i.oldBay(2, u.tbsp)
-        ]);
+        this.addIngredients([i.chickenDrumstickPackage(1, u.unit), i.oldBay(2, u.tbsp)]);
     }
 
     public generateRecipe() {

@@ -8,9 +8,7 @@ import { Timer } from '../class/timer';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.variations = [
-            LeekMushroom
-        ]
+        this.variations = [LeekMushroom];
     }
 }
 
@@ -18,28 +16,24 @@ class LeekMushroom extends Recipe {
     constructor() {
         super();
         this.steps = [
-            e.pan().add([
-                i.avocadoOil(3, u.second)
-            ]),
+            e.pan().add([i.avocadoOil(3, u.second)]),
             e.pan().cook(2, 'm', 6),
             text.set(['Cut in half', i.leek(2, u.unit)]),
             text.set(['Cut leek in strips and soak in glass bowl of water']),
             text.set(['Chop', i.garlicClove(2, u.unit)]),
             text.set(['Cut', i.Groups.mushroom(5, u.unit)]),
             Timer.end(),
-            e.pan().add([
-                i.leek(),
-                i.garlicClove(),
-                i.Groups.mushroom()
-            ]),
+            e.pan().add([i.leek(), i.garlicClove(), i.Groups.mushroom()]),
             e.pan().cook(5, 'm'),
             Timer.end(),
-            e.pan().add([
-                i.soySauce(1, u.tsp),
-                i.sirachaSauce(.5, u.tbsp),
-                i.pepperFlake(.25, u.tbsp),
-                i.hoisonSauce(1, u.tsp),
-            ]),
+            e
+                .pan()
+                .add([
+                    i.soySauce(1, u.tsp),
+                    i.sirachaSauce(0.5, u.tbsp),
+                    i.pepperFlake(0.25, u.tbsp),
+                    i.hoisonSauce(1, u.tsp),
+                ]),
             e.pan().cook(2, 'm'),
             Timer.end(),
         ];

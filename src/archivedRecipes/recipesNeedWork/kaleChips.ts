@@ -8,11 +8,7 @@ export class MealRecipe extends Recipe {
     constructor() {
         super();
         this.recipeType = c.snack;
-        this.addIngredients([
-            i.kale(),
-            i.cookingSpray(),
-            i.oldBay(.5, u.tsp),
-        ]);
+        this.addIngredients([i.kale(), i.cookingSpray(), i.oldBay(0.5, u.tsp)]);
     }
 
     public generateRecipe() {

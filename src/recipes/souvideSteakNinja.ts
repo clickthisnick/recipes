@@ -8,27 +8,20 @@ import { Equipment as e } from '../class/equipment';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.variations = [
-            NinjaSouvideSteak
-        ]
-     }
+        this.variations = [NinjaSouvideSteak];
+    }
 }
 
 class NinjaSouvideSteak extends Recipe {
     constructor() {
         super();
         this.steps = [
-            i.topSirloin(1, u.pound).seasonWith([
-                i.thyme(2, u.dash),
-                i.blackPepper(2, u.dash),
-            ]),
+            i.topSirloin(1, u.pound).seasonWith([i.thyme(2, u.dash), i.blackPepper(2, u.dash)]),
             Timer.set(60, 'm', 'Souvide steak at 132 degrees'),
             Timer.end(),
             e.ninja().preheat(500),
             Timer.end(),
-            e.ninja().add([
-                i.topSirloin()
-            ]),
+            e.ninja().add([i.topSirloin()]),
             e.ninja().cook(1.5, 'm', 500),
             Timer.end(),
             text.set(['Flip steak']),
@@ -36,9 +29,7 @@ class NinjaSouvideSteak extends Recipe {
             Timer.end(),
             Timer.set(15, 'm', 'Let steak rest'),
             Timer.end(),
-            i.topSirloin().seasonWith([
-                i.steakSauce(1, u.unit)
-            ])
+            i.topSirloin().seasonWith([i.steakSauce(1, u.unit)]),
         ];
     }
 }

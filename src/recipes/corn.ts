@@ -8,19 +8,15 @@ import { Text as text } from '../class/text';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.variations = [
-            Corn
-         ]
-     }
+        this.variations = [Corn];
+    }
 }
 
 class Corn extends Recipe {
     constructor() {
         super();
         this.steps = [
-            e.pot().add([
-                i.water(20, u.thousandSecondCounts)
-            ]),
+            e.pot().add([i.water(20, u.thousandSecondCounts)]),
             Timer.set(15, 'm', 'Boil water'),
             Timer.end(),
             text.set(['Put corn in pot']),

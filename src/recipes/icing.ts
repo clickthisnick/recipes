@@ -8,9 +8,7 @@ import { Timer } from '../class/timer';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.variations = [
-            Icing
-        ]
+        this.variations = [Icing];
     }
 }
 
@@ -18,23 +16,18 @@ export class Icing extends Recipe {
     constructor() {
         super();
         this.steps = [
-            e.instantPot().add([
-                i.eggWhite(3, u.ounce),
-                i.vanillaExtract(1, u.tsp),
-                i.powderedSugar(4, u.cup),
-            ]),
-            e.kitchenAidMixingBowl().add([
-                i.eggWhite(),
-                i.vanillaExtract(),
-            ]),
-            text.set([
-                'Run mixer on high until mixture is fluffy',
-            ]),
-            e.kitchenAidMixingBowl().add([
-                i.powderedSugar()
-            ]),
+            e
+                .instantPot()
+                .add([
+                    i.eggWhite(3, u.ounce),
+                    i.vanillaExtract(1, u.tsp),
+                    i.powderedSugar(4, u.cup),
+                ]),
+            e.kitchenAidMixingBowl().add([i.eggWhite(), i.vanillaExtract()]),
+            text.set(['Run mixer on high until mixture is fluffy']),
+            e.kitchenAidMixingBowl().add([i.powderedSugar()]),
             Timer.set(7, 'm', 'Keep running kitchen aid mixer until mixture is glassy'),
-            Timer.end()
+            Timer.end(),
         ];
     }
 }

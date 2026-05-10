@@ -8,9 +8,7 @@ import { Timer } from '../class/timer';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.variations = [
-            PizzaWithPremadeCrust
-        ]
+        this.variations = [PizzaWithPremadeCrust];
     }
 }
 

@@ -1,93 +1,131 @@
-// This appears to be unused, but it is used as the init point of all items which extend it
-
+import { AnimalItems } from '../class/ingredients/animal';
+import { CarbItems } from '../class/ingredients/carb';
+import { FruitItems } from '../class/ingredients/fruit';
+import { OilItems } from '../class/ingredients/oil';
+import { SauceItems } from '../class/ingredients/sauce';
+import { SpiceItems } from '../class/ingredients/spice';
 import { VegetableItems } from '../class/ingredients/vegetable';
-import { IUnitObj, Units } from './units';
-import { Items as i } from './items';
-import { IPurchaseLink, Ingredient } from '../class/ingredients/ingredient';
 
-function returnItem(itemName: string, quantity: number, unit: IUnitObj, subItems: Ingredient[]) {
-    // This functions attempts to take a group of items, and returns a singular item back
-    // The reason why it exists is if you have a recipe that just needs "meat" but you don't care if its chickenThighs or beef
-    // Then you can use this to just return meat, then in shopping mode - you get all the options for "meat" and you can choose the one you best see fit at the time
-    const mainItem = i.ingredient(itemName, quantity, unit)
+import { IUnitObj, Units } from './units';
+import {
+    IItemObj,
+    IPurchaseLink,
+    IStorePurchaseLink,
+    Ingredient,
+} from '../class/ingredients/ingredient';
+
+type ItemFactory = (quantity?: number, unit?: IUnitObj) => Ingredient;
+
+type ItemGroupMap = {
+    chicken: ItemFactory;
+    mushroom: ItemFactory;
+    onion: ItemFactory;
+    cheese: ItemFactory;
+};
+
+function ingredient(
+    name: string,
+    quantity = 0,
+    unit: IUnitObj = Units.none,
+    purchaseLinks: IStorePurchaseLink = {}
+): Ingredient {
+    const item: IItemObj = {
+        name,
+        putAwayTime: 10,
+        takeOutTime: 10,
+        cleanSteps: '',
+        quantity,
+        unit,
+        wash: false,
+        isTakeoutUnitable: false,
+        isMeatProduct: false,
+        purchaseLinks,
+        perishableLimit: 0,
+        nutrition: {},
+    };
+
+    return new Ingredient(item);
+}
+
+const BaseItems = {
+    ...AnimalItems,
+    ...CarbItems,
+    ...FruitItems,
+    ...OilItems,
+    ...SauceItems,
+    ...SpiceItems,
+    ...VegetableItems,
+
+    ingredient,
+};
+
+function returnItem(
+    itemName: string,
+    quantity: number,
+    unit: IUnitObj,
+    subItems: Ingredient[]
+): Ingredient {
+    const mainItem = BaseItems.ingredient(itemName, quantity, unit);
     let lowestPerishableLimit = 0;
 
-    for (let idx = 0; idx < subItems.length; idx++) {
-        const ingredient = subItems[idx];
-
-        // Set if its a meat product
+    for (const ingredient of subItems) {
         if (ingredient.isMeatProduct) {
             mainItem.isMeatProduct = ingredient.isMeatProduct;
         }
 
-        // Set a perishable limit from the lowest limit of the group of items
-        // Since its a group it _should_ roughly be the same though
-        if (lowestPerishableLimit === 0) {
-            if (ingredient.perishableLimit) {
-                lowestPerishableLimit = ingredient.perishableLimit;
-            }
-        } else {
-            if (ingredient.perishableLimit) {
-                if (ingredient.perishableLimit < lowestPerishableLimit) {
-                    lowestPerishableLimit = ingredient.perishableLimit;
+        if (
+            ingredient.perishableLimit &&
+            (lowestPerishableLimit === 0 || ingredient.perishableLimit < lowestPerishableLimit)
+        ) {
+            lowestPerishableLimit = ingredient.perishableLimit;
+        }
+
+        const purchaseLinks = ingredient.purchaseLinks;
+
+        if (purchaseLinks && mainItem.purchaseLinks) {
+            Object.keys(purchaseLinks).forEach((store) => {
+                if (!(store in mainItem.purchaseLinks!)) {
+                    mainItem.purchaseLinks![store] = {};
                 }
-            }
+
+                Object.keys(purchaseLinks[store]).forEach((key) => {
+                    const mainItemPurchaseLinks: IPurchaseLink = mainItem.purchaseLinks![store];
+
+                    const itemKey = `${ingredient.name} ${key}`;
+
+                    mainItemPurchaseLinks[itemKey] = purchaseLinks[store][key];
+                });
+            });
         }
+    }
 
-        const puchaseLinks = ingredient.purchaseLinks;
-        if (puchaseLinks) {
-            Object.keys(puchaseLinks).forEach(store => {
-                if (mainItem.purchaseLinks) {
-                    if (!(store in mainItem.purchaseLinks)) {
-                        mainItem.purchaseLinks[store] = {}
-                    }
-
-
-                    Object.keys(puchaseLinks[store]).forEach(key => {
-                        if (mainItem.purchaseLinks) {
-                            const mainItemPurchaseLinks: IPurchaseLink = mainItem.purchaseLinks[store];
-                            const itemKey = ingredient.name + ' ' + key
-                            mainItemPurchaseLinks[itemKey] = puchaseLinks[store][key];
-                        }
-                    });
-                }
-            })
-        }
-
-        if (lowestPerishableLimit) {
-            mainItem.perishableLimit = lowestPerishableLimit;
-        }
-
+    if (lowestPerishableLimit) {
+        mainItem.perishableLimit = lowestPerishableLimit;
     }
 
     return mainItem;
 }
 
-export class Items extends VegetableItems {
-    private static createGroup(
-        name: string,
-        options: () => any[]
-    ) {
-        return (quantity = 0, unit: IUnitObj = Units.none) => 
-            returnItem(name, quantity, unit, options());
-    }
-
-    public static readonly Groups = {
-        chicken: Items.createGroup('chicken', () => [
-            i.chickenBreast(),
-            i.chickenThigh(),
-        ]),
-        mushroom: Items.createGroup('mushroom', () => [
-            i.whiteMushroom(),
-            i.babyBellaMushroom(),
-        ]),
-        onion: Items.createGroup('onion', () => [
-            i.whiteOnion(),
-            i.redOnion(),
-        ]),
-        cheese: Items.createGroup('cheese', () => [
-            i.cheddarCheese(),
-            i.mozzarellaCheese(),
-        ]),
+function createGroup(name: string, options: () => Ingredient[]): ItemFactory {
+    return (quantity = 0, unit: IUnitObj = Units.none): Ingredient => {
+        return returnItem(name, quantity, unit, options());
     };
 }
+
+const Groups: ItemGroupMap = {
+    chicken: createGroup('chicken', () => [BaseItems.chickenBreast(), BaseItems.chickenThigh()]),
+
+    mushroom: createGroup('mushroom', () => [
+        BaseItems.whiteMushroom(),
+        BaseItems.babyBellaMushroom(),
+    ]),
+
+    onion: createGroup('onion', () => [BaseItems.whiteOnion(), BaseItems.redOnion()]),
+
+    cheese: createGroup('cheese', () => [BaseItems.cheddarCheese(), BaseItems.mozzarellaCheese()]),
+};
+
+export const Items = {
+    ...BaseItems,
+    Groups,
+};

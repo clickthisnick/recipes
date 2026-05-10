@@ -8,9 +8,7 @@ import { Timer } from '../class/timer';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.variations = [
-            LondonBroil
-        ]
+        this.variations = [LondonBroil];
     }
 }
 
@@ -21,9 +19,7 @@ class LondonBroil extends Recipe {
             text.set(['Marinate meat']),
             e.ninja().preheat(500),
             Timer.end(),
-            e.ninja().add([
-                i.londonBroil(1, u.pound),
-            ])
+            e.ninja().add([i.londonBroil(1, u.pound)]),
         ];
     }
 }

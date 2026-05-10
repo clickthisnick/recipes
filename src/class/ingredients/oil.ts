@@ -1,99 +1,58 @@
 import { IItemObj, Ingredient } from './ingredient';
 import { IUnitObj, Units as u, Units } from '../../constants/units';
-import { MeatItems } from './meat';
 import { Stores } from '../../class/stores';
 
-export class OilItems extends MeatItems {
-
-    public static readonly sesameOil = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Sesame Oil',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
+export class OilItems {
+    private static makeOilItem(
+        name: string,
+        quantity = 0,
+        unit: IUnitObj = Units.none,
+        overrides: Partial<IItemObj> = {}
+    ): Ingredient {
+        return Ingredient.makeItem(name, quantity, unit, {
             isMeatProduct: true,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
+            ...overrides,
+        });
     }
 
-    public static readonly avocadoOil = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'avocado Oil',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: true,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly sesameOil = (quantity?: number, unit?: IUnitObj) =>
+        OilItems.makeOilItem('Sesame Oil', quantity, unit);
 
-    public static readonly chilliOil = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Chilli Oil',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: true,
-            purchaseLinks: {},
-            perishableLimit: 0,
+    public static readonly avocadoOil = (quantity?: number, unit?: IUnitObj) =>
+        OilItems.makeOilItem('Avocado Oil', quantity, unit);
+
+    public static readonly chilliOil = (quantity?: number, unit?: IUnitObj) =>
+        OilItems.makeOilItem('Chilli Oil', quantity, unit, {
             nutrition: {
                 [u.tbsp.name]: {
                     calories: 119.34,
-                    sodium: .3,
+                    sodium: 0.3,
                 },
                 [u.tsp.name]: {
                     calories: 39.78,
-                    sodium: .1,
-                }
+                    sodium: 0.1,
+                },
             },
-        }
-        return new Ingredient(item)
-    }
+        });
 
-    public static readonly coconutOil = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Coconut Oil',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: true,
+    public static readonly coconutOil = (quantity?: number, unit?: IUnitObj) =>
+        OilItems.makeOilItem('Coconut Oil', quantity, unit, {
             purchaseLinks: {
                 [Stores.amazon]: {
-                    'BetterBody Foods Organic Naturally Refined Coconut Oil with Neutral Flavor and Aroma': [
-                        {
-                            price: 11.96,
-                            quantity: 56,
-                            quantity_unit: u.fluid_ounce,
-                            link: 'https://www.amazon.com/BetterBody-Foods-Organic-Naturally-Refined/dp/B00U1RKGOW/ref=sr_1_6',
-                            organic: true,
-                            discount: {
-                                'Subscribe 5 Products': 15,
-                                'Subscribe': 5,
-                            }
-                        }
-                    ]
+                    'BetterBody Foods Organic Naturally Refined Coconut Oil with Neutral Flavor and Aroma':
+                        [
+                            {
+                                price: 11.96,
+                                quantity: 56,
+                                quantity_unit: u.fluid_ounce,
+                                link: 'https://www.amazon.com/BetterBody-Foods-Organic-Naturally-Refined/dp/B00U1RKGOW/ref=sr_1_6',
+                                organic: true,
+                                discount: {
+                                    'Subscribe 5 Products': 15,
+                                    Subscribe: 5,
+                                },
+                            },
+                        ],
                 },
                 [Stores.wegmans]: {
                     'Wegmans Organic Extra Virgin Coconut Oil, Unrefined': [
@@ -102,9 +61,9 @@ export class OilItems extends MeatItems {
                             quantity: 26,
                             quantity_unit: u.fluid_ounce,
                             link: 'https://shop.wegmans.com/product/36486/wegmans-organic-extra-virgin-coconut-oil-unrefined',
-                            organic: true
-                        }
-                    ]
+                            organic: true,
+                        },
+                    ],
                 },
                 [Stores.wholeFoods]: {
                     '365 by Whole Foods Market, Organic Expellar Pressed Coconut Oil': [
@@ -113,51 +72,38 @@ export class OilItems extends MeatItems {
                             quantity: 14,
                             quantity_unit: u.fluid_ounce,
                             link: 'https://www.amazon.com/365-Everyday-Value-Organic-Coconut/dp/B074H5BV9Y',
-                            organic: true
-                        }
-                    ]
+                            organic: true,
+                        },
+                    ],
                 },
             },
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+        });
 
-    public static readonly oliveOil = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Olive Oil',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: true,
+    public static readonly oliveOil = (quantity?: number, unit?: IUnitObj) =>
+        OilItems.makeOilItem('Olive Oil', quantity, unit, {
             purchaseLinks: {
                 [Stores.wholeFoods]: {
-                    'california': [
+                    california: [
                         {
                             price: 12.99,
                             quantity: 33.8,
                             quantity_unit: u.fluid_ounce,
                             link: 'https://www.amazon.com/365-Everyday-Value-Unfiltered-Californian/dp/B074HKKC3W',
                             organic: false,
-                        }
+                        },
                     ],
-                    'mediterranean': [
+                    mediterranean: [
                         {
                             price: 19.29,
                             quantity: 101.4,
                             quantity_unit: u.fluid_ounce,
                             link: 'https://www.amazon.com/Everyday-Value-Olive-Virgin-Mediterranean/dp/B074Y6WZ8X/ref=sr_1_16_0o_wf',
                             organic: false,
-                        }
+                        },
                     ],
                 },
                 [Stores.amazon]: {
-                    'mediterranean': [
+                    mediterranean: [
                         {
                             price: 14.98,
                             quantity: 68,
@@ -166,71 +112,38 @@ export class OilItems extends MeatItems {
                             organic: false,
                             discount: {
                                 'Subscribe 5 Products': 15,
-                                'Subscribe': 5,
-                            }
-                        }
+                                Subscribe: 5,
+                            },
+                        },
                     ],
                 },
                 [Stores.wegmans]: {
-                    'mediterranean': [
+                    mediterranean: [
                         {
                             price: 9.19,
                             quantity: 33.8,
                             quantity_unit: u.fluid_ounce,
                             link: 'https://shop.wegmans.com/product/16900/wegmans-100-mediterranean-blend-olive-oil-pure',
                             organic: false,
-                        }
-                    ]
-                }
+                        },
+                    ],
+                },
             },
-            perishableLimit: 0,
             nutrition: {
                 [u.tbsp.name]: {
                     calories: 119.34,
-                    sodium: .3,
+                    sodium: 0.3,
                 },
                 [u.tsp.name]: {
                     calories: 39.78,
-                    sodium: .1,
-                }
+                    sodium: 0.1,
+                },
             },
-        }
-        return new Ingredient(item)
-    }
+        });
 
-    public static readonly vegetableOil = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Vegetable Oil',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: true,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly vegetableOil = (quantity?: number, unit?: IUnitObj) =>
+        OilItems.makeOilItem('Vegetable Oil', quantity, unit);
 
-    public static readonly vegetableBroth = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Vegetable Broth',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: true,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly vegetableBroth = (quantity?: number, unit?: IUnitObj) =>
+        OilItems.makeOilItem('Vegetable Broth', quantity, unit);
 }

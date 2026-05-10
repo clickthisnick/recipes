@@ -13,9 +13,7 @@ This website will have no database what so ever it is so the user can track thei
 Can you create a prompt that AI would be able to clearly build the website for me
 ```
 
-
 AI generated:
-
 
 # Nutrition Tracker App Prompt
 
@@ -34,24 +32,25 @@ The interface should consist of **two main tabs**, switchable via buttons with J
 **Title:** `Nutrition Tracker`
 
 #### Features:
+
 - Let the user select food items from a predefined list using a single `<select>` dropdown.
 - When a food is selected:
-  - Add it to a **"selected foods" list**.
-  - Support **adding the same food multiple times** — quantities must be tracked.
-  - Show a visual **tag-style list** of selected foods with:
-    - The food name
-    - The current quantity (e.g., "Raspberry Bar (x2)")
-    - `+` and `-` buttons to increment or decrement quantity
-    - If quantity reaches 0, remove the food from the list.
+    - Add it to a **"selected foods" list**.
+    - Support **adding the same food multiple times** — quantities must be tracked.
+    - Show a visual **tag-style list** of selected foods with:
+        - The food name
+        - The current quantity (e.g., "Raspberry Bar (x2)")
+        - `+` and `-` buttons to increment or decrement quantity
+        - If quantity reaches 0, remove the food from the list.
 - A button labeled `Update Nutrition` recalculates and displays a table showing:
-  - Total user nutrient intake (based on selected foods and quantities)
-  - FDA recommended daily limits (hardcoded)
+    - Total user nutrient intake (based on selected foods and quantities)
+    - FDA recommended daily limits (hardcoded)
 - The nutrients to track should be modular (e.g., stored in a constant like `['calories', 'protein', 'carbs', 'fat', 'fiber', 'sugar', 'sodium']`) so it's easy to add/remove nutrients.
 - Nutrient values must be **multiplied by the quantity** selected for each food.
 - The summary table includes:
-  - Nutrient name
-  - User’s total intake
-  - FDA daily limit
+    - Nutrient name
+    - User’s total intake
+    - FDA daily limit
 
 ---
 
@@ -60,17 +59,18 @@ The interface should consist of **two main tabs**, switchable via buttons with J
 **Title:** `Add Custom Food`
 
 #### Features:
+
 - A form that allows the user to input:
-  - Food name (text)
-  - Nutrient values (calories, protein, carbs, fat, fiber, sugar, sodium, etc.) as numbers
+    - Food name (text)
+    - Nutrient values (calories, protein, carbs, fat, fiber, sugar, sodium, etc.) as numbers
 - All fields must be validated:
-  - Required
-  - No negative values
+    - Required
+    - No negative values
 - On submission:
-  - Show a pretty-printed JSON representation of the food object in a `<textarea>`
-  - Include a button to `Copy to Clipboard`
+    - Show a pretty-printed JSON representation of the food object in a `<textarea>`
+    - Include a button to `Copy to Clipboard`
 - Below the form, include a helper message:
-  > _"Copy this JSON and manually add it to your foods list in your app repo."_
+    > _"Copy this JSON and manually add it to your foods list in your app repo."_
 
 ---
 
@@ -83,8 +83,8 @@ The interface should consist of **two main tabs**, switchable via buttons with J
 - CSS styling should be clean and minimal — use Flexbox for layout where needed.
 - Use semantic HTML where appropriate.
 - The code should be modular and clean:
-  - Nutrients list and FDA limits should be stored in constants
-  - Avoid repetition where possible (e.g., when generating inputs or rows in tables)
+    - Nutrients list and FDA limits should be stored in constants
+    - Avoid repetition where possible (e.g., when generating inputs or rows in tables)
 
 ---
 
@@ -105,3 +105,4 @@ const foodData = {
   banana: { ... },
   // etc.
 };
+```

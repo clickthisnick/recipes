@@ -8,9 +8,7 @@ import { Timer } from '../class/timer';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.variations = [
-            WholeWheatBread
-        ]
+        this.variations = [WholeWheatBread];
     }
 }
 
@@ -18,39 +16,34 @@ export class WholeWheatBread extends Recipe {
     constructor() {
         super();
         this.steps = [
-            e.kitchenAidMixingBowl().add([
-                i.wholeWheatFlour(3.5, u.cup),
-                i.dryActiveYeast(4, u.tsp),
-            ]),
+            e
+                .kitchenAidMixingBowl()
+                .add([i.wholeWheatFlour(3.5, u.cup), i.dryActiveYeast(4, u.tsp)]),
             e.kitchenAidMixingBowl().mixWithDoughHook(1, 1),
             Timer.end(),
-            e.bowl().add([
-                i.water(2.5, u.cup),
-            ]),
+            e.bowl().add([i.water(2.5, u.cup)]),
             e.bowl().microwave(1.05, 'm'),
             Timer.end(),
-            e.kitchenAidMixingBowl().add([
-                i.ingredient('Microwaved water')
-            ]),
+            e.kitchenAidMixingBowl().add([i.ingredient('Microwaved water')]),
             e.kitchenAidMixingBowl().mixWithDoughHook(1, 1),
             Timer.end(),
             Timer.set(10, 'm', 'Cover the kitchenaid bowl'),
             Timer.end(),
             e.oven().preheat(350),
-                e.kitchenAidMixingBowl().add([
+            e
+                .kitchenAidMixingBowl()
+                .add([
                     i.salt(1, u.tbsp),
-                    i.coconutOil(1/3, u.cup),
-                    i.honey(1/3, u.cup),
-                    i.lemonJuice(4, u.tsp)
+                    i.coconutOil(1 / 3, u.cup),
+                    i.honey(1 / 3, u.cup),
+                    i.lemonJuice(4, u.tsp),
                 ]),
-                e.kitchenAidMixingBowl().mixWithDoughHook(1,1),
-                Timer.end(),
+            e.kitchenAidMixingBowl().mixWithDoughHook(1, 1),
             Timer.end(),
-            e.kitchenAidMixingBowl().add([
-                i.wholeWheatBread(2.5, u.cup),
-            ]),
-            e.kitchenAidMixingBowl().mixWithDoughHook(3,3),
-                text.set(['Grease 2 bread pans']),
+            Timer.end(),
+            e.kitchenAidMixingBowl().add([i.wholeWheatBread(2.5, u.cup)]),
+            e.kitchenAidMixingBowl().mixWithDoughHook(3, 3),
+            text.set(['Grease 2 bread pans']),
             Timer.end(),
             text.set(['Turn off oven']),
             Timer.set(1, 'm', 'wait for oven to get less warm'),
@@ -58,7 +51,7 @@ export class WholeWheatBread extends Recipe {
             Timer.set(20, 'm', 'Put dough in bread pans and put in oven'),
             Timer.end(),
             Timer.set(30, 'm', 'Turn oven to 350'),
-            Timer.end()
+            Timer.end(),
         ];
     }
 }

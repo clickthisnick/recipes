@@ -81,15 +81,27 @@ abstract class Container {
 
     public microwave(duration: number, unit: TimeUnit, disappearWhen = 'timerIsUp'): IStep {
         const humanUnit = unit === 's' ? 'seconds' : 'minutes';
-        return Timer.set(duration, unit, `Microwave ${this.name} for ${duration} ${humanUnit}`, [], disappearWhen);
+        return Timer.set(
+            duration,
+            unit,
+            `Microwave ${this.name} for ${duration} ${humanUnit}`,
+            [],
+            disappearWhen
+        );
     }
 
     public add(ingredients: Ingredient[]): IStep {
         const addIStep = istep();
 
-        const hydrateIStep = (parentStep: IStep, addIngredient: IStep, ingredient: Ingredient): void => {
+        const hydrateIStep = (
+            parentStep: IStep,
+            addIngredient: IStep,
+            ingredient: Ingredient
+        ): void => {
             addIngredient.ingredients.push(ingredient);
-            addIngredient.text = [s.lazyIngredientIdx, addIngredient.ingredients.length - 1].join(' ');
+            addIngredient.text = [s.lazyIngredientIdx, addIngredient.ingredients.length - 1].join(
+                ' '
+            );
             addIngredient.time += ingredient.takeOutTime;
             parentStep.children.push(addIngredient);
 
@@ -184,15 +196,33 @@ class KitchenAidMixingBowl extends Container {
     }
 
     public mixWithDoughHook(speed: number, minutes: number, disappearWhen = 'timerIsUp'): IStep {
-        return Timer.set(minutes, 'm', `Mix with dough hook on speed ${speed} for ${minutes} minutes`, [], disappearWhen);
+        return Timer.set(
+            minutes,
+            'm',
+            `Mix with dough hook on speed ${speed} for ${minutes} minutes`,
+            [],
+            disappearWhen
+        );
     }
 
     public mixWithFlatBeater(speed: number, minutes: number, disappearWhen = 'timerIsUp'): IStep {
-        return Timer.set(minutes, 'm', `Mix with flat beater attachment on speed ${speed} for ${minutes} minutes`, [], disappearWhen);
+        return Timer.set(
+            minutes,
+            'm',
+            `Mix with flat beater attachment on speed ${speed} for ${minutes} minutes`,
+            [],
+            disappearWhen
+        );
     }
 
     public mixWithWhisk(speed: number, minutes: number, disappearWhen = 'timerIsUp'): IStep {
-        return Timer.set(minutes, 'm', `Mix with whisk attachment on speed ${speed} for ${minutes} minutes`, [], disappearWhen);
+        return Timer.set(
+            minutes,
+            'm',
+            `Mix with whisk attachment on speed ${speed} for ${minutes} minutes`,
+            [],
+            disappearWhen
+        );
     }
 }
 
@@ -201,7 +231,12 @@ abstract class CookingContainer extends Container {
         super(id, name);
     }
 
-    public cook(_duration: number, _type: TimeUnit, _degrees: number, _disappearWhen = 'timerIsUp'): IStep {
+    public cook(
+        _duration: number,
+        _type: TimeUnit,
+        _degrees: number,
+        _disappearWhen = 'timerIsUp'
+    ): IStep {
         throw new Error(`${this.constructor.name}.cook() must be implemented by subclass`);
     }
 
@@ -226,15 +261,30 @@ class ToasterOven extends CookingContainer {
         return Timer.set(seconds, 's', `Preheat ${this.name} ${heatText}`, [], disappearWhen);
     }
 
-    public cook(duration: number, type: TimeUnit, degrees: number, disappearWhen = 'timerIsUp'): IStep {
+    public cook(
+        duration: number,
+        type: TimeUnit,
+        degrees: number,
+        disappearWhen = 'timerIsUp'
+    ): IStep {
         return Timer.set(duration, type, `Cook ${this.name} @ ${degrees}°`, [], disappearWhen);
     }
 
-    public roast(duration: number, type: TimeUnit, degrees: number, disappearWhen = 'timerIsUp'): IStep {
+    public roast(
+        duration: number,
+        type: TimeUnit,
+        degrees: number,
+        disappearWhen = 'timerIsUp'
+    ): IStep {
         return Timer.set(duration, type, `Roast ${this.name} @ ${degrees}°`, [], disappearWhen);
     }
 
-    public broil(duration: number, type: TimeUnit, degrees: number, disappearWhen = 'timerIsUp'): IStep {
+    public broil(
+        duration: number,
+        type: TimeUnit,
+        degrees: number,
+        disappearWhen = 'timerIsUp'
+    ): IStep {
         return Timer.set(duration, type, `Broil ${this.name} @ ${degrees}°`, [], disappearWhen);
     }
 }
@@ -256,15 +306,30 @@ class Oven extends CookingContainer {
         return Timer.set(minutes, 'm', `Preheat ${this.name} ${heatText}`, [], disappearWhen);
     }
 
-    public cook(duration: number, type: TimeUnit, degrees: number, disappearWhen = 'timerIsUp'): IStep {
+    public cook(
+        duration: number,
+        type: TimeUnit,
+        degrees: number,
+        disappearWhen = 'timerIsUp'
+    ): IStep {
         return Timer.set(duration, type, `Cook ${this.name} @ ${degrees}°`, [], disappearWhen);
     }
 
-    public roast(duration: number, type: TimeUnit, degrees: number, disappearWhen = 'timerIsUp'): IStep {
+    public roast(
+        duration: number,
+        type: TimeUnit,
+        degrees: number,
+        disappearWhen = 'timerIsUp'
+    ): IStep {
         return Timer.set(duration, type, `Roast ${this.name} @ ${degrees}°`, [], disappearWhen);
     }
 
-    public broil(duration: number, type: TimeUnit, degrees: number, disappearWhen = 'timerIsUp'): IStep {
+    public broil(
+        duration: number,
+        type: TimeUnit,
+        degrees: number,
+        disappearWhen = 'timerIsUp'
+    ): IStep {
         return Timer.set(duration, type, `Broil ${this.name} @ ${degrees}°`, [], disappearWhen);
     }
 }
@@ -283,40 +348,56 @@ class Ninja extends CookingContainer {
     }
 
     public preheatAirFry(minutes: number, disappearWhen = 'timerIsUp'): IStep {
-        return Timer.set(5, 'm', `Turn ${this.name} air fry setting to ${minutes} minutes`, [], disappearWhen);
+        return Timer.set(
+            5,
+            'm',
+            `Turn ${this.name} air fry setting to ${minutes} minutes`,
+            [],
+            disappearWhen
+        );
     }
 
-    public cook(duration: number, type: TimeUnit, degrees: number, disappearWhen = 'timerIsUp'): IStep {
+    public cook(
+        duration: number,
+        type: TimeUnit,
+        degrees: number,
+        disappearWhen = 'timerIsUp'
+    ): IStep {
         return Timer.set(duration, type, `Cook ${this.name} @ ${degrees}°`, [], disappearWhen);
     }
 
-    public airFry(duration: number, type: TimeUnit, degrees: number, disappearWhen = 'timerIsUp'): IStep {
+    public airFry(
+        duration: number,
+        type: TimeUnit,
+        degrees: number,
+        disappearWhen = 'timerIsUp'
+    ): IStep {
         return Timer.set(duration, type, `Air fry ${this.name} @ ${degrees}°`, [], disappearWhen);
     }
 }
 
 class Grinder extends CookingContainer {
-  constructor(id = 99) {
-    super(id);
-  }
+    constructor(id = 99) {
+        super(id);
+    }
 }
 
 class Glass extends CookingContainer {
-  constructor(id = 99) {
-    super(id);
-  }
+    constructor(id = 99) {
+        super(id);
+    }
 }
 
 class SaucePan extends CookingContainer {
-  constructor(id = 99) {
-    super(id);
-  }
+    constructor(id = 99) {
+        super(id);
+    }
 }
 
 class BakingSheet extends CookingContainer {
-  constructor(id = 99) {
-    super(id);
-  }
+    constructor(id = 99) {
+        super(id);
+    }
 }
 
 class Pot extends CookingContainer {
@@ -343,36 +424,99 @@ class Pot extends CookingContainer {
         return heat;
     }
 
-    private cookStr(text: string, duration: number, type: TimeUnit, heat: number, disappearWhen = 'timerIsUp'): IStep {
+    private cookStr(
+        text: string,
+        duration: number,
+        type: TimeUnit,
+        heat: number,
+        disappearWhen = 'timerIsUp'
+    ): IStep {
         this.getHeat(heat);
         return Timer.set(duration, type, text, [this.name], disappearWhen);
     }
 
-    public cook(duration: number, type: TimeUnit, heat: number, disappearWhen = 'timerIsUp'): IStep {
+    public cook(
+        duration: number,
+        type: TimeUnit,
+        heat: number,
+        disappearWhen = 'timerIsUp'
+    ): IStep {
         const resolvedHeat = this.getHeat(heat);
-        return this.cookStr(`Cook ${this.name} on heat ${resolvedHeat}`, duration, type, resolvedHeat, disappearWhen);
+        return this.cookStr(
+            `Cook ${this.name} on heat ${resolvedHeat}`,
+            duration,
+            type,
+            resolvedHeat,
+            disappearWhen
+        );
     }
 
-    public cookWithoutLid(duration: number, type: TimeUnit, heat: number, disappearWhen = 'timerIsUp'): IStep {
+    public cookWithoutLid(
+        duration: number,
+        type: TimeUnit,
+        heat: number,
+        disappearWhen = 'timerIsUp'
+    ): IStep {
         const resolvedHeat = this.getHeat(heat);
-        return this.cookStr(`Cook ${this.name} without lid on heat ${resolvedHeat}`, duration, type, resolvedHeat, disappearWhen);
+        return this.cookStr(
+            `Cook ${this.name} without lid on heat ${resolvedHeat}`,
+            duration,
+            type,
+            resolvedHeat,
+            disappearWhen
+        );
     }
 
-    public cookWithLid(duration: number, type: TimeUnit, heat: number, text = '', disappearWhen = 'timerIsUp'): IStep {
+    public cookWithLid(
+        duration: number,
+        type: TimeUnit,
+        heat: number,
+        text = '',
+        disappearWhen = 'timerIsUp'
+    ): IStep {
         const resolvedHeat = this.getHeat(heat);
         const prefix = text ? `${text} ` : '';
-        return this.cookStr(`Cook ${prefix}${this.name} with lid on heat ${resolvedHeat}`, duration, type, resolvedHeat, disappearWhen);
+        return this.cookStr(
+            `Cook ${prefix}${this.name} with lid on heat ${resolvedHeat}`,
+            duration,
+            type,
+            resolvedHeat,
+            disappearWhen
+        );
     }
 
-    public cookWithLidSlightlyOff(duration: number, type: TimeUnit, heat: number, text = '', disappearWhen = 'timerIsUp'): IStep {
+    public cookWithLidSlightlyOff(
+        duration: number,
+        type: TimeUnit,
+        heat: number,
+        text = '',
+        disappearWhen = 'timerIsUp'
+    ): IStep {
         const resolvedHeat = this.getHeat(heat);
         const prefix = text ? `${text} ` : '';
-        return this.cookStr(`Cook ${prefix}${this.name} with lid slightly off on heat ${resolvedHeat}`, duration, type, resolvedHeat, disappearWhen);
+        return this.cookStr(
+            `Cook ${prefix}${this.name} with lid slightly off on heat ${resolvedHeat}`,
+            duration,
+            type,
+            resolvedHeat,
+            disappearWhen
+        );
     }
 
-    public boilWithLid(duration: number, type: TimeUnit, heat: number, disappearWhen = 'timerIsUp'): IStep {
+    public boilWithLid(
+        duration: number,
+        type: TimeUnit,
+        heat: number,
+        disappearWhen = 'timerIsUp'
+    ): IStep {
         const resolvedHeat = this.getHeat(heat);
-        return this.cookStr(`Boil ${this.name} contents on heat ${resolvedHeat} with lid on`, duration, type, resolvedHeat, disappearWhen);
+        return this.cookStr(
+            `Boil ${this.name} contents on heat ${resolvedHeat} with lid on`,
+            duration,
+            type,
+            resolvedHeat,
+            disappearWhen
+        );
     }
 }
 
@@ -381,7 +525,12 @@ class Strainer extends CookingContainer {
         super(id);
     }
 
-    public wash(text: string, duration: number, type: TimeUnit, disappearWhen = 'timerIsUp'): IStep {
+    public wash(
+        text: string,
+        duration: number,
+        type: TimeUnit,
+        disappearWhen = 'timerIsUp'
+    ): IStep {
         return Timer.set(duration, type, text, [this.name], disappearWhen);
     }
 }
@@ -409,14 +558,32 @@ class Pan extends CookingContainer {
         this.heat = heat;
 
         if (heat === 5) {
-            return Timer.set(2, 'm', `Preheat ${this.name} on heat ${heat}`, [this.name], disappearWhen);
+            return Timer.set(
+                2,
+                'm',
+                `Preheat ${this.name} on heat ${heat}`,
+                [this.name],
+                disappearWhen
+            );
         }
 
         if (heat === 7) {
-            return Timer.set(4, 'm', `Preheat ${this.name} on heat ${heat}`, [this.name], disappearWhen);
+            return Timer.set(
+                4,
+                'm',
+                `Preheat ${this.name} on heat ${heat}`,
+                [this.name],
+                disappearWhen
+            );
         }
 
-        return Timer.set(5, 'm', `Preheat ${this.name} on heat ${heat}`, [this.name], disappearWhen);
+        return Timer.set(
+            5,
+            'm',
+            `Preheat ${this.name} on heat ${heat}`,
+            [this.name],
+            disappearWhen
+        );
     }
 
     private getHeat(heat = 0): number {
@@ -429,25 +596,60 @@ class Pan extends CookingContainer {
         return heat;
     }
 
-    private cookStr(text: string, duration: number, type: TimeUnit, heat = 0, disappearWhen = 'timerIsUp'): IStep {
+    private cookStr(
+        text: string,
+        duration: number,
+        type: TimeUnit,
+        heat = 0,
+        disappearWhen = 'timerIsUp'
+    ): IStep {
         this.getHeat(heat);
         return Timer.set(duration, type, text, [this.name], disappearWhen);
     }
 
     public cook(duration: number, type: TimeUnit, heat = 0, disappearWhen = 'timerIsUp'): IStep {
         const resolvedHeat = this.getHeat(heat);
-        return this.cookStr(`Cook ${this.name} on heat ${resolvedHeat}`, duration, type, resolvedHeat, disappearWhen);
+        return this.cookStr(
+            `Cook ${this.name} on heat ${resolvedHeat}`,
+            duration,
+            type,
+            resolvedHeat,
+            disappearWhen
+        );
     }
 
-    public cookWithLidSlightlyOff(duration: number, type: TimeUnit, heat = 0, disappearWhen = 'timerIsUp'): IStep {
+    public cookWithLidSlightlyOff(
+        duration: number,
+        type: TimeUnit,
+        heat = 0,
+        disappearWhen = 'timerIsUp'
+    ): IStep {
         const resolvedHeat = this.getHeat(heat);
-        return this.cookStr(`Cook ${this.name} on heat ${resolvedHeat} with lid slightly off`, duration, type, resolvedHeat, disappearWhen);
+        return this.cookStr(
+            `Cook ${this.name} on heat ${resolvedHeat} with lid slightly off`,
+            duration,
+            type,
+            resolvedHeat,
+            disappearWhen
+        );
     }
 
-    public cookWithLid(duration: number, type: TimeUnit, heat = 0, text = '', disappearWhen = 'timerIsUp'): IStep {
+    public cookWithLid(
+        duration: number,
+        type: TimeUnit,
+        heat = 0,
+        text = '',
+        disappearWhen = 'timerIsUp'
+    ): IStep {
         const prefix = text ? `${text} ` : '';
         const resolvedHeat = this.getHeat(heat);
-        return this.cookStr(`Cook ${prefix}${this.name} on heat ${resolvedHeat} with lid`, duration, type, resolvedHeat, disappearWhen);
+        return this.cookStr(
+            `Cook ${prefix}${this.name} on heat ${resolvedHeat} with lid`,
+            duration,
+            type,
+            resolvedHeat,
+            disappearWhen
+        );
     }
 }
 
@@ -456,7 +658,12 @@ class InstantPot extends CookingContainer {
         super(id);
     }
 
-    public pressureCook(preheat: number, duration: number, type: TimeUnit, disappearWhen = 'timerIsUp'): IStep {
+    public pressureCook(
+        preheat: number,
+        duration: number,
+        type: TimeUnit,
+        disappearWhen = 'timerIsUp'
+    ): IStep {
         const preheatStep = istep();
         preheatStep.time += Time.convert(preheat, type);
         preheatStep.text = `Put ${this.name} on high pressure for ${duration} minutes`;
@@ -520,9 +727,11 @@ export class Equipment {
 
     public static readonly pan = (id = 99) => new Pan(id);
 
-    public static readonly smallStainlessSteelContainer = (id = 99) => new SmallStainlessSteelContainer(id);
+    public static readonly smallStainlessSteelContainer = (id = 99) =>
+        new SmallStainlessSteelContainer(id);
 
-    public static readonly largeStainlessSteelContainer = (id = 99) => new LargeStainlessSteelContainer(id);
+    public static readonly largeStainlessSteelContainer = (id = 99) =>
+        new LargeStainlessSteelContainer(id);
 
     public static readonly foodProcessor = (id = 99) => new FoodProcessor(id);
 

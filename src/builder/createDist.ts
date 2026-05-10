@@ -7,14 +7,14 @@ const distFolder = path.join(process.cwd(), 'dist');
 const outputFile = path.join(distFolder, 'main.html');
 
 function getBaseHtml(): string {
-  return [
-    HTML.mobileViewport,
-    HTML.audio,
-    HTML.charset,
-    HTML.css,
-    HTML.javascript(),
+    return [
+        HTML.mobileViewport,
+        HTML.audio,
+        HTML.charset,
+        HTML.css,
+        HTML.javascript(),
 
-    `
+        `
 <button id="shoppingButton" onclick="selectMode('shopping')">Shopping Mode</button>
 <button id="cookingButton" onclick="selectMode('cooking')">Cooking Mode</button>
 <br>
@@ -39,12 +39,12 @@ function getBaseHtml(): string {
 <div id="select" style="display: none;">
   Select Recipes<br>
   <button onclick="doneSelectingRecipes()">Done Selecting</button><br>
-`
-  ].join('');
+`,
+    ].join('');
 }
 
 function getStartupScript(): string {
-  return `
+    return `
 </div><br>
 
 <script>
@@ -120,43 +120,43 @@ function getStartupScript(): string {
 }
 
 function isRecipeFile(filename: string): boolean {
-  return filename.endsWith('.ts') || filename.endsWith('.js');
+    return filename.endsWith('.ts') || filename.endsWith('.js');
 }
 
 function generateRecipeHtml(filename: string): string {
-  const recipePath = path.join(recipeFolder, filename);
-  const recipeModule = require(recipePath);
+    const recipePath = path.join(recipeFolder, filename);
+    const recipeModule = require(recipePath);
 
-  if (!recipeModule.MealRecipe) {
-    console.warn('Skipping recipe without MealRecipe export:', filename);
-    return '';
-  }
+    if (!recipeModule.MealRecipe) {
+        console.warn('Skipping recipe without MealRecipe export:', filename);
+        return '';
+    }
 
-  const recipe = new recipeModule.MealRecipe();
+    const recipe = new recipeModule.MealRecipe();
 
-  recipe.generateRecipeHtml(filename);
+    recipe.generateRecipeHtml(filename);
 
-  return recipe.recipeHtml || '';
+    return recipe.recipeHtml || '';
 }
 
 function run(): void {
-  let pageHtml = getBaseHtml();
+    let pageHtml = getBaseHtml();
 
-  const filenames = fs
-    .readdirSync(recipeFolder)
-    .filter(isRecipeFile)
-    .sort(function (a, b) {
-      return a.localeCompare(b);
+    const filenames = fs
+        .readdirSync(recipeFolder)
+        .filter(isRecipeFile)
+        .sort(function (a, b) {
+            return a.localeCompare(b);
+        });
+
+    filenames.forEach(function (filename) {
+        pageHtml += generateRecipeHtml(filename);
     });
 
-  filenames.forEach(function (filename) {
-    pageHtml += generateRecipeHtml(filename);
-  });
+    pageHtml += getStartupScript();
 
-  pageHtml += getStartupScript();
-
-  fs.mkdirSync(distFolder, { recursive: true });
-  fs.writeFileSync(outputFile, pageHtml);
+    fs.mkdirSync(distFolder, { recursive: true });
+    fs.writeFileSync(outputFile, pageHtml);
 }
 
 run();

@@ -22,7 +22,7 @@ export class MealRecipe extends Recipe {
         this.prep();
         this.addSteps([
             [Timer.preheatPan(5, true)],
-                [Async.step, i.butter(), 'the', i.bread()],
+            [Async.step, i.butter(), 'the', i.bread()],
             ['Put the bread on the pan'],
             ['Put the', i.pepperJackCheese(), 'on the bread'],
             ['Put pan lid on'],

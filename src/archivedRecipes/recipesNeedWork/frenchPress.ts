@@ -8,10 +8,7 @@ export class MealRecipe extends Recipe {
     constructor() {
         super();
         this.recipeType = c.coffee;
-        this.addIngredients([
-            i.coffeeGrounds(1.5, u.tbsp),
-            i.sugar()
-        ]);
+        this.addIngredients([i.coffeeGrounds(1.5, u.tbsp), i.sugar()]);
     }
 
     public generateRecipe() {

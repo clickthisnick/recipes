@@ -1,7 +1,7 @@
 import { Recipe, RecipeContainer } from '../class/recipe';
 import { Items as i } from '../constants/items';
 import { Units as u } from '../constants/units';
-import { Text as text} from '../class/text';
+import { Text as text } from '../class/text';
 
 export class MealRecipe extends RecipeContainer {
     constructor() {

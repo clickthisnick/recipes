@@ -8,10 +8,8 @@ import { Text as text } from '../class/text';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.variations = [
-            Risotto, Risotto2Servings
-        ]
-     }
+        this.variations = [Risotto, Risotto2Servings];
+    }
 }
 
 class Risotto extends Recipe {
@@ -27,45 +25,30 @@ class Risotto extends Recipe {
                 i.babyBellaMushroom(),
                 i.garlicClove(),
                 i.thyme(6, u.sprigs),
-                i.redPepperFlakes(.5, u.tsp),
+                i.redPepperFlakes(0.5, u.tsp),
                 //i.oliveOil(.25, u.cup),
-                i.oliveOil(.125, u.cup),
-                i.salt(.5, u.tsp),
+                i.oliveOil(0.125, u.cup),
+                i.salt(0.5, u.tsp),
             ]),
             text.set(['Set timer for 20 minutes to toss oven contents']),
             e.oven().cook(34, 'm', 350),
-            e.pot().add([
-                i.oliveOil(2, u.tbsp),
-                i.whiteOnion(),
-            ]),
+            e.pot().add([i.oliveOil(2, u.tbsp), i.whiteOnion()]),
             e.pot().cook(5, 'm', 6),
             Timer.end(),
-            e.pot().add([
-                i.arborioRice(1, u.cup),
-                i.blackPepper(.5, u.tsp),
-                i.salt(.5, u.tsp),
-            ]),
+            e.pot().add([i.arborioRice(1, u.cup), i.blackPepper(0.5, u.tsp), i.salt(0.5, u.tsp)]),
             Timer.set(2, 'm', 'cook rice'),
             Timer.end(),
-            e.pot().add([
-                i.whiteWine(.5, u.cup),
-            ]),
+            e.pot().add([i.whiteWine(0.5, u.cup)]),
             e.pot().cookWithLid(2, 'm', 6),
             Timer.end(),
-            e.pot().add([
-                i.chickenStock(2.5, u.cup),
-            ]),
+            e.pot().add([i.chickenStock(2.5, u.cup)]),
             e.pot().cookWithoutLid(14, 'm', 6),
             Timer.end(),
             text.set(['Turn stove heat off']),
-            e.pot().add([
-                i.chickenStock(.5, u.cup),
-            ]),
-            e.pot().add([
-                i.parmesanCheese(1, u.cup),
-                i.butter(2, u.tbsp),
-                i.lemonZest(.12, u.lemon),
-            ]),
+            e.pot().add([i.chickenStock(0.5, u.cup)]),
+            e
+                .pot()
+                .add([i.parmesanCheese(1, u.cup), i.butter(2, u.tbsp), i.lemonZest(0.12, u.lemon)]),
             Timer.end(),
         ];
     }
@@ -76,54 +59,49 @@ class Risotto2Servings extends Recipe {
         super();
         this.steps = [
             e.oven().preheat(350),
-                i.babyBellaMushroom(2, u.pound).cutIntoStrips(),
-                i.whiteOnion(2, u.unit).dice(),
-                i.garlicClove(6, u.unit).dice(),
+            i.babyBellaMushroom(2, u.pound).cutIntoStrips(),
+            i.whiteOnion(2, u.unit).dice(),
+            i.garlicClove(6, u.unit).dice(),
             Timer.end(),
-            e.bakingSheet().add([
-                i.babyBellaMushroom(),
-                i.garlicClove(),
-                i.thyme(12, u.sprigs),
-                i.redPepperFlakes(1, u.tsp),
-                i.oliveOil(.25, u.cup),
-                i.salt(1, u.tsp),
-            ]),
+            e
+                .bakingSheet()
+                .add([
+                    i.babyBellaMushroom(),
+                    i.garlicClove(),
+                    i.thyme(12, u.sprigs),
+                    i.redPepperFlakes(1, u.tsp),
+                    i.oliveOil(0.25, u.cup),
+                    i.salt(1, u.tsp),
+                ]),
             text.set(['Set timer for 20 minutes to toss oven contents']),
             e.oven().cook(34, 'm', 350),
-                e.pot().add([
-                    i.oliveOil(2, u.tbsp),
-                    i.whiteOnion(),
-                ]),
-                e.pot().cook(5, 'm', 6),
-                Timer.end(),
-                e.pot().add([
-                    i.arborioRice(2, u.cup),
-                    i.blackPepper(1, u.tsp),
-                    //i.salt(1, u.tsp),
-                ]),
-                Timer.set(2, 'm', 'cook rice'),
-                Timer.end(),
-                e.pot().add([
-                    i.whiteWine(1, u.cup),
-                ]),
-                e.pot().cookWithLid(4, 'm', 6),
-                Timer.end(),
-                e.pot().add([
-                    i.chickenStock(5, u.cup),
-                ]),
-                e.pot().cookWithoutLid(14, 'm', 6),
-                Timer.end(),
-                text.set(['Turn stove heat off']),
-                // e.pot().add([
-                //     i.chickenStock(1, u.cup),
-                // ]),
-                e.pot().add([
-                    //i.parmesanCheese(2, u.cup),
-                    i.parmesanCheese(1.5, u.cup),
-                    //i.butter(4, u.tbsp),
-                    i.butter(3, u.tbsp),
-                    i.lemonZest(.25, u.lemon),
-                ]),
+            e.pot().add([i.oliveOil(2, u.tbsp), i.whiteOnion()]),
+            e.pot().cook(5, 'm', 6),
+            Timer.end(),
+            e.pot().add([
+                i.arborioRice(2, u.cup),
+                i.blackPepper(1, u.tsp),
+                //i.salt(1, u.tsp),
+            ]),
+            Timer.set(2, 'm', 'cook rice'),
+            Timer.end(),
+            e.pot().add([i.whiteWine(1, u.cup)]),
+            e.pot().cookWithLid(4, 'm', 6),
+            Timer.end(),
+            e.pot().add([i.chickenStock(5, u.cup)]),
+            e.pot().cookWithoutLid(14, 'm', 6),
+            Timer.end(),
+            text.set(['Turn stove heat off']),
+            // e.pot().add([
+            //     i.chickenStock(1, u.cup),
+            // ]),
+            e.pot().add([
+                //i.parmesanCheese(2, u.cup),
+                i.parmesanCheese(1.5, u.cup),
+                //i.butter(4, u.tbsp),
+                i.butter(3, u.tbsp),
+                i.lemonZest(0.25, u.lemon),
+            ]),
             Timer.end(['pot', 'baking sheet']),
         ];
     }

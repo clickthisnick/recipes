@@ -40,7 +40,7 @@ export class RecipeContainer {
     private generateRecipeVariation(
         recipeGroup: string,
         recipeClass: RecipeConstructor,
-        includeInVariation = false,
+        includeInVariation = false
     ): void {
         const initRecipe = new recipeClass();
         const recipeName = recipeClass.name;
@@ -55,7 +55,9 @@ export class RecipeContainer {
         const classes = [
             includeInVariation ? `${recipeGroup}-group` : '',
             initRecipe.hideFromCookingView ? 'hideFromCookingView' : '',
-        ].filter(Boolean).join(' ');
+        ]
+            .filter(Boolean)
+            .join(' ');
 
         const style = includeInVariation ? ' style="display: none"' : '';
 
@@ -74,7 +76,7 @@ export class RecipeContainer {
             hideUnderRecipeGroup = true;
         }
 
-        this.variations.forEach(variation => {
+        this.variations.forEach((variation) => {
             this.generateRecipeVariation(recipeGroup, variation, hideUnderRecipeGroup);
         });
 
@@ -121,7 +123,7 @@ export class Recipe {
     public validate(recipeGroup: string, recipeName: string): void {
         const timers: string[] = [];
 
-        this.steps.forEach(step => {
+        this.steps.forEach((step) => {
             if (step.showTimer) {
                 timers.push(step.text);
             } else if (step.disappearWhen === 'timerIsUp') {
@@ -139,9 +141,9 @@ export class Recipe {
 
     public multiplyIngredients(multiple: number): void {
         // This multiplies all ingredient quantities from each step and child step.
-        this.steps.forEach(step => {
-            step.children?.forEach(child => {
-                child.ingredients.forEach(ingredient => {
+        this.steps.forEach((step) => {
+            step.children?.forEach((child) => {
+                child.ingredients.forEach((ingredient) => {
                     if (ingredient.unit !== Units.none && ingredient.quantity > 0) {
                         ingredient.quantity *= multiple;
                     }
@@ -150,7 +152,7 @@ export class Recipe {
 
             // Unit could be null. Do not add ingredients whose unit is null;
             // item('hamburger') is an example of that.
-            step.ingredients.forEach(ingredient => {
+            step.ingredients.forEach((ingredient) => {
                 if (ingredient.unit !== Units.none && ingredient.quantity > 0) {
                     ingredient.quantity *= multiple;
                 }
@@ -161,7 +163,7 @@ export class Recipe {
     private addIngredient(step: IStep): void {
         // This adds all the ingredients from each step into ingredients in the main recipe.
         // It also does any transformations, like converting the ingredient to different units.
-        step.ingredients.forEach(ingredient => {
+        step.ingredients.forEach((ingredient) => {
             // Unit could be null. Do not add ingredients whose unit is null;
             // item('hamburger') is an example of that.
             if (ingredient.unit === Units.none || ingredient.quantity <= 0) {
@@ -197,7 +199,7 @@ export class Recipe {
             this.ingredients[`${ingredient.name} - ${ingredient.unit.name}`] = ingredient;
         });
 
-        step.children?.forEach(child => {
+        step.children?.forEach((child) => {
             this.addIngredient(child);
         });
     }
@@ -206,12 +208,12 @@ export class Recipe {
         const equipment: string[] = [];
 
         // Calculates all the equipment for the step and its child steps.
-        step.equipment.forEach(equipmentItem => {
+        step.equipment.forEach((equipmentItem) => {
             equipment.push(equipmentItem);
         });
 
-        step.children?.forEach(childStep => {
-            childStep.equipment.forEach(equipmentItem => {
+        step.children?.forEach((childStep) => {
+            childStep.equipment.forEach((equipmentItem) => {
                 equipment.push(equipmentItem);
             });
         });
@@ -228,7 +230,7 @@ export class Recipe {
             const step = steps[i];
             const equipment = this.getStepEquipment(step);
 
-            equipment.forEach(equipmentItem => {
+            equipment.forEach((equipmentItem) => {
                 if (foundEquipment[equipmentItem]) {
                     // If we have already found the equipment once, it must have been from a later step.
                     // We can skip it since we assume it has already been dealt with.
@@ -251,7 +253,7 @@ export class Recipe {
         this.ingredients = {};
 
         // Add the ingredients from each step of the recipe into the main recipe as combined ingredients.
-        this.steps.forEach(step => {
+        this.steps.forEach((step) => {
             this.addIngredient(step);
         });
 
@@ -266,7 +268,7 @@ export class Recipe {
         };
 
         // Loop through the ingredients of the recipe and generate a pricing table for each purchasable link.
-        Object.keys(this.ingredients).forEach(ingredientKey => {
+        Object.keys(this.ingredients).forEach((ingredientKey) => {
             const ingredient = this.ingredients[ingredientKey];
             Units.setPricingTable(ingredient);
         });

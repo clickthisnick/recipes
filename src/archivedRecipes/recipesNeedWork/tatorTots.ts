@@ -7,10 +7,7 @@ export class MealRecipe extends Recipe {
     constructor() {
         super();
         this.recipeType = c.snack;
-        this.addIngredients([
-            i.frozenTatorTots(),
-            i.lawlrySaltFree()
-        ]);
+        this.addIngredients([i.frozenTatorTots(), i.lawlrySaltFree()]);
     }
 
     public generateRecipe() {

@@ -9,7 +9,7 @@ export class MealRecipe extends Recipe {
         super();
         this.recipeType = c.chinese;
         this.addIngredients([
-            i.Groups.onion(.5),
+            i.Groups.onion(0.5),
             i.scallion(3),
             i.garlicClove(2),
             i.greenBellPepper(),
@@ -37,7 +37,7 @@ export class MealRecipe extends Recipe {
             ['Put sprilized zuchinni in the pan'],
             [Timer.set(2, 'm')],
             ['Put in', this.get(i.soySauce())],
-            ['Put in',this.get(i.padThaiSauce())],
+            ['Put in', this.get(i.padThaiSauce())],
         ]);
         this.printRecipe();
     }

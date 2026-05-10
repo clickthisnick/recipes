@@ -7,9 +7,7 @@ import { Timer } from '../class/timer';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.variations = [
-            Cereal
-        ]
+        this.variations = [Cereal];
     }
 }
 
@@ -19,11 +17,8 @@ class Cereal extends Recipe {
         this.steps = [
             Timer.set(2, 's'),
             Timer.end(),
-            e.bowl().add([
-                i.flaxSeedCereal(2, u.cup),
-                i.almondMilk(1.5, u.cup),
-            ]),
+            e.bowl().add([i.flaxSeedCereal(2, u.cup), i.almondMilk(1.5, u.cup)]),
             e.bowl().stir(),
-        ]
+        ];
     }
 }

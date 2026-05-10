@@ -12,11 +12,11 @@ export class MealRecipe extends Recipe {
             i.zuchinni(2),
             i.Groups.mushroom(3),
             i.garlicClove(2),
-            i.parmesanCheese(.25, u.cup),
+            i.parmesanCheese(0.25, u.cup),
             i.vegetableOil(2, u.second),
             i.spiriliazer(),
             i.blackPepper(),
-            i.spaghettiSauce(.5),
+            i.spaghettiSauce(0.5),
         ]);
     }
 
@@ -35,7 +35,7 @@ export class MealRecipe extends Recipe {
             ['Turn heat to 5'],
             [Timer.set(5, 'm', 'to be done with the recipe')],
             ['Season with', this.get(i.blackPepper())],
-            ['Top with', this.get(i.parmesanCheese())]
+            ['Top with', this.get(i.parmesanCheese())],
         ]);
         this.printRecipe();
     }

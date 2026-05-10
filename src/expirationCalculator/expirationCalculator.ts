@@ -92,7 +92,7 @@ Todays Date: ${new Date().toLocaleDateString('en-US')}</br>
     `;
 
 items.forEach((item) => {
-    expirationCalculatorHtml+= `<tr onclick="this.classList.toggle('completed')">
+    expirationCalculatorHtml += `<tr onclick="this.classList.toggle('completed')">
         <td>${item.name}</td>
         <td>${item.expirationDays}</td>
         <td>${getExpirationDate(item.expirationDays)}</td>

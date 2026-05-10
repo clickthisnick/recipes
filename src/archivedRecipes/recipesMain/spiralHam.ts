@@ -8,9 +8,7 @@ export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
         this.recipeType = c.frozen;
-        this.variations = [
-            {'recipe': [SpiralHam]}
-        ]
+        this.variations = [{ recipe: [SpiralHam] }];
     }
 
     public init() {

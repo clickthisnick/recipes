@@ -6,13 +6,7 @@ export class MealRecipe extends Recipe {
     constructor() {
         super();
         this.recipeType = c.snack;
-        this.addIngredients([
-            i.almondFlour(),
-            i.buckwheatFlour(),
-            i.egg(),
-            i.water(),
-            i.salt(),
-        ]);
+        this.addIngredients([i.almondFlour(), i.buckwheatFlour(), i.egg(), i.water(), i.salt()]);
     }
 
     public generateRecipe() {

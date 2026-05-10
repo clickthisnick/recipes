@@ -9,9 +9,7 @@ export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
         this.recipeType = c.component;
-        this.variations = [
-            {'recipe': [Mushroom]},
-        ]
+        this.variations = [{ recipe: [Mushroom] }];
     }
 }
 
@@ -20,13 +18,13 @@ class Mushroom extends Recipe {
         super();
         this.steps = [
             [Timer.preheatPan(5, true)],
-                [Async.step, 'Wash', i.i.Groups.mushroom(8, u.ounce), 'with strainer'],
+            [Async.step, 'Wash', i.i.Groups.mushroom(8, u.ounce), 'with strainer'],
             ['Put', i.oliveOil(1, u.tbsp), 'in pan'],
             ['Put', i.Groups.mushroom(), 'in pan'],
             [Timer.panSear(4, 'm', i.Groups.mushroom(), true)],
-                [Async.step, 'Wash and put away strainer'],
-                [Async.step, 'Wash and put away measuring utensil'],
+            [Async.step, 'Wash and put away strainer'],
+            [Async.step, 'Wash and put away measuring utensil'],
             ['Season with', i.dash(1, u.unit)],
-        ]
+        ];
     }
 }

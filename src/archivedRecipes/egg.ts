@@ -9,9 +9,7 @@ export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
         this.recipeType = c.meal;
-        this.variations = [
-            ThawedHomemadeSausageEggs
-        ]
+        this.variations = [ThawedHomemadeSausageEggs];
     }
 }
 
@@ -19,15 +17,10 @@ export class ThawedHomemadeSausageEggs extends Recipe {
     constructor() {
         super();
         this.steps = [
-            e.pan().add([
-                i.homemadeItalianSausage(8, u.ounce),
-                i.Groups.mushroom(4, u.ounce),
-            ]),
+            e.pan().add([i.homemadeItalianSausage(8, u.ounce), i.Groups.mushroom(4, u.ounce)]),
             e.pan().cook(7, 'm', 4),
             Timer.end(),
-            e.pan().add(
-                i.egg(4, u.unit),
-            ),
+            e.pan().add(i.egg(4, u.unit)),
             e.pan().cook(2, 'm', 4),
             Timer.end(),
             e.pan().stir(),

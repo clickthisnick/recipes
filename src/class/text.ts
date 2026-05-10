@@ -1,30 +1,30 @@
-import { IStep, istep } from "./step";
+import { IStep, istep } from './step';
 import { Serializer as s } from './serializer';
-import { Ingredient } from "./ingredients/ingredient";
+import { Ingredient } from './ingredients/ingredient';
 
 export class Text {
     // 99 is just an identifier that doesn't start with 0/1/2
     // By default we assume that equipment is reused throughout the recipe
 
     public static readonly set = (texts: any[]): IStep => {
-        const textArray: string[] = []
-        const ingredientsArray: Ingredient[] = []
+        const textArray: string[] = [];
+        const ingredientsArray: Ingredient[] = [];
 
-        texts.forEach(text => {
+        texts.forEach((text) => {
             if (typeof text === 'object') {
-                textArray.push(s.turnIngObjIntoStr(text, true))
-                ingredientsArray.push(text)
+                textArray.push(s.turnIngObjIntoStr(text, true));
+                ingredientsArray.push(text);
             } else {
-                textArray.push(text)
+                textArray.push(text);
             }
-        })
+        });
 
-        const step = istep()
+        const step = istep();
 
-        step.text = textArray.join(' ')
-        step.disappearWhen = 'clicked'
-        step.ingredients = ingredientsArray
+        step.text = textArray.join(' ');
+        step.disappearWhen = 'clicked';
+        step.ingredients = ingredientsArray;
 
-        return step
-    }
+        return step;
+    };
 }

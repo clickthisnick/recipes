@@ -1,204 +1,55 @@
-import { Stores } from '../../class/stores';
 import { IItemObj, Ingredient } from './ingredient';
 import { IUnitObj, Units as u, Units } from '../../constants/units';
-import { SauceItems } from './sauce';
+import { Stores } from '../../class/stores';
 
-export class SpiceItems extends SauceItems {
-
-    public static readonly oldBay = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Old Bay Seasoning',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
+export class SpiceItems {
+    private static makeSpiceItem(
+        name: string,
+        quantity = 0,
+        unit: IUnitObj = Units.none,
+        overrides: Partial<IItemObj> = {}
+    ): Ingredient {
+        return Ingredient.makeItem(name, quantity, unit, {
+            isMeatProduct: true,
+            ...overrides,
+        });
     }
 
-    public static readonly tandoriMasalla = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Tandori Masalla',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly oldBay = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Old Bay Seasoning', quantity, unit);
 
-    public static readonly paprika = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Paprika',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly tandoriMasalla = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Tandori Masalla', quantity, unit);
 
-    public static readonly vanillaExtract = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Vanilla Extract',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly paprika = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Paprika', quantity, unit);
 
-    public static readonly hotPaprika = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Hot Paprika',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly vanillaExtract = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Vanilla Extract', quantity, unit);
 
-    public static readonly coconutSugar = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Coconut Sugar',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly hotPaprika = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Hot Paprika', quantity, unit);
 
-    public static readonly sugar = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Sugar',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly coconutSugar = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Coconut Sugar', quantity, unit);
 
-    public static readonly cumin = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Cumin',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly sugar = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Sugar', quantity, unit);
 
-        public static readonly driedThyme = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Turmeric',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly cumin = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Cumin', quantity, unit);
 
-    public static readonly turmeric = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Turmeric',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly driedThyme = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Dried Thyme', quantity, unit);
 
-    public static readonly thyme = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Dried Thyme',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
+    public static readonly turmeric = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Turmeric', quantity, unit);
+
+    public static readonly thyme = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Dried Thyme', quantity, unit, {
             purchaseLinks: {
                 [Stores.amazon]: {
-                    'Thyme': [
+                    Thyme: [
                         {
                             price: 13.14,
                             quantity: 16,
@@ -207,357 +58,73 @@ export class SpiceItems extends SauceItems {
                             organic: true,
                             discount: {
                                 'Subscribe 5 Products': 15,
-                                'Subscribe': 5,
-                            }
-                        }
+                                Subscribe: 5,
+                            },
+                        },
                     ],
-                }
+                },
             },
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+        });
 
-    public static readonly mintLeaf = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Mint Leaf',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly mintLeaf = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Mint Leaf', quantity, unit);
 
-    public static readonly gingerPowder = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Ginger Powder',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly gingerPowder = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Ginger Powder', quantity, unit);
 
-    public static readonly saffron = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Saffron',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly saffron = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Saffron', quantity, unit);
 
-    public static readonly monkFruit = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Monk Fruit',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly monkFruit = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Monk Fruit', quantity, unit);
 
+    public static readonly sweetPaprika = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Sweet Paprika', quantity, unit);
 
-    public static readonly sweetPaprika = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Smoked Paprika',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly smokedPaprika = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Smoked Paprika', quantity, unit);
 
-    public static readonly smokedPaprika = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Smoked Paprika',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly worcestershireSauce = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Worcestershire Sauce', quantity, unit);
 
-    public static readonly worcestershireSauce = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Worcestershire Sauce',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly gramMasala = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Gram Masala', quantity, unit);
 
-    public static readonly gramMasala = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Gram Masala',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly litesalt = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Lite Salt', quantity, unit);
 
-    public static readonly litesalt = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Lite Salt',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly salt = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Salt', quantity, unit);
 
-    public static readonly salt = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Salt',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly seaSalt = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Sea Salt', quantity, unit);
 
-    public static readonly seaSalt = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Sea Salt',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly pepperFlake = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Pepper Flake', quantity, unit);
 
-    public static readonly pepperFlake = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Pepper Flake',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly nutmeg = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Nutmeg', quantity, unit);
 
-    public static readonly nutmeg = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'nutmeg',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly allSpice = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('All Spice', quantity, unit);
 
-    public static readonly allSpice = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'all spice',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly lawlrySaltFree = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Lawlry Salt Free Seasoning', quantity, unit);
 
-    public static readonly lawlrySaltFree = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'lawlry salk free seasoning',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly dash = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Dash Seasoning', quantity, unit);
 
-    public static readonly dash = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'dash seasoning',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly cassavaFlour = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Cassava Flour', quantity, unit);
 
-    public static readonly cassavaFlour = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Cassava Flour',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly cornstarch = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Cornstarch', quantity, unit);
 
-    public static readonly cornstarch = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'cornstarch',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
-
-    public static readonly cacaoPowderUnsweetened = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'unsweetened cacao powder',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
+    public static readonly cacaoPowderUnsweetened = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Unsweetened Cacao Powder', quantity, unit, {
             purchaseLinks: {
                 [Stores.amazon]: {
-                    'Anthony\'s Organic Raw Cocoa Powder, Cacao Powder 5lb': [
+                    "Anthony's Organic Raw Cocoa Powder, Cacao Powder 5lb": [
                         {
                             price: 29.99,
                             quantity: 5,
@@ -566,7 +133,7 @@ export class SpiceItems extends SauceItems {
                             organic: true,
                         },
                     ],
-                    'Anthony\'s Organic Raw Cocoa Powder, Cacao Powder 2lb': [
+                    "Anthony's Organic Raw Cocoa Powder, Cacao Powder 2lb": [
                         {
                             price: 14.85,
                             quantity: 2,
@@ -575,8 +142,8 @@ export class SpiceItems extends SauceItems {
                             organic: true,
                             discount: {
                                 'Subscribe 5 Products': 5,
-                            }
-                        }
+                            },
+                        },
                     ],
                     'BetterBody Foods Organic Cacao Powder, Non-GMO, Gluten-Free Superfood': [
                         {
@@ -587,227 +154,49 @@ export class SpiceItems extends SauceItems {
                             organic: true,
                             discount: {
                                 'Subscribe 5 Products': 15,
-                                'Subscribe': 5,
-                            }
-                        }
-                    ]
+                                Subscribe: 5,
+                            },
+                        },
+                    ],
                 },
             },
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+        });
 
-    public static readonly peas = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Peas',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly peas = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Peas', quantity, unit);
 
-    public static readonly peaProtein = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Pea Protein',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly peaProtein = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Pea Protein', quantity, unit);
 
-    public static readonly chilliPowder = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'chilli powder',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly chilliPowder = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Chilli Powder', quantity, unit);
 
-    public static readonly cayennePepper = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'cayenne pepper',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly cayennePepper = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Cayenne Pepper', quantity, unit);
 
-    public static readonly dhanaJeera = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Dhana Jeera',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly dhanaJeera = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Dhana Jeera', quantity, unit);
 
-    public static readonly bayLeaf = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Bay Leaf',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly bayLeaf = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Bay Leaf', quantity, unit);
 
-    public static readonly greenCardamonSeed = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Green Cardamon Seed',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly greenCardamonSeed = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Green Cardamon Seed', quantity, unit);
 
-    public static readonly clove = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Clove',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly clove = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Clove', quantity, unit);
 
-    public static readonly wholeBlackPepper = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Whole Black Pepper',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly wholeBlackPepper = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Whole Black Pepper', quantity, unit);
 
-    public static readonly panangCurryPaste = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Panang Curry Paste',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly panangCurryPaste = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Panang Curry Paste', quantity, unit);
 
-    public static readonly citricAcid = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Citric Acid',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly citricAcid = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Citric Acid', quantity, unit);
 
-    public static readonly blackPepper = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Black Pepper',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
+    public static readonly blackPepper = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Black Pepper', quantity, unit, {
             purchaseLinks: {
                 [Stores.amazon]: {
                     'Amazon Brand - Peppercorn': [
@@ -819,227 +208,55 @@ export class SpiceItems extends SauceItems {
                             organic: false,
                             discount: {
                                 'Subscribe 5 Products': 15,
-                                'Subscribe': 5,
-                            }
-                        }
+                                Subscribe: 5,
+                            },
+                        },
                     ],
-                }
+                },
             },
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+        });
 
-    public static readonly parsleyFlakes = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Parsley Flakes',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly parsleyFlakes = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Parsley Flakes', quantity, unit);
 
-    public static readonly dillWeed = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Dill Weed',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly dillWeed = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Dill Weed', quantity, unit);
 
-    public static readonly parsley = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Parsley',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly parsley = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Parsley', quantity, unit);
 
-    public static readonly curryPowder = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'curry powder',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly curryPowder = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Curry Powder', quantity, unit);
 
-    public static readonly kosherSalt = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'kosher salt',
-            putAwayTime: 10,
-            takeOutTime: 10,
+    public static readonly kosherSalt = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Kosher Salt', quantity, unit, {
             cleanSteps: 'Put kosher salt back in cupboard',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+        });
 
-    public static readonly ceylonCinnamon = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Ceylon Cinnamon',
-            putAwayTime: 10,
-            takeOutTime: 10,
+    public static readonly ceylonCinnamon = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Ceylon Cinnamon', quantity, unit, {
             cleanSteps: 'Put cinnamon back in cupboard',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+        });
 
-    public static readonly cinnamon = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'cinnamon',
-            putAwayTime: 10,
-            takeOutTime: 10,
+    public static readonly cinnamon = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Cinnamon', quantity, unit, {
             cleanSteps: 'Put cinnamon back in cupboard',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+        });
 
-    public static readonly wholeFennelSeeds = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Whole Fennel Seeds',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly wholeFennelSeeds = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Whole Fennel Seeds', quantity, unit);
 
-    public static readonly marjoram = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Marjoram',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly marjoram = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Marjoram', quantity, unit);
 
-    public static readonly italianSeasoning = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Italian Seasoning',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly italianSeasoning = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Italian Seasoning', quantity, unit);
 
-    public static readonly powderedSugar = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Powdered Sugar',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly powderedSugar = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Powdered Sugar', quantity, unit);
 
-    public static readonly garlicPowder = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Garlic Powder',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
+    public static readonly garlicPowder = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Garlic Powder', quantity, unit, {
             purchaseLinks: {
                 [Stores.amazon]: {
                     'Amazon Brand - Happy Belly Granulated Garlic': [
@@ -1051,87 +268,23 @@ export class SpiceItems extends SauceItems {
                             organic: false,
                             discount: {
                                 'Subscribe 5 Products': 15,
-                                'Subscribe': 5,
-                            }
-                        }
+                                Subscribe: 5,
+                            },
+                        },
                     ],
-                }
+                },
             },
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+        });
 
-    public static readonly onionPowder = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'onion powder',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly onionPowder = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Onion Powder', quantity, unit);
 
-    public static readonly garlicGranules = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'garlic granules',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly garlicGranules = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Garlic Granules', quantity, unit);
 
-    public static readonly onionGranules = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'onion granules',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly onionGranules = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Onion Granules', quantity, unit);
 
-    public static readonly driedOnion = (quantity = 0, unit: IUnitObj = Units.none) => {
-        const item: IItemObj = {
-            name: 'Dried Onion',
-            putAwayTime: 10,
-            takeOutTime: 10,
-            cleanSteps: '',
-            quantity: quantity,
-            unit: unit,
-            wash: false,
-            isTakeoutUnitable: false,
-            isMeatProduct: false,
-            purchaseLinks: {},
-            perishableLimit: 0,
-            nutrition: {}
-        }
-        return new Ingredient(item)
-    }
+    public static readonly driedOnion = (quantity?: number, unit?: IUnitObj) =>
+        SpiceItems.makeSpiceItem('Dried Onion', quantity, unit);
 }

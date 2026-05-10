@@ -13,7 +13,7 @@ export class MealRecipe extends Recipe {
             i.water(4, u.cup),
             i.salt(1, u.tsp),
             i.raoPastaElbow(1, u.pound),
-            i.almondMilk(.5, u.cup),
+            i.almondMilk(0.5, u.cup),
             i.cheddarCheese(1, u.pound),
         ]);
     }
@@ -30,7 +30,7 @@ export class MealRecipe extends Recipe {
             ['Release valve'],
             ['Stir in', i.almondMilk()],
             ['Stir in cheese'],
-            [Timer.set(5, 'm', 'Put lid back on (but don\'t cook)')],
+            [Timer.set(5, 'm', "Put lid back on (but don't cook)")],
         ]);
         this.printRecipe();
     }

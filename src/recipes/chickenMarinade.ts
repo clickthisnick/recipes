@@ -8,10 +8,8 @@ import { Text as text } from '../class/text';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.variations = [
-            DijonChicken
-        ]
-     }
+        this.variations = [DijonChicken];
+    }
 }
 
 class DijonChicken extends Recipe {
@@ -19,18 +17,20 @@ class DijonChicken extends Recipe {
         super();
         this.steps = [
             text.set(['Mince', i.garlicClove(6, u.unit)]),
-            e.bowl().add([
-                i.dijonMustard(.75, u.cup),
-                i.orangeJuice(.25, u.cup),
-                i.oliveOil(2, u.tbsp),
-                i.garlicClove(),
-                i.salt(2, u.tsp),
-                i.chickenThigh(3, u.pound),
-            ]),
+            e
+                .bowl()
+                .add([
+                    i.dijonMustard(0.75, u.cup),
+                    i.orangeJuice(0.25, u.cup),
+                    i.oliveOil(2, u.tbsp),
+                    i.garlicClove(),
+                    i.salt(2, u.tsp),
+                    i.chickenThigh(3, u.pound),
+                ]),
             Timer.set(12, 'h', 'Marinate chicken'),
             Timer.end(),
             Timer.set(10, 'm', 'Cook Chicken in ninja at 500'),
             Timer.end(),
-        ]
+        ];
     }
 }

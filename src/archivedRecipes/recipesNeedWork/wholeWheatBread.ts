@@ -10,8 +10,8 @@ export class MealRecipe extends Recipe {
         this.addIngredients([
             i.wheatBreadFlour(4.5, u.cup),
             i.water(1.5, u.cup),
-            i.oliveOil(.33, u.cup),
-            i.honey(.25, u.cup),
+            i.oliveOil(0.33, u.cup),
+            i.honey(0.25, u.cup),
             i.kosherSalt(2, u.tsp),
             i.dryActiveYeast(1, u.tbsp),
             i.kosherSalt(2, u.tsp),
@@ -33,7 +33,9 @@ export class MealRecipe extends Recipe {
             ['Put in', this.get(i.wheatBreadFlour())],
             ['Put in', this.get(i.vitalWheatGluten())],
             ['Put in center the', this.get(i.dryActiveYeast())],
-            ['Put bread maker on bread setting (menu item 1) with medium crust and 2 lb loaf and hit start'],
+            [
+                'Put bread maker on bread setting (menu item 1) with medium crust and 2 lb loaf and hit start',
+            ],
             ['Let bread cool for 20 minutes'],
             ['Slice bread'],
         ]);

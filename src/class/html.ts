@@ -2,19 +2,18 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 export class HTML {
-  public static readonly headerStart = '<h1>';
-  public static readonly headerEnd = '</h1>';
+    public static readonly headerStart = '<h1>';
+    public static readonly headerEnd = '</h1>';
 
-  public static readonly mobileViewport =
-    '<meta name="viewport" content="width=device-width, initial-scale=1">';
+    public static readonly mobileViewport =
+        '<meta name="viewport" content="width=device-width, initial-scale=1">';
 
-  public static readonly charset =
-    '<meta charset="utf-8">';
+    public static readonly charset = '<meta charset="utf-8">';
 
-  public static readonly audio = `
+    public static readonly audio = `
 <audio id="beep" preload="auto"></audio>`;
 
-  public static readonly css = `<style>
+    public static readonly css = `<style>
 a {
   color: orange;
   text-decoration: none;
@@ -72,14 +71,14 @@ button {
 }
 </style>`;
 
-  public static javascript(): string {
-    const jsPath = path.resolve(__dirname, 'js.ts');
-    const js = fs.readFileSync(jsPath, 'utf8');
+    public static javascript(): string {
+        const jsPath = path.resolve(__dirname, 'js.ts');
+        const js = fs.readFileSync(jsPath, 'utf8');
 
-    return `<script>${HTML.escapeScript(js)}</script>`;
-  }
+        return `<script>${HTML.escapeScript(js)}</script>`;
+    }
 
-  private static escapeScript(script: string): string {
-    return script.replace(/<\/script>/gi, '<\\/script>');
-  }
+    private static escapeScript(script: string): string {
+        return script.replace(/<\/script>/gi, '<\\/script>');
+    }
 }

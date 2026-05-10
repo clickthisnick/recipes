@@ -8,14 +8,12 @@ export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
         this.recipeType = c.meal;
-        this.variations = [
-            {'recipe': [ChipotleMarinade]},
-        ]
-     }
+        this.variations = [{ recipe: [ChipotleMarinade] }];
+    }
 
-     public init() {
-         this.generateRecipes()
-     }
+    public init() {
+        this.generateRecipes();
+    }
 }
 
 class ChipotleMarinade extends Recipe {
@@ -47,8 +45,12 @@ class ChipotleMarinade extends Recipe {
             ['Add', i.salt(), 'to blender'],
             ['Blend ingredients'],
             ['Cube', i.chickenBreastPackage()],
-            ['Put', i.chickenBreastPackage(0), 'and the marinade in a bowl and cover with tin foil'],
-            [Timer.set(2, 'h', 'Let meat sit in marinade for at least 2 hours')]
+            [
+                'Put',
+                i.chickenBreastPackage(0),
+                'and the marinade in a bowl and cover with tin foil',
+            ],
+            [Timer.set(2, 'h', 'Let meat sit in marinade for at least 2 hours')],
         ]);
     }
 }

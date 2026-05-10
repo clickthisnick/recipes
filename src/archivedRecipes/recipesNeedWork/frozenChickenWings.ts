@@ -7,9 +7,7 @@ export class MealRecipe extends Recipe {
     constructor() {
         super();
         this.recipeType = c.snack;
-        this.addIngredients([
-            i.frozenChickenWings(1, u.pound),
-        ]);
+        this.addIngredients([i.frozenChickenWings(1, u.pound)]);
     }
 
     public generateRecipe() {

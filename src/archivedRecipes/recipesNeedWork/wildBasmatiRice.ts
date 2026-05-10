@@ -7,10 +7,7 @@ export class MealRecipe extends Recipe {
     constructor() {
         super();
         this.recipeType = c.instantPot;
-        this.addIngredients([
-            i.wildBasmatiRice(1, u.cup),
-            i.instaPot(1)
-        ]);
+        this.addIngredients([i.wildBasmatiRice(1, u.cup), i.instaPot(1)]);
     }
 
     public generateRecipe() {

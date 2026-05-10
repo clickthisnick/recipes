@@ -7,11 +7,7 @@ export class MealRecipe extends Recipe {
     constructor() {
         super();
         this.recipeType = c.beef;
-        this.addIngredients([
-            i.bonelessRibClubSteak(),
-            i.blackPepper(),
-            i.salt(),
-        ]);
+        this.addIngredients([i.bonelessRibClubSteak(), i.blackPepper(), i.salt()]);
     }
 
     public generateRecipe() {
@@ -25,7 +21,6 @@ export class MealRecipe extends Recipe {
             [Timer.set(4, 'm', 'Put steak in airfryer @ 370 deg')],
             ['Flip steak'],
             [Timer.set(3, 'm', 'Put steak in airfryer @ 370 deg until correct temperature')],
-
         ]);
         this.printRecipe();
     }

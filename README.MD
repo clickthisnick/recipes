@@ -1,13 +1,23 @@
 ## [Recipe Main](https://www.clickthisnick.com/recipes)
+
 ## [Recipe App](https://www.clickthisnick.com/recipes/dist/main.html)
+
 ## [Meat Temperature](https://www.clickthisnick.com/recipes/meatTemp.html)
+
 ## [Water Intake](https://www.clickthisnick.com/recipes/waterIntake.html)
+
 ## [Grocery List](https://www.clickthisnick.com/recipes/groceryList.html)
+
 ## [Expiration Calculator](https://www.clickthisnick.com/recipes/expirationCalculator.html)
+
 ## [Pull Cord Slicer Amount](https://www.clickthisnick.com/recipes/cordSlicer.html)
+
 ## [Frozen Food Portions](https://www.clickthisnick.com/recipes/frozenFood.html)
+
 # Recipes List
+
 # 1 Meal
+
 ## [BuffaloKaleBowl](https://www.clickthisnick.com/recipes/dist/buffalokalebowl.html)
 
 ## [ButterChicken](https://www.clickthisnick.com/recipes/dist/butterchicken.html)
@@ -31,6 +41,7 @@
 ## [Sushi](https://www.clickthisnick.com/recipes/dist/sushi.html)
 
 # Component
+
 ## [Asparagus](https://www.clickthisnick.com/recipes/dist/asparagus.html)
 
 ## [BabyBackRibs](https://www.clickthisnick.com/recipes/dist/babybackribs.html)
@@ -50,12 +61,15 @@
 ## [Rice](https://www.clickthisnick.com/recipes/dist/rice.html)
 
 # Frozen
+
 ## [SpiralHam](https://www.clickthisnick.com/recipes/dist/spiralham.html)
 
 # Heavy Cleanup Meal
+
 ## [BakedZiti](https://www.clickthisnick.com/recipes/dist/bakedziti.html)
 
 # 1 Meal
+
 ## [BuffaloKaleBowl](https://www.clickthisnick.com/recipes/dist/buffalokalebowl.html)
 
 ## [ButterChicken](https://www.clickthisnick.com/recipes/dist/butterchicken.html)
@@ -79,6 +93,7 @@
 ## [Sushi](https://www.clickthisnick.com/recipes/dist/sushi.html)
 
 # Component
+
 ## [Asparagus](https://www.clickthisnick.com/recipes/dist/asparagus.html)
 
 ## [BabyBackRibs](https://www.clickthisnick.com/recipes/dist/babybackribs.html)
@@ -98,12 +113,15 @@
 ## [Rice](https://www.clickthisnick.com/recipes/dist/rice.html)
 
 # Frozen
+
 ## [SpiralHam](https://www.clickthisnick.com/recipes/dist/spiralham.html)
 
 # Heavy Cleanup Meal
+
 ## [BakedZiti](https://www.clickthisnick.com/recipes/dist/bakedziti.html)
 
 # 1 Meal
+
 ## [BuffaloKaleBowl](https://www.clickthisnick.com/recipes/dist/buffalokalebowl.html)
 
 ## [ButterChicken](https://www.clickthisnick.com/recipes/dist/butterchicken.html)
@@ -127,6 +145,7 @@
 ## [Sushi](https://www.clickthisnick.com/recipes/dist/sushi.html)
 
 # Component
+
 ## [Asparagus](https://www.clickthisnick.com/recipes/dist/asparagus.html)
 
 ## [BabyBackRibs](https://www.clickthisnick.com/recipes/dist/babybackribs.html)
@@ -146,7 +165,9 @@
 ## [Rice](https://www.clickthisnick.com/recipes/dist/rice.html)
 
 # Frozen
+
 ## [SpiralHam](https://www.clickthisnick.com/recipes/dist/spiralham.html)
 
 # Heavy Cleanup Meal
+
 ## [BakedZiti](https://www.clickthisnick.com/recipes/dist/bakedziti.html)

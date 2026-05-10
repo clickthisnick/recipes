@@ -8,10 +8,8 @@ import { Text as text } from '../class/text';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.variations = [
-            AidellsCajunSausage
-        ]
-     }
+        this.variations = [AidellsCajunSausage];
+    }
 }
 
 class AidellsCajunSausage extends Recipe {
@@ -20,10 +18,7 @@ class AidellsCajunSausage extends Recipe {
         this.steps = [
             e.pan().preheat(5),
             Timer.end(),
-            e.pan().add([
-                i.water(1, u.cup),
-                i.sausageAidellsCajun(4, u.unit),
-            ]),
+            e.pan().add([i.water(1, u.cup), i.sausageAidellsCajun(4, u.unit)]),
             Timer.set(8, 'm', 'cook'),
             text.set(['Cut', i.whiteOnion(1, u.unit), 'into slices']),
             Timer.end(),

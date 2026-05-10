@@ -7,10 +7,7 @@ export class MealRecipe extends Recipe {
     constructor() {
         super();
         this.recipeType = c.beef;
-        this.addIngredients([
-            i.beyondBurger(),
-            i.briocheHamburgerBun(),
-        ]);
+        this.addIngredients([i.beyondBurger(), i.briocheHamburgerBun()]);
     }
 
     public generateRecipe() {

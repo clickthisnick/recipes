@@ -7,9 +7,7 @@ import { Timer } from '../class/timer';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.variations = [
-            TacoSeasoning1PoundMeat
-        ]
+        this.variations = [TacoSeasoning1PoundMeat];
     }
 }
 
@@ -21,19 +19,17 @@ class TacoSeasoning1PoundMeat extends Recipe {
                 i.chilliPowder(1, u.tbsp),
                 i.cumin(1.5, u.tsp),
                 i.salt(1, u.tsp),
-                i.smokedPaprika(.5, u.tsp),
-                i.garlicPowder(.25, u.tsp),
-                i.onionPowder(.25, u.tsp),
-                i.driedOregano(.25, u.tsp),
+                i.smokedPaprika(0.5, u.tsp),
+                i.garlicPowder(0.25, u.tsp),
+                i.onionPowder(0.25, u.tsp),
+                i.driedOregano(0.25, u.tsp),
                 i.blackPepper(20, u.crack), // 1 u.tsp // TODO calculate this someday
-                i.water(.5, u.cup),
+                i.water(0.5, u.cup),
             ]),
             e.largeBowl().mix(),
-            e.largeBowl().add([
-                i.ingredient("1 Pound Meat")
-            ]),
-            Timer.set(30, "m", "Let meat marindate"),
-            Timer.end()
+            e.largeBowl().add([i.ingredient('1 Pound Meat')]),
+            Timer.set(30, 'm', 'Let meat marindate'),
+            Timer.end(),
         ];
     }
 }

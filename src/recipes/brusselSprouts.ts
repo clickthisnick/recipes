@@ -17,14 +17,9 @@ class BrusselSprouts extends Recipe {
         this.steps = [
             e.ninja().preheatAirFry(15),
             i.brusselSprouts(1, u.pound).cutInHalf(),
-            i.brusselSprouts().seasonWith([
-                i.dash(3, u.dash),
-                i.oliveOil(1, u.tbsp),
-            ]),
+            i.brusselSprouts().seasonWith([i.dash(3, u.dash), i.oliveOil(1, u.tbsp)]),
             Timer.end(),
-            e.ninja().add([
-                i.brusselSprouts()
-            ]),
+            e.ninja().add([i.brusselSprouts()]),
             Timer.set(15, 'm', 'Wait for air fryer to be done'),
             Timer.end(),
         ];

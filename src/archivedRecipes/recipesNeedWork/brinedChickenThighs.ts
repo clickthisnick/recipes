@@ -7,11 +7,7 @@ export class MealRecipe extends Recipe {
     constructor() {
         super();
         this.recipeType = c.chicken;
-        this.addIngredients([
-            i.chickenThighPackage(),
-            i.salt(),
-            i.paprika(),
-        ]);
+        this.addIngredients([i.chickenThighPackage(), i.salt(), i.paprika()]);
     }
 
     public generateRecipe() {

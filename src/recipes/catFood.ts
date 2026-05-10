@@ -1,5 +1,5 @@
 import { Recipe, RecipeContainer } from '../class/recipe';
-import { Text as text} from '../class/text';
+import { Text as text } from '../class/text';
 import { Equipment as e } from '../class/equipment';
 import { Items as i } from '../constants/items';
 import { Units as u } from '../constants/units';
@@ -8,14 +8,9 @@ import { Units as u } from '../constants/units';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.variations = [
-            catFoodRecipe,
-            catFoodThreeHalfPounds,
-            catFoodSevenPounds
-        ]
+        this.variations = [catFoodRecipe, catFoodThreeHalfPounds, catFoodSevenPounds];
     }
 }
-
 
 class catFoodRecipe extends Recipe {
     constructor() {
@@ -28,7 +23,7 @@ class catFoodRecipe extends Recipe {
         // 8 oz water
 
         this.steps = [
-            text.set(["NOTE 1.5 ounces water is 1/4 cup, 2 ounces water is 1/3 cup"]),
+            text.set(['NOTE 1.5 ounces water is 1/4 cup, 2 ounces water is 1/3 cup']),
             e.glass(0).add([
                 //  These are all pills, easier to dissolve then to try and break open
                 // We could try powder/droppers if that is available as well
@@ -37,8 +32,8 @@ class catFoodRecipe extends Recipe {
                 i.salmonOil(4000, u.milligram),
                 i.vitaminE(200, u.iu),
             ]),
-            text.set(["Get out 2 sets of gloves"]),
-            text.set(["Get out all meat packages and open them"]),
+            text.set(['Get out 2 sets of gloves']),
+            text.set(['Get out all meat packages and open them']),
             text.set(['Remove 25% of the bones and 50% of the skin from the chicken thighs']),
             e.grinder().add([
                 i.chickenHeart(400, u.gram),
@@ -47,14 +42,14 @@ class catFoodRecipe extends Recipe {
                 //i.chickenLiver(7, u.ounce),
                 //i.chickenHeart(14, u.ounce),
             ]),
-            text.set(["Open grinder"]),
+            text.set(['Open grinder']),
             e.bowl(1).add([
                 i.water(9, u.ounce), // This is an additional 2 ounces
                 i.vitaminBComplex(200, u.milligram), // Put here since its a powder
                 i.litesalt(8.4, u.gram),
                 i.eggyolk(4, u.unit),
             ]),
-            text.set(["Put 2.3 ounces into containers."]),
+            text.set(['Put 2.3 ounces into containers.']),
             // text.set(["3100 mg taurine - (6 - Thorne 500mg pills)"]),
             // text.set(["6200 mg salmon oil - (2 - Salmon Oil pills)"]),
             // text.set(["310 IU vitamin e - (3 Solgar pills)"]),
@@ -72,8 +67,8 @@ class catFoodSevenPounds extends Recipe {
     constructor() {
         super();
 
-        const recipe = new catFoodRecipe()
-        recipe.multiplyIngredients(1.555)
+        const recipe = new catFoodRecipe();
+        recipe.multiplyIngredients(1.555);
 
         this.steps = recipe.steps;
     }
@@ -83,8 +78,8 @@ class catFoodThreeHalfPounds extends Recipe {
     constructor() {
         super();
 
-        const recipe = new catFoodRecipe()
-        recipe.multiplyIngredients(0.7775)
+        const recipe = new catFoodRecipe();
+        recipe.multiplyIngredients(0.7775);
 
         this.steps = recipe.steps;
     }

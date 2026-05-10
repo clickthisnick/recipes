@@ -16,50 +16,48 @@ const SECOND_BAKE_MINUTES = 13;
 const BROIL_MINUTES = 1;
 
 export class MealRecipe extends RecipeContainer {
-  constructor() {
-    super();
+    constructor() {
+        super();
 
-    this.variations = [BreadedMushrooms];
-  }
+        this.variations = [BreadedMushrooms];
+    }
 }
 
 class BreadedMushrooms extends Recipe {
-  constructor() {
-    super();
+    constructor() {
+        super();
 
-    this.steps = [
-      oven.preheat(OVEN_TEMP),
-      Timer.end(),
+        this.steps = [
+            oven.preheat(OVEN_TEMP),
+            Timer.end(),
 
-      pan.add([
-        i.pankoBreadCrumbs(3, u.cup),
-      ]),
+            pan.add([i.pankoBreadCrumbs(3, u.cup)]),
 
-      pan.cook(PANKO_TOAST_MINUTES, 'm'),
-      Timer.end(),
+            pan.cook(PANKO_TOAST_MINUTES, 'm'),
+            Timer.end(),
 
-      bowl.add([
-        i.water(7, u.ounce),
-        i.salt(0.5, u.tsp),
-        i.garlicPowder(0.5, u.tsp),
-        i.cornstarch(2, u.tbsp),
-        i.cassavaFlour(0.5, u.cup),        
-      ]),
+            bowl.add([
+                i.water(7, u.ounce),
+                i.salt(0.5, u.tsp),
+                i.garlicPowder(0.5, u.tsp),
+                i.cornstarch(2, u.tbsp),
+                i.cassavaFlour(0.5, u.cup),
+            ]),
 
-      text.set(['Slice 3–4 king oyster mushrooms']),
-      text.set(['Dip mushrooms into batter, let drain, then coat with panko']),
-      text.set(['Spray', i.avocadoOil(), 'on breaded mushrooms']),
+            text.set(['Slice 3–4 king oyster mushrooms']),
+            text.set(['Dip mushrooms into batter, let drain, then coat with panko']),
+            text.set(['Spray', i.avocadoOil(), 'on breaded mushrooms']),
 
-      oven.cook(FIRST_BAKE_MINUTES, 'm', OVEN_TEMP),
-      Timer.end(),
+            oven.cook(FIRST_BAKE_MINUTES, 'm', OVEN_TEMP),
+            Timer.end(),
 
-      text.set(['Flip mushrooms']),
+            text.set(['Flip mushrooms']),
 
-      oven.cook(SECOND_BAKE_MINUTES, 'm', OVEN_TEMP),
-      Timer.end(),
+            oven.cook(SECOND_BAKE_MINUTES, 'm', OVEN_TEMP),
+            Timer.end(),
 
-      oven.broil(BROIL_MINUTES, 'm', OVEN_TEMP),
-      Timer.end(),
-    ];
-  }
+            oven.broil(BROIL_MINUTES, 'm', OVEN_TEMP),
+            Timer.end(),
+        ];
+    }
 }

@@ -8,9 +8,7 @@ import { Timer } from '../class/timer';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.variations = [
-            PizzaDough
-        ]
+        this.variations = [PizzaDough];
     }
 }
 
@@ -19,20 +17,15 @@ class PizzaDough extends Recipe {
         super();
         this.steps = [
             text.set(['Put warm', i.water(14, u.ounce), 'at 110 F into bowl and stir']),
-            e.bowl().add([
-                i.dryActiveYeast(2.25, u.tsp),
-                i.coconutSugar(.125, u.tsp),
-            ]),
-            e.kitchenAidMixingBowl().add([
-                i.wholeWheatFlour(3.5, u.cup)
-            ]),
+            e.bowl().add([i.dryActiveYeast(2.25, u.tsp), i.coconutSugar(0.125, u.tsp)]),
+            e.kitchenAidMixingBowl().add([i.wholeWheatFlour(3.5, u.cup)]),
             Timer.set(20, 'm', 'Wait for yeast to get cloudy'),
             Timer.end(),
-            e.kitchenAidMixingBowl().add([
-                i.ingredient('Yeast water')
-            ]),
+            e.kitchenAidMixingBowl().add([i.ingredient('Yeast water')]),
             e.kitchenAidMixingBowl().stir(),
-            text.set(['Break dough in half and place in one in oiled red joesph containers (16oz) and the other in the mixing bowl.']),
+            text.set([
+                'Break dough in half and place in one in oiled red joesph containers (16oz) and the other in the mixing bowl.',
+            ]),
             Timer.set(1.5, 'h', 'Let dough rise'),
             Timer.end(),
             text.set(['Break the pizza dough in half again']),

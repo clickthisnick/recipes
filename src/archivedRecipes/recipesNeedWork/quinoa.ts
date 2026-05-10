@@ -7,10 +7,7 @@ export class MealRecipe extends Recipe {
     constructor() {
         super();
         this.recipeType = c.instantPot;
-        this.addIngredients([
-            i.quinoa(),
-            i.water(),
-        ]);
+        this.addIngredients([i.quinoa(), i.water()]);
     }
 
     public generateRecipe() {

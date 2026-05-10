@@ -1,15 +1,13 @@
 import { Recipe, RecipeContainer } from '../class/recipe';
 import { Items as i } from '../constants/items';
 import { Units as u } from '../constants/units';
-import { Text as text} from '../class/text';
+import { Text as text } from '../class/text';
 import { Timer } from '../class/timer';
 
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.variations = [
-            CleanWaterBottle, CleanSmallFizzyWaterBottle
-        ]
+        this.variations = [CleanWaterBottle, CleanSmallFizzyWaterBottle];
     }
 }
 
@@ -26,7 +24,7 @@ class CleanWaterBottle extends Recipe {
             text.set(['Dump out water']),
             text.set(['Use straw pipe cleaner and clean the straw']),
             text.set(['Put 10 seconds water in water bottle']),
-            text.set(['Put in', i.bakingPowder(.5, u.tsp)]),
+            text.set(['Put in', i.bakingPowder(0.5, u.tsp)]),
             Timer.set(45, 's', 'shake'),
             Timer.end(),
             text.set(['Dump out water']),
@@ -37,7 +35,7 @@ class CleanWaterBottle extends Recipe {
             text.set(['Fill 1/4 with water']),
             text.set(['Dump out water']),
             text.set(['Let air dry']),
-        ]
+        ];
     }
 }
 
@@ -46,12 +44,12 @@ class CleanSmallFizzyWaterBottle extends Recipe {
         super();
         this.steps = [
             text.set(['Put 3 seconds water in water bottle']),
-            text.set(['Put in', i.whiteVinegar(.5, u.tsp)]),
+            text.set(['Put in', i.whiteVinegar(0.5, u.tsp)]),
             Timer.set(30, 's', 'shake'),
             Timer.end(),
             text.set(['Dump out water']),
             text.set(['Put 5 seconds water in water bottle']),
-            text.set(['Put in', i.bakingPowder(.25, u.tsp)]),
+            text.set(['Put in', i.bakingPowder(0.25, u.tsp)]),
             Timer.set(30, 's', 'shake'),
             Timer.end(),
             text.set(['Dump out water']),
@@ -62,6 +60,6 @@ class CleanSmallFizzyWaterBottle extends Recipe {
             text.set(['Fill 1/4 with water']),
             text.set(['Dump out water']),
             text.set(['Let air dry']),
-        ]
+        ];
     }
 }

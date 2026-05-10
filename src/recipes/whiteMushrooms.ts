@@ -7,26 +7,24 @@ import { Timer } from '../class/timer';
 export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
-        this.variations = [
-            WhiteMushrooms
-        ]
-     }
+        this.variations = [WhiteMushrooms];
+    }
 }
 
 export class WhiteMushrooms extends Recipe {
     constructor() {
         super();
         this.steps = [
-            e.ninja().add([
-                i.whiteMushroom(8, u.ounce),
-            ]),
+            e.ninja().add([i.whiteMushroom(8, u.ounce)]),
             e.ninja().airFry(13, 'm', 375),
             Timer.end(),
-            i.whiteMushroom().seasonWith([
-                i.lawlrySaltFree(1, u.tsp),
-                i.redPepperFlakes(1/8, u.tsp),
-                i.seaSalt(1/16, u.tsp),
-            ])
+            i
+                .whiteMushroom()
+                .seasonWith([
+                    i.lawlrySaltFree(1, u.tsp),
+                    i.redPepperFlakes(1 / 8, u.tsp),
+                    i.seaSalt(1 / 16, u.tsp),
+                ]),
         ];
     }
 }

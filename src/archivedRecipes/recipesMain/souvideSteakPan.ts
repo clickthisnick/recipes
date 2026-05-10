@@ -8,10 +8,8 @@ export class MealRecipe extends RecipeContainer {
     constructor() {
         super();
         this.recipeType = c.meal;
-        this.variations = [
-            {'recipe': [PanSouvideSteak]},
-        ]
-     }
+        this.variations = [{ recipe: [PanSouvideSteak] }];
+    }
 }
 
 class PanSouvideSteak extends Recipe {

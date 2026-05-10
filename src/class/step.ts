@@ -4,19 +4,19 @@ export interface IStep {
     id: number;
     time: number; // In seconds
     text: string;
-    ingredients: Ingredient[]
-    equipment: string[]
-    children: IStep[]
+    ingredients: Ingredient[];
+    equipment: string[];
+    children: IStep[];
     style: string;
-    disappearWhen: string
-    showTimer: boolean
+    disappearWhen: string;
+    showTimer: boolean;
 }
 
-let id = 0
+let id = 0;
 
 function getIStepId() {
-    id += 1
-    return id
+    id += 1;
+    return id;
 }
 
 export function istep(): IStep {
@@ -30,5 +30,5 @@ export function istep(): IStep {
         style: '',
         disappearWhen: 'clicked',
         showTimer: false,
-    }
+    };
 }
