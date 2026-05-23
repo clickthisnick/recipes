@@ -15,108 +15,94 @@ function getBaseHtml(): string {
         HTML.javascript(),
 
         `
-<button id="shoppingButton" onclick="selectMode('shopping')">Shopping Mode</button>
-<button id="cookingButton" onclick="selectMode('cooking')">Cooking Mode</button>
+<button id="shoppingButton" data-mode="shopping">
+    Shopping Mode
+</button>
+
+<button id="cookingButton" data-mode="cooking">
+    Cooking Mode
+</button>
+
 <br>
 
 <div id="shopping" style="display: none;">
-  Shopping List
-  <button id="shoppingListButton" style="display: none;" onclick="saveShoppingUrl()">Save Shopping Url</button>
-  <br>
-  <span id="shoppingUrl"></span>
+    Shopping List
+
+    <button id="shoppingListButton" style="display: none;">
+        Save Shopping Url
+    </button>
+
+    <br>
+
+    <span id="shoppingUrl"></span>
 </div>
+
 <br>
 
-<div id="cooking" style="display: none;">Cooking List</div>
+<div id="cooking" style="display: none;">
+    Cooking List
+</div>
+
 <br>
 
 <div id="selected" style="display: none;">
-  Selected Recipes
-  <div id="selectedRecipeGroupNames"></div>
-  <br>
+    Selected Recipes
+
+    <div id="selectedRecipeGroupNames"></div>
+
+    <br>
 </div>
 
 <div id="select" style="display: none;">
-  Select Recipes<br>
-  <button onclick="doneSelectingRecipes()">Done Selecting</button><br>
+    Select Recipes
+
+    <br>
+
+    <button id="doneSelectingRecipesButton">
+        Done Selecting
+    </button>
+
+    <br>
 `,
     ].join('');
 }
 
-function getStartupScript(): string {
+function getClosingHtml(): string {
     return `
-</div><br>
+</div>
+
+<br>
 
 <script>
-(function () {
-  var recipesSelected = [];
+document.addEventListener('DOMContentLoaded', () => {
+    setupEventListeners();
+});
 
-  if (!queryString || !Object.prototype.hasOwnProperty.call(queryString, 'mode')) {
-    return;
-  }
+function setupEventListeners() {
+    setupModeButtons();
 
-  var mode = queryString.mode;
-  delete queryString.mode;
+    getById('doneSelectingRecipesButton')
+        ?.addEventListener('click', doneSelectingRecipes);
 
-  if (Object.prototype.hasOwnProperty.call(queryString, 'recipes')) {
-    recipesSelected = String(queryString.recipes)
-      .split(',')
-      .map(function (recipe) {
-        return recipe.trim();
-      })
-      .filter(Boolean);
+    getById('shoppingListButton')
+        ?.addEventListener('click', saveShoppingUrl);
+}
 
-    delete queryString.recipes;
-  }
+function setupModeButtons() {
+    document
+        .querySelectorAll('[data-mode]')
+        .forEach((button) => {
+            button.addEventListener('click', () => {
+                const mode = button.dataset.mode;
 
-  selectMode(mode);
-
-  if (mode === 'shopping') {
-    var shoppingEl = document.getElementById('shopping');
-
-    if (shoppingEl && typeof recipes !== 'undefined') {
-      shoppingEl.innerHTML += recipes;
-    }
-
-    Object.keys(queryString).forEach(function (key) {
-      var item;
-
-      try {
-        item = JSON.parse(queryString[key]);
-      } catch (e) {
-        console.warn('Skipping invalid shopping item:', key, queryString[key]);
-        return;
-      }
-
-      // Backwards-compatible expected format:
-      // ?apple=["g",100]
-      if (!Array.isArray(item) || item.length < 2) {
-        console.warn('Skipping malformed shopping item:', key, item);
-        return;
-      }
-
-      var unit = item[0];
-      var quantity = item[1];
-
-      if (!ingredients[key]) {
-        ingredients[key] = {};
-      }
-
-      if (!ingredients[key].units) {
-        ingredients[key].units = {};
-      }
-
-      ingredients[key].units[unit] = quantity;
-    });
-  } else if (mode === 'cooking') {
-    recipesSelected.forEach(function (recipeGroupName) {
-      selectRecipe(recipeGroupName);
-    });
-  }
-
-  doneSelectingRecipes();
-})();
-</script>`;
+                if (mode) {
+                    selectMode(mode);
+                }
+            });
+        });
+}
+</script>
+`;
 }
 
 function isRecipeFile(filename: string): boolean {
@@ -125,10 +111,15 @@ function isRecipeFile(filename: string): boolean {
 
 function generateRecipeHtml(filename: string): string {
     const recipePath = path.join(recipeFolder, filename);
+
     const recipeModule = require(recipePath);
 
     if (!recipeModule.MealRecipe) {
-        console.warn('Skipping recipe without MealRecipe export:', filename);
+        console.warn(
+            'Skipping recipe without MealRecipe export:',
+            filename
+        );
+
         return '';
     }
 
@@ -145,18 +136,19 @@ function run(): void {
     const filenames = fs
         .readdirSync(recipeFolder)
         .filter(isRecipeFile)
-        .sort(function (a, b) {
-            return a.localeCompare(b);
-        });
+        .sort((a, b) => a.localeCompare(b));
 
-    filenames.forEach(function (filename) {
+    filenames.forEach((filename) => {
         pageHtml += generateRecipeHtml(filename);
     });
 
-    pageHtml += getStartupScript();
+    pageHtml += getClosingHtml();
 
     fs.mkdirSync(distFolder, { recursive: true });
+
     fs.writeFileSync(outputFile, pageHtml);
+
+    console.log('✅ Generated:', outputFile);
 }
 
 run();

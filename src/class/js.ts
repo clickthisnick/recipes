@@ -1,52 +1,119 @@
+const appState = {
+    recipes: {},
+    selectedRecipeGroupNames: [],
+    ingredients: {},
+    perishableItems: {},
+    timerClicks: {},
+    mode: '',
+    shownRecipeId: '',
+};
+
 document.addEventListener(
     'click',
     () => {
-        const audio = document.getElementById('beep');
-
-        if (!audio) {
-            console.log('❌ No audio element found during unlock');
-            return;
-        }
-
-        console.log('👆 User interaction detected, attempting unlock...');
-
-        audio
-            .play()
-            .then(() => {
-                console.log('✅ Audio unlocked successfully');
-
-                audio.pause();
-                audio.currentTime = 0;
-            })
-            .catch((err) => {
-                console.log('❌ Unlock failed:', err.name, err.message);
-            });
+        unlockAudio();
     },
     { once: true }
 );
 
-const recipes = {};
-const selectedRecipes = [];
-const selectedRecipeGroupNames = [];
-const ingredients = {};
-let mode = '';
-const perishableItems = {};
+/* -----------------------------
+ * DOM helpers
+ * ----------------------------- */
 
-function playSound(duration = 4) {
-    const audio = document.getElementById('beep');
+function getById(id) {
+    return document.getElementById(id);
+}
+
+function showElement(id, display = 'inline') {
+    getById(id)?.style.setProperty('display', display);
+}
+
+function hideElement(id) {
+    getById(id)?.style.setProperty('display', 'none');
+}
+
+function showElementsByClassName(className, display = 'inline') {
+    document.querySelectorAll(`.${className}`).forEach((element) => {
+        element.style.display = display;
+    });
+}
+
+function hideElementsByClassName(className) {
+    document.querySelectorAll(`.${className}`).forEach((element) => {
+        element.style.display = 'none';
+    });
+}
+
+function removeClassFromAll(className) {
+    document.querySelectorAll(`.${className}`).forEach((element) => {
+        element.classList.remove(className);
+    });
+}
+
+function clearElement(id) {
+    const element = getById(id);
+
+    if (element) {
+        element.innerHTML = '';
+    }
+}
+
+function appendText(parent, text) {
+    parent.appendChild(document.createTextNode(text));
+}
+
+function appendBreak(parent) {
+    parent.appendChild(document.createElement('br'));
+}
+
+/* -----------------------------
+ * Audio
+ * ----------------------------- */
+
+function getAudioElement() {
+    const audio = getById('beep');
 
     if (!audio) {
         console.log('❌ No audio element found');
-        return;
+        return null;
     }
 
-    audio.src = duration === 4 ? '../src/sounds/pager-beep.mp3' : '../src/sounds/1sec.m4a';
+    return audio;
+}
+
+function unlockAudio() {
+    const audio = getAudioElement();
+
+    if (!audio) return;
+
+    console.log('👆 User interaction detected, attempting unlock...');
+
+    audio
+        .play()
+        .then(() => {
+            console.log('✅ Audio unlocked successfully');
+
+            audio.pause();
+            audio.currentTime = 0;
+        })
+        .catch((err) => {
+            console.log('❌ Unlock failed:', err.name, err.message);
+        });
+}
+
+function playSound(duration = 4) {
+    const audio = getAudioElement();
+
+    if (!audio) return;
+
+    audio.src =
+        duration === 4
+            ? '../src/sounds/pager-beep.mp3'
+            : '../src/sounds/1sec.m4a';
 
     console.log('Full URL:', audio.src);
 
     audio.load();
-
-    console.log('Trying to play...');
 
     audio
         .play()
@@ -58,23 +125,11 @@ function playSound(duration = 4) {
         });
 }
 
-/**
- * Parses a URL query string into a plain JavaScript object.
- *
- * - Single query parameters are returned as strings
- * - Repeated query parameters are returned as arrays of strings
- *
- * Examples:
- *   parseParams('?foo=1&bar=2')
- *   → { foo: '1', bar: '2' }
- *
- *   parseParams('?foo=1&foo=2&bar=3')
- *   → { foo: ['1', '2'], bar: '3' }
- *
- * @param {string} search - The URL query string (e.g. window.location.search)
- * @returns {Object<string, string | string[]>} Parsed query parameters
- */
-const parseParams = (search) => {
+/* -----------------------------
+ * URL helpers
+ * ----------------------------- */
+
+function parseParams(search) {
     const params = new URLSearchParams(search);
     const result = {};
 
@@ -87,224 +142,216 @@ const parseParams = (search) => {
     }
 
     return result;
-};
+}
 
 const queryString = parseParams(window.location.search);
 
-function setRecipe(recipeGroupName, recipe) {
-    // Setting the recipe data into the recipe
-    if (recipes.hasOwnProperty(recipeGroupName) === false) {
-        recipes[recipeGroupName] = [];
-    }
-    recipes[recipeGroupName].push(recipe);
-}
-
-function removeAllClassNames(className) {
-    document.querySelectorAll(`.${className}`).forEach((element) => {
-        element.className = '';
-    });
-}
-
-function selectMode(id) {
-    mode = id;
-    showElement(id);
-    showElement('select');
-
-    // Play the silent beep so ios lets us play it in the background later (after we change src)
-    const audio = document.getElementById('beep');
-    audio.play();
-
-    hideElement('cookingButton');
-    hideElement('shoppingButton');
-
-    const url = new URL(window.location);
-
-    url.searchParams.set('mode', mode);
-
-    history.pushState({}, '', url);
-
-    // This will make all the elements disappear by removing all the html/className
-    // This is different than just setting the display to visible or non visible
-    if (mode == 'cooking') {
-        console.log('hoohohoh');
-        hideElementsByClassName('hideFromCookingView');
-        removeAllClassNames('hideFromCookingView');
-    }
-}
-
-function deselectRecipe(recipeGroupName) {
-    const idx = selectedRecipeGroupNames.indexOf(recipeGroupName);
-
-    if (idx >= 0) {
-        selectedRecipeGroupNames.splice(idx, 1);
-        selectedRecipes.splice(idx, 1);
-    }
-
-    renderSelectedRecipes();
-}
-
-function renderSelectedRecipes() {
-    // Show all the selected recipes
-    let selectedRecipesHtml = '';
-    for (let i = 0; i < selectedRecipeGroupNames.length; i++) {
-        let recipeGroup = selectedRecipeGroupNames[i];
-        if (recipeGroup) {
-            recipeGroup = recipeGroup.split('-')[1];
-        }
-
-        selectedRecipesHtml += `<button onclick="deselectRecipe('${selectedRecipeGroupNames[i]}')">${recipeGroup}</button>`;
-        selectedRecipesHtml += '<br>';
-    }
-
-    const selectedDiv = document.getElementById('selectedRecipeGroupNames');
-    if (selectedDiv) {
-        selectedDiv.innerHTML = selectedRecipesHtml;
-    }
-    showElement('selected');
-}
-
-function setRecipesParamLast(recipesValue) {
+function updateUrlParam(key, value) {
     const url = new URL(window.location.href);
 
-    // normalize to comma-separated string
-    const recipesStr = Array.isArray(recipesValue)
-        ? recipesValue.join(',')
-        : String(recipesValue ?? '');
-
-    // remove then append so it becomes the last param
-    url.searchParams.delete('recipes');
-    if (recipesStr) url.searchParams.append('recipes', recipesStr);
+    url.searchParams.set(key, value);
 
     history.pushState({}, '', url.toString());
 }
 
+function setRecipesParamLast(recipeGroupNames) {
+    const url = new URL(window.location.href);
+    const recipesValue = recipeGroupNames.join(',');
+
+    url.searchParams.delete('recipes');
+
+    if (recipesValue) {
+        url.searchParams.append('recipes', recipesValue);
+    }
+
+    history.pushState({}, '', url.toString());
+}
+
+/* -----------------------------
+ * Recipe state
+ * ----------------------------- */
+
+
+function getSelectedRecipes() {
+    return appState.selectedRecipeGroupNames.flatMap((recipeGroupName) => {
+        return appState.recipes[recipeGroupName] ?? [];
+    });
+}
+
 function selectRecipe(recipeGroupName) {
-    selectedRecipeGroupNames.push(recipeGroupName);
-    selectedRecipes.push(recipes[recipeGroupName]);
+    if (!appState.recipes[recipeGroupName]) {
+        console.log(`❌ Recipe group not found: ${recipeGroupName}`);
+        return;
+    }
 
-    // Set query param for recipe(s)
-    setRecipesParamLast(recipeGroupName);
+    if (!appState.selectedRecipeGroupNames.includes(recipeGroupName)) {
+        appState.selectedRecipeGroupNames.push(recipeGroupName);
+    }
 
+    setRecipesParamLast(appState.selectedRecipeGroupNames);
     renderSelectedRecipes();
 }
 
-/**
- * Adds a cooking step as a div panel to the #cooking container.
- *
- * Each step can:
- *   - Have a custom style
- *   - Trigger a timer via `loadTimer(time, id, disappearWhen)` on click
- *   - Toggle a 'timer' class and remove itself if no timer is required
- *   - Recursively add child steps
- *
- * @param {Object} istep - Step object containing the step data
- * @param {number|string} istep.id - Unique identifier for the step
- * @param {string} istep.text - Text content of the step
- * @param {string} [istep.style] - Optional CSS styles for the div
- * @param {boolean} [istep.showTimer] - Whether to show a timer
- * @param {number} [istep.time] - Timer duration (required if showTimer is true)
- * @param {string} [istep.disappearWhen] - Optional parameter for loadTimer
- * @param {Object[]} [istep.children] - Optional array of child steps
- * @returns {void}
- */
-function addStep(istep) {
-    const cookingDiv = document.getElementById('cooking');
+function deselectRecipe(recipeGroupName) {
+    appState.selectedRecipeGroupNames = appState.selectedRecipeGroupNames.filter(
+        (selectedRecipeGroupName) => selectedRecipeGroupName !== recipeGroupName
+    );
+
+    setRecipesParamLast(appState.selectedRecipeGroupNames);
+    renderSelectedRecipes();
+}
+
+function getRecipeDisplayName(recipeGroupName) {
+    if (!recipeGroupName) return '';
+
+    return recipeGroupName.split('-')[1] ?? recipeGroupName;
+}
+
+function renderSelectedRecipes() {
+    const selectedDiv = getById('selectedRecipeGroupNames');
+
+    if (!selectedDiv) return;
+
+    selectedDiv.innerHTML = '';
+
+    appState.selectedRecipeGroupNames.forEach((recipeGroupName) => {
+        const button = document.createElement('button');
+
+        button.textContent = getRecipeDisplayName(recipeGroupName);
+
+        button.addEventListener('click', () => {
+            deselectRecipe(recipeGroupName);
+        });
+
+        selectedDiv.appendChild(button);
+        appendBreak(selectedDiv);
+    });
+
+    showElement('selected');
+}
+
+/* -----------------------------
+ * Mode
+ * ----------------------------- */
+
+function selectMode(id) {
+    appState.mode = id;
+
+    showElement(id);
+    showElement('select');
+
+    unlockAudio();
+
+    hideElement('cookingButton');
+    hideElement('shoppingButton');
+
+    updateUrlParam('mode', appState.mode);
+
+    if (appState.mode === 'cooking') {
+        hideElementsByClassName('hideFromCookingView');
+        removeClassFromAll('hideFromCookingView');
+    }
+}
+
+/* -----------------------------
+ * Cooking steps
+ * ----------------------------- */
+
+function addStep(step) {
+    const cookingDiv = getById('cooking');
+
     if (!cookingDiv) {
         alert('Cannot find cooking element with id "cooking"');
         return;
     }
 
-    // Create the panel div
-    const divStep = document.createElement('div');
-    divStep.className = 'panel';
-    divStep.id = `panel-${istep.id}`;
+    const stepPanel = document.createElement('div');
 
-    if (istep.style) {
-        divStep.style.cssText = istep.style;
+    stepPanel.className = 'panel';
+    stepPanel.id = `panel-${step.id}`;
+
+    if (step.style) {
+        stepPanel.style.cssText = step.style;
     }
 
-    // Add a span for the step ID
-    const span = document.createElement('span');
-    span.id = istep.id;
-    divStep.appendChild(span);
+    const stepIdSpan = document.createElement('span');
+    stepIdSpan.id = step.id;
 
-    // Add the text content
-    divStep.appendChild(document.createTextNode(istep.text));
+    stepPanel.appendChild(stepIdSpan);
+    appendText(stepPanel, step.text);
 
-    // Set click behavior
-    if (istep.showTimer) {
-        divStep.onclick = () => loadTimer(istep.time, istep.id, istep.disappearWhen);
-    } else {
-        divStep.onclick = () => {
-            divStep.classList.toggle('timer');
-            divStep.remove();
-        };
-    }
-
-    // Append the panel to the cooking container
-    cookingDiv.appendChild(divStep);
-
-    // Recursively add child steps if any
-    if (istep.children && istep.children.length > 0) {
-        istep.children.forEach(addStep);
-    }
-}
-
-/**
- * Generates a shopping URL based on the selected recipes and their ingredients,
- * then displays it in the element with ID "shoppingUrl".
- *
- * The generated URL includes:
- *   - `mode=shopping` as a fixed query parameter
- *   - `recipes` as a comma-separated list of selected recipe group names
- *   - Each ingredient as a query parameter in the format:
- *       ingredient=["unit", quantity]
- *     where both the ingredient and unit are URL-encoded.
- *
- * Example output:
- *   https://example.com?mode=shopping&recipes=Salad,Pasta&asparagus=["tsb", 1]&tomato=["cup", 2]
- *
- * @returns {void}
- */
-function saveShoppingUrl() {
-    // Base URL without query string
-    const baseUrl = document.location.href.split('?')[0];
-
-    // Start query parameters
-    const params = new URLSearchParams();
-    params.set('mode', 'shopping');
-    params.set('recipes', selectedRecipeGroupNames);
-
-    // Add each ingredient
-    for (const [ingredient, data] of Object.entries(ingredients)) {
-        const unit = Object.keys(data.units)[0];
-        const quantity = data.units[unit];
-
-        // Format as ["unit", quantity] and encode as string
-        const value = `["${unit}", ${quantity}]`;
-        params.set(ingredient, value);
-    }
-
-    const shoppingUrl = `${baseUrl}?${params.toString()}`;
-
-    // Display the generated URL
-    document.getElementById('shoppingUrl').innerHTML = shoppingUrl + '<br>';
-}
-
-function generateLinks(linkByPrice, priceKeys) {
-    let links = '';
-
-    // sort the prices key so we can list them by price
-    priceKeys.sort();
-
-    priceKeys.forEach((priceKey) => {
-        linkByPrice[priceKey].forEach((value) => {
-            links += value;
+    if (step.showTimer) {
+        stepPanel.addEventListener('click', () => {
+            loadTimer(step.time, step.id, step.disappearWhen);
         });
-    });
+    } else {
+        stepPanel.addEventListener('click', () => {
+            stepPanel.classList.toggle('timer');
+            stepPanel.remove();
+        });
+    }
 
-    return links;
+    cookingDiv.appendChild(stepPanel);
+
+    if (Array.isArray(step.children)) {
+        step.children.forEach(addStep);
+    }
 }
+
+function renderCookingSteps() {
+    const cookingDiv = getById('cooking');
+
+    if (!cookingDiv) return;
+
+    cookingDiv.innerHTML = '';
+
+    getSelectedRecipes().forEach((recipe) => {
+        recipe.steps.forEach(addStep);
+    });
+}
+
+/* -----------------------------
+ * Shopping state
+ * ----------------------------- */
+
+function resetShoppingState() {
+    appState.ingredients = {};
+    appState.perishableItems = {};
+}
+
+function addIngredientToShoppingList(ingredient) {
+    if (ingredient.perishableLimit > 0) {
+        appState.perishableItems[ingredient.name] = ingredient.perishableLimit;
+    }
+
+    const existingIngredient = appState.ingredients[ingredient.name];
+
+    if (!existingIngredient) {
+        appState.ingredients[ingredient.name] = { ...ingredient };
+        return;
+    }
+
+    if (existingIngredient.unit.name === ingredient.unit.name) {
+        existingIngredient.quantity += ingredient.quantity;
+        return;
+    }
+
+    appState.ingredients[`${ingredient.name} ${ingredient.unit.name}`] = {
+        ...ingredient,
+    };
+}
+
+function buildShoppingStateFromSelectedRecipes() {
+    resetShoppingState();
+
+    getSelectedRecipes().forEach((recipe) => {
+        Object.values(recipe.ingredients).forEach(addIngredientToShoppingList);
+    });
+}
+
+/* -----------------------------
+ * Shopping links
+ * ----------------------------- */
 
 function applyCreditCardDiscounts(store, pricePerQuantity) {
     const discounts = {
@@ -312,323 +359,390 @@ function applyCreditCardDiscounts(store, pricePerQuantity) {
         whole: 0.95,
     };
 
-    const rate = Object.entries(discounts).find(([key]) => store.startsWith(key))?.[1] ?? 0.98;
+    const discountRate =
+        Object.entries(discounts).find(([storePrefix]) =>
+            store.startsWith(storePrefix)
+        )?.[1] ?? 0.98;
 
-    return (pricePerQuantity * rate).toFixed(3);
+    return (Number(pricePerQuantity) * discountRate).toFixed(3);
 }
+
+function addPriceLink(linkByPrice, priceKeys, price, html) {
+    if (!linkByPrice[price]) {
+        linkByPrice[price] = [];
+        priceKeys.push(price);
+    }
+
+    linkByPrice[price].push(html);
+}
+
+function generateLinks(linkByPrice, priceKeys) {
+    return priceKeys
+        .sort((a, b) => Number(a) - Number(b))
+        .flatMap((priceKey) => linkByPrice[priceKey])
+        .join('');
+}
+
+function getIngredientLinksHtml(ingredient) {
+    if (!ingredient.purchaseLinks) {
+        return '';
+    }
+
+    let commonUnit;
+    const linkByPrice = {};
+    const priceKeys = [];
+
+    Object.keys(ingredient.purchaseLinks)
+        .sort()
+        .forEach((store) => {
+            const storeLinks = ingredient.purchaseLinks[store];
+
+            Object.keys(storeLinks).forEach((storeDescription) => {
+                const items = storeLinks[storeDescription];
+
+                items.forEach((item) => {
+                    if (!commonUnit) {
+                        commonUnit = item.quantity_unit.name;
+                    }
+
+                    const basePricePerQuantity =
+                        item.priceConversionTable[commonUnit];
+
+                    if (item.discount) {
+                        Object.entries(item.discount).forEach(
+                            ([discountName, discountValue]) => {
+                                const discountMultiplier =
+                                    (100 - discountValue) * 0.01;
+
+                                const discountedPrice = applyCreditCardDiscounts(
+                                    store,
+                                    Number(basePricePerQuantity) * discountMultiplier
+                                );
+
+                                addPriceLink(
+                                    linkByPrice,
+                                    priceKeys,
+                                    discountedPrice,
+                                    createStoreLinkHtml({
+                                        store,
+                                        storeDescription,
+                                        label: discountName,
+                                        item,
+                                        priceText: discountedPrice,
+                                        commonUnit,
+                                    })
+                                );
+                            }
+                        );
+                    }
+
+                    const finalPrice = applyCreditCardDiscounts(
+                        store,
+                        basePricePerQuantity
+                    );
+
+                    addPriceLink(
+                        linkByPrice,
+                        priceKeys,
+                        finalPrice,
+                        createStoreLinkHtml({
+                            store,
+                            storeDescription,
+                            label: item.price,
+                            item,
+                            priceText: finalPrice,
+                            commonUnit,
+                        })
+                    );
+                });
+            });
+        });
+
+    return generateLinks(linkByPrice, priceKeys);
+}
+
+function createStoreLinkHtml({
+    store,
+    storeDescription,
+    label,
+    item,
+    priceText,
+    commonUnit,
+}) {
+    return `
+        <span class="${store}-filter store-filter">
+            <br>
+            ${store}: &nbsp;
+            <a href="${item.link}" target="_blank">
+                ${storeDescription} - ${label} - ${priceText}/${commonUnit}
+            </a>
+        </span>
+    `;
+}
+
+/* -----------------------------
+ * Shopping rendering
+ * ----------------------------- */
+
+function renderShoppingHeader(shoppingDiv) {
+    appendBreak(shoppingDiv);
+
+    appendText(shoppingDiv, appState.selectedRecipeGroupNames.join(', '));
+    appendBreak(shoppingDiv);
+
+    appendText(shoppingDiv, 'Perishable Items: ');
+    appendText(shoppingDiv, JSON.stringify(appState.perishableItems));
+    appendBreak(shoppingDiv);
+
+    const wholeFoodsButton = document.createElement('button');
+
+    wholeFoodsButton.className = 'wholeFoodsToggle';
+    wholeFoodsButton.textContent = 'Whole Foods';
+
+    wholeFoodsButton.addEventListener('click', () => {
+        hideElementsByClassName('store-filter');
+        showElementsByClassName('whole-foods-filter');
+    });
+
+    shoppingDiv.appendChild(wholeFoodsButton);
+    appendBreak(shoppingDiv);
+}
+
+function renderShoppingIngredient(shoppingDiv, ingredientKey, ingredient) {
+    const panel = document.createElement('div');
+    panel.className = 'panel';
+    panel.id = `shopping-${ingredientKey}`;
+
+    panel.addEventListener('click', () => {
+        panel.classList.toggle('completed');
+    });
+
+    const removeButton = document.createElement('button');
+    removeButton.textContent = 'x';
+
+    removeButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+
+        panel.remove();
+        delete appState.ingredients[ingredientKey];
+    });
+
+    const text = document.createTextNode(
+        ` ${ingredient.name} ${ingredient.quantity} ${ingredient.unit.name}`
+    );
+
+    const linksWrapper = document.createElement('span');
+    linksWrapper.innerHTML = getIngredientLinksHtml(ingredient);
+
+    panel.appendChild(removeButton);
+    panel.appendChild(text);
+    panel.appendChild(linksWrapper);
+
+    shoppingDiv.appendChild(panel);
+}
+
+function renderShoppingList() {
+    const shoppingDiv = getById('shopping');
+
+    if (!shoppingDiv) {
+        console.log('❌ No shopping element found');
+        return;
+    }
+
+    shoppingDiv.innerHTML = '';
+
+    buildShoppingStateFromSelectedRecipes();
+    renderShoppingHeader(shoppingDiv);
+
+    Object.entries(appState.ingredients).forEach(([ingredientKey, ingredient]) => {
+        renderShoppingIngredient(shoppingDiv, ingredientKey, ingredient);
+    });
+}
+
+function saveShoppingUrl() {
+    const baseUrl = document.location.href.split('?')[0];
+    const params = new URLSearchParams();
+
+    params.set('mode', 'shopping');
+    params.set('recipes', appState.selectedRecipeGroupNames.join(','));
+
+    Object.entries(appState.ingredients).forEach(([ingredientName, ingredient]) => {
+        if (!ingredient.units) return;
+
+        const unit = Object.keys(ingredient.units)[0];
+        const quantity = ingredient.units[unit];
+
+        params.set(ingredientName, `["${unit}", ${quantity}]`);
+    });
+
+    const shoppingUrl = `${baseUrl}?${params.toString()}`;
+    const shoppingUrlDiv = getById('shoppingUrl');
+
+    if (shoppingUrlDiv) {
+        shoppingUrlDiv.innerHTML = `${shoppingUrl}<br>`;
+    }
+}
+
+/* -----------------------------
+ * Main flow
+ * ----------------------------- */
 
 function doneSelectingRecipes() {
     hideElement('select');
     hideElement('selected');
     showElement('shoppingListButton');
-    const shoppingDiv = document.getElementById('shopping');
 
-    if (mode === 'shopping') {
-        // Get all ingredients across all recipes
-        // selectedRecipes is an array of array of recipes
-        selectedRecipes.forEach((singleRecipeArray) => {
-            singleRecipeArray.forEach((singleRecipe) => {
-                Object.keys(singleRecipe.ingredients).forEach((ingredientKey) => {
-                    const ingredient = singleRecipe.ingredients[ingredientKey];
-
-                    if (ingredient.perishableLimit > 0) {
-                        perishableItems[ingredient.name] = ingredient.perishableLimit;
-                    }
-
-                    // If there are no previous ingredients, add the ingredient
-                    if (!ingredients.hasOwnProperty(ingredient.name)) {
-                        ingredients[ingredient.name] = ingredient;
-                    } else {
-                        // If the previously known ingredient has the same unit as the ingredient we are adding
-                        // Just update the quantity
-                        if (ingredients[ingredient.name].unit.name == ingredient.unit.name) {
-                            ingredients[ingredient.name].quantity += ingredient.quantity;
-                        } else {
-                            // Otherwise just add the ingredient as the unit
-                            ingredients[`${ingredient.name} ${ingredient.unit.name}`] = ingredient;
-                        }
-                    }
-                });
-            });
-        });
-
-        // Show ingredients to the user
-        shoppingDiv.innerHTML += '<br>';
-        shoppingDiv.innerHTML += selectedRecipeGroupNames;
-        shoppingDiv.innerHTML += '<br> Perishable Items: ';
-        shoppingDiv.innerHTML += JSON.stringify(perishableItems);
-        shoppingDiv.innerHTML += '<br>';
-        shoppingDiv.innerHTML += `<button class="wholeFoodsToggle" onclick="hideElementsByClassName('store-filter'); showElementsByClassName('whole-foods-filter')">Whole Foods</button>`;
-        shoppingDiv.innerHTML += '<br>';
-
-        Object.keys(ingredients).forEach((ingredientKey) => {
-            let commonUnit;
-            let links = '';
-
-            const linkByPrice = {}; // Key is prices, value is array of items
-            const priceKeys = []; // Keys of the linkByPrice
-
-            const ingredient = ingredients[ingredientKey];
-
-            // When you click a saved url we don't include the purchaseLinks
-            if (ingredient.hasOwnProperty('purchaseLinks')) {
-                const stores = Object.keys(ingredient['purchaseLinks']).sort();
-
-                stores.forEach((store) => {
-                    const storeLinks = ingredient['purchaseLinks'][store];
-                    const storeDescriptions = Object.keys(storeLinks);
-
-                    storeDescriptions.forEach((storeDescription) => {
-                        const items = storeLinks[storeDescription];
-                        items.forEach((item) => {
-                            // Make the first unit found the common unit so when we price compare, all units are the same
-                            if (commonUnit === undefined) {
-                                commonUnit = item.quantity_unit.name;
-                            }
-
-                            let pricePerQuantity = item.priceConversionTable[commonUnit];
-
-                            if (item.discount) {
-                                Object.keys(item.discount).forEach((discountKey) => {
-                                    const discountValue = item.discount[discountKey];
-                                    const priceMultiple = ((100 - discountValue) * 0.01).toFixed(2);
-
-                                    let subscribePricePerQuantity = (
-                                        pricePerQuantity * priceMultiple
-                                    ).toFixed(3);
-
-                                    subscribePricePerQuantity = applyCreditCardDiscounts(
-                                        store,
-                                        subscribePricePerQuantity
-                                    );
-
-                                    if (!linkByPrice.hasOwnProperty(subscribePricePerQuantity)) {
-                                        linkByPrice[subscribePricePerQuantity] = [
-                                            `<span class="${store}-filter store-filter" ></br> ${store}: &nbsp;<a href="${item.link}" target="_blank">${storeDescription} - ${discountKey} ${subscribePricePerQuantity} - ${subscribePricePerQuantity}/${commonUnit}</a></span>`,
-                                        ];
-                                        priceKeys.push(subscribePricePerQuantity);
-                                    } else {
-                                        linkByPrice[subscribePricePerQuantity].push(
-                                            `<span class="${store}-filter store-filter" ></br> ${store}: &nbsp;<a href="${item.link}" target="_blank">${storeDescription} - ${discountKey} ${subscribePricePerQuantity} - ${subscribePricePerQuantity}/${commonUnit}</a></span>`
-                                        );
-                                    }
-                                });
-                            }
-
-                            pricePerQuantity = applyCreditCardDiscounts(store, pricePerQuantity);
-
-                            if (!linkByPrice.hasOwnProperty(pricePerQuantity)) {
-                                linkByPrice[pricePerQuantity] = [
-                                    `<span class="${store}-filter store-filter" > </br> ${store}: &nbsp;<a href="${item.link}" target="_blank">${storeDescription} - ${item.price} - ${pricePerQuantity}/${commonUnit}</a></span>`,
-                                ];
-                                priceKeys.push(pricePerQuantity);
-                            } else {
-                                linkByPrice[pricePerQuantity].push(
-                                    `<span class="${store}-filter store-filter" > </br> ${store}: &nbsp;<a href="${item.link}" target="_blank">${storeDescription} - ${item.price} - ${pricePerQuantity}/${commonUnit}</a></span>`
-                                );
-                            }
-                        });
-                    });
-
-                    links = generateLinks(linkByPrice, priceKeys);
-                });
-            }
-
-            shoppingDiv.innerHTML +=
-                '<div onclick="this.classList.toggle(' +
-                "'completed'" +
-                ');"' +
-                'id="shopping-' +
-                ingredient.name +
-                '" class="panel" style="">' +
-                '<span' +
-                "document.getElementById('shopping-" +
-                ingredient.name +
-                "').remove(); delete ingredients['" +
-                ingredient.name +
-                "'" +
-                '];" >' +
-                ingredient.name +
-                ' ' +
-                ingredient.quantity +
-                ' ' +
-                ingredient.unit.name +
-                '</span>' +
-                links +
-                '</div>';
-        });
-    } else {
-        selectedRecipes.forEach((recipes) => {
-            recipes.forEach((recipe) => {
-                recipe.steps.forEach((istep) => {
-                    addStep(istep);
-                });
-            });
-        });
+    if (appState.mode === 'shopping') {
+        renderShoppingList();
+        return;
     }
+
+    renderCookingSteps();
 }
 
-function showElement(id) {
-    document.getElementById(id).style.display = 'inline';
+/* -----------------------------
+ * Timers
+ * ----------------------------- */
+
+function setStepVisibility(idToShow, idToHide) {
+    hideElement(`panel-${idToHide}`);
+    showElement(`panel-${idToShow}`, 'block');
 }
 
-function showElementsByClassName(className) {
-    document.querySelectorAll(`.${className}`).forEach((el) => {
-        el.style.display = 'inline';
-    });
+function incrementTimerClicks(timerPanelId) {
+    appState.timerClicks[timerPanelId] =
+        (appState.timerClicks[timerPanelId] ?? 0) + 1;
+
+    return appState.timerClicks[timerPanelId];
 }
-
-function hideElementsByClassName(className) {
-    document.querySelectorAll(`.${className}`).forEach((el) => {
-        el.style.display = 'none';
-    });
-}
-
-function hideElement(id) {
-    document.getElementById(id).style.display = 'none';
-}
-
-// This is where my new recipe app ends
-
-function setStepVisibility(idxToShow, idxToHide) {
-    document.getElementById('panel-' + idxToHide).style.display = 'none';
-    document.getElementById('panel-' + idxToShow).style.display = 'block';
-}
-
-const timerClicks = {};
 
 function startTimer(duration, stepId, disappearWhen) {
-    const timerPanelId = 'panel-' + stepId;
-    const timerElement = document.getElementById(timerPanelId);
-
-    // Toggle the timer if the class doesn't already have it
-    // We only do this once
-    if (!timerElement.classList.contains('timer')) {
-        timerElement.classList.toggle('timer');
-    }
+    const timerPanelId = `panel-${stepId}`;
+    const timerElement = getById(timerPanelId);
 
     if (!timerElement) {
-        throw new Error('timerElement is failed');
+        throw new Error(`Missing timer element: ${timerPanelId}`);
     }
 
-    // If clicking an element that's already green
+    timerElement.classList.add('timer');
+
     if (timerElement.classList.contains('timerCompletedButShowing')) {
-        timerElement.classList.toggle('timerCompletedButShowing');
-        timerElement.classList.toggle('completed');
+        timerElement.classList.remove('timerCompletedButShowing');
+        timerElement.classList.add('completed');
     }
 
-    if (timerClicks.hasOwnProperty(timerPanelId)) {
-        timerClicks[timerPanelId] += 1;
-    } else {
-        timerClicks[timerPanelId] = 1;
+    const clickCount = incrementTimerClicks(timerPanelId);
+
+    if (clickCount >= 3) {
+        timerElement.style.display = 'none';
     }
 
-    if (timerElement && timerElement.getAttribute('class')) {
-        const timerClass = timerElement.getAttribute('class');
-        if (timerClass && timerClass.includes('timer')) {
-            // <!--If you click block 2 times after timer started, then you can skip-- >
-            // We use 2 clicks because its easy to accidentally click one
-            if (timerClicks[timerPanelId] >= 3) {
-                document.getElementById(timerPanelId).style.display = 'none';
-            }
-            if (timerClicks[timerPanelId] >= 2) {
-                // Do nothing aside from increment the counter on the 2nd click
-                return;
-            }
-        }
+    if (clickCount >= 2) {
+        return;
     }
 
     const originalTimerHtml = timerElement.innerHTML;
-    const intervalID = window.setInterval(function () {
-        let minutes = parseInt(duration / 60, 10);
-        let seconds = parseInt(duration % 60, 10);
 
-        minutes = minutes < 10 ? '0' + minutes : minutes;
-        seconds = seconds < 10 ? '0' + seconds : seconds;
+    const intervalId = window.setInterval(() => {
+        renderTimerText(timerElement, duration, originalTimerHtml);
 
-        timerElement.innerHTML = minutes + ':' + seconds + ' ' + originalTimerHtml;
+        duration -= 1;
 
-        if (--duration < 0) {
-            if (disappearWhen == 'timerIsUp') {
-                timerElement.classList.toggle('timer');
-                window.clearInterval(intervalID);
-                timerElement.classList.toggle('completed');
-                // if (async == false) {
-                //     const timerPanelIdElement = document.getElementById(timerPanelId)
-                //     if (timerPanelIdElement) {
-                //         timerPanelIdElement.style.display = 'none';
-                //     }
-
-                //     // const panelStepIdxToShow = document.getElementById("panel-" + stepIdxToShow)
-                //     // if (panelStepIdxToShow) {
-                //     //     panelStepIdxToShow.style.display = 'block';
-                //     // }
-                // }
-
-                if (document.getElementById(timerPanelId).style.display != 'none') {
-                    // our end timers are always x2 our start timer id
-                    document.getElementById(`panel-${stepId * 2}`)?.remove();
-                    playSound();
-                }
-            } else if (disappearWhen == 'clicked') {
-                const ttimerPanelId = 'panel-' + stepId;
-                const ttimerElement = document.getElementById(ttimerPanelId);
-
-                console.log('panel-' + stepId);
-                console.log(ttimerElement.style.display);
-                console.log(ttimerElement.style);
-                console.log(ttimerElement);
-
-                if (!timerElement.classList.contains('completed')) {
-                    if (!timerElement.classList.contains('timerCompletedButShowing')) {
-                        timerElement.classList.toggle('timer');
-                        timerElement.classList.toggle('timerCompletedButShowing');
-                    }
-
-                    playSound(1);
-                } else {
-                    // our end timers are always x2 our start timer id
-                    // document.getElementById(`panel-${stepId * 2}`)?.remove();
-
-                    window.clearInterval(intervalID);
-                }
-            }
+        if (duration < 0) {
+            handleTimerFinished({
+                intervalId,
+                timerElement,
+                stepId,
+                disappearWhen,
+            });
         }
     }, 1000);
+}
+
+function renderTimerText(timerElement, duration, originalTimerHtml) {
+    const minutes = String(parseInt(duration / 60, 10)).padStart(2, '0');
+    const seconds = String(parseInt(duration % 60, 10)).padStart(2, '0');
+
+    timerElement.innerHTML = `${minutes}:${seconds} ${originalTimerHtml}`;
+}
+
+function handleTimerFinished({
+    intervalId,
+    timerElement,
+    stepId,
+    disappearWhen,
+}) {
+    if (disappearWhen === 'timerIsUp') {
+        timerElement.classList.remove('timer');
+        timerElement.classList.add('completed');
+
+        window.clearInterval(intervalId);
+
+        if (timerElement.style.display !== 'none') {
+            getById(`panel-${stepId * 2}`)?.remove();
+            playSound();
+        }
+
+        return;
+    }
+
+    if (disappearWhen === 'clicked') {
+        if (!timerElement.classList.contains('completed')) {
+            timerElement.classList.remove('timer');
+            timerElement.classList.add('timerCompletedButShowing');
+
+            playSound(1);
+            return;
+        }
+
+        window.clearInterval(intervalId);
+    }
 }
 
 function loadTimer(seconds, stepId, disappearWhen) {
     startTimer(seconds, stepId, disappearWhen);
 }
 
-let shownId = '';
+/* -----------------------------
+ * Recipe visibility
+ * ----------------------------- */
 
 function getCheckedOptions() {
-    let id = '';
-    const htmlCollection = document.getElementById('options').getElementsByTagName('button');
+    const options = getById('options');
 
-    for (const item of htmlCollection) {
-        if (item.classList[0] == 'completed') {
-            id += item.innerHTML;
-        }
-    }
+    if (!options) return '';
 
-    return id;
+    return [...options.getElementsByTagName('button')]
+        .filter((button) => button.classList.contains('completed'))
+        .map((button) => button.innerHTML)
+        .join('');
 }
 
-// Used to hide/show recipes
 function showRecipe() {
     const id = getCheckedOptions();
 
-    // Show
-    if (document.getElementById(id)) {
-        document.getElementById(id).style.display = 'block';
+    showElement(id, 'block');
+
+    if (appState.shownRecipeId) {
+        hideElement(appState.shownRecipeId);
     }
 
-    if (document.getElementById(shownId)) {
-        // Hide previously shown
-        document.getElementById(shownId).style.display = 'none';
-    }
-
-    shownId = id;
+    appState.shownRecipeId = id;
 }
+
+/* -----------------------------
+ * Temporary global exports
+ *
+ * These make it easier to wire old HTML later.
+ * We can remove these once nothing relies on globals.
+ * ----------------------------- */
+
+window.appState = appState;
+window.queryString = queryString;
+
+window.selectRecipe = selectRecipe;
+
+window.showRecipe = showRecipe;
+window.loadTimer = loadTimer;
+window.startTimer = startTimer;
+window.playSound = playSound;
