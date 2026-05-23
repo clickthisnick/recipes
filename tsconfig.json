@@ -1,26 +1,12 @@
 {
-    "compileOnSave": false,
-    "compilerOptions": {
-        "allowJs": false,
-        "forceConsistentCasingInFileNames": true,
-        "allowUnreachableCode": false,
-        "allowUnusedLabels": false,
-        "noFallthroughCasesInSwitch": true,
-        "noUnusedParameters": true,
-        "noUnusedLocals": true,
-        "noEmitOnError": true,
-        "removeComments": true,
-        "suppressImplicitAnyIndexErrors": false,
-        "noImplicitReturns": true,
-        "inlineSourceMap": true,
-        "outDir": "",
-        "module": "commonjs",
-        "moduleResolution": "node",
-        "alwaysStrict": true,
-        "noImplicitAny": true,
-        "noImplicitThis": true,
-        "strictNullChecks": true,
-        "target": "ES2019",
-        "lib": ["ES2019"]
-    }
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "outDir": "./dist"
+  },
+  "include": ["src/**/*"]
 }
