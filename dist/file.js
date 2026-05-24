@@ -12,6 +12,9 @@ const state = {
     timers: new Map(),
     screen: 'select',
     searchQuery: '',
+    cookingPlanSteps: [],
+    cookingStartedAt: null,
+    cookingElapsedInterval: null,
 };
 // ============================================================
 // ID HELPERS
@@ -79,16 +82,12 @@ function createStep(input) {
 export function instruction(text, opts = {}) {
     return createStep({ type: 'instruction', text, ...opts });
 }
-// Note step — renders as dimmed italic, dismissable by tap
 export const text = {
     set: (lines) => createStep({ type: 'text', text: lines.join('\n') }),
 };
 export function timerStep(label, durationSeconds, opts = {}) {
     return createStep({ type: 'timer', text: label, durationSeconds, ...opts });
 }
-// Two-part timer: Timer.set(...) opens it, Timer.end() closes
-// (Both produce Step values — Timer.end() is a no-op marker step
-//  that the renderer skips; the pair reads naturally in DSL.)
 export const Timer = {
     set: (amount, unit, label) => {
         const seconds = unit === 's' ? amount : unit === 'm' ? amount * 60 : amount * 3600;
@@ -115,24 +114,28 @@ class Equipment {
             equipment: [this.name],
         });
     }
-    cook(label, durationSeconds) {
-        return timerStep(label, durationSeconds, { equipment: [this.name] });
+    cook(label, durationSeconds, temperature) {
+        const text = temperature !== undefined ? `${label} (heat ${temperature})` : label;
+        return timerStep(text, durationSeconds, { equipment: [this.name] });
     }
-    add(ingredients) {
-        // Each ingredient becomes its own child step.
-        // The container shows the equipment name and disappears once
-        // all children have been checked off.
-        const children = ingredients.map((ing) => createStep({
-            type: 'instruction',
-            text: formatIngredient(ing),
-            ingredients: [ing],
-            equipment: [this.name],
-        }));
+    add(ingredients, note) {
+        const children = ingredients.map((entry) => {
+            const [ing, itemNote] = Array.isArray(entry) ? entry : [entry, undefined];
+            return createStep({
+                type: 'instruction',
+                text: itemNote
+                    ? `${formatIngredient(ing)} — ${itemNote}`
+                    : formatIngredient(ing),
+                ingredients: [ing],
+                equipment: [this.name],
+            });
+        });
+        const allIngredients = ingredients.map(e => Array.isArray(e) ? e[0] : e);
         return createStep({
             type: 'instruction',
-            text: `Add to ${this.name}`,
+            text: `Add to ${this.name}${note ? ` — ${note}` : ''}`,
             equipment: [this.name],
-            ingredients,
+            ingredients: allIngredients,
             children,
         });
     }
@@ -154,12 +157,12 @@ export const e = {
 // RECIPE REGISTRATION
 // ============================================================
 export function createRecipe(id, name, steps, group) {
+    steps.forEach(s => { s.recipeId = id; });
     return { id, name, steps, group };
 }
 export function registerRecipe(recipe) {
     state.recipes.set(recipe.id, recipe);
 }
-// Register multiple variations under a shared group name
 export function registerGroup(group, recipes) {
     recipes.forEach((recipe) => registerRecipe({ ...recipe, group }));
 }
@@ -179,6 +182,116 @@ function getFilteredRecipes() {
             return aFav - bFav;
         return a.name.localeCompare(b.name);
     });
+}
+// ============================================================
+// COOK TIME
+// ============================================================
+function recipeCookSeconds(recipe) {
+    // Critical path calculation — simulates parallel execution.
+    // Each claim key tracks the wall-clock time at which that equipment/
+    // ingredient becomes free. A step can only start once all of its
+    // claimed keys are free (paths converge at the max). Timer steps then
+    // push their keys' release times forward by their duration (paths diverge
+    // when unrelated keys are updated independently).
+    const releaseAt = new Map();
+    function claimKeysForStep(step) {
+        const keys = [];
+        for (const eq of (step.equipment ?? [])) {
+            keys.push(`eq::${eq}`);
+        }
+        for (const ing of (step.ingredients ?? [])) {
+            keys.push(`ing::${ing.name}`);
+        }
+        return keys;
+    }
+    let totalTime = 0;
+    for (const step of recipe.steps) {
+        if (step.type !== 'timer')
+            continue;
+        const keys = claimKeysForStep(step);
+        // This step starts when all its claimed resources are free —
+        // paths converge here via max.
+        const startAt = keys.reduce((m, k) => Math.max(m, releaseAt.get(k) ?? 0), 0);
+        const endAt = startAt + (step.durationSeconds ?? 0);
+        // Push release times forward for all claimed keys — paths diverge
+        // here because unrelated keys remain on their own independent timelines.
+        for (const k of keys) {
+            releaseAt.set(k, endAt);
+        }
+        totalTime = Math.max(totalTime, endAt);
+    }
+    return totalTime;
+}
+function formatCookTime(seconds) {
+    const totalMinutes = Math.ceil(seconds / 60);
+    if (totalMinutes < 60)
+        return `${totalMinutes} min`;
+    const hrs = Math.floor(totalMinutes / 60);
+    const mins = totalMinutes % 60;
+    return mins === 0 ? `${hrs} hr` : `${hrs} hr ${mins} min`;
+}
+// ============================================================
+// COOKING PLAN — PER-STEP LOCK INJECTION
+// ============================================================
+//
+// Called once when the user hits "Start Cooking". Walks steps in authored
+// order and attaches waitForIds directly to each step that needs to wait
+// for a timer to finish before it becomes interactable.
+//
+// Algorithm:
+//   A timer step "claims" all of its equipment and ingredients.
+//   Any later step that shares a claimed equipment or ingredient is locked,
+//   waiting for the claiming timer to complete.
+//   Claims are keyed as "recipeId::equipment" or "recipeId::ingredient"
+//   so the same equipment name in two different recipes stays separate.
+//
+//   Example: "Cook sausage (5 min)" claims the pan.
+//   "Continue cooking sausage" also uses the pan → locked until cook timer done.
+//   "Bring water to boil (6 min)" claims the pot.
+//   "Add lentil spaghetti to pot" also uses the pot → locked until boil done.
+function buildCookingPlan(recipes) {
+    const steps = recipes
+        .flatMap(r => r.steps)
+        .filter(s => !(s.type === 'text' && s.text === ''));
+    // Clear any waitForIds from a previous cook session
+    steps.forEach(s => { s.waitForIds = undefined; });
+    // Maps "recipeId::equipment" or "recipeId::ingredient name" → timer step ID
+    // that currently claims it. A claim persists until it is explicitly
+    // superseded by a newer timer on the same key (at which point the new
+    // timer becomes the one to wait for instead).
+    const claims = new Map();
+    function claimKeys(step) {
+        const keys = [];
+        for (const eq of (step.equipment ?? [])) {
+            keys.push(`${step.recipeId}::eq::${eq}`);
+        }
+        for (const ing of (step.ingredients ?? [])) {
+            keys.push(`${step.recipeId}::ing::${ing.name}`);
+        }
+        return keys;
+    }
+    for (const step of steps) {
+        const keys = claimKeys(step);
+        // Collect any active claims that block this step
+        const waitFor = new Set();
+        for (const key of keys) {
+            const claimingId = claims.get(key);
+            if (claimingId !== undefined) {
+                waitFor.add(claimingId);
+            }
+        }
+        if (waitFor.size > 0) {
+            step.waitForIds = [...waitFor];
+        }
+        // If this step is a timer, it now claims all its equipment/ingredients,
+        // replacing any prior claim on those keys.
+        if (step.type === 'timer') {
+            for (const key of keys) {
+                claims.set(key, step.id);
+            }
+        }
+    }
+    return steps;
 }
 // ============================================================
 // SHOPPING LIST
@@ -258,7 +371,6 @@ function renderRecipeList() {
         root.appendChild(empty);
         return;
     }
-    // Group recipes under their group heading
     const groups = new Map();
     recipes.forEach((recipe) => {
         const key = recipe.group ?? '';
@@ -319,8 +431,8 @@ function updateActionButtons() {
     if (state.selectedRecipeIds.length === 0)
         return;
     const shopBtn = createButton('🛒 Go Shopping', () => navigateTo('shopping'));
-    const cookBtn = createButton('🍳 Start Cooking', () => navigateTo('cooking'));
     shopBtn.className = 'action-btn';
+    const cookBtn = createButton('🍳 Start Cooking', () => navigateTo('cooking'));
     cookBtn.className = 'action-btn';
     actions.appendChild(shopBtn);
     actions.appendChild(cookBtn);
@@ -368,22 +480,119 @@ function renderShoppingScreen() {
 // ============================================================
 // SCREEN: COOKING
 // ============================================================
+function formatElapsed(seconds) {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return m > 0
+        ? `${m}m ${String(s).padStart(2, '0')}s`
+        : `${s}s`;
+}
 function renderCookingScreen() {
     const root = getElement('app');
     clear(root);
-    getSelectedRecipes().forEach((recipe) => {
-        const title = document.createElement('h2');
-        title.textContent = recipe.name;
-        root.appendChild(title);
-        recipe.steps.forEach((step) => {
-            // Timer.end() produces an empty text step — skip rendering it
-            if (step.type === 'text' && step.text === '')
-                return;
-            root.appendChild(renderStep(step));
-        });
-    });
+    // Record when cooking started (only on first render, not on re-render)
+    if (state.cookingStartedAt === null) {
+        state.cookingStartedAt = Date.now();
+    }
+    const selected = getSelectedRecipes();
+    state.cookingPlanSteps = buildCookingPlan(selected);
+    // Total time banner when multiple recipes selected
+    if (selected.length > 1) {
+        const totalSecs = selected.reduce((s, r) => s + recipeCookSeconds(r), 0);
+        const banner = document.createElement('div');
+        banner.className = 'cook-time-banner';
+        banner.textContent = `Total cook time: ${formatCookTime(totalSecs)}`;
+        root.appendChild(banner);
+    }
+    let lastRecipeId;
+    for (const step of state.cookingPlanSteps) {
+        if (step.recipeId && step.recipeId !== lastRecipeId) {
+            lastRecipeId = step.recipeId;
+            const recipe = state.recipes.get(step.recipeId);
+            if (recipe) {
+                const header = document.createElement('div');
+                header.className = 'recipe-title-row';
+                const title = document.createElement('h2');
+                title.textContent = recipe.name;
+                // Badge: "estimated 20 min · actual 4m 32s"
+                // Stops ticking when all steps are done.
+                const badge = document.createElement('span');
+                badge.className = 'cook-time-badge';
+                const estimateText = formatCookTime(recipeCookSeconds(recipe));
+                const updateBadge = () => {
+                    const secs = Math.floor((Date.now() - state.cookingStartedAt) / 1000);
+                    badge.textContent = `estimated ${estimateText} · actual ${formatElapsed(secs)}`;
+                };
+                updateBadge();
+                if (state.cookingElapsedInterval !== null) {
+                    window.clearInterval(state.cookingElapsedInterval);
+                }
+                state.cookingElapsedInterval = window.setInterval(() => {
+                    // Stop ticking when no active step panels remain
+                    const hasSteps = document.querySelector(`#app .panel:not(.completed):not(.skipped)`);
+                    if (!hasSteps) {
+                        window.clearInterval(state.cookingElapsedInterval);
+                        state.cookingElapsedInterval = null;
+                        return;
+                    }
+                    updateBadge();
+                }, 1000);
+                header.appendChild(title);
+                header.appendChild(badge);
+                root.appendChild(header);
+            }
+        }
+        root.appendChild(renderStep(step));
+    }
     root.appendChild(createStartOverButton());
 }
+// ============================================================
+// STEP LOCKING
+// ============================================================
+//
+// A locked step is dimmed, shows a "waiting" label, and ignores taps.
+// It watches the DOM via MutationObserver and unlocks itself the moment
+// all waited-on timer step elements are completed or skipped.
+// On unlock it briefly flashes a "ready" style before settling normally.
+function applyLock(panel, step) {
+    const waitForIds = step.waitForIds;
+    if (!waitForIds || waitForIds.length === 0)
+        return;
+    const appEl = document.getElementById('app');
+    if (!appEl)
+        return;
+    // Timer panels stay in the DOM after finishing (as completed/skipped cards)
+    // so we can't rely on element absence alone — also treat completed/skipped as done.
+    const isUnlocked = () => waitForIds.every(id => {
+        const el = document.getElementById(`step-${id}`);
+        return !el || el.classList.contains('completed') || el.classList.contains('skipped');
+    });
+    // Apply locked appearance immediately — don't check isUnlocked() yet
+    // because waited-on panels may not be in the DOM at this point
+    // (renderStep builds panels before they're appended to #app).
+    panel.classList.add('step-locked');
+    const pill = document.createElement('div');
+    pill.className = 'waiting-pill';
+    pill.textContent = '⏳ waiting…';
+    panel.appendChild(pill);
+    const unlock = () => {
+        if (!isUnlocked())
+            return;
+        observer.disconnect();
+        panel.classList.remove('step-locked');
+        pill.remove();
+        panel.classList.add('step-unlocked');
+        setTimeout(() => panel.classList.remove('step-unlocked'), 800);
+    };
+    const observer = new MutationObserver(unlock);
+    observer.observe(appEl, { childList: true, subtree: true });
+    // Defer the initial check until after the full render pass has
+    // appended all panels to the DOM — use setTimeout 0 for this.
+    setTimeout(unlock, 0);
+}
+// ============================================================
+// STEP RENDERING
+// ============================================================
 function renderStep(step, onDone) {
     const panel = createPanel();
     panel.id = `step-${step.id}`;
@@ -415,9 +624,17 @@ function renderStep(step, onDone) {
             }
         };
         step.children.forEach((child) => {
+            // Inherit the container's waitForIds so child ingredient
+            // panels are individually locked — tapping an ingredient
+            // inside a locked container is silently ignored.
+            if (step.waitForIds && !child.waitForIds) {
+                child.waitForIds = step.waitForIds;
+            }
             const childPanel = renderStep(child, checkDone);
             childWrap.appendChild(childPanel);
         });
+        // Lock the whole container if needed
+        applyLock(panel, step);
         return panel;
     }
     // ── Timer step ───────────────────────────────────────────
@@ -426,6 +643,9 @@ function renderStep(step, onDone) {
         let clickCount = 0;
         let clickTimer = 0;
         panel.addEventListener('click', () => {
+            // Ignore taps while locked
+            if (panel.classList.contains('step-locked'))
+                return;
             if (panel.classList.contains('completed') || panel.classList.contains('skipped'))
                 return;
             if (!state.timers.has(step.id)) {
@@ -441,14 +661,18 @@ function renderStep(step, onDone) {
             }
             clickTimer = window.setTimeout(() => { clickCount = 0; }, 600);
         });
+        applyLock(panel, step);
         return panel;
     }
     // ── Instruction / cleanup step ───────────────────────────
     panel.addEventListener('click', () => {
+        if (panel.classList.contains('step-locked'))
+            return;
         panel.classList.add('done-child');
         panel.remove();
         onDone?.();
     });
+    applyLock(panel, step);
     return panel;
 }
 function completeTimer(step, panel, onDone) {
@@ -478,7 +702,13 @@ function createStartOverButton() {
         state.timers.forEach((id) => window.clearInterval(id));
         state.timers.clear();
         state.selectedRecipeIds = [];
+        state.cookingPlanSteps = [];
         state.searchQuery = '';
+        state.cookingStartedAt = null;
+        if (state.cookingElapsedInterval !== null) {
+            window.clearInterval(state.cookingElapsedInterval);
+            state.cookingElapsedInterval = null;
+        }
         navigateTo('select');
     });
     btn.className = 'start-over-btn';
@@ -633,6 +863,8 @@ h2 { margin-top: 0; font-size: 28px; }
     margin: 10px 0;
     cursor: pointer;
     font-size: 22px;
+    position: relative;
+    transition: opacity 0.3s, border-color 0.3s, background 0.3s;
 }
 
 .panel.text-step {
@@ -675,6 +907,38 @@ h2 { margin-top: 0; font-size: 28px; }
 .panel.completed { background: #1a5c2a; color: white; border-color: #2d9e4a; }
 .panel.skipped   { background: #374151; color: #9ca3af; border-color: #4b5563; text-decoration: line-through; }
 
+/* Locked step — dimmed with a left red border accent */
+.panel.step-locked {
+    opacity: 0.45;
+    cursor: not-allowed;
+    border-left: 4px solid #ef4444;
+    border-color: #333;
+    border-left-color: #ef4444;
+}
+
+/* Small pill shown inside locked steps */
+.waiting-pill {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 13px;
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 20px;
+    padding: 2px 10px;
+    letter-spacing: 0.04em;
+}
+
+/* Brief green flash when a step unlocks */
+@keyframes unlockFlash {
+    0%   { border-color: #2d9e4a; background: rgba(45, 158, 74, 0.15); }
+    100% { border-color: #444;    background: transparent; }
+}
+
+.panel.step-unlocked {
+    animation: unlockFlash 0.8s ease-out forwards;
+}
+
 .purchase-links { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
 
 .purchase-link { color: #60a5fa; font-size: 16px; text-decoration: none; }
@@ -692,6 +956,41 @@ h2 { margin-top: 0; font-size: 28px; }
 }
 
 .empty { color: #666; font-style: italic; }
+
+/* Recipe title row with cook time badge */
+.recipe-title-row {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 4px;
+}
+
+.recipe-title-row h2 { margin: 0; }
+
+.cook-time-badge {
+    font-size: 16px;
+    color: #888;
+    white-space: nowrap;
+}
+
+.cook-time-elapsed {
+    font-size: 16px;
+    color: #60a5fa;
+    white-space: nowrap;
+    margin-left: auto;
+}
+
+/* Total cook time banner (multi-recipe) */
+.cook-time-banner {
+    font-size: 16px;
+    color: #888;
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 10px 16px;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
 `;
 // ============================================================
 // BOOTSTRAP
@@ -699,9 +998,6 @@ h2 { margin-top: 0; font-size: 28px; }
 function bootstrap() {
     document.head.insertAdjacentHTML('beforeend', `<style>${styles}</style>`);
     document.body.innerHTML = `<div id="app"></div>`;
-    // Browsers block audio until the user has interacted with the page.
-    // On the first tap anywhere, silently play and immediately pause the
-    // audio so the context is unlocked before a timer actually fires.
     const unlockAudio = () => {
         audio.play().then(() => {
             audio.pause();
@@ -723,24 +1019,14 @@ export const stores = {
 // ============================================================
 // INGREDIENT FACTORY
 // ============================================================
-// The cast to `as Ingredient` is the only place the brand is attached.
-// All other code receives a properly typed Ingredient and cannot
-// construct one without going through this factory.
 function ingredientFactory(name, defaults = {}) {
     return (quantity = 0, unit = u.none) => ({ name, quantity, unit, ...defaults });
 }
-// Converts a camelCase key to a Title Case display name.
-// e.g. 'chiaSeed' -> 'Chia Seed', 'frozenBlueberry' -> 'Frozen Blueberry'
 function keyToName(key) {
     return key
         .replace(/([A-Z])/g, ' $1')
         .replace(/^./, (c) => c.toUpperCase());
 }
-// Generates typed ingredient factories from a compact name map.
-// Pass '' to derive the display name from the key automatically via keyToName.
-// Only supply an explicit name when the auto-generated one is wrong
-// (e.g. different casing, hyphens, proper nouns).
-// IntelliSense works: i.banana autocompletes and is callable as (quantity, unit).
 function simpleIngredients(map) {
     return Object.fromEntries(Object.entries(map).map(([key, name]) => [
         key,
@@ -753,7 +1039,7 @@ function simpleIngredients(map) {
 export const i = {
     ...simpleIngredients({
         apple: '',
-        antiOxidantBerryBlend: 'Anti-Oxidant Berry Blend', // hyphen can't be derived
+        antiOxidantBerryBlend: 'Anti-Oxidant Berry Blend',
         frozenBerries: '',
         cocoaFlavanols: '',
         chiaSeed: '',
@@ -785,8 +1071,8 @@ export const i = {
         pomegranateSeeds: '',
         water: '',
         avocadoOil: '',
-        abbotPeaItalianSausage: '',
-        lentilSpaghetti: '',
+        abbotPeaItalianSausage: 'Abbot Pea Italian Sausage',
+        lentilSpaghetti: 'Lentil Spaghetti',
         spaghettiSauce: '',
     }),
     peanutButter: ingredientFactory('Peanut Butter', {
@@ -881,22 +1167,27 @@ registerGroup('Quick', [
 ]);
 registerGroup('Dinner', [
     createRecipe('abbot-pea-protein-spaghetti', 'Abbot Pea Protein Spaghetti', [
-        // Start pot of water
+        // Pot lane
         e.pot().add([i.water(30, u.ounce)]),
-        e.pot().cook('Bring water to boil', time.minutes(6)),
-        // Brown sausage in pan
+        e.pot().cook('Bring water to boil', time.minutes(6), 9),
+        // Pan lane — free to start in parallel, no lock needed
         e.pan().add([i.avocadoOil(1, u.spray), i.abbotPeaItalianSausage(1, u.bag)]),
-        e.pan().cook('Cook sausage', time.minutes(5)),
-        // Add spaghetti once water is boiling
-        text.set(['Break lentil spaghetti (8 oz) into 3 even sections and add to pot']),
-        // Continue cooking both
-        e.pan().cook('Continue cooking sausage', time.minutes(10)),
-        e.pot().cook('Cook spaghetti (first half)', time.minutes(7)),
+        e.pan().cook('Cook sausage', time.minutes(5), 5),
+        // Pot lane resumes — will be auto-locked until boil timer clears
+        e.pot().add([
+            i.avocadoOil(1, u.spray),
+            [i.lentilSpaghetti(8, u.ounce), 'break into 3 even sections first'],
+        ]),
+        // Pan lane continues freely — not locked because the boil timer
+        // started BEFORE the pan's own "Cook sausage" timer
+        e.pan().cook('Continue cooking sausage', time.minutes(10), 7),
+        // Pot lane — auto-locked until pan timer clears
+        e.pot().cook('Cook spaghetti (first half)', time.minutes(7), 7),
         e.pot().stir(),
-        e.pot().cook('Cook spaghetti (second half)', time.minutes(7)),
-        // Add sauce to pan
+        e.pot().cook('Cook spaghetti (second half)', time.minutes(7), 7),
+        // Pan lane — auto-locked until pot timer clears
         e.pan().add([i.spaghettiSauce(1, u.bag)]),
-        e.pan().cook('Simmer sauce with sausage', time.minutes(5)),
+        e.pan().cook('Simmer sauce with sausage', time.minutes(5), 7),
     ]),
 ]);
 // ============================================================

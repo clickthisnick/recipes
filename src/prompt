@@ -1,0 +1,133 @@
+# Recipe Cooking Assistant — Requirements
+
+## Overview
+A single-file TypeScript app that lets a user select recipes, view a shopping list, and walk through cooking steps interactively. It runs in the browser with no frameworks.
+
+---
+
+## Screens
+There are three screens: Select, Shopping, and Cooking. Navigation is handled by a simple state machine — no URLs.
+
+### Select Screen
+- Shows a searchable list of all registered recipes
+- Recipes can be grouped under category headings (e.g. Breakfast, Dinner)
+- Each recipe row has a star/favorite toggle that floats favorited recipes to the top
+- Multiple recipes can be selected at once (toggled on/off)
+- A fixed bottom bar appears when any recipe is selected, with two buttons: "Go Shopping" and "Start Cooking"
+- Tapping "Start Cooking" navigates directly to the cooking screen with no intermediate panel
+
+### Shopping Screen
+- Shows a consolidated ingredient list across all selected recipes, summing quantities of the same ingredient+unit
+- Each ingredient row can be tapped to mark it as completed (strikethrough/green)
+- If an ingredient has purchase links, they are shown as tappable URLs with store name, variant, price, and quantity
+- A "Start Over" button returns to the Select screen and resets all state
+
+### Cooking Screen
+- Shows all steps from all selected recipes in authored order, with a recipe title heading before each recipe's steps
+- Each recipe title heading shows a live badge in the format: `estimated 20 min · actual 4m 32s`, updating every second
+  - "estimated" is the critical-path cook time for that recipe
+  - "actual" is the wall-clock time elapsed since the cooking screen was first entered
+  - The actual timer stops ticking automatically when all step cards have been completed or skipped (no active panels remain in the DOM)
+  - The elapsed time resets on Start Over
+- If multiple recipes are selected, a muted banner at the top shows the total estimated cook time across all recipes
+- Steps are rendered as tappable cards
+- A "Start Over" button at the bottom resets everything
+
+---
+
+## Step Types
+
+- **Instruction** — tap to dismiss (card disappears)
+- **Cleanup** — same as instruction, tap to dismiss
+- **Text/note** — italicised card, tap to dismiss
+- **Timer** — tap once to start countdown, tap 3× rapidly to skip. Shows MM:SS countdown while running. On completion plays a sound and marks the card green with a completion timestamp. On skip marks it grey with a strikethrough and skip timestamp.
+- **Container** — a step with child ingredient steps nested inside it. The header shows the action (e.g. "Add to pan"). Each child ingredient is its own tappable row. When all children are dismissed the container disappears.
+
+---
+
+## Locking System
+This is the core behaviour of the cooking screen.
+
+A timer step "claims" all of its equipment and ingredients for its duration. Any subsequent step that uses any of the same equipment or ingredients is locked — rendered dimmed with a red left border and a "⏳ waiting…" pill — and cannot be tapped until the claiming timer completes or is skipped.
+
+### Rules
+- Claims are tracked as a map of `"recipeId::eq::equipmentName"` or `"recipeId::ing::ingredientName"` → timer step ID
+- When processing steps in order: check if any of the step's equipment/ingredients are currently claimed → if so, add the claiming timer ID to `waitForIds` on that step
+- If the step is itself a timer, it then claims all its equipment/ingredients (replacing any prior claim on those keys)
+- A locked step watches the DOM via MutationObserver and unlocks itself when all waited-on timer cards are either completed or skipped (have the `.completed` or `.skipped` class)
+- On unlock, the card briefly flashes green before returning to normal
+- Container steps propagate their `waitForIds` down to their child steps so individual ingredient rows are also locked
+- Two recipes using the same equipment name (e.g. both use a pot) are treated as separate lanes because claims are scoped by recipeId
+
+---
+
+## Cook Time Estimation
+- A recipe's estimated cook time is calculated via critical path analysis, not a naive sum, to account for parallel execution
+- Walk steps in authored order. Maintain a map of claim key → wall-clock time at which that resource is free. Each timer step starts at the max release time of all its claimed keys (paths converge), then pushes those keys' release times forward by its duration (paths diverge). Total time is the maximum end time across all timers.
+- Format: if total seconds >= 3600, show "X hr Y min" (omit minutes if zero); if < 3600, show "X min" (round up to nearest minute)
+- Shown on the cooking screen as part of the live badge next to each recipe title
+
+---
+
+## Equipment
+Equipment is defined via a fluent class with methods:
+- `.preheat(temp)` → timer step "Preheat X to Y°", 15 minutes
+- `.cook(label, duration, temperature?)` → timer step
+- `.add(ingredients[], note?)` → container step with one child per ingredient
+- `.stir()` / `.mix()` → instruction steps
+
+Available equipment: bowl, pan, pot, oven, toaster oven, instant pot, bullet mixer, knife, cutting board.
+
+---
+
+## Ingredients
+Ingredient factory functions `(quantity, unit) => Ingredient`. Optional metadata:
+- `purchaseLinks` — nested by store → variant → array of `{ price, quantity, quantityUnit, link, organic?, discount? }`
+- `nutrition` — keyed by unit name, with fields for servings, calories, sodium, sugar, protein
+- `perishableDays`, `isMeatProduct`
+
+Simple ingredients with no metadata are declared via a bulk `simpleIngredients()` helper that auto-derives display names from camelCase keys.
+
+---
+
+## Units
+Supported: none, cup, tbsp, tsp, ounce, pound, fl oz, unit, handful, spray, bag.
+
+Quantities are formatted with unicode fractions (¼, ½, ¾, etc.) where applicable.
+
+---
+
+## Time Helpers
+`time.seconds(n)`, `time.minutes(n)`, `time.hours(n)` — all return a number of seconds.
+
+`Timer.set(amount, unit, label)` and `Timer.end()` allow inline timer steps without equipment context.
+
+---
+
+## Stores
+Named constants for Amazon, Amazon Fresh, Whole Foods — used as keys in purchase link objects.
+
+---
+
+## Styling
+Dark theme (#111 background, #f0f0f0 text). Large touch-friendly cards (font-size 22px, padding 20px). All styles are injected as a `<style>` tag at bootstrap time — no external CSS file.
+
+Key visual states:
+- Selected recipe: green background
+- Starred recipe: gold star
+- Active timer: amber/yellow card
+- Completed timer: green card with ✓ and timestamp
+- Skipped timer: grey card with strikethrough and timestamp
+- Locked step: 45% opacity, red left border, "⏳ waiting…" pill
+- Unlock flash: brief green border/background animation
+- Recipe title on cooking screen: name followed by `estimated X min · actual Xm XXs` badge in muted colour, actual time updating every second and freezing when all steps are done
+
+---
+
+## Audio
+A beep sound plays when a timer completes. The audio element is unlocked on first user tap (browser autoplay policy workaround).
+
+---
+
+## Bootstrap
+The app mounts on `DOMContentLoaded`, injects styles, renders `<div id="app">`, and calls `render()`. All state lives in a single `state` object. No persistence between page loads.
