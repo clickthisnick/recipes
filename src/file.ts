@@ -108,6 +108,8 @@ export const u = {
     fluidOunce: { name: 'fl oz', plural: 'fl oz' },
     unit:       { name: 'unit' },
     handful:    { name: 'handful' },
+    spray:      { name: 'spray' },
+    bag:        { name: 'bag' },
 };
 
 // ============================================================
@@ -961,6 +963,11 @@ export const i = {
         milk:                     '',
         bread:                    '',
         pomegranateSeeds:         '',
+        water:                    '',
+        avocadoOil:               '',
+        abbotPeaItalianSausage:   '',
+        lentilSpaghetti:          '',
+        spaghettiSauce:           '',
     }),
 
     peanutButter: ingredientFactory('Peanut Butter', {
@@ -1060,6 +1067,31 @@ registerGroup('Quick', [
         e.toasterOven().preheat(350),
         timerStep('Toast bread', time.minutes(3)),
         cleanup('toaster oven'),
+    ]),
+]);
+
+registerGroup('Dinner', [
+    createRecipe('abbot-pea-protein-spaghetti', 'Abbot Pea Protein Spaghetti', [
+        // Start pot of water
+        e.pot().add([i.water(30, u.ounce)]),
+        e.pot().cook('Bring water to boil', time.minutes(6)),
+
+        // Brown sausage in pan
+        e.pan().add([i.avocadoOil(1, u.spray), i.abbotPeaItalianSausage(1, u.bag)]),
+        e.pan().cook('Cook sausage', time.minutes(5)),
+
+        // Add spaghetti once water is boiling
+        text.set(['Break lentil spaghetti (8 oz) into 3 even sections and add to pot']),
+
+        // Continue cooking both
+        e.pan().cook('Continue cooking sausage', time.minutes(10)),
+        e.pot().cook('Cook spaghetti (first half)', time.minutes(7)),
+        e.pot().stir(),
+        e.pot().cook('Cook spaghetti (second half)', time.minutes(7)),
+
+        // Add sauce to pan
+        e.pan().add([i.spaghettiSauce(1, u.bag)]),
+        e.pan().cook('Simmer sauce with sausage', time.minutes(5)),
     ]),
 ]);
 
