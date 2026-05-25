@@ -17,19 +17,27 @@ There are three screens: Select, Shopping, and Cooking. Navigation is handled by
 - Tapping "Start Cooking" navigates directly to the cooking screen with no intermediate panel
 
 ### Shopping Screen
-- Shows a consolidated ingredient list across all selected recipes, summing quantities of the same ingredient+unit
+- Shows a consolidated ingredient list across all selected recipes, summing quantities of ingredients that share the same name and unit
+- Ingredient identity for shopping list deduplication is name+unit string — the same ingredient object referenced multiple times in a recipe counts only once
 - Each ingredient row can be tapped to mark it as completed (strikethrough/green)
 - If an ingredient has purchase links, they are shown as tappable URLs with store name, variant, price, and quantity
 - A "Start Over" button returns to the Select screen and resets all state
 
 ### Cooking Screen
-- Shows all steps from all selected recipes in authored order, with a recipe title heading before each recipe's steps
-- Each recipe title heading shows a live badge in the format: `estimated 20 min · actual 4m 32s`, updating every second
+- Shows all steps from all selected recipes split into two zones: **Ready** (top) and **Waiting** (bottom)
+- Steps the user can act on immediately — those with no `waitForIds`, or whose waited-on steps are already done — appear in the **Ready** zone at the top
+- Steps that are still locked appear in the **Waiting** zone below, separated by a muted "⏳ Waiting on timers" label and a divider line
+- When a locked step unlocks, it flashes green and is physically moved from the Waiting zone into the Ready zone at its correct authored position
+- Promoted panels are inserted in authored order using `data-step-index`; completed/skipped panels are treated as pinned (index −1) and never jumped over
+- Container child panels are never independently promoted — only the parent container moves
+- The Waiting zone is hidden entirely if there are no locked steps
+- Recipe title headings always appear in the Ready zone, above the first step of their recipe
+- Each recipe title heading shows a live badge: `estimated 20 min · actual 4m 32s`, updating every second
   - "estimated" is the critical-path cook time for that recipe
-  - "actual" is the wall-clock time elapsed since the cooking screen was first entered
-  - The actual timer stops ticking automatically when all step cards have been completed or skipped (no active panels remain in the DOM)
+  - "actual" is wall-clock time elapsed since the cooking screen was first entered
+  - The actual timer stops ticking when all step cards have been completed or skipped
   - The elapsed time resets on Start Over
-- If multiple recipes are selected, a muted banner at the top shows the total estimated cook time across all recipes
+- If multiple recipes are selected, a muted banner at the top shows total estimated cook time
 - Steps are rendered as tappable cards
 - A "Start Over" button at the bottom resets everything
 
@@ -37,56 +45,150 @@ There are three screens: Select, Shopping, and Cooking. Navigation is handled by
 
 ## Step Types
 
-- **Instruction** — tap to dismiss (card disappears)
+- **Instruction** — tap to dismiss (card disappears). Used for all active hands-on steps: prep, cleanup, notes, transfers, flips, sprays, slices, combines.
 - **Cleanup** — same as instruction, tap to dismiss
-- **Text/note** — italicised card, tap to dismiss
-- **Timer** — tap once to start countdown, tap 3× rapidly to skip. Shows MM:SS countdown while running. On completion plays a sound and marks the card green with a completion timestamp. On skip marks it grey with a strikethrough and skip timestamp.
-- **Container** — a step with child ingredient steps nested inside it. The header shows the action (e.g. "Add to pan"). Each child ingredient is its own tappable row. When all children are dismissed the container disappears.
+- **Timer** — tap once to start countdown, tap 3× rapidly to skip. Shows MM:SS countdown while running. On completion plays a sound and marks the card green with a timestamp. On skip marks it grey with strikethrough and timestamp.
+- **Container** — a step with child ingredient steps nested inside it. The header shows the action (e.g. "Add to batter bowl"). Each child is its own tappable row. When all children are dismissed the container disappears.
 
 ---
 
 ## Locking System
-This is the core behaviour of the cooking screen.
 
-A timer step "claims" all of its equipment and ingredients for its duration. Any subsequent step that uses any of the same equipment or ingredients is locked — rendered dimmed with a red left border and a "⏳ waiting…" pill — and cannot be tapped until the claiming timer completes or is skipped.
+A step "claims" its equipment and ingredients when it is a timer **or** when it has `waitForIds` set. Any subsequent step that references the same equipment (by name) or the same ingredient (by object reference) is locked — rendered dimmed with a red left border and a "⏳ waiting…" pill — and cannot be tapped until all blocking steps are done.
 
-### Rules
-- Claims are tracked as a map of `"recipeId::eq::equipmentName"` or `"recipeId::ing::ingredientName"` → timer step ID
-- When processing steps in order: check if any of the step's equipment/ingredients are currently claimed → if so, add the claiming timer ID to `waitForIds` on that step
-- If the step is itself a timer, it then claims all its equipment/ingredients (replacing any prior claim on those keys)
-- A locked step watches the DOM via MutationObserver and unlocks itself when all waited-on timer cards are either completed or skipped (have the `.completed` or `.skipped` class)
-- On unlock, the card briefly flashes green before returning to normal
-- Container steps propagate their `waitForIds` down to their child steps so individual ingredient rows are also locked
-- Two recipes using the same equipment name (e.g. both use a pot) are treated as separate lanes because claims are scoped by recipeId
+### Claim keys
+- Equipment claims are keyed by `"recipeId::eq::equipmentName"` — equipment is identified by name, so a named vessel like `"panko pan"` is distinct from `"pan"`
+- Ingredient claims are keyed by **object reference**, not by name — two calls to `i.avocadoOil()` produce separate objects and are treated as independent instances with no shared claim
+
+### Propagation
+- Claims propagate transitively: if step B is locked (has `waitForIds`), it also creates claims on its equipment and ingredients. Any step C that shares equipment or ingredients with B will automatically wait for B without needing an explicit `waitFor()` declaration.
+- This means a single `waitFor()` at the head of a dependency chain locks all downstream steps that share the same resources.
+
+### Manual dependencies
+- `step.waitFor(...steps)` is a fluent method on `Step` that appends to `waitForIds` and returns `this`
+- Used for culinary constraints that can't be derived from code logic — e.g. "don't dip mushrooms until panko is in the bowl"
+- `buildCookingPlan` preserves manual `waitForIds` set via `waitFor()` before clearing derived ones, then merges both into the final `waitForIds`
+
+### Unlock behaviour
+- A locked step watches the DOM via `MutationObserver` (observing `childList`, `subtree`, and `class` attribute changes)
+- It unlocks when every waited-on step element is either absent from the DOM or has the `.completed` or `.skipped` class — covering both timer completion and instruction dismissal
+- On unlock: flashes green for 800 ms, then `promotePanelToReady()` moves it to the Ready zone at its authored position
+
+### Recipe scoping
+- Two recipes using the same equipment name are treated as separate lanes because equipment claims are scoped by `recipeId`
+
+---
+
+## Cooking Layout — Actionable Steps First
+
+```
+┌─────────────────────────────────────────┐
+│  #ready-section                         │
+│  Recipe title headings + all steps      │
+│  that are currently actionable          │
+├─────────────────────────────────────────┤
+│  #waiting-section  (hidden if empty)    │
+│  ⏳ Waiting on timers  ← muted label    │
+│  Steps that are still locked            │
+└─────────────────────────────────────────┘
+```
+
+- Each step panel is rendered once, assigned a `data-step-index` (its position in `cookingPlanSteps`), and placed in the appropriate zone
+- Panels are never re-rendered — they are physically moved via DOM insertion
+- `promotePanelToReady(panel)` inserts at the correct authored position by finding the first non-completed/skipped panel with a higher `data-step-index`
+- Child panels inside `.container-children` are never independently promoted
 
 ---
 
 ## Cook Time Estimation
-- A recipe's estimated cook time is calculated via critical path analysis, not a naive sum, to account for parallel execution
-- Walk steps in authored order. Maintain a map of claim key → wall-clock time at which that resource is free. Each timer step starts at the max release time of all its claimed keys (paths converge), then pushes those keys' release times forward by its duration (paths diverge). Total time is the maximum end time across all timers.
-- Format: if total seconds >= 3600, show "X hr Y min" (omit minutes if zero); if < 3600, show "X min" (round up to nearest minute)
-- Shown on the cooking screen as part of the live badge next to each recipe title
+- Calculated via critical path analysis across a recipe's timer steps
+- Walk steps in authored order. Maintain a map of claim key → wall-clock time the resource is free. Each timer starts at the max release time of its claimed keys (paths converge), then pushes those keys' release times forward by its duration (paths diverge). Total time is the maximum end time.
+- Format: `X hr Y min` if ≥ 3600 s (omit minutes if zero); `X min` (rounded up) if < 3600 s
 
 ---
 
 ## Equipment
-Equipment is defined via a fluent class with methods:
-- `.preheat(temp)` → timer step "Preheat X to Y°", 15 minutes
-- `.cook(label, duration, temperature?)` → timer step
-- `.add(ingredients[], note?)` → container step with one child per ingredient
-- `.stir()` / `.mix()` → instruction steps
 
-Available equipment: bowl, pan, pot, oven, toaster oven, instant pot, bullet mixer, knife, cutting board.
+Equipment instances are created via factory functions. All factories accept an optional `label` string to distinguish multiple instances of the same type:
+
+```ts
+const pankoPan = e.pan('panko pan');   // claim key: "recipeId::eq::panko pan"
+const saucePan = e.pan('sauce pan');   // claim key: "recipeId::eq::sauce pan"
+const plainPan = e.pan();              // claim key: "recipeId::eq::pan"
+```
+
+Available factories: `e.bowl()`, `e.pan()`, `e.pot()`, `e.oven()`, `e.toasterOven()`, `e.instantPot()`, `e.bulletMixer()`, `e.knife()`, `e.cuttingBoard()`.
+
+### Contents tracking
+Each `Equipment` instance tracks its current `contents: Ingredient[]`, updated by `add()`, `transfer()`, `mix()`, and `combine()`. `cook()` and `broil()` automatically inherit the contents of nested vessels (registered via `place()`) so downstream steps are locked correctly without manual ingredient listing.
+
+### `result` getter
+`mix()` and `combine()` produce a new `Ingredient` representing the combined state of the vessel. Access it via `vessel.result` immediately after the call. Throws if accessed before any `mix()` or `combine()` call.
+
+### Methods
+
+- `.preheat(temp)` → timer step `"Preheat {name} to {temp}°"`, 15 minutes
+- `.cook(label, duration, temperature?, extraEquipment?)` → timer step. Automatically claims this vessel, all nested vessels (placed via `.place()`), and all their contents. `extraEquipment` adds additional vessels not yet nested.
+- `.broil(label, duration)` → timer step `"Broil — {label}"`. Same auto-inheritance as `.cook()`.
+- `.place(vessel, label?, duration?, temperature?)` → registers `vessel` as nested inside this one. Without `label`/`duration` produces an instruction step `"Place {vessel} in {this}"`. With both, produces a timer step combining placement and cooking into one card.
+- `.add(ingredients[], note?)` → container step with one child per ingredient. Appends ingredients to this vessel's contents.
+- `.transfer(target, ingredients[])` → instruction step `"Transfer {ingredients} from {this} to {target}"`. Validates at recipe-definition time that all ingredients are present in this vessel (throws a descriptive error if not). Removes them from this vessel's contents and adds them to the target.
+- `.combine(ingredients[], note?)` → instruction step. Applies this vessel's contents to the given ingredients, producing a new combined ingredient. Vessel contents are replaced with the combined result. Access via `.result`.
+- `.mix(resultName?)` → instruction step `"Mix {name}"`. If `resultName` is provided, replaces vessel contents with a single named ingredient. Access via `.result`.
+- `.slice(ingredient)` → instruction step `"Slice {ingredient.name}"`, claims equipment and ingredient
+- `.spray(ingredient)` → instruction step `"Spray {ingredient.name} on {name}"`, claims equipment and ingredient
+- `.flip()` → instruction step `"Flip contents of {name}"`, claims equipment and current contents
+- `.stir()` → instruction step
+
+### `transfer()` validation
+`transfer()` runs at recipe-definition time (when the IIFE executes on module load). If the ingredient is not in the source vessel it throws immediately with a message like:
+```
+transfer() from 'panko pan' to 'panko bowl': 'Panko Bread Crumbs' is not in panko pan. Contents: [empty]
+```
+This is caught by `validate-recipes.ts` before serving.
+
+---
+
+## Recipe Authoring Pattern
+
+All recipes use an **imperative IIFE** pattern. This is required (not optional) — it ensures consistent style and allows side-effect calls like `rename()` between steps without TypeScript errors:
+
+```ts
+createRecipe('my-recipe', 'My Recipe', (() => {
+    const pan  = e.pan();
+    const bowl = e.bowl();
+    const steps: Step[] = [];
+    const s = (...newSteps: Step[]) => steps.push(...newSteps);
+
+    s(bowl.add([i.egg(3, u.unit)]));
+    s(bowl.mix());
+    s(pan.cook('Cook eggs', time.minutes(5)));
+
+    return steps;
+})()),
+```
+
+- Named equipment (`const pan = e.pan('panko pan')`) is declared as local `const` inside the IIFE so it can be reused across multiple steps
+- Ingredient constants (e.g. `const PANKO = i.pankoBreadCrumbs(3, u.cup)`) are declared as local `const` when the same object reference must be shared across steps — this prevents shopping list double-counting and enables object-identity locking
+- `rename()` on an ingredient is called between `s()` calls (not inside the array) since it returns `void`
+- The lane with the most total timer time should be authored first to minimise the impact of tap latency
 
 ---
 
 ## Ingredients
-Ingredient factory functions `(quantity, unit) => Ingredient`. Optional metadata:
+
+Ingredient factory functions `(quantity, unit) => Ingredient`. Each call produces a new object — two calls to `i.avocadoOil()` are independent instances.
+
+Optional metadata:
 - `purchaseLinks` — nested by store → variant → array of `{ price, quantity, quantityUnit, link, organic?, discount? }`
 - `nutrition` — keyed by unit name, with fields for servings, calories, sodium, sugar, protein
 - `perishableDays`, `isMeatProduct`
 
-Simple ingredients with no metadata are declared via a bulk `simpleIngredients()` helper that auto-derives display names from camelCase keys.
+### `rename(newName)`
+A method on `Ingredient` that silently mutates the display name — no step card is produced. Used when an ingredient changes state mid-recipe (e.g. raw mushrooms → breaded mushrooms). All subsequent steps that reference the same object will use the new name.
+
+### `simpleIngredients()` helper
+Bulk-declares ingredients with no metadata. Auto-derives display names from camelCase keys — e.g. `kingOysterMushroom` → `"King Oyster Mushroom"`. An explicit string is only needed when the auto-derived form is wrong.
 
 ---
 
@@ -100,7 +202,7 @@ Quantities are formatted with unicode fractions (¼, ½, ¾, etc.) where applica
 ## Time Helpers
 `time.seconds(n)`, `time.minutes(n)`, `time.hours(n)` — all return a number of seconds.
 
-`Timer.set(amount, unit, label)` and `Timer.end()` allow inline timer steps without equipment context.
+`Timer.set(amount, unit, label)` creates an inline timer step without equipment context. Units: `'s'`, `'m'`, `'h'`.
 
 ---
 
@@ -110,7 +212,7 @@ Named constants for Amazon, Amazon Fresh, Whole Foods — used as keys in purcha
 ---
 
 ## Styling
-Dark theme (#111 background, #f0f0f0 text). Large touch-friendly cards (font-size 22px, padding 20px). All styles are injected as a `<style>` tag at bootstrap time — no external CSS file.
+Dark theme (`#111` background, `#f0f0f0` text). Large touch-friendly cards (font-size 22px, padding 20px). All styles injected as a `<style>` tag at bootstrap time — no external CSS file.
 
 Key visual states:
 - Selected recipe: green background
@@ -119,13 +221,20 @@ Key visual states:
 - Completed timer: green card with ✓ and timestamp
 - Skipped timer: grey card with strikethrough and timestamp
 - Locked step: 45% opacity, red left border, "⏳ waiting…" pill
-- Unlock flash: brief green border/background animation
-- Recipe title on cooking screen: name followed by `estimated X min · actual Xm XXs` badge in muted colour, actual time updating every second and freezing when all steps are done
+- Unlock flash: green border/background animation (800 ms), then panel moves to Ready zone at authored position
+- Recipe title: name + `estimated X min · actual Xm XXs` badge (muted colour, updates every second, freezes when all steps done)
+- Ready zone (`#ready-section`): no decoration, appears at top
+- Waiting zone (`#waiting-section`): top border + muted label; hidden when empty; completed/skipped panels are pinned and never jumped over by promoted panels
 
 ---
 
 ## Audio
 A beep sound plays when a timer completes. The audio element is unlocked on first user tap (browser autoplay policy workaround).
+
+---
+
+## Validation Script (`validate-recipes.ts`)
+A separate script that imports the recipe module and catches any `transfer()` validation errors thrown at definition time. Run with `npx ts-node validate-recipes.ts` before deploying. Returns exit code 0 on success, 1 on failure. Suitable for use as a `pre-push` git hook or CI check.
 
 ---
 
