@@ -1422,24 +1422,28 @@ registerGroup('Breakfast', [
         const mixer = e.bulletMixer();
         const steps = [];
         const s = (...newSteps) => steps.push(...newSteps);
+        // Step 1: Grind nuts/seeds smooth with liquid
         s(mixer.add([
             i.macadamiaNutMilk(1, u.cup),
+            i.lemonJuice(0.5, u.unit),
+            i.macadamiaNut(0.25, u.cup), // Hard items
+            i.cocoaNibs(1, u.tsp),
+            i.chiaSeed(1, u.tsp),
+            i.hempSeed(1, u.tbsp),
+        ]));
+        s(mixer.mix()); // Blend until completely smooth
+        // Step 2: Add greens and soft fruits
+        s(mixer.add([
+            i.celery(1, u.unit),
+            i.spinach(1, u.handful),
+            i.kale(1, u.handful),
             i.banana(1, u.unit),
-            i.macadamiaNut(0.25, u.cup),
             i.cherry(3, u.unit),
             i.antiOxidantBerryBlend(0.5, u.cup),
-            i.cocoaNibs(1, u.tsp),
-            i.hempSeed(1, u.tbsp),
             i.vanillaExtract(0.25, u.tsp),
-            i.chiaSeed(1, u.tsp),
-            i.lemonJuice(0.5, u.unit),
-            i.celery(1, u.unit),
         ]));
-        s(mixer.mix());
-        s(mixer.add([i.spinach(1, u.handful), i.kale(1, u.handful)]));
-        s(Timer.set(30, 's', 'Let mixer settle so liquid goes down'));
-        s(mixer.mix());
-        s(instruction('Garnish with strawberry and mint'));
+        s(Timer.set(30, 's', 'Let mixer settle'));
+        s(mixer.mix()); // Final blend
         return steps;
     })()),
     createRecipe('scrambled-eggs', 'Scrambled Eggs', (() => {
