@@ -15,6 +15,7 @@ const state = {
     cookingPlanSteps: [],
     cookingStartedAt: null,
     cookingElapsedInterval: null,
+    audioUnlocked: false,
 };
 // ============================================================
 // ID HELPERS
@@ -104,6 +105,11 @@ export function cleanup(equipmentName) {
         text: `Clean and put away ${equipmentName}`,
         equipment: [equipmentName],
     });
+}
+export function generateCleanupLabels(ingredients, customTexts) {
+    return ingredients
+        .filter(ing => ing.requiresDateLabel)
+        .map(ing => instruction(customTexts?.[ing.name] ?? `Write today's date on the ${ing.name} bottle with a Sharpie`));
 }
 // ============================================================
 // EQUIPMENT
@@ -323,9 +329,62 @@ export const e = {
 // ============================================================
 // RECIPE REGISTRATION
 // ============================================================
-export function createRecipe(id, name, steps, group) {
+function collectIngredientsWithLabel(steps) {
+    const collected = new Map(); // Use object reference as key
+    function walkSteps(steps) {
+        for (const step of steps) {
+            for (const ing of (step.ingredients ?? [])) {
+                if (ing.requiresDateLabel && !collected.has(ing)) {
+                    collected.set(ing, ing);
+                }
+            }
+            if (step.children) {
+                walkSteps(step.children);
+            }
+        }
+    }
+    walkSteps(steps);
+    return [...collected.values()];
+}
+function findLastStepIndexForIngredient(steps, targetIng) {
+    let lastIndex = -1;
+    for (let i = 0; i < steps.length; i++) {
+        const step = steps[i];
+        // Only consider container steps (add, transfer, combine, etc.) and timer steps
+        // Skip simple instruction steps that might have derived ingredient lists from equipment
+        const isContainerOrTimer = (step.type === 'instruction' && step.children && step.children.length > 0) ||
+            step.type === 'timer';
+        if (isContainerOrTimer) {
+            for (const ing of (step.ingredients ?? [])) {
+                if (ing === targetIng) {
+                    lastIndex = i;
+                    break;
+                }
+            }
+        }
+    }
+    return lastIndex;
+}
+export function createRecipe(id, name, steps, group, estimatedMinutes) {
     steps.forEach(s => { s.recipeId = id; });
-    return { id, name, steps, group };
+    // Automatically generate cleanup label steps and insert after last usage
+    const ingredientsToLabel = collectIngredientsWithLabel(steps);
+    const stepsToInsert = [];
+    for (const ing of ingredientsToLabel) {
+        const lastIndex = findLastStepIndexForIngredient(steps, ing);
+        if (lastIndex !== -1) {
+            const cleanupStep = generateCleanupLabels([ing])[0];
+            stepsToInsert.push({ index: lastIndex, step: cleanupStep });
+        }
+    }
+    // Sort by index in descending order so we insert from the end backwards
+    // (prevents earlier insertions from shifting later indices)
+    stepsToInsert.sort((a, b) => b.index - a.index);
+    // Insert cleanup steps after their last usage
+    for (const { index, step } of stepsToInsert) {
+        steps.splice(index + 1, 0, step);
+    }
+    return { id, name, steps, group, estimatedMinutes };
 }
 export function registerRecipe(recipe) {
     state.recipes.set(recipe.id, recipe);
@@ -523,6 +582,20 @@ function createPanel() {
     return panel;
 }
 // ============================================================
+// AUDIO UNLOCK
+// ============================================================
+function unlockAudioContext() {
+    if (state.audioUnlocked)
+        return;
+    // Create a silent audio element just to unlock the browser's audio context
+    const silentAudio = new Audio();
+    silentAudio.src = 'data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQIAAAAAAA==';
+    silentAudio.play().catch(() => {
+        // Fail silently if autoplay is blocked
+    });
+    state.audioUnlocked = true;
+}
+// ============================================================
 // SCREEN: SELECT
 // ============================================================
 function renderSelectScreen() {
@@ -604,6 +677,8 @@ function renderRecipeList() {
                 else {
                     state.selectedRecipeIds.push(recipe.id);
                     btn.classList.add('selected');
+                    // Unlock audio on first recipe selection
+                    unlockAudioContext();
                 }
                 updateActionButtons();
             });
@@ -762,10 +837,20 @@ function renderCookingScreen() {
     state.cookingPlanSteps = buildCookingPlan(selected);
     // Total time banner when multiple recipes selected
     if (selected.length > 1) {
-        const totalSecs = selected.reduce((s, r) => s + recipeCookSeconds(r), 0);
+        const totalSecs = selected.reduce((s, r) => {
+            const recipeSecs = recipeCookSeconds(r);
+            return s + recipeSecs;
+        }, 0);
+        const hardcodedTotal = selected.reduce((s, r) => {
+            return s + (r.estimatedMinutes ? r.estimatedMinutes * 60 : 0);
+        }, 0);
         const banner = document.createElement('div');
         banner.className = 'cook-time-banner';
-        banner.textContent = `Total cook time: ${formatCookTime(totalSecs)}`;
+        let bannerText = `Total cook time: ${formatCookTime(totalSecs)}`;
+        if (hardcodedTotal > 0) {
+            bannerText = `Total: ${formatCookTime(hardcodedTotal)} goal (${formatCookTime(totalSecs)} calculated)`;
+        }
+        banner.textContent = bannerText;
         root.appendChild(banner);
     }
     const { ready, waiting } = getOrCreateCookingSections();
@@ -784,10 +869,15 @@ function renderCookingScreen() {
                 title.textContent = recipe.name;
                 const badge = document.createElement('span');
                 badge.className = 'cook-time-badge';
-                const estimateText = formatCookTime(recipeCookSeconds(recipe));
+                const calculatedSecs = recipeCookSeconds(recipe);
+                const calculatedText = formatCookTime(calculatedSecs);
+                const hardcodedText = recipe.estimatedMinutes ? `${recipe.estimatedMinutes} min` : null;
                 const updateBadge = () => {
                     const secs = Math.floor((Date.now() - state.cookingStartedAt) / 1000);
-                    badge.textContent = `estimated ${estimateText} · actual ${formatElapsed(secs)}`;
+                    const estimateDisplay = hardcodedText
+                        ? `estimated ${hardcodedText} (${calculatedText} calculated)`
+                        : `estimated ${calculatedText}`;
+                    badge.textContent = `${estimateDisplay} · actual ${formatElapsed(secs)}`;
                 };
                 updateBadge();
                 if (state.cookingElapsedInterval !== null) {
@@ -967,6 +1057,7 @@ function createStartOverButton() {
         state.cookingPlanSteps = [];
         state.searchQuery = '';
         state.cookingStartedAt = null;
+        state.audioUnlocked = false;
         if (state.cookingElapsedInterval !== null) {
             window.clearInterval(state.cookingElapsedInterval);
             state.cookingElapsedInterval = null;
@@ -1278,14 +1369,6 @@ h2 { margin-top: 0; font-size: 28px; }
 function bootstrap() {
     document.head.insertAdjacentHTML('beforeend', `<style>${styles}</style>`);
     document.body.innerHTML = `<div id="app"></div>`;
-    const unlockAudio = () => {
-        audio.play().then(() => {
-            audio.pause();
-            audio.currentTime = 0;
-        }).catch(() => { });
-        document.removeEventListener('click', unlockAudio);
-    };
-    document.addEventListener('click', unlockAudio);
     render();
 }
 // ============================================================
@@ -1343,7 +1426,6 @@ export const i = {
         frozenBlueberry: '',
         cherry: '',
         blueprintNuttyPudding: '',
-        macadamiaNutMilk: '',
         vanillaExtract: '',
         lemonJuice: '',
         celery: '',
@@ -1364,6 +1446,9 @@ export const i = {
         cornstarch: '',
         cassavaFlour: '',
         kingOysterMushroom: '',
+    }),
+    macadamiaNutMilk: ingredientFactory('Macadamia Nut Milk', {
+        requiresDateLabel: true,
     }),
     peanutButter: ingredientFactory('Peanut Butter', {
         purchaseLinks: {
@@ -1420,16 +1505,20 @@ export const i = {
 registerGroup('Breakfast', [
     createRecipe('blueprint-smoothie', 'Blueprint Smoothie', (() => {
         const mixer = e.bulletMixer();
+        const MACADAMIA_MILK = i.macadamiaNutMilk(1, u.cup);
         const steps = [];
         const s = (...newSteps) => steps.push(...newSteps);
         // Step 1: Grind nuts/seeds smooth with liquid
         s(mixer.add([
-            i.macadamiaNutMilk(1, u.cup),
+            MACADAMIA_MILK,
             i.lemonJuice(0.5, u.unit),
             i.macadamiaNut(0.25, u.cup), // Hard items
             i.cocoaNibs(1, u.tsp),
             i.chiaSeed(1, u.tsp),
             i.hempSeed(1, u.tbsp),
+            i.cherry(3, u.unit),
+            i.antiOxidantBerryBlend(0.5, u.cup),
+            i.vanillaExtract(0.25, u.tsp),
         ]));
         s(mixer.mix()); // Blend until completely smooth
         // Step 2: Add greens and soft fruits
@@ -1438,14 +1527,11 @@ registerGroup('Breakfast', [
             i.spinach(1, u.handful),
             i.kale(1, u.handful),
             i.banana(1, u.unit),
-            i.cherry(3, u.unit),
-            i.antiOxidantBerryBlend(0.5, u.cup),
-            i.vanillaExtract(0.25, u.tsp),
         ]));
         s(Timer.set(30, 's', 'Let mixer settle'));
         s(mixer.mix()); // Final blend
         return steps;
-    })()),
+    })(), undefined, 8), // estimatedMinutes: 8
     createRecipe('scrambled-eggs', 'Scrambled Eggs', (() => {
         const bowl = e.bowl();
         const pan = e.pan();

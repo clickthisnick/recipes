@@ -32,12 +32,17 @@ There are three screens: Select, Shopping, and Cooking. Navigation is handled by
 - Container child panels are never independently promoted — only the parent container moves
 - The Waiting zone is hidden entirely if there are no locked steps
 - Recipe title headings always appear in the Ready zone, above the first step of their recipe
-- Each recipe title heading shows a live badge: `estimated 20 min · actual 4m 32s`, updating every second
-  - "estimated" is the critical-path cook time for that recipe
+- Each recipe title heading shows a live badge, updating every second:
+  - If a hardcoded `estimatedMinutes` is set: `estimated 20 min (14m 32s calculated) · actual 4m 32s`
+    - Shows the user's hardcoded target, followed by the calculated critical path in parentheses
+  - If no hardcoded estimate: `estimated 14m 32s · actual 4m 32s`
+    - Shows only the calculated critical path time
   - "actual" is wall-clock time elapsed since the cooking screen was first entered
   - The actual timer stops ticking when all step cards have been completed or skipped
   - The elapsed time resets on Start Over
-- If multiple recipes are selected, a muted banner at the top shows total estimated cook time
+- If multiple recipes are selected, a muted banner at the top shows total time:
+  - If any recipes have hardcoded estimates: `Total: 45 min goal (52m 14s calculated)`
+  - If no hardcoded estimates: `Total cook time: 52m 14s`
 - Steps are rendered as tappable cards
 - A "Start Over" button at the bottom resets everything
 
@@ -101,9 +106,49 @@ A step "claims" its equipment and ingredients when it is a timer **or** when it 
 ---
 
 ## Cook Time Estimation
-- Calculated via critical path analysis across a recipe's timer steps
-- Walk steps in authored order. Maintain a map of claim key → wall-clock time the resource is free. Each timer starts at the max release time of its claimed keys (paths converge), then pushes those keys' release times forward by its duration (paths diverge). Total time is the maximum end time.
+- The app always calculates the critical-path time automatically from timer steps
+- Optionally, you can provide a hardcoded `estimatedMinutes` when defining a recipe (your personal estimate of how long it will take)
+- Both times are shown together in the UI so you can compare your goal vs. the calculated estimate:
+  - Hardcoded estimate appears as the primary "estimated" time
+  - Calculated time appears in parentheses as a reference: `estimated 20 min (14m 32s calculated)`
+  - If no hardcoded estimate is provided, only the calculated time shows: `estimated 14m 32s`
+- Critical-path calculation: Walk steps in authored order. Maintain a map of claim key → wall-clock time the resource is free. Each timer starts at the max release time of its claimed keys (paths converge), then pushes those keys' release times forward by its duration (paths diverge). Total time is the maximum end time.
 - Format: `X hr Y min` if ≥ 3600 s (omit minutes if zero); `X min` (rounded up) if < 3600 s
+
+---
+
+## Step Factories
+
+- `instruction(text, opts?)` → creates an instruction step
+- `timerStep(label, durationSeconds, opts?)` → creates a timer step
+- `Timer.set(amount, unit, label)` → creates an inline timer step (unit: `'s'`, `'m'`, `'h'`)
+- `cleanup(equipmentName)` → creates a cleanup step `"Clean and put away {equipmentName}"`
+- `generateCleanupLabels(ingredients, customTexts?)` → creates instruction steps for ingredients that need date labels
+  - Filters `ingredients[]` for those with `requiresDateLabel: true`
+  - Default text: `"Write today's date on the {ingredient name} bottle with a Sharpie"`
+  - Optional `customTexts` object to override text per ingredient: `{ 'Macadamia Nut Milk': 'Label with today\'s date' }`
+  - Returns an array of `Step[]`
+  - **Note:** This function is called automatically when a recipe is created — you typically don't need to call it manually. See [Automatic Cleanup Labels](#automatic-cleanup-labels) below.
+
+### Automatic Cleanup Labels
+
+When a recipe is created via `createRecipe()`, the system automatically:
+1. Scans all steps and collects every ingredient with `requiresDateLabel: true`
+2. For each ingredient, finds the **last step that uses it**
+3. Generates a cleanup/put-away instruction step with default text
+4. Inserts it **immediately after** the last step that references that ingredient
+
+This way, the put-away reminder appears right when you no longer need the ingredient—at the moment you're done using it and should label and store it.
+
+Example: If Macadamia Nut Milk (with `requiresDateLabel: true`) is first used in an `add()` step:
+```
+Step 1: Add Macadamia Nut Milk to mixer
+Step 2: [Put away step auto-inserted] "Write today's date on the Macadamia Nut Milk bottle with a Sharpie"
+Step 3: Mix
+...
+```
+
+No manual work needed—just use ingredients with `requiresDateLabel: true` and the put-away steps are automatically positioned after their last use.
 
 ---
 
@@ -154,24 +199,31 @@ This is caught by `validate-recipes.ts` before serving.
 All recipes use an **imperative IIFE** pattern. This is required (not optional) — it ensures consistent style and allows side-effect calls like `rename()` between steps without TypeScript errors:
 
 ```ts
-createRecipe('my-recipe', 'My Recipe', (() => {
-    const pan  = e.pan();
-    const bowl = e.bowl();
-    const steps: Step[] = [];
-    const s = (...newSteps: Step[]) => steps.push(...newSteps);
+createRecipe(
+    'my-recipe',
+    'My Recipe',
+    (() => {
+        const pan  = e.pan();
+        const bowl = e.bowl();
+        const steps: Step[] = [];
+        const s = (...newSteps: Step[]) => steps.push(...newSteps);
 
-    s(bowl.add([i.egg(3, u.unit)]));
-    s(bowl.mix());
-    s(pan.cook('Cook eggs', time.minutes(5)));
+        s(bowl.add([i.egg(3, u.unit)]));
+        s(bowl.mix());
+        s(pan.cook('Cook eggs', time.minutes(5)));
 
-    return steps;
-})()),
+        return steps;
+    })(),
+    undefined,  // group (optional)
+    12          // estimatedMinutes (optional)
+),
 ```
 
 - Named equipment (`const pan = e.pan('panko pan')`) is declared as local `const` inside the IIFE so it can be reused across multiple steps
 - Ingredient constants (e.g. `const PANKO = i.pankoBreadCrumbs(3, u.cup)`) are declared as local `const` when the same object reference must be shared across steps — this prevents shopping list double-counting and enables object-identity locking
 - `rename()` on an ingredient is called between `s()` calls (not inside the array) since it returns `void`
 - The lane with the most total timer time should be authored first to minimise the impact of tap latency
+- The optional `estimatedMinutes` parameter allows you to specify a hardcoded time estimate. If not provided, the critical-path algorithm is used instead.
 
 ---
 
@@ -183,6 +235,7 @@ Optional metadata:
 - `purchaseLinks` — nested by store → variant → array of `{ price, quantity, quantityUnit, link, organic?, discount? }`
 - `nutrition` — keyed by unit name, with fields for servings, calories, sodium, sugar, protein
 - `perishableDays`, `isMeatProduct`
+- `requiresDateLabel` — if `true`, automatically adds an instruction child step to any `.add()` call using this ingredient, asking the user to write today's date on the bottle with a Sharpie (useful for tracking expiration)
 
 ### `rename(newName)`
 A method on `Ingredient` that silently mutates the display name — no step card is produced. Used when an ingredient changes state mid-recipe (e.g. raw mushrooms → breaded mushrooms). All subsequent steps that reference the same object will use the new name.
@@ -229,7 +282,7 @@ Key visual states:
 ---
 
 ## Audio
-A beep sound plays when a timer completes. The audio element is unlocked on first user tap (browser autoplay policy workaround).
+A beep sound plays when a timer completes. The audio context is unlocked silently on first recipe selection (when clicking a recipe button to select it), bypassing browser autoplay restrictions without producing any audible sound. This ensures timer sounds will play reliably during the cooking session.
 
 ---
 
