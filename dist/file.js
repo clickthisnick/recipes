@@ -1611,30 +1611,6 @@ registerGroup('Breakfast', [
         s(mixer.mix()); // Final blend
         return steps;
     })(), undefined, 8), // estimatedMinutes: 8
-    createRecipe('scrambled-eggs', 'Scrambled Eggs', (() => {
-        const bowl = e.bowl();
-        const pan = e.pan();
-        const steps = [];
-        const s = (...newSteps) => steps.push(...newSteps);
-        s(bowl.add([i.egg(3, u.unit), i.milk(0.25, u.cup)]));
-        s(bowl.mix());
-        s(pan.cook('Cook eggs in pan', time.minutes(5)));
-        s(instruction('Serve immediately'));
-        s(cleanup('bowl'));
-        s(cleanup('pan'));
-        return steps;
-    })()),
-]);
-registerGroup('Quick', [
-    createRecipe('toast', 'Toast', (() => {
-        const toasterOven = e.toasterOven();
-        const steps = [];
-        const s = (...newSteps) => steps.push(...newSteps);
-        s(toasterOven.preheat(350));
-        s(timerStep('Toast bread', time.minutes(3)));
-        s(cleanup('toaster oven'));
-        return steps;
-    })()),
 ]);
 registerGroup('Dinner', [
     createRecipe('breaded-mushrooms', 'Breaded Mushrooms', (() => {
