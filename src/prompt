@@ -48,6 +48,31 @@ There are three screens: Select, Shopping, and Cooking. Navigation is handled by
 
 ---
 
+## URL Routing
+
+You can link directly to a recipe using a query parameter: `?recipe=recipe-id`
+
+**Example:** `https://yourapp.com/cooking?recipe=blueprint-smoothie`
+
+When a recipe ID is provided in the URL:
+1. The recipe is automatically selected
+2. The audio context is unlocked silently (same as when manually selecting a recipe)
+3. The app navigates directly to the Cooking screen and begins immediately
+4. If the recipe ID doesn't match any registered recipe, the app displays the Select screen normally
+
+### Copy to Clipboard
+
+Both the Select and Cooking screens display a link icon (🔗) next to each recipe that allows you to copy the recipe's shareable URL:
+
+- **Select Screen** — Click the 🔗 button on any recipe row to copy its link
+- **Cooking Screen** — Click the 🔗 button next to the recipe title to copy its link
+- The button briefly changes to ✓ after copying to confirm the action
+- The copied link is ready to paste and share with others
+
+This makes it easy to create and share recipe links without manually typing the URL.
+
+---
+
 ## Step Types
 
 - **Instruction** — tap to dismiss (card disappears). Used for all active hands-on steps: prep, cleanup, notes, transfers, flips, sprays, slices, combines.
@@ -282,7 +307,7 @@ Key visual states:
 ---
 
 ## Audio
-A beep sound plays when a timer completes. The audio context is unlocked silently on first recipe selection (when clicking a recipe button to select it), bypassing browser autoplay restrictions without producing any audible sound. This ensures timer sounds will play reliably during the cooking session.
+A beep sound plays when a timer completes. The audio context is unlocked silently on first recipe selection (when clicking a recipe button to select it), bypassing browser autoplay restrictions without producing any audible sound. This also happens when a recipe is accessed directly via URL parameter. This ensures timer sounds will play reliably during the cooking session.
 
 ---
 
@@ -293,3 +318,5 @@ A separate script that imports the recipe module and catches any `transfer()` va
 
 ## Bootstrap
 The app mounts on `DOMContentLoaded`, injects styles, renders `<div id="app">`, and calls `render()`. All state lives in a single `state` object. No persistence between page loads.
+
+When the app boots, it checks for a `?recipe=recipe-id` URL parameter. If found and the recipe exists, it auto-selects that recipe, unlocks the audio context, and jumps directly to the Cooking screen.

@@ -582,6 +582,42 @@ function createPanel() {
     return panel;
 }
 // ============================================================
+// COPY TO CLIPBOARD
+// ============================================================
+function getRecipeURL(recipeId) {
+    const baseURL = window.location.origin + window.location.pathname;
+    return `${baseURL}?recipe=${recipeId}`;
+}
+function copyToClipboard(text) {
+    return navigator.clipboard.writeText(text).catch(() => {
+        // Fallback for older browsers
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+    });
+}
+function createCopyButton(recipeId) {
+    const btn = document.createElement('button');
+    btn.className = 'copy-link-btn';
+    btn.textContent = '🔗';
+    btn.title = 'Copy recipe link';
+    btn.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        const url = getRecipeURL(recipeId);
+        copyToClipboard(url).then(() => {
+            const original = btn.textContent;
+            btn.textContent = '✓';
+            setTimeout(() => {
+                btn.textContent = original;
+            }, 1500);
+        });
+    });
+    return btn;
+}
+// ============================================================
 // AUDIO UNLOCK
 // ============================================================
 function unlockAudioContext() {
@@ -682,8 +718,10 @@ function renderRecipeList() {
                 }
                 updateActionButtons();
             });
+            const copyBtn = createCopyButton(recipe.id);
             row.appendChild(star);
             row.appendChild(btn);
+            row.appendChild(copyBtn);
             root.appendChild(row);
         });
     });
@@ -892,8 +930,10 @@ function renderCookingScreen() {
                     }
                     updateBadge();
                 }, 1000);
+                const copyBtn = createCopyButton(recipe.id);
                 header.appendChild(title);
                 header.appendChild(badge);
+                header.appendChild(copyBtn);
                 ready.appendChild(header);
             }
         }
@@ -1102,6 +1142,13 @@ function startTimer(step, panel, onDone) {
 const audio = new Audio('../src/sounds/pager-beep.mp3');
 function playSound() { audio.currentTime = 0; audio.play().catch(console.error); }
 // ============================================================
+// URL ROUTING
+// ============================================================
+function getRecipeIdFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('recipe');
+}
+// ============================================================
 // RENDER
 // ============================================================
 function render() {
@@ -1183,6 +1230,25 @@ h2 { margin-top: 0; font-size: 28px; }
 }
 
 .star-btn.starred { color: #f5c518; }
+
+.copy-link-btn {
+    font-size: 18px;
+    padding: 10px 12px;
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.3s;
+}
+
+.copy-link-btn:hover {
+    color: #60a5fa;
+}
+
+.copy-link-btn:active {
+    color: #2d9e4a;
+}
 
 .actions {
     position: fixed;
@@ -1306,12 +1372,16 @@ h2 { margin-top: 0; font-size: 28px; }
 /* Recipe title row with cook time badge */
 .recipe-title-row {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 12px;
     margin-bottom: 4px;
 }
 
-.recipe-title-row h2 { margin: 0; }
+.recipe-title-row h2 { margin: 0; flex: 1; }
+
+.recipe-title-row .copy-link-btn {
+    margin-left: auto;
+}
 
 .cook-time-badge {
     font-size: 16px;
@@ -1369,7 +1439,16 @@ h2 { margin-top: 0; font-size: 28px; }
 function bootstrap() {
     document.head.insertAdjacentHTML('beforeend', `<style>${styles}</style>`);
     document.body.innerHTML = `<div id="app"></div>`;
-    render();
+    // Check if a recipe ID is provided in the URL (e.g. ?recipe=blueprint-smoothie)
+    const recipeIdFromURL = getRecipeIdFromURL();
+    if (recipeIdFromURL && state.recipes.has(recipeIdFromURL)) {
+        state.selectedRecipeIds = [recipeIdFromURL];
+        unlockAudioContext();
+        navigateTo('cooking');
+    }
+    else {
+        render();
+    }
 }
 // ============================================================
 // STORES
