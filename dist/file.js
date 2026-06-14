@@ -392,16 +392,71 @@ export function registerRecipe(recipe) {
 export function registerGroup(group, recipes) {
     recipes.forEach((recipe) => registerRecipe({ ...recipe, group }));
 }
+// ============================================================
+// AD-HOC INGREDIENTS
+// ============================================================
+//
+// Wraps a single ingredient into a one-step synthetic recipe so it flows
+// through the shopping list and nutrition rollup using the same codepaths as
+// hand-authored recipes — no parallel "loose ingredients" pipeline.
+//
+// The fiction is intentional: the single step exists only so the existing
+// step-walking logic in buildShoppingList and recipeNutrition finds the
+// ingredient. The cooking screen filters adhoc recipes out (see
+// getCookableRecipes) so the synthetic step never reaches the cook flow.
+const ADHOC_GROUP = 'Custom additions';
+function createAdhocRecipe(ingredient) {
+    // Unique id per call — same ingredient added twice produces two recipes,
+    // so the user can adjust them independently and they each get a "×N"
+    // counter like any other recipe.
+    const id = `adhoc:${ingredient.name.toLowerCase().replace(/\s+/g, '-')}:${Date.now()}-${Math.floor(Math.random() * 1e4)}`;
+    const step = instruction(`Have ${formatIngredient(ingredient)} on hand`, {
+        ingredients: [ingredient],
+    });
+    step.recipeId = id;
+    return {
+        id,
+        name: formatIngredient(ingredient),
+        group: ADHOC_GROUP,
+        steps: [step],
+        adhoc: true,
+    };
+}
 export function getSelectedRecipes() {
-    return state.selectedRecipeIds
-        .map((id) => state.recipes.get(id))
-        .filter(Boolean);
+    // Returns each selected recipe ONCE, in the order it first appeared in the
+    // selection list. Servings-per-recipe is tracked separately via getServings()
+    // — cooking treats each recipe as one batch, but shopping and nutrition
+    // multiply by serving count.
+    const seen = new Set();
+    const out = [];
+    for (const id of state.selectedRecipeIds) {
+        if (seen.has(id))
+            continue;
+        seen.add(id);
+        const r = state.recipes.get(id);
+        if (r)
+            out.push(r);
+    }
+    return out;
+}
+// How many servings of a given recipe are currently selected. Same recipe can
+// be tapped multiple times to add servings; the shopping list and nutrition
+// screen scale by this count.
+export function getServings(recipeId) {
+    return state.selectedRecipeIds.filter(id => id === recipeId).length;
 }
 function getFilteredRecipes() {
     const q = state.searchQuery.toLowerCase();
     const all = [...state.recipes.values()];
     const matched = q ? all.filter((r) => r.name.toLowerCase().includes(q)) : all;
     return matched.sort((a, b) => {
+        // Ad-hoc additions float to the very top — they're transient session
+        // items the user just added and likely wants to see/adjust.
+        const aAdhoc = a.adhoc ? 0 : 1;
+        const bAdhoc = b.adhoc ? 0 : 1;
+        if (aAdhoc !== bAdhoc)
+            return aAdhoc - bAdhoc;
+        // Then favorites
         const aFav = state.favoriteRecipeIds.includes(a.id) ? 0 : 1;
         const bFav = state.favoriteRecipeIds.includes(b.id) ? 0 : 1;
         if (aFav !== bFav)
@@ -544,19 +599,38 @@ function buildCookingPlan(recipes) {
 // SHOPPING LIST
 // ============================================================
 function buildShoppingList() {
+    // Object-reference dedup first — the SAME ingredient object appears across
+    // many steps (parent, children, mix contents), so summing by step would
+    // multi-count it. Walk to a Set of distinct objects, then sum by name+unit
+    // across those, scaled by the recipe's serving count.
     const combined = new Map();
     getSelectedRecipes().forEach((recipe) => {
-        recipe.steps.forEach((step) => {
-            step.ingredients?.forEach((ingredient) => {
-                const key = `${ingredient.name}-${ingredient.unit?.name ?? ''}`;
-                const existing = combined.get(key);
-                if (!existing) {
-                    combined.set(key, { ...ingredient });
-                    return;
-                }
-                existing.quantity = (existing.quantity ?? 0) + (ingredient.quantity ?? 0);
-            });
-        });
+        const servings = getServings(recipe.id);
+        const distinct = new Set();
+        const walk = (steps) => {
+            for (const step of steps) {
+                for (const ing of step.ingredients ?? [])
+                    distinct.add(ing);
+                if (step.children)
+                    walk(step.children);
+            }
+        };
+        walk(recipe.steps);
+        for (const ingredient of distinct) {
+            // Skip composites from mix()/combine() — they're roll-ups of real
+            // ingredients already counted on their own.
+            if (isComposite(ingredient))
+                continue;
+            const key = `${ingredient.name}-${ingredient.unit?.name ?? ''}`;
+            const addQty = (ingredient.quantity ?? 0) * servings;
+            const existing = combined.get(key);
+            if (!existing) {
+                combined.set(key, { ...ingredient, quantity: addQty });
+            }
+            else {
+                existing.quantity = (existing.quantity ?? 0) + addQty;
+            }
+        }
     });
     return [...combined.values()];
 }
@@ -566,6 +640,14 @@ const addTotals = (a, b) => ({
     sodium: a.sodium + b.sodium,
     sugar: a.sugar + b.sugar,
     protein: a.protein + b.protein,
+});
+// Scale a totals row by a serving count — used so the nutrition screen reports
+// the actual amount the user will consume when they select N servings of a recipe.
+const scaleTotals = (t, n) => ({
+    calories: t.calories * n,
+    sodium: t.sodium * n,
+    sugar: t.sugar * n,
+    protein: t.protein * n,
 });
 // Composite ingredients produced by mix()/combine() carry _constituents and
 // are roll-ups of real ingredients that are already counted on their own —
@@ -768,6 +850,7 @@ function renderRecipeList() {
         empty.textContent = 'No recipes found.';
         empty.className = 'empty';
         root.appendChild(empty);
+        appendAddIngredientButton(root);
         return;
     }
     const groups = new Map();
@@ -787,46 +870,108 @@ function renderRecipeList() {
         groupRecipes.forEach((recipe) => {
             const row = document.createElement('div');
             row.className = 'recipe-row';
-            const star = document.createElement('button');
-            const isFav = state.favoriteRecipeIds.includes(recipe.id);
-            star.className = 'star-btn';
-            star.textContent = isFav ? '★' : '☆';
-            star.classList.toggle('starred', isFav);
-            star.addEventListener('click', (ev) => {
-                ev.stopPropagation();
-                if (state.favoriteRecipeIds.includes(recipe.id)) {
-                    state.favoriteRecipeIds = state.favoriteRecipeIds.filter((id) => id !== recipe.id);
-                }
-                else {
-                    state.favoriteRecipeIds.push(recipe.id);
-                }
-                renderRecipeList();
-            });
+            // Ad-hoc rows skip the star (transient — favoriting one-offs is
+            // noise) and the copy link (the ID is a Date.now-stamped key that
+            // won't survive a page reload, so a shareable URL is meaningless).
+            if (!recipe.adhoc) {
+                const star = document.createElement('button');
+                const isFav = state.favoriteRecipeIds.includes(recipe.id);
+                star.className = 'star-btn';
+                star.textContent = isFav ? '★' : '☆';
+                star.classList.toggle('starred', isFav);
+                star.addEventListener('click', (ev) => {
+                    ev.stopPropagation();
+                    if (state.favoriteRecipeIds.includes(recipe.id)) {
+                        state.favoriteRecipeIds = state.favoriteRecipeIds.filter((id) => id !== recipe.id);
+                    }
+                    else {
+                        state.favoriteRecipeIds.push(recipe.id);
+                    }
+                    renderRecipeList();
+                });
+                row.appendChild(star);
+            }
+            else {
+                // Spacer so ad-hoc rows align with starred ones
+                const spacer = document.createElement('span');
+                spacer.className = 'star-spacer';
+                row.appendChild(spacer);
+            }
             const btn = document.createElement('button');
             btn.className = 'recipe-btn';
-            btn.textContent = recipe.name;
-            const isSelected = state.selectedRecipeIds.includes(recipe.id);
-            btn.classList.toggle('selected', isSelected);
+            const count = state.selectedRecipeIds.filter(id => id === recipe.id).length;
+            btn.classList.toggle('selected', count > 0);
+            // Recipe name, with a small ×N badge when selected more than once
+            const nameSpan = document.createElement('span');
+            nameSpan.textContent = recipe.name;
+            btn.appendChild(nameSpan);
+            if (count > 1) {
+                const badge = document.createElement('span');
+                badge.className = 'count-badge';
+                badge.textContent = `×${count}`;
+                btn.appendChild(badge);
+            }
+            // Tap adds one serving. Same recipe can appear multiple times in
+            // selectedRecipeIds — each occurrence is one serving of the recipe.
             btn.addEventListener('click', () => {
-                if (state.selectedRecipeIds.includes(recipe.id)) {
-                    state.selectedRecipeIds = state.selectedRecipeIds.filter((id) => id !== recipe.id);
-                    btn.classList.remove('selected');
-                }
-                else {
-                    state.selectedRecipeIds.push(recipe.id);
-                    btn.classList.add('selected');
-                    // Unlock audio on first recipe selection
-                    unlockAudioContext();
-                }
+                state.selectedRecipeIds.push(recipe.id);
+                unlockAudioContext();
+                renderRecipeList();
                 updateActionButtons();
             });
-            const copyBtn = createCopyButton(recipe.id);
-            row.appendChild(star);
+            // When at least one serving is selected, show a "−" button so the
+            // user can remove servings one at a time. Hidden at count: 0.
+            const minusBtn = document.createElement('button');
+            minusBtn.className = 'count-minus-btn';
+            minusBtn.textContent = '−';
+            minusBtn.title = 'Remove one serving';
+            minusBtn.style.visibility = count > 0 ? 'visible' : 'hidden';
+            minusBtn.addEventListener('click', (ev) => {
+                ev.stopPropagation();
+                const idx = state.selectedRecipeIds.lastIndexOf(recipe.id);
+                if (idx !== -1)
+                    state.selectedRecipeIds.splice(idx, 1);
+                renderRecipeList();
+                updateActionButtons();
+            });
+            // For ad-hoc rows, an "×" button removes the recipe entirely
+            // (drops all servings AND unregisters the synthetic recipe so it
+            // stops cluttering the list once the user is done with it).
+            // For real recipes, we keep the share-link button instead.
             row.appendChild(btn);
-            row.appendChild(copyBtn);
+            row.appendChild(minusBtn);
+            if (recipe.adhoc) {
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'adhoc-remove-btn';
+                removeBtn.textContent = '×';
+                removeBtn.title = 'Remove this ad-hoc ingredient';
+                removeBtn.addEventListener('click', (ev) => {
+                    ev.stopPropagation();
+                    state.selectedRecipeIds = state.selectedRecipeIds.filter(id => id !== recipe.id);
+                    state.recipes.delete(recipe.id);
+                    renderRecipeList();
+                    updateActionButtons();
+                });
+                row.appendChild(removeBtn);
+            }
+            else {
+                row.appendChild(createCopyButton(recipe.id));
+            }
             root.appendChild(row);
         });
     });
+    // "+ Add an ingredient" — opens a picker screen for adding a one-off
+    // ingredient (no recipe). The picker creates a synthetic adhoc recipe so
+    // the rest of the app's machinery (shopping/nutrition) works unchanged.
+    appendAddIngredientButton(root);
+}
+function appendAddIngredientButton(root) {
+    const addRow = document.createElement('div');
+    addRow.className = 'add-ingredient-row';
+    const addBtn = createButton('+ Add an ingredient', () => navigateTo('add-ingredient'));
+    addBtn.className = 'add-ingredient-btn';
+    addRow.appendChild(addBtn);
+    root.appendChild(addRow);
 }
 function updateActionButtons() {
     const actions = getElement('actions');
@@ -837,11 +982,16 @@ function updateActionButtons() {
     shopBtn.className = 'action-btn';
     const nutritionBtn = createButton('📊 Nutrition', () => navigateTo('nutrition'));
     nutritionBtn.className = 'action-btn action-btn-nutrition';
-    const cookBtn = createButton('🍳 Start Cooking', () => navigateTo('cooking'));
-    cookBtn.className = 'action-btn';
     actions.appendChild(shopBtn);
     actions.appendChild(nutritionBtn);
-    actions.appendChild(cookBtn);
+    // Only show "Start Cooking" when at least one real (non-adhoc) recipe is
+    // selected — there's nothing to cook for ad-hoc-only shopping lists.
+    const hasCookable = getSelectedRecipes().some(r => !r.adhoc);
+    if (hasCookable) {
+        const cookBtn = createButton('🍳 Start Cooking', () => navigateTo('cooking'));
+        cookBtn.className = 'action-btn';
+        actions.appendChild(cookBtn);
+    }
 }
 // ============================================================
 // SCREEN: SHOPPING
@@ -919,17 +1069,34 @@ function renderNutritionScreen() {
         root.appendChild(createStartOverButton());
         return;
     }
-    const perRecipe = recipes.map(r => ({ recipe: r, nutrition: recipeNutrition(r) }));
+    const perRecipe = recipes.map(r => ({
+        recipe: r,
+        servings: getServings(r.id),
+        nutrition: recipeNutrition(r),
+    }));
     // ── Grand total ──────────────────────────────────────────
-    const grand = perRecipe.reduce((acc, p) => addTotals(acc, p.nutrition.totals), emptyTotals());
+    // Sum the SCALED per-recipe totals (each multiplied by its serving count).
+    const grand = perRecipe.reduce((acc, p) => addTotals(acc, scaleTotals(p.nutrition.totals, p.servings)), emptyTotals());
     const gCovered = perRecipe.reduce((a, p) => a + p.nutrition.covered, 0);
     const gFlagged = perRecipe.reduce((a, p) => a + p.nutrition.missing + p.nutrition.uncomputable, 0);
     const gTotal = perRecipe.reduce((a, p) => a + p.nutrition.total, 0);
+    const grandServings = perRecipe.reduce((a, p) => a + p.servings, 0);
     const totalCard = createPanel();
     totalCard.className = 'panel nutrition-total';
     const totalTitle = document.createElement('div');
     totalTitle.className = 'nutrition-total-title';
-    totalTitle.textContent = recipes.length > 1 ? 'All selected recipes' : recipes[0].name;
+    // Title disambiguates "1 recipe ×3" from "3 different recipes" — the grand
+    // total card scales by servings, so the reader should always know exactly
+    // what's being summed.
+    if (recipes.length === 1 && perRecipe[0].servings === 1) {
+        totalTitle.textContent = recipes[0].name;
+    }
+    else if (recipes.length === 1) {
+        totalTitle.textContent = `${recipes[0].name} ×${perRecipe[0].servings}`;
+    }
+    else {
+        totalTitle.textContent = `All selected recipes (${grandServings} serving${grandServings === 1 ? '' : 's'})`;
+    }
     totalCard.appendChild(totalTitle);
     const totalValue = document.createElement('div');
     totalValue.className = 'nutrition-values';
@@ -941,10 +1108,13 @@ function renderNutritionScreen() {
     totalCard.appendChild(totalCoverage);
     root.appendChild(totalCard);
     // ── Per recipe (expandable) ──────────────────────────────
-    perRecipe.forEach(({ recipe, nutrition }) => {
+    perRecipe.forEach(({ recipe, servings, nutrition }) => {
         const section = createPanel();
         section.className = 'panel nutrition-recipe';
         const flaggedCount = nutrition.missing + nutrition.uncomputable;
+        // Scaled subtotal — what the user will actually consume for the chosen
+        // number of servings.
+        const sectionTotals = scaleTotals(nutrition.totals, servings);
         const header = document.createElement('div');
         header.className = 'nutrition-recipe-header';
         const caret = document.createElement('span');
@@ -952,10 +1122,10 @@ function renderNutritionScreen() {
         caret.textContent = '▸';
         const name = document.createElement('span');
         name.className = 'nutrition-recipe-name';
-        name.textContent = recipe.name;
+        name.textContent = servings > 1 ? `${recipe.name} ×${servings}` : recipe.name;
         const sub = document.createElement('span');
         sub.className = 'nutrition-recipe-sub';
-        sub.textContent = nutrition.covered > 0 ? formatTotals(nutrition.totals) : '— no computable data';
+        sub.textContent = nutrition.covered > 0 ? formatTotals(sectionTotals) : '— no computable data';
         header.appendChild(caret);
         header.appendChild(name);
         header.appendChild(sub);
@@ -973,12 +1143,15 @@ function renderNutritionScreen() {
             row.className = 'nutrition-ingredient-row';
             const ingName = document.createElement('span');
             ingName.className = 'nutrition-ingredient-name';
-            ingName.textContent = formatIngredient(ing);
+            // Scale the displayed quantity per serving count so the row's
+            // amount matches the row's nutrition (e.g. "2 cups Macadamia Milk").
+            const scaledIng = { ...ing, quantity: (ing.quantity ?? 0) * servings };
+            ingName.textContent = formatIngredient(scaledIng);
             row.appendChild(ingName);
             const detail = document.createElement('span');
             if (result.status === 'ok') {
                 detail.className = 'nutrition-ingredient-value';
-                detail.textContent = formatTotals(result.totals);
+                detail.textContent = formatTotals(scaleTotals(result.totals, servings));
             }
             else if (result.status === 'missing') {
                 row.classList.add('flagged');
@@ -999,6 +1172,17 @@ function renderNutritionScreen() {
                 reason.textContent = result.reason;
                 row.appendChild(reason);
             }
+            // Brand provenance — show which product's label these numbers came
+            // from, so a reader knows the figures are brand-specific (and what
+            // they'd change by if they swapped to a different listed product).
+            if (result.status === 'ok' && result.brand) {
+                const product = selectedProduct(ing);
+                const variant = product?.variant ? ` · ${product.variant}` : '';
+                const via = document.createElement('div');
+                via.className = 'nutrition-provenance';
+                via.textContent = `via ${result.brand}${variant}`;
+                row.appendChild(via);
+            }
             list.appendChild(row);
         });
         section.appendChild(list);
@@ -1009,6 +1193,184 @@ function renderNutritionScreen() {
         root.appendChild(section);
     });
     root.appendChild(createStartOverButton());
+}
+// ============================================================
+// SCREEN: ADD INGREDIENT
+// ============================================================
+//
+// Picker for adding a one-off ingredient to the current shopping/nutrition
+// session without going through a recipe. The user searches the registered
+// ingredients (from `i`), picks one, sets a quantity and unit, and confirms.
+// Confirmation creates a synthetic adhoc recipe via createAdhocRecipe() and
+// selects one serving of it, after which it flows through every existing
+// pipeline as if it were a real recipe.
+//
+// State is local to the screen (search query + selection) — kept in module
+// vars rather than the global state because it's transient and discarded when
+// the user leaves the picker.
+let adhocSearchQuery = '';
+let adhocSelectedKey = null;
+let adhocQuantity = 1;
+let adhocUnitName = '';
+// Best guess at a natural unit for an ingredient — inspects any nutrition
+// block (on the ingredient or its first product) and uses one of its keyed
+// units. Falls back to `u.unit` so the picker always has something to show.
+function pickDefaultUnit(ing) {
+    const productUnits = ing.products?.[0]?.nutrition && Object.keys(ing.products[0].nutrition);
+    const ownUnits = ing.nutrition && Object.keys(ing.nutrition);
+    const hint = productUnits?.[0] ?? ownUnits?.[0];
+    if (hint) {
+        const match = Object.values(u).find(unit => unit.name === hint);
+        if (match)
+            return match;
+    }
+    return u.unit;
+}
+// Enumerate every registered ingredient factory in `i`, instantiating each
+// once at zero quantity to read its display name and default unit. Cached on
+// first call — the set of factories doesn't change at runtime.
+let adhocCatalog = null;
+function getAdhocCatalog() {
+    if (adhocCatalog)
+        return adhocCatalog;
+    adhocCatalog = Object.entries(i).map(([key, factory]) => {
+        const sample = factory();
+        return { key, name: sample.name, sample };
+    }).sort((a, b) => a.name.localeCompare(b.name));
+    return adhocCatalog;
+}
+function renderAddIngredientScreen() {
+    const root = getElement('app');
+    clear(root);
+    const heading = document.createElement('h2');
+    heading.textContent = 'Add an ingredient';
+    root.appendChild(heading);
+    const sub = document.createElement('p');
+    sub.className = 'adhoc-sub';
+    sub.textContent = 'Pick an ingredient to add to your shopping list and nutrition totals.';
+    root.appendChild(sub);
+    // Search box — filters the ingredient catalog by name substring.
+    const searchInput = document.createElement('input');
+    searchInput.type = 'text';
+    searchInput.placeholder = 'Search ingredients…';
+    searchInput.value = adhocSearchQuery;
+    searchInput.className = 'search-input';
+    searchInput.addEventListener('input', () => {
+        adhocSearchQuery = searchInput.value;
+        renderAdhocList();
+    });
+    root.appendChild(searchInput);
+    const list = document.createElement('div');
+    list.id = 'adhoc-list';
+    root.appendChild(list);
+    // Quantity + unit + confirm — only shown once an ingredient is selected.
+    const detail = document.createElement('div');
+    detail.id = 'adhoc-detail';
+    detail.className = 'adhoc-detail';
+    root.appendChild(detail);
+    const backBtn = createButton('← Back', () => {
+        // Reset transient picker state when leaving
+        adhocSearchQuery = '';
+        adhocSelectedKey = null;
+        adhocQuantity = 1;
+        adhocUnitName = '';
+        navigateTo('select');
+    });
+    backBtn.className = 'start-over-btn';
+    root.appendChild(backBtn);
+    renderAdhocList();
+    renderAdhocDetail();
+}
+function renderAdhocList() {
+    const root = getElement('adhoc-list');
+    clear(root);
+    const q = adhocSearchQuery.toLowerCase().trim();
+    const all = getAdhocCatalog();
+    const matched = q ? all.filter(c => c.name.toLowerCase().includes(q)) : all;
+    if (matched.length === 0) {
+        const empty = document.createElement('p');
+        empty.className = 'empty';
+        empty.textContent = 'No matching ingredients.';
+        root.appendChild(empty);
+        return;
+    }
+    matched.forEach(({ key, name }) => {
+        const btn = document.createElement('button');
+        btn.className = 'adhoc-item';
+        btn.textContent = name;
+        if (adhocSelectedKey === key)
+            btn.classList.add('selected');
+        btn.addEventListener('click', () => {
+            adhocSelectedKey = key;
+            // Reset quantity/unit to defaults when picking a new ingredient
+            const sample = all.find(c => c.key === key).sample;
+            adhocQuantity = 1;
+            adhocUnitName = pickDefaultUnit(sample).name;
+            renderAdhocList();
+            renderAdhocDetail();
+        });
+        root.appendChild(btn);
+    });
+}
+function renderAdhocDetail() {
+    const root = getElement('adhoc-detail');
+    clear(root);
+    if (!adhocSelectedKey)
+        return;
+    const catalogEntry = getAdhocCatalog().find(c => c.key === adhocSelectedKey);
+    if (!catalogEntry)
+        return;
+    const label = document.createElement('div');
+    label.className = 'adhoc-detail-label';
+    label.textContent = `How much ${catalogEntry.name}?`;
+    root.appendChild(label);
+    // Quantity input
+    const qtyInput = document.createElement('input');
+    qtyInput.type = 'number';
+    qtyInput.min = '0';
+    qtyInput.step = '0.25';
+    qtyInput.value = String(adhocQuantity);
+    qtyInput.className = 'adhoc-qty';
+    qtyInput.addEventListener('input', () => {
+        const v = parseFloat(qtyInput.value);
+        adhocQuantity = isNaN(v) ? 0 : v;
+    });
+    root.appendChild(qtyInput);
+    // Unit dropdown — every supported unit is offered (no unit-conversion
+    // logic exists, so we don't try to restrict per ingredient).
+    const unitSelect = document.createElement('select');
+    unitSelect.className = 'adhoc-unit';
+    for (const unit of Object.values(u)) {
+        const opt = document.createElement('option');
+        opt.value = unit.name;
+        opt.textContent = unit.name || '(none)';
+        if (unit.name === adhocUnitName)
+            opt.selected = true;
+        unitSelect.appendChild(opt);
+    }
+    unitSelect.addEventListener('change', () => {
+        adhocUnitName = unitSelect.value;
+    });
+    root.appendChild(unitSelect);
+    // Confirm — builds a fresh ingredient object at the chosen qty/unit,
+    // wraps it in a synthetic adhoc recipe, registers + selects it, then
+    // returns to the select screen so the user sees it in the list.
+    const confirmBtn = createButton('Add to list', () => {
+        const factory = i[adhocSelectedKey];
+        const unit = Object.values(u).find(uu => uu.name === adhocUnitName) ?? u.unit;
+        const fresh = factory(adhocQuantity, unit);
+        const recipe = createAdhocRecipe(fresh);
+        registerRecipe(recipe);
+        state.selectedRecipeIds.push(recipe.id);
+        // Clear picker state
+        adhocSearchQuery = '';
+        adhocSelectedKey = null;
+        adhocQuantity = 1;
+        adhocUnitName = '';
+        navigateTo('select');
+    });
+    confirmBtn.className = 'adhoc-confirm';
+    root.appendChild(confirmBtn);
 }
 // ============================================================
 // SCREEN: COOKING
@@ -1103,7 +1465,10 @@ function renderCookingScreen() {
     if (state.cookingStartedAt === null) {
         state.cookingStartedAt = Date.now();
     }
-    const selected = getSelectedRecipes();
+    // Ad-hoc ingredients are tracked as synthetic recipes for shopping/nutrition
+    // purposes, but they carry no real steps — exclude them from cooking so the
+    // cook flow doesn't sprout meaningless "Have X on hand" cards.
+    const selected = getSelectedRecipes().filter(r => !r.adhoc);
     state.cookingPlanSteps = buildCookingPlan(selected);
     // Total time banner when multiple recipes selected
     if (selected.length > 1) {
@@ -1330,6 +1695,12 @@ function createStartOverButton() {
         state.searchQuery = '';
         state.cookingStartedAt = null;
         state.audioUnlocked = false;
+        // Drop ad-hoc recipes — they're transient session items and shouldn't
+        // outlive a Start Over. Real recipes stay registered for next time.
+        for (const [id, recipe] of state.recipes) {
+            if (recipe.adhoc)
+                state.recipes.delete(id);
+        }
         if (state.cookingElapsedInterval !== null) {
             window.clearInterval(state.cookingElapsedInterval);
             state.cookingElapsedInterval = null;
@@ -1389,6 +1760,7 @@ function render() {
         case 'shopping': return renderShoppingScreen();
         case 'cooking': return renderCookingScreen();
         case 'nutrition': return renderNutritionScreen();
+        case 'add-ingredient': return renderAddIngredientScreen();
     }
 }
 // ============================================================
@@ -1452,6 +1824,155 @@ h2 { margin-top: 0; font-size: 28px; }
     color: white;
 }
 
+/* Small "×N" badge inside the recipe button when more than one serving is
+   selected — placed inline after the name so the button stays tappable as a
+   whole and the count is obvious at a glance. */
+.count-badge {
+    margin-left: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 2px 10px;
+    border-radius: 12px;
+}
+
+/* The "−" button next to a selected recipe, used to remove one serving at a
+   time. Hidden (visibility:hidden, not display:none) when count is 0 so the
+   row layout doesn't shift as servings are added/removed. */
+.count-minus-btn {
+    font-size: 28px;
+    padding: 10px 16px;
+    background: #2a2a2a;
+    border: 2px solid #444;
+    border-radius: 12px;
+    color: #f0f0f0;
+    cursor: pointer;
+    line-height: 1;
+}
+
+/* Reserved space where the star would go for ad-hoc rows — keeps the recipe
+   button column aligned across rows with and without favoriting. */
+.star-spacer {
+    display: inline-block;
+    width: 52px;  /* matches .star-btn padding + char width */
+}
+
+/* "×" delete on ad-hoc rows — removes the synthetic recipe entirely. Red so
+   it's visually distinguished from the "−" servings button. */
+.adhoc-remove-btn {
+    font-size: 22px;
+    padding: 10px 14px;
+    background: none;
+    border: none;
+    color: #ef4444;
+    cursor: pointer;
+    line-height: 1;
+}
+.adhoc-remove-btn:hover { color: #f87171; }
+
+/* ── Add-ingredient screen ── */
+
+/* The bottom "+ Add an ingredient" affordance on the recipe list — visually
+   distinct from the recipe rows so it reads as a separate action. */
+.add-ingredient-row {
+    margin-top: 16px;
+    display: flex;
+}
+.add-ingredient-btn {
+    flex: 1;
+    font-size: 20px;
+    padding: 16px;
+    border-radius: 12px;
+    border: 2px dashed #555;
+    background: transparent;
+    color: #aaa;
+    cursor: pointer;
+}
+.add-ingredient-btn:hover {
+    border-color: #888;
+    color: #f0f0f0;
+}
+
+.adhoc-sub {
+    color: #888;
+    margin: 0 0 16px 0;
+}
+
+/* Scrollable list of catalog ingredients in the picker. Capped height so the
+   quantity + unit controls below stay reachable on short screens. */
+#adhoc-list {
+    max-height: 50vh;
+    overflow-y: auto;
+    border: 2px solid #333;
+    border-radius: 12px;
+    padding: 8px;
+    margin-bottom: 16px;
+}
+.adhoc-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: #1a1a1a;
+    border: 2px solid #333;
+    border-radius: 10px;
+    color: #f0f0f0;
+    font-size: 18px;
+    padding: 12px 16px;
+    margin: 4px 0;
+    cursor: pointer;
+}
+.adhoc-item.selected {
+    background: #1a5c2a;
+    border-color: #2d9e4a;
+}
+
+/* Quantity + unit + confirm row, shown once an ingredient is picked. */
+.adhoc-detail {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    padding: 12px 0;
+}
+.adhoc-detail:empty { display: none; }
+.adhoc-detail-label {
+    flex-basis: 100%;
+    font-size: 18px;
+    color: #f0f0f0;
+}
+.adhoc-qty {
+    flex: 1;
+    min-width: 80px;
+    background: #222;
+    border: 2px solid #444;
+    border-radius: 10px;
+    color: #f0f0f0;
+    font-size: 20px;
+    padding: 12px;
+}
+.adhoc-unit {
+    flex: 1;
+    min-width: 100px;
+    background: #222;
+    border: 2px solid #444;
+    border-radius: 10px;
+    color: #f0f0f0;
+    font-size: 20px;
+    padding: 12px;
+}
+.adhoc-confirm {
+    flex-basis: 100%;
+    background: #16a34a;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 22px;
+    font-weight: bold;
+    padding: 18px;
+    cursor: pointer;
+}
+.adhoc-confirm:hover { background: #15803d; }
+
 .star-btn {
     font-size: 28px;
     padding: 12px;
@@ -1503,9 +2024,14 @@ h2 { margin-top: 0; font-size: 28px; }
     font-weight: bold;
 }
 
+/* Default positional coloring (used when all three buttons are present:
+   Shopping blue, Cooking green). When only Shopping + Nutrition are shown
+   (ad-hoc-only selection), the Nutrition button would otherwise inherit
+   the green :last-child rule — the more specific selector below overrides
+   that so Nutrition stays purple regardless of position. */
 .action-btn:first-child { background: #2563eb; color: white; }
 .action-btn:last-child  { background: #16a34a; color: white; }
-.action-btn-nutrition   { background: #7c3aed; color: white; }
+.actions .action-btn-nutrition { background: #7c3aed; color: white; }
 
 #recipe-list { padding-bottom: 120px; }
 
@@ -1589,6 +2115,13 @@ h2 { margin-top: 0; font-size: 28px; }
 
 .purchase-link { color: #60a5fa; font-size: 16px; text-decoration: none; }
 .purchase-link:hover { text-decoration: underline; }
+
+/* The product selected as the default — its label drives nutrition, and it's
+   highlighted on the shopping list so the user can see which one is "the pick". */
+.purchase-link.default-product {
+    color: #2d9e4a;
+    font-weight: bold;
+}
 
 .start-over-btn {
     margin-top: 32px;
@@ -1774,6 +2307,17 @@ h2 { margin-top: 0; font-size: 28px; }
     margin-top: 2px;
 }
 
+/* "via {brand}" provenance shown under an ingredient whose numbers came from
+   a selected product's label — full-width, muted, italic. Acknowledges that
+   nutrition is brand-specific and tells the reader where the figures came from. */
+.nutrition-provenance {
+    flex-basis: 100%;
+    font-size: 12px;
+    color: #666;
+    font-style: italic;
+    margin-top: 2px;
+}
+
 `;
 // ============================================================
 // BOOTSTRAP
@@ -1861,102 +2405,289 @@ export const i = {
         cassavaFlour: '',
         kingOysterMushroom: '',
     }),
+    // ──────────────────────────────────────────────────────────────────────
+    // Blueprint Smoothie ingredients
+    //
+    // Packaged goods carry their nutrition on a Product (brand-specific), with
+    // defaultBrand pointing at the SKU actually used. Produce (lemon, cherry,
+    // celery, spinach, kale, banana) keeps a single brand-independent nutrition
+    // block on the ingredient itself. Each label is keyed by the exact unit the
+    // recipe uses — there's no unit conversion. Sodium in mg; sugar/protein in g.
+    // ──────────────────────────────────────────────────────────────────────
     macadamiaNutMilk: ingredientFactory('Macadamia Nut Milk', {
         requiresDateLabel: true,
-        // Milkadamia unsweetened (sold at Whole Foods), per 1 cup (240 ml).
-        nutrition: {
-            [u.cup.name]: { servings: 4, servingSize: 1, calories: 50, sodium: 75, sugar: 0, protein: 1 },
-        },
+        defaultBrand: 'Milkadamia',
+        products: [
+            {
+                brand: 'Milkadamia',
+                variant: 'Unsweetened',
+                store: stores.wholeFoods,
+                link: 'https://www.amazon.com/dp/B01JH2O854',
+                size: 32, sizeUnit: u.fluidOunce,
+                nutrition: {
+                    [u.cup.name]: { servings: 4, servingSize: 1, calories: 50, sodium: 75, sugar: 0, protein: 1 },
+                },
+            },
+        ],
     }),
-    // ── Blueprint Smoothie ingredients with Whole Foods / 365 nutrition ──
-    // Each block is keyed by the exact unit the smoothie uses (no unit
-    // conversion exists), with servingSize expressed in that unit. Sodium is
-    // in mg; sugar and protein in g. Values are per the keyed unit; the recipe
-    // quantity scales them (servingsUsed = quantity / servingSize).
-    // Juice of one lemon (1 unit ≈ juice of 1 lemon, ~2 tbsp).
+    macadamiaNut: ingredientFactory('Macadamia Nut', {
+        defaultBrand: '365',
+        products: [
+            {
+                brand: '365',
+                variant: 'Organic Raw',
+                store: stores.wholeFoods,
+                link: 'https://www.wholefoodsmarket.com/product/365-by-whole-foods-market-organic-macadamia-nuts-8-oz-b086hk83yf',
+                price: 10.79, size: 8, sizeUnit: u.ounce, organic: true,
+                nutrition: {
+                    [u.cup.name]: { servings: 1, servingSize: 1, calories: 960, sodium: 7, sugar: 6, protein: 11 },
+                },
+            },
+        ],
+    }),
+    cocoaNibs: ingredientFactory('Cocoa Nibs', {
+        defaultBrand: 'Navitas',
+        products: [
+            {
+                brand: 'Navitas',
+                variant: 'Organic Raw',
+                nutrition: {
+                    [u.tsp.name]: { servings: 1, servingSize: 1, calories: 20, sodium: 0, sugar: 0, protein: 0.3 },
+                },
+            },
+        ],
+    }),
+    chiaSeed: ingredientFactory('Chia Seed', {
+        defaultBrand: '365',
+        products: [
+            {
+                brand: '365',
+                variant: 'Organic Black',
+                store: stores.wholeFoods,
+                nutrition: {
+                    [u.tsp.name]: { servings: 1, servingSize: 1, calories: 19, sodium: 0, sugar: 0, protein: 1 },
+                },
+            },
+        ],
+    }),
+    hempSeed: ingredientFactory('Hemp Seed', {
+        defaultBrand: 'Manitoba Harvest',
+        products: [
+            {
+                brand: 'Manitoba Harvest',
+                variant: 'Hemp Hearts',
+                store: stores.wholeFoods,
+                nutrition: {
+                    [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 55, sodium: 0, sugar: 0.5, protein: 3.3 },
+                },
+            },
+        ],
+    }),
+    antiOxidantBerryBlend: ingredientFactory('Antioxidant Berry Blend', {
+        defaultBrand: '365',
+        products: [
+            {
+                brand: '365',
+                variant: 'Organic Antioxidant Fruit Blend (frozen)',
+                store: stores.wholeFoods,
+                size: 16, sizeUnit: u.ounce, organic: true,
+                nutrition: {
+                    [u.cup.name]: { servings: 4, servingSize: 1, calories: 70, sodium: 0, sugar: 13, protein: 1 },
+                },
+            },
+        ],
+    }),
+    vanillaExtract: ingredientFactory('Vanilla Extract', {
+        defaultBrand: '365',
+        products: [
+            {
+                brand: '365',
+                variant: 'Pure Vanilla Extract',
+                store: stores.wholeFoods,
+                nutrition: {
+                    [u.tsp.name]: { servings: 1, servingSize: 1, calories: 12, sodium: 0, sugar: 0.5, protein: 0 },
+                },
+            },
+        ],
+    }),
+    // Lemon juice — produce, brand-independent.
     lemonJuice: ingredientFactory('Lemon Juice', {
         nutrition: {
             [u.unit.name]: { servings: 1, servingSize: 1, calories: 10, sodium: 0, sugar: 2, protein: 0.2 },
         },
     }),
-    // Raw macadamia nuts, per cup (~134 g whole). ¼ cup in the recipe ≈ 240 cal.
-    macadamiaNut: ingredientFactory('Macadamia Nut', {
-        nutrition: {
-            [u.cup.name]: { servings: 1, servingSize: 1, calories: 960, sodium: 7, sugar: 6, protein: 11 },
-        },
-    }),
-    // Cacao nibs, per tsp (~20 cal/tsp; 140 cal per 2 tbsp).
-    cocoaNibs: ingredientFactory('Cocoa Nibs', {
-        nutrition: {
-            [u.tsp.name]: { servings: 1, servingSize: 1, calories: 20, sodium: 0, sugar: 0, protein: 0.3 },
-        },
-    }),
-    // Chia seeds, per tsp (~58 cal/tbsp ÷ 3).
-    chiaSeed: ingredientFactory('Chia Seed', {
-        nutrition: {
-            [u.tsp.name]: { servings: 1, servingSize: 1, calories: 19, sodium: 0, sugar: 0, protein: 1 },
-        },
-    }),
-    // Hemp hearts, per tbsp (~166 cal / ~10 g protein per 3 tbsp).
-    hempSeed: ingredientFactory('Hemp Seed', {
-        nutrition: {
-            [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 55, sodium: 0, sugar: 0.5, protein: 3.3 },
-        },
-    }),
-    // Sweet cherries, per cherry (~8 g). 3 in the recipe.
+    // Sweet cherries — produce.
     cherry: ingredientFactory('Cherry', {
         nutrition: {
             [u.unit.name]: { servings: 1, servingSize: 1, calories: 5, sodium: 0, sugar: 1, protein: 0 },
         },
     }),
-    // 365 Organic Antioxidant Fruit Blend (frozen), per 1 cup.
-    antiOxidantBerryBlend: ingredientFactory('Antioxidant Berry Blend', {
-        nutrition: {
-            [u.cup.name]: { servings: 4, servingSize: 1, calories: 70, sodium: 0, sugar: 13, protein: 1 },
-        },
-    }),
-    // Pure vanilla extract, per tsp (~12 cal/tsp).
-    vanillaExtract: ingredientFactory('Vanilla Extract', {
-        nutrition: {
-            [u.tsp.name]: { servings: 1, servingSize: 1, calories: 12, sodium: 0, sugar: 0.5, protein: 0 },
-        },
-    }),
-    // Celery, per medium stalk (~40 g).
+    // Celery — produce, per medium stalk (~40 g).
     celery: ingredientFactory('Celery', {
         nutrition: {
             [u.unit.name]: { servings: 1, servingSize: 1, calories: 6, sodium: 32, sugar: 1, protein: 0.3 },
         },
     }),
-    // Raw spinach, per handful (≈ 1 cup / ~30 g).
+    // Raw spinach — produce, per handful (≈ 1 cup / ~30 g).
     spinach: ingredientFactory('Spinach', {
         nutrition: {
             [u.handful.name]: { servings: 1, servingSize: 1, calories: 7, sodium: 24, sugar: 0.1, protein: 0.9 },
         },
     }),
-    // Raw kale, per handful (≈ 1 cup chopped / ~21 g).
+    // Raw kale — produce, per handful (≈ 1 cup chopped / ~21 g).
     kale: ingredientFactory('Kale', {
         nutrition: {
             [u.handful.name]: { servings: 1, servingSize: 1, calories: 8, sodium: 11, sugar: 0.2, protein: 0.7 },
         },
     }),
-    // Medium organic banana (~118 g). Nutrition is keyed by 'unit' so it
-    // computes against i.banana(1, u.unit) in the smoothie — there's no unit
-    // conversion, so the key must match the unit the recipe actually uses.
-    // servingSize: 1 → one banana is one serving. Sodium in mg; sugar/protein in g.
+    // Organic banana — produce, per medium banana (~118 g).
     banana: ingredientFactory('Organic Banana', {
         nutrition: {
             [u.unit.name]: { servings: 1, servingSize: 1, calories: 105, sodium: 1, sugar: 14, protein: 1.3 },
         },
     }),
-    peanutButter: ingredientFactory('Peanut Butter', {}),
-    pittedDates: ingredientFactory('Pitted Dates', {}),
+    // ──────────────────────────────────────────────────────────────────────
+    // Other ingredients (purchase info migrated from old purchaseLinks to
+    // products[]). Nutrition not yet researched — these will flag as `missing`
+    // in the Nutrition screen until labels are added per default brand.
+    // ──────────────────────────────────────────────────────────────────────
+    peanutButter: ingredientFactory('Peanut Butter', {
+        defaultBrand: '365',
+        products: [
+            { brand: '365', variant: 'Organic Unsweetened', store: stores.wholeFoods,
+                price: 4.19, size: 16, sizeUnit: u.ounce, organic: true,
+                link: 'https://www.amazon.com/365-Everyday-Value-Organic-Unsweetened/dp/B074H61LYV/ref=sr_1_9_0o_wf' },
+            { brand: '365', variant: 'Creamy', store: stores.wholeFoods,
+                price: 2.49, size: 16, sizeUnit: u.ounce,
+                link: 'https://www.amazon.com/365-Everyday-Value-Peanut-Butter/dp/B074H57SPT/ref=sr_1_7_0o_wf' },
+            { brand: '365', variant: 'Crunchy', store: stores.wholeFoods,
+                price: 4.99, size: 36, sizeUnit: u.ounce,
+                link: 'https://www.amazon.com/Everyday-Value-Peanut-Butter-Crunchy/dp/B074Y2V88X/ref=sr_1_16_0o_wf' },
+            { brand: 'Amazon Brand', variant: 'Creamy', store: stores.amazon,
+                price: 4.69, size: 40, sizeUnit: u.ounce,
+                link: 'https://www.amazon.com/dp/B07KWGSCW2/ref=sns_myd_detail_page',
+                discount: { subscribe5Products: 5 } },
+        ],
+    }),
+    pittedDates: ingredientFactory('Pitted Dates', {
+        defaultBrand: '365',
+        products: [
+            { brand: '365', store: stores.wholeFoods,
+                price: 3.99, size: 8, sizeUnit: u.ounce,
+                link: 'https://www.amazon.com/365-Everyday-Value-Dates-Pitted/dp/B074VDMNH7/ref=sr_1_5_0o_wf' },
+            { brand: 'Food to Live', variant: 'Organic Deglet Nour', store: stores.amazon,
+                price: 16.59, size: 2.5, sizeUnit: u.pound, organic: true,
+                link: 'https://www.amazon.com/ORGANIC-Pitted-Dates-Deglet-Nour/dp/B0872L82ZK/ref=sr_1_10',
+                discount: { subscribe5Products: 5 } },
+        ],
+    }),
     orangeJuice: ingredientFactory('Orange Juice', {
+        // No purchase link yet; nutrition on the ingredient until a brand is added.
         nutrition: {
             [u.fluidOunce.name]: { servings: 8, servingSize: 7, calories: 110, sodium: 0, sugar: 22, protein: 2 },
         },
     }),
-    strawberry: ingredientFactory('Strawberry', {}),
-    collagenPowder: ingredientFactory('Collagen Powder', {}),
+    strawberry: ingredientFactory('Strawberry', {
+        defaultBrand: '365',
+        products: [
+            { brand: '365', variant: 'Organic Whole Strawberries (frozen)', store: stores.wholeFoods,
+                price: 6.69, size: 32, sizeUnit: u.ounce, organic: true,
+                link: 'https://www.wholefoodsmarket.com/product/365-by-whole-foods-market-365-whole-foods-market-organic-whole-strawberries-b09gcp3jng' },
+        ],
+    }),
+    collagenPowder: ingredientFactory('Collagen Powder', {
+        defaultBrand: 'Sports Research',
+        products: [
+            { brand: 'Sports Research', store: stores.amazon,
+                price: 17.99, size: 1, sizeUnit: u.pound,
+                link: 'https://www.amazon.com/gp/product/B071S8D69C/ref=ppx_yo_dt_b_asin_title_o00_s00',
+                discount: { subscribe5Products: 5 } },
+        ],
+    }),
+    // ──────────────────────────────────────────────────────────────────────
+    // Added: Whole Foods 365 + Blueprint by Bryan Johnson products
+    // Each carries its label on a Product so the brand drives nutrition.
+    // ──────────────────────────────────────────────────────────────────────
+    // 365 Organic Psyllium Husk Whole Flakes — per 1 tbsp (5 g).
+    psyllium: ingredientFactory('Psyllium Husk', {
+        defaultBrand: '365',
+        products: [
+            { brand: '365', variant: 'Organic Whole Flakes', store: stores.wholeFoods,
+                link: 'https://www.amazon.com/365-Whole-Foods-Market-Psyllium/dp/B0CDQJRFGX',
+                nutrition: {
+                    [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 20, sodium: 0, sugar: 0, protein: 0 },
+                } },
+        ],
+    }),
+    // Blueprint Macadamia Nut Protein Bar (White Cocoa) — per 1 bar.
+    // Nutrition is keyed by 'unit' since the natural quantity is "1 bar".
+    blueprintMacadamiaBar: ingredientFactory('Blueprint Macadamia Bar', {
+        defaultBrand: 'Blueprint',
+        products: [
+            { brand: 'Blueprint', variant: 'White Cocoa Macadamia Protein Bar',
+                store: stores.amazon,
+                link: 'https://www.amazon.com/Blueprint-Bryan-Johnson-Macadamia-White/dp/B0DQLV78BG',
+                nutrition: {
+                    [u.unit.name]: { servings: 1, servingSize: 1, calories: 160, sodium: 80, sugar: 1, protein: 9 },
+                } },
+        ],
+    }),
+    // 365 Organic Black Lentils (dry) — per ¼ cup dry (35 g).
+    // Note: this is the dried legume, NOT the lentilSpaghetti pasta used by
+    // the dinner recipe. Keep them as separate ingredients.
+    blackLentils: ingredientFactory('Black Lentils', {
+        defaultBrand: '365',
+        products: [
+            { brand: '365', variant: 'Organic, Black, dry', store: stores.wholeFoods,
+                size: 16, sizeUnit: u.ounce, organic: true,
+                link: 'https://www.amazon.com/365-Whole-Foods-Market-Organic/dp/B084NHD2R9',
+                nutrition: {
+                    // Recipe convention so far is to express recipe amounts in cups.
+                    // Label is per ¼ cup dry, so 1 cup dry = 4× label values.
+                    [u.cup.name]: { servings: 1, servingSize: 1, calories: 600, sodium: 0, sugar: 4, protein: 44 },
+                } },
+        ],
+    }),
+    // Blueprint Extra Virgin Olive Oil ("Snake Oil") — per 1 tbsp (15 ml).
+    blueprintOliveOil: ingredientFactory('Extra Virgin Olive Oil', {
+        defaultBrand: 'Blueprint',
+        products: [
+            { brand: 'Blueprint', variant: 'Snake Oil (High Polyphenol EVOO)',
+                store: stores.amazon, size: 750, sizeUnit: u.fluidOunce,
+                link: 'https://www.amazon.com/Blueprint-Bryan-Johnson-Olive-Oil/dp/B0F1P5SR2M',
+                nutrition: {
+                    [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 120, sodium: 0, sugar: 0, protein: 0 },
+                } },
+        ],
+    }),
+    // Blueprint Longevity Protein (Chocolate) — per 1 scoop (~38 g).
+    // Plant protein (pea + hemp + flax) with allulose, cocoa, polyphenol extracts.
+    longevityProtein: ingredientFactory('Longevity Protein', {
+        defaultBrand: 'Blueprint',
+        products: [
+            { brand: 'Blueprint', variant: 'Chocolate (30 servings)',
+                store: stores.amazon,
+                link: 'https://www.amazon.com/Blueprint-Bryan-Johnson-Longevity-Protein/dp/B0DNGJRLQF',
+                nutrition: {
+                    // Keyed by 'scoop'? — units list doesn't include scoop. Use 'unit'
+                    // since the natural recipe amount is "1 scoop = 1 unit".
+                    [u.unit.name]: { servings: 1, servingSize: 1, calories: 200, sodium: 190, sugar: 0, protein: 26 },
+                } },
+        ],
+    }),
+    // Blueprint Blueberry Nut Mix — per 1 scoop (15 g). Macadamias + walnuts +
+    // blueberries; no added sugar. Sugar listed is natural from the blueberries.
+    blueberryNutMix: ingredientFactory('Blueberry Nut Mix', {
+        defaultBrand: 'Blueprint',
+        products: [
+            { brand: 'Blueprint', variant: 'Macadamia + Walnut + Blueberry',
+                store: stores.amazon,
+                link: 'https://www.amazon.com/Blueprint-Bryan-Johnson-Blueberry-Nut/dp/B0D3FZ29RJ',
+                nutrition: {
+                    [u.unit.name]: { servings: 1, servingSize: 1, calories: 70, sodium: 0, sugar: 2, protein: 1 },
+                } },
+        ],
+    }),
 };
 // ============================================================
 // RECIPES
