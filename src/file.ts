@@ -8,7 +8,7 @@
 // ============================================================
 
 export type StepType = 'instruction' | 'timer' | 'cleanup';
-export type Screen   = 'select' | 'shopping' | 'cooking';
+export type Screen   = 'select' | 'shopping' | 'cooking' | 'nutrition';
 
 export interface Unit {
     name: string;
@@ -730,6 +730,134 @@ function buildShoppingList(): Ingredient[] {
 }
 
 // ============================================================
+// NUTRITION
+// ============================================================
+//
+// Computes per-ingredient → per-recipe → grand-total nutrition for the
+// currently selected recipes, used by the Nutrition screen.
+//
+// Every ingredient falls into exactly one of three buckets, so the UI can
+// flag the two cases where a number can't be trusted:
+//
+//   'ok'           — has data AND the recipe's unit matches a keyed unit.
+//   'missing'      — the ingredient has no nutrition block at all.
+//   'uncomputable' — the ingredient HAS a nutrition block, but it can't be
+//                    applied here (the recipe uses a unit the data isn't
+//                    keyed by — there's no unit conversion — or the serving
+//                    size is missing/zero). The `reason` explains which.
+//
+// Serving math: a nutrition entry is read as a standard label —
+// `servingSize` units per serving, with the calorie/sodium/etc. values being
+// PER SERVING. So servingsUsed = quantity / servingSize, and each value is
+// multiplied by servingsUsed.
+
+interface NutritionTotals { calories: number; sodium: number; sugar: number; protein: number; }
+
+type NutritionResult =
+    | { status: 'ok'; totals: NutritionTotals }
+    | { status: 'missing' }
+    | { status: 'uncomputable'; reason: string };
+
+const emptyTotals = (): NutritionTotals => ({ calories: 0, sodium: 0, sugar: 0, protein: 0 });
+
+const addTotals = (a: NutritionTotals, b: NutritionTotals): NutritionTotals => ({
+    calories: a.calories + b.calories,
+    sodium:   a.sodium   + b.sodium,
+    sugar:    a.sugar    + b.sugar,
+    protein:  a.protein  + b.protein,
+});
+
+// Composite ingredients produced by mix()/combine() carry _constituents and
+// are roll-ups of real ingredients that are already counted on their own —
+// excluding them avoids double counting and noisy false "missing" flags.
+function isComposite(ing: Ingredient): boolean {
+    return Array.isArray((ing as any)._constituents);
+}
+
+function ingredientNutrition(ing: Ingredient): NutritionResult {
+    if (!ing.nutrition || Object.keys(ing.nutrition).length === 0) {
+        return { status: 'missing' };
+    }
+    if (!ing.unit || !ing.unit.name) {
+        return { status: 'uncomputable', reason: 'no unit on the recipe ingredient' };
+    }
+    const facts = ing.nutrition[ing.unit.name];
+    if (!facts) {
+        const keyed = Object.keys(ing.nutrition).map(k => `"${k}"`).join(', ');
+        return {
+            status: 'uncomputable',
+            reason: `recipe uses "${ing.unit.name}" but data is only keyed by ${keyed} (no unit conversion)`,
+        };
+    }
+    const servingSize = facts.servingSize ?? 0;
+    if (servingSize <= 0) {
+        return { status: 'uncomputable', reason: 'serving size is missing or zero' };
+    }
+    const servingsUsed = (ing.quantity ?? 0) / servingSize;
+    return {
+        status: 'ok',
+        totals: {
+            calories: (facts.calories ?? 0) * servingsUsed,
+            sodium:   (facts.sodium   ?? 0) * servingsUsed,
+            sugar:    (facts.sugar    ?? 0) * servingsUsed,
+            protein:  (facts.protein  ?? 0) * servingsUsed,
+        },
+    };
+}
+
+interface RecipeNutrition {
+    totals:       NutritionTotals;
+    covered:      number; // ingredients with usable ('ok') data
+    missing:      number; // ingredients with no nutrition block
+    uncomputable: number; // ingredients with data that can't be applied here
+    total:        number; // distinct non-composite ingredients
+    breakdown:    { ing: Ingredient; result: NutritionResult }[];
+}
+
+function recipeNutrition(recipe: Recipe): RecipeNutrition {
+    // Dedupe by object reference — the SAME ingredient object appears across
+    // multiple steps (e.g. PANKO in add/place/transfer). Reference-dedup counts
+    // each real quantity exactly once. Composites are filtered out (see above).
+    const seen = new Set<Ingredient>();
+    const walk = (steps: Step[]) => {
+        for (const step of steps) {
+            for (const ing of step.ingredients ?? []) seen.add(ing);
+            if (step.children) walk(step.children);
+        }
+    };
+    walk(recipe.steps);
+
+    const breakdown = [...seen]
+        .filter(ing => !isComposite(ing))
+        .map(ing => ({ ing, result: ingredientNutrition(ing) }));
+
+    const totals = breakdown.reduce(
+        (acc, b) => b.result.status === 'ok' ? addTotals(acc, b.result.totals) : acc,
+        emptyTotals(),
+    );
+
+    return {
+        totals,
+        covered:      breakdown.filter(b => b.result.status === 'ok').length,
+        missing:      breakdown.filter(b => b.result.status === 'missing').length,
+        uncomputable: breakdown.filter(b => b.result.status === 'uncomputable').length,
+        total:        breakdown.length,
+        breakdown,
+    };
+}
+
+function formatTotals(t: NutritionTotals): string {
+    return `${Math.round(t.calories)} cal · ${Math.round(t.sodium)} mg sodium · ` +
+           `${Math.round(t.sugar)} g sugar · ${Math.round(t.protein)} g protein`;
+}
+
+function coverageLabel(covered: number, total: number, flagged: number): string {
+    if (total === 0) return 'No ingredients';
+    if (flagged === 0) return `All ${total} ingredients have data`;
+    return `${covered} of ${total} ingredients have data · ${flagged} flagged`;
+}
+
+// ============================================================
 // DOM HELPERS
 // ============================================================
 
@@ -927,10 +1055,14 @@ function updateActionButtons(): void {
     const shopBtn = createButton('🛒 Go Shopping', () => navigateTo('shopping'));
     shopBtn.className = 'action-btn';
 
+    const nutritionBtn = createButton('📊 Nutrition', () => navigateTo('nutrition'));
+    nutritionBtn.className = 'action-btn action-btn-nutrition';
+
     const cookBtn = createButton('🍳 Start Cooking', () => navigateTo('cooking'));
     cookBtn.className = 'action-btn';
 
     actions.appendChild(shopBtn);
+    actions.appendChild(nutritionBtn);
     actions.appendChild(cookBtn);
 }
 
@@ -979,6 +1111,155 @@ function renderShoppingScreen(): void {
         });
 
         root.appendChild(panel);
+    });
+
+    root.appendChild(createStartOverButton());
+}
+
+// ============================================================
+// SCREEN: NUTRITION
+// ============================================================
+//
+// Three levels of drill-down, top to bottom:
+//   1. Grand total across all selected recipes (pinned at top).
+//   2. Per recipe — a collapsible section showing the recipe subtotal.
+//   3. Per ingredient — tap a recipe header to expand its ingredient rows.
+//
+// Ingredients that can't contribute a trustworthy number are flagged inline:
+//   • "no nutrition data" — the ingredient has no nutrition block.
+//   • "can't compute"     — it has data but the unit doesn't match (or the
+//                           serving size is unusable); the reason is shown.
+// Every recipe and the grand total also carry a coverage line so a subtotal
+// built from only some of its ingredients is never read as complete.
+
+function renderNutritionScreen(): void {
+    const root = getElement<HTMLDivElement>('app');
+    clear(root);
+
+    const heading = document.createElement('h2');
+    heading.textContent = 'Nutrition';
+    root.appendChild(heading);
+
+    const recipes = getSelectedRecipes();
+
+    if (recipes.length === 0) {
+        const empty = document.createElement('p');
+        empty.className   = 'empty';
+        empty.textContent = 'No recipes selected.';
+        root.appendChild(empty);
+        root.appendChild(createStartOverButton());
+        return;
+    }
+
+    const perRecipe = recipes.map(r => ({ recipe: r, nutrition: recipeNutrition(r) }));
+
+    // ── Grand total ──────────────────────────────────────────
+    const grand    = perRecipe.reduce((acc, p) => addTotals(acc, p.nutrition.totals), emptyTotals());
+    const gCovered = perRecipe.reduce((a, p) => a + p.nutrition.covered, 0);
+    const gFlagged = perRecipe.reduce((a, p) => a + p.nutrition.missing + p.nutrition.uncomputable, 0);
+    const gTotal   = perRecipe.reduce((a, p) => a + p.nutrition.total, 0);
+
+    const totalCard = createPanel();
+    totalCard.className = 'panel nutrition-total';
+
+    const totalTitle = document.createElement('div');
+    totalTitle.className   = 'nutrition-total-title';
+    totalTitle.textContent = recipes.length > 1 ? 'All selected recipes' : recipes[0].name;
+    totalCard.appendChild(totalTitle);
+
+    const totalValue = document.createElement('div');
+    totalValue.className   = 'nutrition-values';
+    totalValue.textContent = gCovered > 0 ? formatTotals(grand) : '— no computable data';
+    totalCard.appendChild(totalValue);
+
+    const totalCoverage = document.createElement('div');
+    totalCoverage.className   = 'nutrition-coverage' + (gFlagged > 0 ? ' flagged' : '');
+    totalCoverage.textContent = (gFlagged > 0 ? '⚠ ' : '') + coverageLabel(gCovered, gTotal, gFlagged);
+    totalCard.appendChild(totalCoverage);
+
+    root.appendChild(totalCard);
+
+    // ── Per recipe (expandable) ──────────────────────────────
+    perRecipe.forEach(({ recipe, nutrition }) => {
+        const section = createPanel();
+        section.className = 'panel nutrition-recipe';
+
+        const flaggedCount = nutrition.missing + nutrition.uncomputable;
+
+        const header = document.createElement('div');
+        header.className = 'nutrition-recipe-header';
+
+        const caret = document.createElement('span');
+        caret.className   = 'nutrition-caret';
+        caret.textContent = '▸';
+
+        const name = document.createElement('span');
+        name.className   = 'nutrition-recipe-name';
+        name.textContent = recipe.name;
+
+        const sub = document.createElement('span');
+        sub.className   = 'nutrition-recipe-sub';
+        sub.textContent = nutrition.covered > 0 ? formatTotals(nutrition.totals) : '— no computable data';
+
+        header.appendChild(caret);
+        header.appendChild(name);
+        header.appendChild(sub);
+        section.appendChild(header);
+
+        const cov = document.createElement('div');
+        cov.className   = 'nutrition-coverage' + (flaggedCount > 0 ? ' flagged' : '');
+        cov.textContent = (flaggedCount > 0 ? '⚠ ' : '') +
+            coverageLabel(nutrition.covered, nutrition.total, flaggedCount);
+        section.appendChild(cov);
+
+        // Per-ingredient breakdown — collapsed until the header is tapped
+        const list = document.createElement('div');
+        list.className = 'nutrition-ingredients collapsed';
+
+        nutrition.breakdown.forEach(({ ing, result }) => {
+            const row = document.createElement('div');
+            row.className = 'nutrition-ingredient-row';
+
+            const ingName = document.createElement('span');
+            ingName.className   = 'nutrition-ingredient-name';
+            ingName.textContent = formatIngredient(ing);
+            row.appendChild(ingName);
+
+            const detail = document.createElement('span');
+            if (result.status === 'ok') {
+                detail.className   = 'nutrition-ingredient-value';
+                detail.textContent = formatTotals(result.totals);
+            } else if (result.status === 'missing') {
+                row.classList.add('flagged');
+                detail.className   = 'nutrition-flag';
+                detail.textContent = '⚠ no nutrition data';
+            } else {
+                row.classList.add('flagged');
+                detail.className   = 'nutrition-flag';
+                detail.textContent = "⚠ can't compute";
+                detail.title       = result.reason;
+            }
+            row.appendChild(detail);
+
+            // Spell out why an ingredient with data still couldn't be used
+            if (result.status === 'uncomputable') {
+                const reason = document.createElement('div');
+                reason.className   = 'nutrition-flag-reason';
+                reason.textContent = result.reason;
+                row.appendChild(reason);
+            }
+
+            list.appendChild(row);
+        });
+
+        section.appendChild(list);
+
+        header.addEventListener('click', () => {
+            const collapsed = list.classList.toggle('collapsed');
+            caret.textContent = collapsed ? '▸' : '▾';
+        });
+
+        root.appendChild(section);
     });
 
     root.appendChild(createStartOverButton());
@@ -1425,9 +1706,10 @@ function getRecipeIdFromURL(): string | null {
 
 function render(): void {
     switch (state.screen) {
-        case 'select':   return renderSelectScreen();
-        case 'shopping': return renderShoppingScreen();
-        case 'cooking':  return renderCookingScreen();
+        case 'select':    return renderSelectScreen();
+        case 'shopping':  return renderShoppingScreen();
+        case 'cooking':   return renderCookingScreen();
+        case 'nutrition': return renderNutritionScreen();
     }
 }
 
@@ -1546,6 +1828,7 @@ h2 { margin-top: 0; font-size: 28px; }
 
 .action-btn:first-child { background: #2563eb; color: white; }
 .action-btn:last-child  { background: #16a34a; color: white; }
+.action-btn-nutrition   { background: #7c3aed; color: white; }
 
 #recipe-list { padding-bottom: 120px; }
 
@@ -1704,6 +1987,114 @@ h2 { margin-top: 0; font-size: 28px; }
     padding-left: 4px;
     pointer-events: none;
     user-select: none;
+}
+
+/* ── Nutrition screen ── */
+
+/* Grand-total card pinned at the top */
+.panel.nutrition-total {
+    cursor: default;
+    border-color: #555;
+    background: #1a1a1a;
+}
+
+.nutrition-total-title {
+    font-size: 16px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+}
+
+.nutrition-values {
+    font-size: 20px;
+    color: #f0f0f0;
+}
+
+/* Coverage line — turns amber whenever anything is flagged so a
+   subtotal built from partial data is never read as complete */
+.nutrition-coverage {
+    font-size: 14px;
+    color: #888;
+    margin-top: 8px;
+}
+
+.nutrition-coverage.flagged { color: #f59e0b; }
+
+/* Collapsible per-recipe section */
+.panel.nutrition-recipe {
+    cursor: default;
+    padding: 0;
+}
+
+.nutrition-recipe-header {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 16px 20px 6px;
+    cursor: pointer;
+}
+
+.nutrition-caret { color: #888; font-size: 16px; }
+
+.nutrition-recipe-name { font-size: 22px; flex: 1; }
+
+.nutrition-recipe-sub {
+    font-size: 14px;
+    color: #888;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.panel.nutrition-recipe .nutrition-coverage {
+    padding: 0 20px 14px;
+    margin-top: 0;
+}
+
+.nutrition-ingredients {
+    border-top: 1px solid #333;
+    padding: 6px 20px 14px;
+    display: flex;
+    flex-direction: column;
+}
+
+.nutrition-ingredients.collapsed { display: none; }
+
+.nutrition-ingredient-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 4px 14px;
+    font-size: 16px;
+    padding: 8px 0;
+    border-bottom: 1px solid #222;
+}
+
+.nutrition-ingredient-row:last-child { border-bottom: none; }
+
+.nutrition-ingredient-name { color: #f0f0f0; }
+
+.nutrition-ingredient-value { color: #888; text-align: right; }
+
+/* Inline flag pill for missing / uncomputable ingredients */
+.nutrition-flag {
+    color: #f59e0b;
+    font-size: 13px;
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: 16px;
+    padding: 2px 10px;
+    white-space: nowrap;
+}
+
+/* Full-width explanation under an uncomputable ingredient */
+.nutrition-flag-reason {
+    flex-basis: 100%;
+    font-size: 13px;
+    color: #d97706;
+    font-style: italic;
+    margin-top: 2px;
 }
 
 `;

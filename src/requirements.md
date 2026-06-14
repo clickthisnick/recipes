@@ -1,19 +1,19 @@
 # Recipe Cooking Assistant — Requirements
 
 ## Overview
-A single-file TypeScript app that lets a user select recipes, view a shopping list, and walk through cooking steps interactively. It runs in the browser with no frameworks.
+A single-file TypeScript app that lets a user select recipes, view a shopping list, review nutrition, and walk through cooking steps interactively. It runs in the browser with no frameworks.
 
 ---
 
 ## Screens
-There are three screens: Select, Shopping, and Cooking. Navigation is handled by a simple state machine — no URLs.
+There are four screens: Select, Shopping, Nutrition, and Cooking. Navigation is handled by a simple state machine — no URLs.
 
 ### Select Screen
 - Shows a searchable list of all registered recipes
 - Recipes can be grouped under category headings (e.g. Breakfast, Dinner)
 - Each recipe row has a star/favorite toggle that floats favorited recipes to the top
 - Multiple recipes can be selected at once (toggled on/off)
-- A fixed bottom bar appears when any recipe is selected, with two buttons: "Go Shopping" and "Start Cooking"
+- A fixed bottom bar appears when any recipe is selected, with three buttons: "Go Shopping", "Nutrition", and "Start Cooking"
 - Tapping "Start Cooking" navigates directly to the cooking screen with no intermediate panel
 
 ### Shopping Screen
@@ -22,6 +22,55 @@ There are three screens: Select, Shopping, and Cooking. Navigation is handled by
 - Each ingredient row can be tapped to mark it as completed (strikethrough/green)
 - If an ingredient has purchase links, they are shown as tappable URLs with store name, variant, price, and quantity
 - A "Start Over" button returns to the Select screen and resets all state
+
+### Nutrition Screen
+A reference screen — separate from cooking, since nutrition data is something you study before shopping, not mid-cook. It presents three levels of drill-down in a single scrollable accordion:
+
+```
+┌─────────────────────────────────────────┐
+│  Grand total (pinned)                   │
+│  All selected recipes · X cal · …       │
+│  coverage line (amber if anything flagged)
+├─────────────────────────────────────────┤
+│  ▸ Recipe A      recipe subtotal        │   ← tap header to expand
+│  ▾ Recipe B      recipe subtotal        │
+│      • Ingredient — per-ingredient total│
+│      • Ingredient — ⚠ no nutrition data │
+│      • Ingredient — ⚠ can't compute     │
+│           reason text…                  │
+└─────────────────────────────────────────┘
+```
+
+- **Grand total** — a card at the top sums every selected recipe. Titled "All selected recipes" when more than one recipe is selected, otherwise titled with the single recipe's name.
+- **Per recipe** — each recipe is a collapsible section showing its subtotal in the header. Tapping the header toggles its ingredient breakdown (collapsed by default; a `▸`/`▾` caret reflects state).
+- **Per ingredient** — each ingredient row inside an expanded section shows either its computed contribution or a flag (see below).
+- Totals shown are calories, sodium (mg), sugar (g), and protein (g), rounded to whole numbers.
+- If a recipe (or the grand total) has **no** computable ingredients, the value line shows `— no computable data` instead of a row of zeros.
+- A "Start Over" button at the bottom resets everything. If no recipes are selected, the screen shows an empty message and the Start Over button.
+
+#### Flagging missing / uncomputable nutrition
+Every ingredient falls into exactly one of three buckets so a subtotal is never silently built from partial data:
+
+- **ok** — the ingredient has a `nutrition` block **and** the recipe's unit matches a keyed unit. Shows the computed `X cal · Y mg sodium · …` contribution.
+- **missing** — the ingredient has no `nutrition` block at all. Flagged inline with an amber pill: `⚠ no nutrition data`.
+- **uncomputable** — the ingredient **has** a `nutrition` block, but it can't be applied here. Flagged with `⚠ can't compute` plus an italic reason line beneath it. Reasons:
+  - The recipe uses a unit the data isn't keyed by (there is **no unit conversion**) — e.g. `recipe uses "cup" but data is only keyed by "fl oz" (no unit conversion)`
+  - The ingredient has no unit at all
+  - The serving size is missing or zero
+
+Flagged ingredients are **excluded** from the recipe and grand totals — they contribute nothing rather than a misleading zero.
+
+#### Coverage line
+Both the grand total and each recipe section carry a coverage line summarising data completeness, and it turns amber whenever anything is flagged:
+- All good: `All N ingredients have data`
+- Some flagged: `⚠ C of N ingredients have data · F flagged`
+- No ingredients: `No ingredients`
+
+#### Composite ingredients
+Ingredients produced by `mix(resultName)` / `combine()` carry a `_constituents` array and are roll-ups of real ingredients that are already counted individually. They are **excluded** from the nutrition breakdown to avoid double counting and to prevent noisy false "missing" flags on synthetic items like `"batter"`.
+
+#### Ingredient identity for nutrition
+Unlike the shopping list (which dedupes by name+unit string), the nutrition breakdown dedupes by **object reference**, consistent with the rest of the app's object-identity model. The same ingredient object referenced across multiple steps is counted exactly once.
 
 ### Cooking Screen
 - Shows all steps from all selected recipes split into two zones: **Ready** (top) and **Waiting** (bottom)
@@ -142,6 +191,46 @@ A step "claims" its equipment and ingredients when it is a timer **or** when it 
 
 ---
 
+## Nutrition Calculation
+
+The app computes nutrition for the currently selected recipes at three levels: per ingredient, per recipe, and a grand total across all selected recipes.
+
+### Reading a nutrition block
+An ingredient's `nutrition` is keyed by **unit name**, with each entry read as a standard nutrition label:
+```ts
+nutrition: {
+    'fl oz': { servings: 8, servingSize: 7, calories: 110, sodium: 0, sugar: 22, protein: 2 },
+}
+```
+- `servingSize` — number of (keyed) units in one serving
+- `calories`, `sodium`, `sugar`, `protein` — values **per serving**
+- `servings` — servings per container (metadata; not used in the per-recipe computation)
+
+### Per-ingredient computation
+Given a recipe ingredient with `quantity` and `unit`:
+1. Look up `nutrition[unit.name]`. If absent → **uncomputable** (unit mismatch; no conversion is performed).
+2. `servingsUsed = quantity / servingSize` (if `servingSize` ≤ 0 → **uncomputable**).
+3. Each nutrient = its per-serving value × `servingsUsed`.
+
+So 14 fl oz of the orange juice above = 2 servings = 220 cal, 44 g sugar, etc.
+
+### Aggregation rules
+- Walk all steps (and children) of a recipe, collecting distinct ingredient **objects** (reference dedup).
+- Exclude composite ingredients (those carrying `_constituents` from `mix()`/`combine()`).
+- Sum only **ok** ingredients into totals; **missing** and **uncomputable** ingredients contribute nothing and are counted toward the flagged total.
+- The grand total sums the per-recipe totals and coverage counts.
+
+### Three result states
+| State | Condition | UI |
+|---|---|---|
+| `ok` | has data + unit matches | shows computed contribution |
+| `missing` | no `nutrition` block | `⚠ no nutrition data` pill |
+| `uncomputable` | has data but can't apply (unit mismatch / no unit / bad serving size) | `⚠ can't compute` pill + reason text |
+
+> **Note:** With the current ingredient data, only `orangeJuice` carries a `nutrition` block and it isn't used in any registered recipe — so every ingredient currently flags as `missing`. The feature becomes meaningful as `nutrition` blocks are added to more ingredients (keyed by the unit each recipe actually uses).
+
+---
+
 ## Step Factories
 
 - `instruction(text, opts?)` → creates an instruction step
@@ -193,7 +282,7 @@ Available factories: `e.bowl()`, `e.pan()`, `e.pot()`, `e.oven()`, `e.toasterOve
 Each `Equipment` instance tracks its current `contents: Ingredient[]`, updated by `add()`, `transfer()`, `mix()`, and `combine()`. `cook()` and `broil()` automatically inherit the contents of nested vessels (registered via `place()`) so downstream steps are locked correctly without manual ingredient listing.
 
 ### `result` getter
-`mix()` and `combine()` produce a new `Ingredient` representing the combined state of the vessel. Access it via `vessel.result` immediately after the call. Throws if accessed before any `mix()` or `combine()` call.
+`mix()` and `combine()` produce a new `Ingredient` representing the combined state of the vessel. Access it via `vessel.result` immediately after the call. Throws if accessed before any `mix()` or `combine()` call. Note these produced ingredients carry a `_constituents` array and are treated as composites — excluded from the nutrition breakdown (their constituents are counted individually).
 
 ### Methods
 
@@ -258,7 +347,7 @@ Ingredient factory functions `(quantity, unit) => Ingredient`. Each call produce
 
 Optional metadata:
 - `purchaseLinks` — nested by store → variant → array of `{ price, quantity, quantityUnit, link, organic?, discount? }`
-- `nutrition` — keyed by unit name, with fields for servings, calories, sodium, sugar, protein
+- `nutrition` — keyed by unit name, with fields for `servings`, `servingSize`, `calories`, `sodium`, `sugar`, `protein` (per serving). Used by the Nutrition screen; the recipe's unit must match a key here or the ingredient is flagged as uncomputable.
 - `perishableDays`, `isMeatProduct`
 - `requiresDateLabel` — if `true`, automatically adds an instruction child step to any `.add()` call using this ingredient, asking the user to write today's date on the bottle with a Sharpie (useful for tracking expiration)
 
@@ -303,6 +392,10 @@ Key visual states:
 - Recipe title: name + `estimated X min · actual Xm XXs` badge (muted colour, updates every second, freezes when all steps done)
 - Ready zone (`#ready-section`): no decoration, appears at top
 - Waiting zone (`#waiting-section`): top border + muted label; hidden when empty; completed/skipped panels are pinned and never jumped over by promoted panels
+- Action bar: three buttons — Go Shopping (blue), Nutrition (purple), Start Cooking (green)
+- Nutrition grand-total card: dark inset card, muted uppercase title
+- Nutrition recipe section: collapsible, `▸`/`▾` caret, subtotal on the right of the header
+- Nutrition flag pill: amber pill (`⚠ no nutrition data` / `⚠ can't compute`); coverage line turns amber whenever anything is flagged; uncomputable rows show an italic amber reason line beneath
 
 ---
 
