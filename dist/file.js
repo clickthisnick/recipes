@@ -573,19 +573,39 @@ const addTotals = (a, b) => ({
 function isComposite(ing) {
     return Array.isArray(ing._constituents);
 }
+// The single product whose label drives this ingredient's nutrition (and which
+// the shopping list marks as the pick). Prefers the product matching
+// defaultBrand; otherwise the first listed. Nutrition is NEVER blended across
+// brands — one brand is in the dish, so one label is used.
+function selectedProduct(ing) {
+    const ps = ing.products ?? [];
+    if (ps.length === 0)
+        return undefined;
+    return ps.find(p => p.brand === ing.defaultBrand) ?? ps[0];
+}
+// Resolution order: the selected product's label (brand-specific), else the
+// ingredient's own generic label (for produce). Brand-bearing goods keep their
+// label on the Product; brand-independent produce keeps it on the ingredient.
+function nutritionSource(ing) {
+    const product = selectedProduct(ing);
+    if (product?.nutrition)
+        return { label: product.nutrition, brand: product.brand };
+    return { label: ing.nutrition };
+}
 function ingredientNutrition(ing) {
-    if (!ing.nutrition || Object.keys(ing.nutrition).length === 0) {
+    const { label, brand } = nutritionSource(ing);
+    if (!label || Object.keys(label).length === 0) {
         return { status: 'missing' };
     }
     if (!ing.unit || !ing.unit.name) {
         return { status: 'uncomputable', reason: 'no unit on the recipe ingredient' };
     }
-    const facts = ing.nutrition[ing.unit.name];
+    const facts = label[ing.unit.name];
     if (!facts) {
-        const keyed = Object.keys(ing.nutrition).map(k => `"${k}"`).join(', ');
+        const keyed = Object.keys(label).map(k => `"${k}"`).join(', ');
         return {
             status: 'uncomputable',
-            reason: `recipe uses "${ing.unit.name}" but data is only keyed by ${keyed} (no unit conversion)`,
+            reason: `recipe uses "${ing.unit.name}" but ${brand ? `${brand}'s ` : ''}data is only keyed by ${keyed} (no unit conversion)`,
         };
     }
     const servingSize = facts.servingSize ?? 0;
@@ -595,6 +615,7 @@ function ingredientNutrition(ing) {
     const servingsUsed = (ing.quantity ?? 0) / servingSize;
     return {
         status: 'ok',
+        brand,
         totals: {
             calories: (facts.calories ?? 0) * servingsUsed,
             sodium: (facts.sodium ?? 0) * servingsUsed,
@@ -836,20 +857,26 @@ function renderShoppingScreen() {
         const label = document.createElement('span');
         label.textContent = formatIngredient(ingredient);
         panel.appendChild(label);
-        if (ingredient.purchaseLinks) {
+        const products = ingredient.products ?? [];
+        if (products.length > 0) {
             const links = document.createElement('div');
             links.className = 'purchase-links';
-            Object.entries(ingredient.purchaseLinks).forEach(([store, variants]) => {
-                Object.entries(variants).forEach(([variant, products]) => {
-                    products.forEach((product) => {
-                        const a = document.createElement('a');
-                        a.href = product.link;
-                        a.target = '_blank';
-                        a.className = 'purchase-link';
-                        a.textContent = `${store}${variant !== 'standard' ? ` (${variant})` : ''} — $${product.price} / ${product.quantity} ${product.quantityUnit.name}`;
-                        links.appendChild(a);
-                    });
-                });
+            const chosen = selectedProduct(ingredient);
+            products.forEach((product) => {
+                const a = document.createElement('a');
+                a.href = product.link ?? '#';
+                a.target = '_blank';
+                a.className = 'purchase-link';
+                if (product === chosen)
+                    a.classList.add('default-product');
+                const variant = product.variant ? ` ${product.variant}` : '';
+                const where = product.store ? ` · ${product.store}` : '';
+                const pkg = product.price !== undefined && product.size !== undefined
+                    ? ` — $${product.price} / ${product.size} ${product.sizeUnit?.name ?? ''}`.trimEnd()
+                    : '';
+                const pick = product === chosen ? ' ✓' : '';
+                a.textContent = `${product.brand}${variant}${where}${pkg}${pick}`;
+                links.appendChild(a);
             });
             panel.appendChild(links);
         }
@@ -1800,11 +1827,8 @@ function simpleIngredients(map) {
 export const i = {
     ...simpleIngredients({
         apple: '',
-        antiOxidantBerryBlend: '',
         frozenBerries: '',
         cocoaFlavanols: '',
-        chiaSeed: '',
-        hempSeed: '',
         wheatGrassPowder: '',
         creatine: '',
         chlorellaPowder: '',
@@ -1812,19 +1836,15 @@ export const i = {
         acaiFrozenMix: '',
         blueprintBlueberryWalnut: '',
         blueprintCacao: '',
-        // banana is declared separately below so it can carry a nutrition block
         frozenStrawberry: '',
-        cocoaNibs: '',
         frozenCauliflower: '',
         frozenBroccoli: '',
         frozenBlueberry: '',
-        cherry: '',
         blueprintNuttyPudding: '',
-        vanillaExtract: '',
-        lemonJuice: '',
-        celery: '',
-        spinach: '',
-        kale: '',
+        // The following Blueprint Smoothie ingredients are declared separately
+        // below with nutrition blocks: banana, lemonJuice, cocoaNibs, chiaSeed,
+        // hempSeed, cherry, antiOxidantBerryBlend, vanillaExtract, celery,
+        // spinach, kale (plus macadamiaNutMilk and macadamiaNut, already factories).
         egg: '',
         milk: '',
         bread: '',
@@ -1843,6 +1863,81 @@ export const i = {
     }),
     macadamiaNutMilk: ingredientFactory('Macadamia Nut Milk', {
         requiresDateLabel: true,
+        // Milkadamia unsweetened (sold at Whole Foods), per 1 cup (240 ml).
+        nutrition: {
+            [u.cup.name]: { servings: 4, servingSize: 1, calories: 50, sodium: 75, sugar: 0, protein: 1 },
+        },
+    }),
+    // ── Blueprint Smoothie ingredients with Whole Foods / 365 nutrition ──
+    // Each block is keyed by the exact unit the smoothie uses (no unit
+    // conversion exists), with servingSize expressed in that unit. Sodium is
+    // in mg; sugar and protein in g. Values are per the keyed unit; the recipe
+    // quantity scales them (servingsUsed = quantity / servingSize).
+    // Juice of one lemon (1 unit ≈ juice of 1 lemon, ~2 tbsp).
+    lemonJuice: ingredientFactory('Lemon Juice', {
+        nutrition: {
+            [u.unit.name]: { servings: 1, servingSize: 1, calories: 10, sodium: 0, sugar: 2, protein: 0.2 },
+        },
+    }),
+    // Raw macadamia nuts, per cup (~134 g whole). ¼ cup in the recipe ≈ 240 cal.
+    macadamiaNut: ingredientFactory('Macadamia Nut', {
+        nutrition: {
+            [u.cup.name]: { servings: 1, servingSize: 1, calories: 960, sodium: 7, sugar: 6, protein: 11 },
+        },
+    }),
+    // Cacao nibs, per tsp (~20 cal/tsp; 140 cal per 2 tbsp).
+    cocoaNibs: ingredientFactory('Cocoa Nibs', {
+        nutrition: {
+            [u.tsp.name]: { servings: 1, servingSize: 1, calories: 20, sodium: 0, sugar: 0, protein: 0.3 },
+        },
+    }),
+    // Chia seeds, per tsp (~58 cal/tbsp ÷ 3).
+    chiaSeed: ingredientFactory('Chia Seed', {
+        nutrition: {
+            [u.tsp.name]: { servings: 1, servingSize: 1, calories: 19, sodium: 0, sugar: 0, protein: 1 },
+        },
+    }),
+    // Hemp hearts, per tbsp (~166 cal / ~10 g protein per 3 tbsp).
+    hempSeed: ingredientFactory('Hemp Seed', {
+        nutrition: {
+            [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 55, sodium: 0, sugar: 0.5, protein: 3.3 },
+        },
+    }),
+    // Sweet cherries, per cherry (~8 g). 3 in the recipe.
+    cherry: ingredientFactory('Cherry', {
+        nutrition: {
+            [u.unit.name]: { servings: 1, servingSize: 1, calories: 5, sodium: 0, sugar: 1, protein: 0 },
+        },
+    }),
+    // 365 Organic Antioxidant Fruit Blend (frozen), per 1 cup.
+    antiOxidantBerryBlend: ingredientFactory('Antioxidant Berry Blend', {
+        nutrition: {
+            [u.cup.name]: { servings: 4, servingSize: 1, calories: 70, sodium: 0, sugar: 13, protein: 1 },
+        },
+    }),
+    // Pure vanilla extract, per tsp (~12 cal/tsp).
+    vanillaExtract: ingredientFactory('Vanilla Extract', {
+        nutrition: {
+            [u.tsp.name]: { servings: 1, servingSize: 1, calories: 12, sodium: 0, sugar: 0.5, protein: 0 },
+        },
+    }),
+    // Celery, per medium stalk (~40 g).
+    celery: ingredientFactory('Celery', {
+        nutrition: {
+            [u.unit.name]: { servings: 1, servingSize: 1, calories: 6, sodium: 32, sugar: 1, protein: 0.3 },
+        },
+    }),
+    // Raw spinach, per handful (≈ 1 cup / ~30 g).
+    spinach: ingredientFactory('Spinach', {
+        nutrition: {
+            [u.handful.name]: { servings: 1, servingSize: 1, calories: 7, sodium: 24, sugar: 0.1, protein: 0.9 },
+        },
+    }),
+    // Raw kale, per handful (≈ 1 cup chopped / ~21 g).
+    kale: ingredientFactory('Kale', {
+        nutrition: {
+            [u.handful.name]: { servings: 1, servingSize: 1, calories: 8, sodium: 11, sugar: 0.2, protein: 0.7 },
+        },
     }),
     // Medium organic banana (~118 g). Nutrition is keyed by 'unit' so it
     // computes against i.banana(1, u.unit) in the smoothie — there's no unit
@@ -1853,54 +1948,15 @@ export const i = {
             [u.unit.name]: { servings: 1, servingSize: 1, calories: 105, sodium: 1, sugar: 14, protein: 1.3 },
         },
     }),
-    peanutButter: ingredientFactory('Peanut Butter', {
-        purchaseLinks: {
-            [stores.wholeFoods]: {
-                organic: [{ price: 4.19, quantity: 16, quantityUnit: u.ounce, organic: true, link: 'https://www.amazon.com/365-Everyday-Value-Organic-Unsweetened/dp/B074H61LYV/ref=sr_1_9_0o_wf' }],
-                creamy: [{ price: 2.49, quantity: 16, quantityUnit: u.ounce, organic: false, link: 'https://www.amazon.com/365-Everyday-Value-Peanut-Butter/dp/B074H57SPT/ref=sr_1_7_0o_wf' }],
-                crunchy: [{ price: 4.99, quantity: 36, quantityUnit: u.ounce, organic: false, link: 'https://www.amazon.com/Everyday-Value-Peanut-Butter-Crunchy/dp/B074Y2V88X/ref=sr_1_16_0o_wf' }],
-            },
-            [stores.amazon]: {
-                creamy: [{ price: 4.69, quantity: 40, quantityUnit: u.ounce, organic: false, link: 'https://www.amazon.com/dp/B07KWGSCW2/ref=sns_myd_detail_page', discount: { subscribe5Products: 5 } }],
-            },
-        },
-    }),
-    pittedDates: ingredientFactory('Pitted Dates', {
-        purchaseLinks: {
-            [stores.wholeFoods]: {
-                standard: [{ price: 3.99, quantity: 8, quantityUnit: u.ounce, organic: false, link: 'https://www.amazon.com/365-Everyday-Value-Dates-Pitted/dp/B074VDMNH7/ref=sr_1_5_0o_wf' }],
-            },
-            [stores.amazon]: {
-                organic: [{ price: 16.59, quantity: 2.5, quantityUnit: u.pound, organic: true, link: 'https://www.amazon.com/ORGANIC-Pitted-Dates-Deglet-Nour/dp/B0872L82ZK/ref=sr_1_10', discount: { subscribe5Products: 5 } }],
-            },
-        },
-    }),
+    peanutButter: ingredientFactory('Peanut Butter', {}),
+    pittedDates: ingredientFactory('Pitted Dates', {}),
     orangeJuice: ingredientFactory('Orange Juice', {
         nutrition: {
             [u.fluidOunce.name]: { servings: 8, servingSize: 7, calories: 110, sodium: 0, sugar: 22, protein: 2 },
         },
     }),
-    macadamiaNut: ingredientFactory('Macadamia Nut', {
-        purchaseLinks: {
-            [stores.wholeFoods]: {
-                organic: [{ price: 10.79, quantity: 8, quantityUnit: u.ounce, organic: true, link: 'https://www.wholefoodsmarket.com/product/365-by-whole-foods-market-organic-macadamia-nuts-8-oz-b086hk83yf' }],
-            },
-        },
-    }),
-    strawberry: ingredientFactory('Strawberry', {
-        purchaseLinks: {
-            [stores.wholeFoods]: {
-                organic: [{ price: 6.69, quantity: 32, quantityUnit: u.ounce, organic: true, link: 'https://www.wholefoodsmarket.com/product/365-by-whole-foods-market-365-whole-foods-market-organic-whole-strawberries-b09gcp3jng' }],
-            },
-        },
-    }),
-    collagenPowder: ingredientFactory('Collagen Powder', {
-        purchaseLinks: {
-            [stores.amazon]: {
-                standard: [{ price: 17.99, quantity: 1, quantityUnit: u.pound, organic: false, link: 'https://www.amazon.com/gp/product/B071S8D69C/ref=ppx_yo_dt_b_asin_title_o00_s00', discount: { subscribe5Products: 5 } }],
-            },
-        },
-    }),
+    strawberry: ingredientFactory('Strawberry', {}),
+    collagenPowder: ingredientFactory('Collagen Powder', {}),
 };
 // ============================================================
 // RECIPES

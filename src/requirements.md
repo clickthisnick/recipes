@@ -227,7 +227,7 @@ So 14 fl oz of the orange juice above = 2 servings = 220 cal, 44 g sugar, etc.
 | `missing` | no `nutrition` block | `⚠ no nutrition data` pill |
 | `uncomputable` | has data but can't apply (unit mismatch / no unit / bad serving size) | `⚠ can't compute` pill + reason text |
 
-> **Note:** Most ingredients don't yet carry a `nutrition` block, so they flag as `missing`. The ones with data so far are the organic banana (keyed by `'unit'`, so it computes in the Blueprint Smoothie) and orange juice (keyed by `'fl oz'`, not currently used in a recipe). The feature becomes more complete as `nutrition` blocks are added to more ingredients — keyed by the unit each recipe actually uses, since there's no conversion.
+> **Note:** The entire **Blueprint Smoothie** now carries nutrition data — every ingredient is keyed by the unit the recipe uses (Whole Foods / 365 label values), so it reports full coverage (~568 cal · 145 mg sodium · 28 g sugar · 12 g protein). Orange juice also has data (keyed by `'fl oz'`) but isn't used in a recipe. Most other ingredients (e.g. the Dinner recipes) don't yet carry a `nutrition` block and flag as `missing` until one is added — keyed by the unit each recipe actually uses, since there's no conversion.
 
 ---
 
