@@ -1812,7 +1812,7 @@ export const i = {
         acaiFrozenMix: '',
         blueprintBlueberryWalnut: '',
         blueprintCacao: '',
-        banana: '',
+        // banana is declared separately below so it can carry a nutrition block
         frozenStrawberry: '',
         cocoaNibs: '',
         frozenCauliflower: '',
@@ -1843,6 +1843,15 @@ export const i = {
     }),
     macadamiaNutMilk: ingredientFactory('Macadamia Nut Milk', {
         requiresDateLabel: true,
+    }),
+    // Medium organic banana (~118 g). Nutrition is keyed by 'unit' so it
+    // computes against i.banana(1, u.unit) in the smoothie — there's no unit
+    // conversion, so the key must match the unit the recipe actually uses.
+    // servingSize: 1 → one banana is one serving. Sodium in mg; sugar/protein in g.
+    banana: ingredientFactory('Organic Banana', {
+        nutrition: {
+            [u.unit.name]: { servings: 1, servingSize: 1, calories: 105, sodium: 1, sugar: 14, protein: 1.3 },
+        },
     }),
     peanutButter: ingredientFactory('Peanut Butter', {
         purchaseLinks: {
