@@ -5,10 +5,13 @@
 // ============================================================
 // GLOBAL STATE
 // ============================================================
+// Recipe IDs to pin to the top of the list. Edit at build time.
+const FAVORITE_RECIPE_IDS = [
+    'blueprint-smoothie',
+];
 const state = {
     recipes: new Map(),
     selectedRecipeIds: [],
-    favoriteRecipeIds: [],
     timers: new Map(),
     screen: 'select',
     searchQuery: '',
@@ -45,7 +48,49 @@ export const u = {
     handful: { name: 'handful' },
     spray: { name: 'spray' },
     bag: { name: 'bag' },
+    gram: { name: 'g', plural: 'g' },
+    shot: { name: 'shot', plural: 'shots' },
 };
+// ============================================================
+// UNIT CONVERSION
+// ============================================================
+const CONVERSION_FACTORS = {
+    // Volume cluster
+    [u.tsp.name]: { [u.tsp.name]: 1, [u.tbsp.name]: 1 / 3, [u.cup.name]: 1 / 48, [u.fluidOunce.name]: 1 / 6 },
+    [u.tbsp.name]: { [u.tsp.name]: 3, [u.tbsp.name]: 1, [u.cup.name]: 1 / 16, [u.fluidOunce.name]: 1 / 2 },
+    [u.cup.name]: { [u.tsp.name]: 48, [u.tbsp.name]: 16, [u.cup.name]: 1, [u.fluidOunce.name]: 8 },
+    [u.fluidOunce.name]: { [u.tsp.name]: 6, [u.tbsp.name]: 2, [u.cup.name]: 1 / 8, [u.fluidOunce.name]: 1 },
+    // Weight cluster
+    [u.ounce.name]: { [u.ounce.name]: 1, [u.pound.name]: 1 / 16, [u.gram.name]: 28.3495 },
+    [u.pound.name]: { [u.ounce.name]: 16, [u.pound.name]: 1, [u.gram.name]: 453.592 },
+    [u.gram.name]: { [u.ounce.name]: 1 / 28.3495, [u.pound.name]: 1 / 453.592, [u.gram.name]: 1 },
+};
+function convertUnits(quantity, from, to) {
+    if (from === to)
+        return quantity;
+    const factor = CONVERSION_FACTORS[from]?.[to];
+    if (factor === undefined)
+        return null;
+    return quantity * factor;
+}
+// Extends convertUnits with ingredient-specific density conversions (e.g. cup → oz).
+// Tries: physical → density → density + physical chained.
+// Returns null if no path exists.
+function convertWithDensity(quantity, from, to, conversions) {
+    const physical = convertUnits(quantity, from, to);
+    if (physical !== null)
+        return physical;
+    if (!conversions)
+        return null;
+    const density = conversions[from];
+    if (!density)
+        return null;
+    const afterDensity = quantity * density.factor;
+    const intermediate = density.to.name;
+    if (intermediate === to)
+        return afterDensity;
+    return convertUnits(afterDensity, intermediate, to);
+}
 // ============================================================
 // FORMATTERS
 // ============================================================
@@ -114,32 +159,12 @@ export function generateCleanupLabels(ingredients, customTexts) {
 // ============================================================
 // EQUIPMENT
 // ============================================================
-//
-// Each Equipment instance tracks its current contents (ingredients that
-// have been .add()ed or .transfer()ed into it). This lets cook() and
-// broil() automatically claim the contents of any extraEquipment vessel
-// passed to them, so steps that transfer or use those contents are
-// correctly locked without the recipe author having to list ingredients
-// manually.
-//
-// transfer() validates at recipe-definition time (startup) that the
-// ingredients being moved are actually present in the source vessel,
-// giving clear error messages before the app is served.
 class Equipment {
-    // label is an optional display name to distinguish multiple instances
-    // of the same equipment type, e.g. e.pan('panko pan') vs e.pan('sauce pan').
-    // It scopes the claim key so the locking system treats them as separate lanes.
     constructor(type, label) {
         this.type = type;
         this.label = label;
-        // Tracks ingredients currently inside this vessel.
-        // Updated by add(), transfer(), mix(), and combine().
         this.contents = [];
-        // Tracks vessels placed inside this one via place().
-        // cook() and broil() automatically claim these and their contents.
         this.nestedVessels = [];
-        // Holds the ingredient produced by the last mix() or combine() call.
-        // Access via vessel.result immediately after the call.
         this._result = null;
     }
     get name() { return this.label ?? this.type; }
@@ -148,14 +173,12 @@ class Equipment {
             throw new Error(`${this.name}.result accessed before any mix() or combine() call`);
         return this._result;
     }
-    // Returns all ingredients currently in this vessel plus any nested vessels.
     getContents() {
         return [
             ...this.contents,
             ...this.nestedVessels.flatMap(v => v.getContents()),
         ];
     }
-    // Returns all equipment names claimed by this vessel (itself + nested vessels).
     getAllEquipment() {
         return [
             this.name,
@@ -167,9 +190,6 @@ class Equipment {
             equipment: [this.name],
         });
     }
-    // cook() automatically inherits the contents of any extraEquipment vessels
-    // cook() automatically claims this vessel, any vessels placed inside it via place(),
-    // and all their contents — no extraEquipment needed once a vessel is placed.
     cook(label, durationSeconds, temperature, extraEquipment = []) {
         const text = temperature !== undefined ? `${label} (${temperature}°)` : label;
         const allEquipment = [...this.getAllEquipment(), ...extraEquipment.map(eq => eq.name)];
@@ -181,7 +201,6 @@ class Equipment {
     }
     add(ingredients, note) {
         const allIngredients = ingredients.map(e => Array.isArray(e) ? e[0] : e);
-        // Track contents
         this.contents.push(...allIngredients);
         const children = ingredients.map((entry) => {
             const [ing, itemNote] = Array.isArray(entry) ? entry : [entry, undefined];
@@ -202,9 +221,6 @@ class Equipment {
             children,
         });
     }
-    // Moves ingredients from this vessel into target, validating at definition
-    // time that the ingredients are actually present in this vessel.
-    // Throws a descriptive error immediately if not, catching mistakes before serving.
     transfer(target, ingredients) {
         for (const ing of ingredients) {
             const idx = this.contents.findIndex(c => c.name === ing.name);
@@ -256,9 +272,6 @@ class Equipment {
             ingredients: [...this.contents],
         });
     }
-    // place() registers a vessel inside this one. If a label and duration are
-    // provided it becomes a timer step (e.g. "Toast panko (450°)"), combining
-    // the placement and the cook into a single visual card.
     place(vessel, label, durationSeconds, temperature) {
         this.nestedVessels.push(vessel);
         const allEquipment = [this.name, vessel.name];
@@ -278,9 +291,6 @@ class Equipment {
         });
     }
     stir() { return instruction(`Stir ${this.name}`, { equipment: [this.name] }); }
-    // mix() combines all current contents into a single named ingredient.
-    // The vessel's contents are replaced with the new ingredient.
-    // Access the produced ingredient via vessel.result immediately after.
     mix(resultName) {
         const allContents = this.getContents();
         if (resultName) {
@@ -292,10 +302,6 @@ class Equipment {
         }
         return instruction(`Mix ${this.name}`, { equipment: [this.name], ingredients: allContents });
     }
-    // combine() applies this vessel's contents to the given ingredients,
-    // producing a new named ingredient that represents the combination.
-    // The vessel retains its contents (not emptied until transfer()).
-    // Access the produced ingredient via vessel.result immediately after.
     combine(ingredients, note) {
         const allConstituents = [...this.getContents(), ...ingredients];
         const produced = {
@@ -330,17 +336,15 @@ export const e = {
 // RECIPE REGISTRATION
 // ============================================================
 function collectIngredientsWithLabel(steps) {
-    const collected = new Map(); // Use object reference as key
+    const collected = new Map();
     function walkSteps(steps) {
         for (const step of steps) {
             for (const ing of (step.ingredients ?? [])) {
-                if (ing.requiresDateLabel && !collected.has(ing)) {
+                if (ing.requiresDateLabel && !collected.has(ing))
                     collected.set(ing, ing);
-                }
             }
-            if (step.children) {
+            if (step.children)
                 walkSteps(step.children);
-            }
         }
     }
     walkSteps(steps);
@@ -350,8 +354,6 @@ function findLastStepIndexForIngredient(steps, targetIng) {
     let lastIndex = -1;
     for (let i = 0; i < steps.length; i++) {
         const step = steps[i];
-        // Only consider container steps (add, transfer, combine, etc.) and timer steps
-        // Skip simple instruction steps that might have derived ingredient lists from equipment
         const isContainerOrTimer = (step.type === 'instruction' && step.children && step.children.length > 0) ||
             step.type === 'timer';
         if (isContainerOrTimer) {
@@ -367,7 +369,6 @@ function findLastStepIndexForIngredient(steps, targetIng) {
 }
 export function createRecipe(id, name, steps, group, estimatedMinutes) {
     steps.forEach(s => { s.recipeId = id; });
-    // Automatically generate cleanup label steps and insert after last usage
     const ingredientsToLabel = collectIngredientsWithLabel(steps);
     const stepsToInsert = [];
     for (const ing of ingredientsToLabel) {
@@ -377,13 +378,9 @@ export function createRecipe(id, name, steps, group, estimatedMinutes) {
             stepsToInsert.push({ index: lastIndex, step: cleanupStep });
         }
     }
-    // Sort by index in descending order so we insert from the end backwards
-    // (prevents earlier insertions from shifting later indices)
     stepsToInsert.sort((a, b) => b.index - a.index);
-    // Insert cleanup steps after their last usage
-    for (const { index, step } of stepsToInsert) {
+    for (const { index, step } of stepsToInsert)
         steps.splice(index + 1, 0, step);
-    }
     return { id, name, steps, group, estimatedMinutes };
 }
 export function registerRecipe(recipe) {
@@ -395,38 +392,14 @@ export function registerGroup(group, recipes) {
 // ============================================================
 // AD-HOC INGREDIENTS
 // ============================================================
-//
-// Wraps a single ingredient into a one-step synthetic recipe so it flows
-// through the shopping list and nutrition rollup using the same codepaths as
-// hand-authored recipes — no parallel "loose ingredients" pipeline.
-//
-// The fiction is intentional: the single step exists only so the existing
-// step-walking logic in buildShoppingList and recipeNutrition finds the
-// ingredient. The cooking screen filters adhoc recipes out (see
-// getCookableRecipes) so the synthetic step never reaches the cook flow.
 const ADHOC_GROUP = 'Custom additions';
 function createAdhocRecipe(ingredient) {
-    // Unique id per call — same ingredient added twice produces two recipes,
-    // so the user can adjust them independently and they each get a "×N"
-    // counter like any other recipe.
     const id = `adhoc:${ingredient.name.toLowerCase().replace(/\s+/g, '-')}:${Date.now()}-${Math.floor(Math.random() * 1e4)}`;
-    const step = instruction(`Have ${formatIngredient(ingredient)} on hand`, {
-        ingredients: [ingredient],
-    });
+    const step = instruction(`Have ${formatIngredient(ingredient)} on hand`, { ingredients: [ingredient] });
     step.recipeId = id;
-    return {
-        id,
-        name: formatIngredient(ingredient),
-        group: ADHOC_GROUP,
-        steps: [step],
-        adhoc: true,
-    };
+    return { id, name: formatIngredient(ingredient), group: ADHOC_GROUP, steps: [step], adhoc: true };
 }
 export function getSelectedRecipes() {
-    // Returns each selected recipe ONCE, in the order it first appeared in the
-    // selection list. Servings-per-recipe is tracked separately via getServings()
-    // — cooking treats each recipe as one batch, but shopping and nutrition
-    // multiply by serving count.
     const seen = new Set();
     const out = [];
     for (const id of state.selectedRecipeIds) {
@@ -439,9 +412,6 @@ export function getSelectedRecipes() {
     }
     return out;
 }
-// How many servings of a given recipe are currently selected. Same recipe can
-// be tapped multiple times to add servings; the shopping list and nutrition
-// screen scale by this count.
 export function getServings(recipeId) {
     return state.selectedRecipeIds.filter(id => id === recipeId).length;
 }
@@ -450,15 +420,12 @@ function getFilteredRecipes() {
     const all = [...state.recipes.values()];
     const matched = q ? all.filter((r) => r.name.toLowerCase().includes(q)) : all;
     return matched.sort((a, b) => {
-        // Ad-hoc additions float to the very top — they're transient session
-        // items the user just added and likely wants to see/adjust.
         const aAdhoc = a.adhoc ? 0 : 1;
         const bAdhoc = b.adhoc ? 0 : 1;
         if (aAdhoc !== bAdhoc)
             return aAdhoc - bAdhoc;
-        // Then favorites
-        const aFav = state.favoriteRecipeIds.includes(a.id) ? 0 : 1;
-        const bFav = state.favoriteRecipeIds.includes(b.id) ? 0 : 1;
+        const aFav = FAVORITE_RECIPE_IDS.includes(a.id) ? 0 : 1;
+        const bFav = FAVORITE_RECIPE_IDS.includes(b.id) ? 0 : 1;
         if (aFav !== bFav)
             return aFav - bFav;
         return a.name.localeCompare(b.name);
@@ -468,21 +435,13 @@ function getFilteredRecipes() {
 // COOK TIME
 // ============================================================
 function recipeCookSeconds(recipe) {
-    // Critical path calculation — simulates parallel execution.
-    // Each claim key tracks the wall-clock time at which that equipment/
-    // ingredient becomes free. A step can only start once all of its
-    // claimed keys are free (paths converge at the max). Timer steps then
-    // push their keys' release times forward by their duration (paths diverge
-    // when unrelated keys are updated independently).
     const releaseAt = new Map();
     function claimKeysForStep(step) {
         const keys = [];
-        for (const eq of (step.equipment ?? [])) {
+        for (const eq of (step.equipment ?? []))
             keys.push(`eq::${eq}`);
-        }
-        for (const ing of (step.ingredients ?? [])) {
+        for (const ing of (step.ingredients ?? []))
             keys.push(`ing::${ing.name}`);
-        }
         return keys;
     }
     let totalTime = 0;
@@ -490,15 +449,10 @@ function recipeCookSeconds(recipe) {
         if (step.type !== 'timer')
             continue;
         const keys = claimKeysForStep(step);
-        // This step starts when all its claimed resources are free —
-        // paths converge here via max.
         const startAt = keys.reduce((m, k) => Math.max(m, releaseAt.get(k) ?? 0), 0);
         const endAt = startAt + (step.durationSeconds ?? 0);
-        // Push release times forward for all claimed keys — paths diverge
-        // here because unrelated keys remain on their own independent timelines.
-        for (const k of keys) {
+        for (const k of keys)
             releaseAt.set(k, endAt);
-        }
         totalTime = Math.max(totalTime, endAt);
     }
     return totalTime;
@@ -512,47 +466,22 @@ function formatCookTime(seconds) {
     return mins === 0 ? `${hrs} hr` : `${hrs} hr ${mins} min`;
 }
 // ============================================================
-// COOKING PLAN — PER-STEP LOCK INJECTION
+// COOKING PLAN
 // ============================================================
-//
-// Called once when the user hits "Start Cooking". Walks steps in authored
-// order and attaches waitForIds directly to each step that needs to wait
-// for a timer to finish before it becomes interactable.
-//
-// Algorithm:
-//   A timer step "claims" all of its equipment and ingredients.
-//   Any later step that shares a claimed equipment or ingredient is locked,
-//   waiting for the claiming timer to complete.
-//   Claims are keyed as "recipeId::equipment" or "recipeId::ingredient"
-//   so the same equipment name in two different recipes stays separate.
-//
-//   Example: "Cook sausage (5 min)" claims the pan.
-//   "Continue cooking sausage" also uses the pan → locked until cook timer done.
-//   "Bring water to boil (6 min)" claims the pot.
-//   "Add lentil spaghetti to pot" also uses the pot → locked until boil done.
 function buildCookingPlan(recipes) {
-    const steps = recipes
-        .flatMap(r => r.steps);
-    // Preserve manually declared waitForIds (set via waitFor()) — store them
-    // keyed by step id so we can merge them back after the derived pass.
+    const steps = recipes.flatMap(r => r.steps);
     const manualWaits = new Map();
     steps.forEach(s => {
-        if (s.waitForIds && s.waitForIds.length > 0) {
+        if (s.waitForIds && s.waitForIds.length > 0)
             manualWaits.set(s.id, [...s.waitForIds]);
-        }
         s.waitForIds = undefined;
     });
-    // Equipment claims keyed by "recipeId::eq::name" — equipment is identified
-    // by name since there's only ever one instance of a named vessel.
-    // Ingredient claims keyed by object reference — two calls to i.avocadoOil()
-    // produce separate objects and are treated as independent instances.
     const equipClaims = new Map();
     const ingClaims = new Map();
     function getBlockingIds(step) {
         const blocking = new Set();
         for (const eq of (step.equipment ?? [])) {
-            const key = `${step.recipeId}::eq::${eq}`;
-            const id = equipClaims.get(key);
+            const id = equipClaims.get(`${step.recipeId}::eq::${eq}`);
             if (id !== undefined)
                 blocking.add(id);
         }
@@ -564,34 +493,21 @@ function buildCookingPlan(recipes) {
         return [...blocking];
     }
     function setClaims(step) {
-        for (const eq of (step.equipment ?? [])) {
+        for (const eq of (step.equipment ?? []))
             equipClaims.set(`${step.recipeId}::eq::${eq}`, step.id);
-        }
-        for (const ing of (step.ingredients ?? [])) {
+        for (const ing of (step.ingredients ?? []))
             ingClaims.set(ing, step.id);
-        }
     }
     for (const step of steps) {
-        // Collect any active claims that block this step
         const waitFor = new Set();
-        // Seed with manual waits declared via waitFor()
-        for (const id of (manualWaits.get(step.id) ?? [])) {
+        for (const id of (manualWaits.get(step.id) ?? []))
             waitFor.add(id);
-        }
-        // Add derived waits from equipment/ingredient conflicts
-        for (const id of getBlockingIds(step)) {
+        for (const id of getBlockingIds(step))
             waitFor.add(id);
-        }
-        if (waitFor.size > 0) {
+        if (waitFor.size > 0)
             step.waitForIds = [...waitFor];
-        }
-        // Any step that is itself waiting (has waitForIds) creates claims on its
-        // equipment and ingredients — not just timers. This means downstream steps
-        // that share the same equipment/ingredients will transitively inherit the
-        // block without needing explicit waitFor() declarations.
-        if (step.type === 'timer' || (step.waitForIds && step.waitForIds.length > 0)) {
+        if (step.type === 'timer' || (step.waitForIds && step.waitForIds.length > 0))
             setClaims(step);
-        }
     }
     return steps;
 }
@@ -599,10 +515,6 @@ function buildCookingPlan(recipes) {
 // SHOPPING LIST
 // ============================================================
 function buildShoppingList() {
-    // Object-reference dedup first — the SAME ingredient object appears across
-    // many steps (parent, children, mix contents), so summing by step would
-    // multi-count it. Walk to a Set of distinct objects, then sum by name+unit
-    // across those, scaled by the recipe's serving count.
     const combined = new Map();
     getSelectedRecipes().forEach((recipe) => {
         const servings = getServings(recipe.id);
@@ -617,8 +529,6 @@ function buildShoppingList() {
         };
         walk(recipe.steps);
         for (const ingredient of distinct) {
-            // Skip composites from mix()/combine() — they're roll-ups of real
-            // ingredients already counted on their own.
             if (isComposite(ingredient))
                 continue;
             const key = `${ingredient.name}-${ingredient.unit?.name ?? ''}`;
@@ -641,60 +551,63 @@ const addTotals = (a, b) => ({
     sugar: a.sugar + b.sugar,
     protein: a.protein + b.protein,
 });
-// Scale a totals row by a serving count — used so the nutrition screen reports
-// the actual amount the user will consume when they select N servings of a recipe.
 const scaleTotals = (t, n) => ({
     calories: t.calories * n,
     sodium: t.sodium * n,
     sugar: t.sugar * n,
     protein: t.protein * n,
 });
-// Composite ingredients produced by mix()/combine() carry _constituents and
-// are roll-ups of real ingredients that are already counted on their own —
-// excluding them avoids double counting and noisy false "missing" flags.
 function isComposite(ing) {
     return Array.isArray(ing._constituents);
 }
-// The single product whose label drives this ingredient's nutrition (and which
-// the shopping list marks as the pick). Prefers the product matching
-// defaultBrand; otherwise the first listed. Nutrition is NEVER blended across
-// brands — one brand is in the dish, so one label is used.
 function selectedProduct(ing) {
     const ps = ing.products ?? [];
     if (ps.length === 0)
         return undefined;
     return ps.find(p => p.brand === ing.defaultBrand) ?? ps[0];
 }
-// Resolution order: the selected product's label (brand-specific), else the
-// ingredient's own generic label (for produce). Brand-bearing goods keep their
-// label on the Product; brand-independent produce keeps it on the ingredient.
 function nutritionSource(ing) {
     const product = selectedProduct(ing);
     if (product?.nutrition)
         return { label: product.nutrition, brand: product.brand };
     return { label: ing.nutrition };
 }
+function resolveNutritionFacts(ing, label) {
+    const recipeUnit = ing.unit?.name ?? '';
+    const qty = ing.quantity ?? 0;
+    // 1. Exact match
+    if (label[recipeUnit]) {
+        return { facts: label[recipeUnit], convertedQty: qty, matchedUnit: recipeUnit };
+    }
+    // 2. Physical or density conversion into each keyed unit
+    for (const keyedUnit of Object.keys(label)) {
+        const converted = convertWithDensity(qty, recipeUnit, keyedUnit, ing.conversions);
+        if (converted !== null) {
+            return { facts: label[keyedUnit], convertedQty: converted, matchedUnit: keyedUnit };
+        }
+    }
+    return null;
+}
 function ingredientNutrition(ing) {
     const { label, brand } = nutritionSource(ing);
-    if (!label || Object.keys(label).length === 0) {
+    if (!label || Object.keys(label).length === 0)
         return { status: 'missing' };
-    }
     if (!ing.unit || !ing.unit.name) {
         return { status: 'uncomputable', reason: 'no unit on the recipe ingredient' };
     }
-    const facts = label[ing.unit.name];
-    if (!facts) {
+    const resolved = resolveNutritionFacts(ing, label);
+    if (!resolved) {
         const keyed = Object.keys(label).map(k => `"${k}"`).join(', ');
         return {
             status: 'uncomputable',
-            reason: `recipe uses "${ing.unit.name}" but ${brand ? `${brand}'s ` : ''}data is only keyed by ${keyed} (no unit conversion)`,
+            reason: `recipe uses "${ing.unit.name}" but ${brand ? `${brand}'s ` : ''}data is keyed by ${keyed} (no conversion path)`,
         };
     }
+    const { facts, convertedQty } = resolved;
     const servingSize = facts.servingSize ?? 0;
-    if (servingSize <= 0) {
+    if (servingSize <= 0)
         return { status: 'uncomputable', reason: 'serving size is missing or zero' };
-    }
-    const servingsUsed = (ing.quantity ?? 0) / servingSize;
+    const servingsUsed = convertedQty / servingSize;
     return {
         status: 'ok',
         brand,
@@ -706,10 +619,33 @@ function ingredientNutrition(ing) {
         },
     };
 }
+function ingredientCost(ing) {
+    const product = selectedProduct(ing);
+    if (!product)
+        return { status: 'missing' };
+    if (product.price === undefined || product.size === undefined || !product.sizeUnit) {
+        return { status: 'missing' };
+    }
+    if (!ing.unit || !ing.unit.name) {
+        return { status: 'uncomputable', reason: 'no unit on the recipe ingredient' };
+    }
+    const recipeUnit = ing.unit.name;
+    const packageUnit = product.sizeUnit.name;
+    const qty = ing.quantity ?? 0;
+    const convertedQty = convertWithDensity(qty, recipeUnit, packageUnit, ing.conversions);
+    if (convertedQty === null) {
+        return {
+            status: 'uncomputable',
+            reason: `recipe uses "${recipeUnit}" but package is in "${packageUnit}" (no conversion path)`,
+        };
+    }
+    return {
+        status: 'ok',
+        brand: product.brand,
+        cost: (product.price / product.size) * convertedQty,
+    };
+}
 function recipeNutrition(recipe) {
-    // Dedupe by object reference — the SAME ingredient object appears across
-    // multiple steps (e.g. PANKO in add/place/transfer). Reference-dedup counts
-    // each real quantity exactly once. Composites are filtered out (see above).
     const seen = new Set();
     const walk = (steps) => {
         for (const step of steps) {
@@ -722,19 +658,23 @@ function recipeNutrition(recipe) {
     walk(recipe.steps);
     const breakdown = [...seen]
         .filter(ing => !isComposite(ing))
-        .map(ing => ({ ing, result: ingredientNutrition(ing) }));
+        .map(ing => ({ ing, result: ingredientNutrition(ing), costResult: ingredientCost(ing) }));
     const totals = breakdown.reduce((acc, b) => b.result.status === 'ok' ? addTotals(acc, b.result.totals) : acc, emptyTotals());
+    const cost = breakdown.reduce((acc, b) => b.costResult.status === 'ok' ? acc + b.costResult.cost : acc, 0);
     return {
         totals,
+        cost,
         covered: breakdown.filter(b => b.result.status === 'ok').length,
         missing: breakdown.filter(b => b.result.status === 'missing').length,
         uncomputable: breakdown.filter(b => b.result.status === 'uncomputable').length,
+        costMissing: breakdown.filter(b => b.costResult.status !== 'ok').length,
         total: breakdown.length,
         breakdown,
     };
 }
-function formatTotals(t) {
-    return `${Math.round(t.calories)} cal · ${Math.round(t.sodium)} mg sodium · ` +
+function formatTotals(t, cost) {
+    const costStr = cost !== undefined ? `$${cost.toFixed(2)} · ` : '';
+    return `${costStr}${Math.round(t.calories)} cal · ${Math.round(t.sodium)} mg sodium · ` +
         `${Math.round(t.sugar)} g sugar · ${Math.round(t.protein)} g protein`;
 }
 function coverageLabel(covered, total, flagged) {
@@ -774,7 +714,6 @@ function getRecipeURL(recipeId) {
 }
 function copyToClipboard(text) {
     return navigator.clipboard.writeText(text).catch(() => {
-        // Fallback for older browsers
         const textarea = document.createElement('textarea');
         textarea.value = text;
         document.body.appendChild(textarea);
@@ -790,13 +729,10 @@ function createCopyButton(recipeId) {
     btn.title = 'Copy recipe link';
     btn.addEventListener('click', (ev) => {
         ev.stopPropagation();
-        const url = getRecipeURL(recipeId);
-        copyToClipboard(url).then(() => {
+        copyToClipboard(getRecipeURL(recipeId)).then(() => {
             const original = btn.textContent;
             btn.textContent = '✓';
-            setTimeout(() => {
-                btn.textContent = original;
-            }, 1500);
+            setTimeout(() => { btn.textContent = original; }, 1500);
         });
     });
     return btn;
@@ -807,12 +743,9 @@ function createCopyButton(recipeId) {
 function unlockAudioContext() {
     if (state.audioUnlocked)
         return;
-    // Create a silent audio element just to unlock the browser's audio context
     const silentAudio = new Audio();
     silentAudio.src = 'data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQIAAAAAAA==';
-    silentAudio.play().catch(() => {
-        // Fail silently if autoplay is blocked
-    });
+    silentAudio.play().catch(() => { });
     state.audioUnlocked = true;
 }
 // ============================================================
@@ -870,38 +803,21 @@ function renderRecipeList() {
         groupRecipes.forEach((recipe) => {
             const row = document.createElement('div');
             row.className = 'recipe-row';
-            // Ad-hoc rows skip the star (transient — favoriting one-offs is
-            // noise) and the copy link (the ID is a Date.now-stamped key that
-            // won't survive a page reload, so a shareable URL is meaningless).
-            if (!recipe.adhoc) {
-                const star = document.createElement('button');
-                const isFav = state.favoriteRecipeIds.includes(recipe.id);
-                star.className = 'star-btn';
-                star.textContent = isFav ? '★' : '☆';
-                star.classList.toggle('starred', isFav);
-                star.addEventListener('click', (ev) => {
-                    ev.stopPropagation();
-                    if (state.favoriteRecipeIds.includes(recipe.id)) {
-                        state.favoriteRecipeIds = state.favoriteRecipeIds.filter((id) => id !== recipe.id);
-                    }
-                    else {
-                        state.favoriteRecipeIds.push(recipe.id);
-                    }
-                    renderRecipeList();
-                });
+            if (!recipe.adhoc && FAVORITE_RECIPE_IDS.includes(recipe.id)) {
+                const star = document.createElement('span');
+                star.className = 'fav-star';
+                star.textContent = '★';
                 row.appendChild(star);
             }
-            else {
-                // Spacer so ad-hoc rows align with starred ones
+            else if (!recipe.adhoc) {
                 const spacer = document.createElement('span');
-                spacer.className = 'star-spacer';
+                spacer.className = 'fav-star fav-star-spacer';
                 row.appendChild(spacer);
             }
             const btn = document.createElement('button');
             btn.className = 'recipe-btn';
             const count = state.selectedRecipeIds.filter(id => id === recipe.id).length;
             btn.classList.toggle('selected', count > 0);
-            // Recipe name, with a small ×N badge when selected more than once
             const nameSpan = document.createElement('span');
             nameSpan.textContent = recipe.name;
             btn.appendChild(nameSpan);
@@ -911,16 +827,12 @@ function renderRecipeList() {
                 badge.textContent = `×${count}`;
                 btn.appendChild(badge);
             }
-            // Tap adds one serving. Same recipe can appear multiple times in
-            // selectedRecipeIds — each occurrence is one serving of the recipe.
             btn.addEventListener('click', () => {
                 state.selectedRecipeIds.push(recipe.id);
                 unlockAudioContext();
                 renderRecipeList();
                 updateActionButtons();
             });
-            // When at least one serving is selected, show a "−" button so the
-            // user can remove servings one at a time. Hidden at count: 0.
             const minusBtn = document.createElement('button');
             minusBtn.className = 'count-minus-btn';
             minusBtn.textContent = '−';
@@ -934,10 +846,6 @@ function renderRecipeList() {
                 renderRecipeList();
                 updateActionButtons();
             });
-            // For ad-hoc rows, an "×" button removes the recipe entirely
-            // (drops all servings AND unregisters the synthetic recipe so it
-            // stops cluttering the list once the user is done with it).
-            // For real recipes, we keep the share-link button instead.
             row.appendChild(btn);
             row.appendChild(minusBtn);
             if (recipe.adhoc) {
@@ -960,9 +868,6 @@ function renderRecipeList() {
             root.appendChild(row);
         });
     });
-    // "+ Add an ingredient" — opens a picker screen for adding a one-off
-    // ingredient (no recipe). The picker creates a synthetic adhoc recipe so
-    // the rest of the app's machinery (shopping/nutrition) works unchanged.
     appendAddIngredientButton(root);
 }
 function appendAddIngredientButton(root) {
@@ -984,8 +889,6 @@ function updateActionButtons() {
     nutritionBtn.className = 'action-btn action-btn-nutrition';
     actions.appendChild(shopBtn);
     actions.appendChild(nutritionBtn);
-    // Only show "Start Cooking" when at least one real (non-adhoc) recipe is
-    // selected — there's nothing to cook for ad-hoc-only shopping lists.
     const hasCookable = getSelectedRecipes().some(r => !r.adhoc);
     if (hasCookable) {
         const cookBtn = createButton('🍳 Start Cooking', () => navigateTo('cooking'));
@@ -1042,18 +945,6 @@ function renderShoppingScreen() {
 // ============================================================
 // SCREEN: NUTRITION
 // ============================================================
-//
-// Three levels of drill-down, top to bottom:
-//   1. Grand total across all selected recipes (pinned at top).
-//   2. Per recipe — a collapsible section showing the recipe subtotal.
-//   3. Per ingredient — tap a recipe header to expand its ingredient rows.
-//
-// Ingredients that can't contribute a trustworthy number are flagged inline:
-//   • "no nutrition data" — the ingredient has no nutrition block.
-//   • "can't compute"     — it has data but the unit doesn't match (or the
-//                           serving size is unusable); the reason is shown.
-// Every recipe and the grand total also carry a coverage line so a subtotal
-// built from only some of its ingredients is never read as complete.
 function renderNutritionScreen() {
     const root = getElement('app');
     clear(root);
@@ -1075,19 +966,18 @@ function renderNutritionScreen() {
         nutrition: recipeNutrition(r),
     }));
     // ── Grand total ──────────────────────────────────────────
-    // Sum the SCALED per-recipe totals (each multiplied by its serving count).
     const grand = perRecipe.reduce((acc, p) => addTotals(acc, scaleTotals(p.nutrition.totals, p.servings)), emptyTotals());
+    const grandCost = perRecipe.reduce((acc, p) => acc + p.nutrition.cost * p.servings, 0);
     const gCovered = perRecipe.reduce((a, p) => a + p.nutrition.covered, 0);
     const gFlagged = perRecipe.reduce((a, p) => a + p.nutrition.missing + p.nutrition.uncomputable, 0);
     const gTotal = perRecipe.reduce((a, p) => a + p.nutrition.total, 0);
+    const gCostMissing = perRecipe.reduce((a, p) => a + p.nutrition.costMissing, 0);
     const grandServings = perRecipe.reduce((a, p) => a + p.servings, 0);
+    const hasCostData = gTotal > gCostMissing;
     const totalCard = createPanel();
     totalCard.className = 'panel nutrition-total';
     const totalTitle = document.createElement('div');
     totalTitle.className = 'nutrition-total-title';
-    // Title disambiguates "1 recipe ×3" from "3 different recipes" — the grand
-    // total card scales by servings, so the reader should always know exactly
-    // what's being summed.
     if (recipes.length === 1 && perRecipe[0].servings === 1) {
         totalTitle.textContent = recipes[0].name;
     }
@@ -1100,8 +990,23 @@ function renderNutritionScreen() {
     totalCard.appendChild(totalTitle);
     const totalValue = document.createElement('div');
     totalValue.className = 'nutrition-values';
-    totalValue.textContent = gCovered > 0 ? formatTotals(grand) : '— no computable data';
+    if (gCovered > 0) {
+        totalValue.textContent = formatTotals(grand, hasCostData ? grandCost : undefined);
+    }
+    else if (hasCostData) {
+        totalValue.textContent = `$${grandCost.toFixed(2)}`;
+    }
+    else {
+        totalValue.textContent = '— no computable data';
+    }
     totalCard.appendChild(totalValue);
+    // Partial cost warning
+    if (gCostMissing > 0 && hasCostData) {
+        const costNote = document.createElement('div');
+        costNote.className = 'nutrition-cost-note';
+        costNote.textContent = `⚠ cost is partial — ${gCostMissing} ingredient${gCostMissing === 1 ? '' : 's'} missing price data`;
+        totalCard.appendChild(costNote);
+    }
     const totalCoverage = document.createElement('div');
     totalCoverage.className = 'nutrition-coverage' + (gFlagged > 0 ? ' flagged' : '');
     totalCoverage.textContent = (gFlagged > 0 ? '⚠ ' : '') + coverageLabel(gCovered, gTotal, gFlagged);
@@ -1112,9 +1017,9 @@ function renderNutritionScreen() {
         const section = createPanel();
         section.className = 'panel nutrition-recipe';
         const flaggedCount = nutrition.missing + nutrition.uncomputable;
-        // Scaled subtotal — what the user will actually consume for the chosen
-        // number of servings.
         const sectionTotals = scaleTotals(nutrition.totals, servings);
+        const sectionCost = nutrition.cost * servings;
+        const recipeHasCostData = nutrition.total > nutrition.costMissing;
         const header = document.createElement('div');
         header.className = 'nutrition-recipe-header';
         const caret = document.createElement('span');
@@ -1125,7 +1030,15 @@ function renderNutritionScreen() {
         name.textContent = servings > 1 ? `${recipe.name} ×${servings}` : recipe.name;
         const sub = document.createElement('span');
         sub.className = 'nutrition-recipe-sub';
-        sub.textContent = nutrition.covered > 0 ? formatTotals(sectionTotals) : '— no computable data';
+        if (nutrition.covered > 0) {
+            sub.textContent = formatTotals(sectionTotals, recipeHasCostData ? sectionCost : undefined);
+        }
+        else if (recipeHasCostData) {
+            sub.textContent = `$${sectionCost.toFixed(2)}`;
+        }
+        else {
+            sub.textContent = '— no computable data';
+        }
         header.appendChild(caret);
         header.appendChild(name);
         header.appendChild(sub);
@@ -1135,23 +1048,25 @@ function renderNutritionScreen() {
         cov.textContent = (flaggedCount > 0 ? '⚠ ' : '') +
             coverageLabel(nutrition.covered, nutrition.total, flaggedCount);
         section.appendChild(cov);
-        // Per-ingredient breakdown — collapsed until the header is tapped
+        // Per-ingredient breakdown
         const list = document.createElement('div');
         list.className = 'nutrition-ingredients collapsed';
-        nutrition.breakdown.forEach(({ ing, result }) => {
+        nutrition.breakdown.forEach(({ ing, result, costResult }) => {
             const row = document.createElement('div');
             row.className = 'nutrition-ingredient-row';
             const ingName = document.createElement('span');
             ingName.className = 'nutrition-ingredient-name';
-            // Scale the displayed quantity per serving count so the row's
-            // amount matches the row's nutrition (e.g. "2 cups Macadamia Milk").
             const scaledIng = { ...ing, quantity: (ing.quantity ?? 0) * servings };
             ingName.textContent = formatIngredient(scaledIng);
             row.appendChild(ingName);
             const detail = document.createElement('span');
             if (result.status === 'ok') {
                 detail.className = 'nutrition-ingredient-value';
-                detail.textContent = formatTotals(scaleTotals(result.totals, servings));
+                // Append cost to the nutrition line when available
+                const costSuffix = costResult.status === 'ok'
+                    ? ` · $${(costResult.cost * servings).toFixed(2)}`
+                    : '';
+                detail.textContent = formatTotals(scaleTotals(result.totals, servings)) + costSuffix;
             }
             else if (result.status === 'missing') {
                 row.classList.add('flagged');
@@ -1165,16 +1080,22 @@ function renderNutritionScreen() {
                 detail.title = result.reason;
             }
             row.appendChild(detail);
-            // Spell out why an ingredient with data still couldn't be used
             if (result.status === 'uncomputable') {
                 const reason = document.createElement('div');
                 reason.className = 'nutrition-flag-reason';
                 reason.textContent = result.reason;
                 row.appendChild(reason);
             }
-            // Brand provenance — show which product's label these numbers came
-            // from, so a reader knows the figures are brand-specific (and what
-            // they'd change by if they swapped to a different listed product).
+            // Cost flag — only shown when nutrition resolved fine but cost didn't
+            if (result.status === 'ok' && costResult.status !== 'ok') {
+                const costFlag = document.createElement('div');
+                costFlag.className = 'nutrition-cost-flag';
+                costFlag.textContent = costResult.status === 'missing'
+                    ? '⚠ no price data'
+                    : `⚠ cost can't compute — ${costResult.reason}`;
+                row.appendChild(costFlag);
+            }
+            // Brand provenance
             if (result.status === 'ok' && result.brand) {
                 const product = selectedProduct(ing);
                 const variant = product?.variant ? ` · ${product.variant}` : '';
@@ -1197,24 +1118,10 @@ function renderNutritionScreen() {
 // ============================================================
 // SCREEN: ADD INGREDIENT
 // ============================================================
-//
-// Picker for adding a one-off ingredient to the current shopping/nutrition
-// session without going through a recipe. The user searches the registered
-// ingredients (from `i`), picks one, sets a quantity and unit, and confirms.
-// Confirmation creates a synthetic adhoc recipe via createAdhocRecipe() and
-// selects one serving of it, after which it flows through every existing
-// pipeline as if it were a real recipe.
-//
-// State is local to the screen (search query + selection) — kept in module
-// vars rather than the global state because it's transient and discarded when
-// the user leaves the picker.
 let adhocSearchQuery = '';
 let adhocSelectedKey = null;
 let adhocQuantity = 1;
 let adhocUnitName = '';
-// Best guess at a natural unit for an ingredient — inspects any nutrition
-// block (on the ingredient or its first product) and uses one of its keyed
-// units. Falls back to `u.unit` so the picker always has something to show.
 function pickDefaultUnit(ing) {
     const productUnits = ing.products?.[0]?.nutrition && Object.keys(ing.products[0].nutrition);
     const ownUnits = ing.nutrition && Object.keys(ing.nutrition);
@@ -1226,9 +1133,6 @@ function pickDefaultUnit(ing) {
     }
     return u.unit;
 }
-// Enumerate every registered ingredient factory in `i`, instantiating each
-// once at zero quantity to read its display name and default unit. Cached on
-// first call — the set of factories doesn't change at runtime.
 let adhocCatalog = null;
 function getAdhocCatalog() {
     if (adhocCatalog)
@@ -1249,7 +1153,6 @@ function renderAddIngredientScreen() {
     sub.className = 'adhoc-sub';
     sub.textContent = 'Pick an ingredient to add to your shopping list and nutrition totals.';
     root.appendChild(sub);
-    // Search box — filters the ingredient catalog by name substring.
     const searchInput = document.createElement('input');
     searchInput.type = 'text';
     searchInput.placeholder = 'Search ingredients…';
@@ -1263,13 +1166,11 @@ function renderAddIngredientScreen() {
     const list = document.createElement('div');
     list.id = 'adhoc-list';
     root.appendChild(list);
-    // Quantity + unit + confirm — only shown once an ingredient is selected.
     const detail = document.createElement('div');
     detail.id = 'adhoc-detail';
     detail.className = 'adhoc-detail';
     root.appendChild(detail);
     const backBtn = createButton('← Back', () => {
-        // Reset transient picker state when leaving
         adhocSearchQuery = '';
         adhocSelectedKey = null;
         adhocQuantity = 1;
@@ -1302,7 +1203,6 @@ function renderAdhocList() {
             btn.classList.add('selected');
         btn.addEventListener('click', () => {
             adhocSelectedKey = key;
-            // Reset quantity/unit to defaults when picking a new ingredient
             const sample = all.find(c => c.key === key).sample;
             adhocQuantity = 1;
             adhocUnitName = pickDefaultUnit(sample).name;
@@ -1324,7 +1224,6 @@ function renderAdhocDetail() {
     label.className = 'adhoc-detail-label';
     label.textContent = `How much ${catalogEntry.name}?`;
     root.appendChild(label);
-    // Quantity input
     const qtyInput = document.createElement('input');
     qtyInput.type = 'number';
     qtyInput.min = '0';
@@ -1336,8 +1235,6 @@ function renderAdhocDetail() {
         adhocQuantity = isNaN(v) ? 0 : v;
     });
     root.appendChild(qtyInput);
-    // Unit dropdown — every supported unit is offered (no unit-conversion
-    // logic exists, so we don't try to restrict per ingredient).
     const unitSelect = document.createElement('select');
     unitSelect.className = 'adhoc-unit';
     for (const unit of Object.values(u)) {
@@ -1348,13 +1245,8 @@ function renderAdhocDetail() {
             opt.selected = true;
         unitSelect.appendChild(opt);
     }
-    unitSelect.addEventListener('change', () => {
-        adhocUnitName = unitSelect.value;
-    });
+    unitSelect.addEventListener('change', () => { adhocUnitName = unitSelect.value; });
     root.appendChild(unitSelect);
-    // Confirm — builds a fresh ingredient object at the chosen qty/unit,
-    // wraps it in a synthetic adhoc recipe, registers + selects it, then
-    // returns to the select screen so the user sees it in the list.
     const confirmBtn = createButton('Add to list', () => {
         const factory = i[adhocSelectedKey];
         const unit = Object.values(u).find(uu => uu.name === adhocUnitName) ?? u.unit;
@@ -1362,7 +1254,6 @@ function renderAdhocDetail() {
         const recipe = createAdhocRecipe(fresh);
         registerRecipe(recipe);
         state.selectedRecipeIds.push(recipe.id);
-        // Clear picker state
         adhocSearchQuery = '';
         adhocSelectedKey = null;
         adhocQuantity = 1;
@@ -1378,33 +1269,8 @@ function renderAdhocDetail() {
 function formatElapsed(seconds) {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
-    return m > 0
-        ? `${m}m ${String(s).padStart(2, '0')}s`
-        : `${s}s`;
+    return m > 0 ? `${m}m ${String(s).padStart(2, '0')}s` : `${s}s`;
 }
-// ============================================================
-// COOKING LAYOUT — ACTIONABLE STEPS FIRST
-// ============================================================
-//
-// The cooking screen renders two zones:
-//
-//   ┌─────────────────────────────────────────┐
-//   │  [Ready section]                        │
-//   │  Steps with no waitForIds, or steps     │
-//   │  whose waited-on timers are done        │
-//   ├─────────────────────────────────────────┤
-//   │  [Waiting section]  (collapsible label) │
-//   │  Steps that are still locked            │
-//   └─────────────────────────────────────────┘
-//
-// Each step panel is rendered once and physically moved between zones
-// whenever its lock state changes. This keeps authored ordering within
-// each zone while always surfacing actionable steps at the top.
-//
-// Movement is triggered by the same MutationObserver that drives the
-// unlock animation — when a step unlocks, promotePanelToReady() is
-// called immediately after the unlock flash, sliding the panel into
-// the ready zone.
 let readySection = null;
 let waitingSection = null;
 function getOrCreateCookingSections() {
@@ -1427,14 +1293,9 @@ function promotePanelToReady(panel) {
         return;
     if (readySection.contains(panel))
         return;
-    // Never independently promote a child panel — it lives inside its
-    // container and the container handles its own promotion.
     if (panel.closest('.container-children'))
         return;
     const incomingIndex = parseInt(panel.dataset.stepIndex ?? '0', 10);
-    // Only consider direct children of readySection that have a step index.
-    // Skip completed/skipped panels — treat them as index -1 (pinned at top),
-    // so newly promoted steps always insert after them.
     const panels = Array.from(readySection.querySelectorAll(':scope > .panel[data-step-index]'));
     const insertBefore = panels.find(p => {
         if (p.classList.contains('completed') || p.classList.contains('skipped'))
@@ -1447,45 +1308,29 @@ function promotePanelToReady(panel) {
     else {
         readySection.appendChild(panel);
     }
-    // Hide the waiting section label if nothing is left waiting
     if (waitingSection) {
         const remainingLocked = waitingSection.querySelectorAll('.panel:not(.waiting-section-label)');
-        if (remainingLocked.length === 0) {
+        if (remainingLocked.length === 0)
             waitingSection.style.display = 'none';
-        }
     }
 }
 function renderCookingScreen() {
     const root = getElement('app');
     clear(root);
-    // Reset section references for a fresh render
     readySection = null;
     waitingSection = null;
-    // Record when cooking started (only on first render, not on re-render)
-    if (state.cookingStartedAt === null) {
+    if (state.cookingStartedAt === null)
         state.cookingStartedAt = Date.now();
-    }
-    // Ad-hoc ingredients are tracked as synthetic recipes for shopping/nutrition
-    // purposes, but they carry no real steps — exclude them from cooking so the
-    // cook flow doesn't sprout meaningless "Have X on hand" cards.
     const selected = getSelectedRecipes().filter(r => !r.adhoc);
     state.cookingPlanSteps = buildCookingPlan(selected);
-    // Total time banner when multiple recipes selected
     if (selected.length > 1) {
-        const totalSecs = selected.reduce((s, r) => {
-            const recipeSecs = recipeCookSeconds(r);
-            return s + recipeSecs;
-        }, 0);
-        const hardcodedTotal = selected.reduce((s, r) => {
-            return s + (r.estimatedMinutes ? r.estimatedMinutes * 60 : 0);
-        }, 0);
+        const totalSecs = selected.reduce((s, r) => s + recipeCookSeconds(r), 0);
+        const hardcodedTotal = selected.reduce((s, r) => s + (r.estimatedMinutes ? r.estimatedMinutes * 60 : 0), 0);
         const banner = document.createElement('div');
         banner.className = 'cook-time-banner';
-        let bannerText = `Total cook time: ${formatCookTime(totalSecs)}`;
-        if (hardcodedTotal > 0) {
-            bannerText = `Total: ${formatCookTime(hardcodedTotal)} goal (${formatCookTime(totalSecs)} calculated)`;
-        }
-        banner.textContent = bannerText;
+        banner.textContent = hardcodedTotal > 0
+            ? `Total: ${formatCookTime(hardcodedTotal)} goal (${formatCookTime(totalSecs)} calculated)`
+            : `Total cook time: ${formatCookTime(totalSecs)}`;
         root.appendChild(banner);
     }
     const { ready, waiting } = getOrCreateCookingSections();
@@ -1493,7 +1338,6 @@ function renderCookingScreen() {
     root.appendChild(waiting);
     let lastRecipeId;
     for (const step of state.cookingPlanSteps) {
-        // Insert recipe title headings into the ready section (they always appear there)
         if (step.recipeId && step.recipeId !== lastRecipeId) {
             lastRecipeId = step.recipeId;
             const recipe = state.recipes.get(step.recipeId);
@@ -1515,9 +1359,8 @@ function renderCookingScreen() {
                     badge.textContent = `${estimateDisplay} · actual ${formatElapsed(secs)}`;
                 };
                 updateBadge();
-                if (state.cookingElapsedInterval !== null) {
+                if (state.cookingElapsedInterval !== null)
                     window.clearInterval(state.cookingElapsedInterval);
-                }
                 state.cookingElapsedInterval = window.setInterval(() => {
                     const hasSteps = document.querySelector(`#app .panel:not(.completed):not(.skipped)`);
                     if (!hasSteps) {
@@ -1527,10 +1370,9 @@ function renderCookingScreen() {
                     }
                     updateBadge();
                 }, 1000);
-                const copyBtn = createCopyButton(recipe.id);
                 header.appendChild(title);
                 header.appendChild(badge);
-                header.appendChild(copyBtn);
+                header.appendChild(createCopyButton(recipe.id));
                 ready.appendChild(header);
             }
         }
@@ -1545,22 +1387,14 @@ function renderCookingScreen() {
             ready.appendChild(panel);
         }
     }
-    // Hide the waiting section if it has no locked panels
     const lockedPanels = waiting.querySelectorAll('.panel');
-    if (lockedPanels.length === 0) {
+    if (lockedPanels.length === 0)
         waiting.style.display = 'none';
-    }
     root.appendChild(createStartOverButton());
 }
 // ============================================================
 // STEP LOCKING
 // ============================================================
-//
-// A locked step is dimmed, shows a "waiting" label, and ignores taps.
-// It watches the DOM via MutationObserver and unlocks itself the moment
-// all waited-on timer step elements are completed or skipped.
-// On unlock it briefly flashes a "ready" style, then promotePanelToReady()
-// physically moves it from the waiting section into the ready section.
 function applyLock(panel, step) {
     const waitForIds = step.waitForIds;
     if (!waitForIds || waitForIds.length === 0)
@@ -1584,7 +1418,6 @@ function applyLock(panel, step) {
         panel.classList.remove('step-locked');
         pill.remove();
         panel.classList.add('step-unlocked');
-        // Move the panel to the ready section after the flash animation
         setTimeout(() => {
             panel.classList.remove('step-unlocked');
             promotePanelToReady(panel);
@@ -1600,7 +1433,6 @@ function applyLock(panel, step) {
 function renderStep(step, onDone) {
     const panel = createPanel();
     panel.id = `step-${step.id}`;
-    // ── Container step (has children) ────────────────────────
     if (step.children && step.children.length > 0) {
         panel.classList.add('container-step');
         const header = document.createElement('div');
@@ -1618,16 +1450,13 @@ function renderStep(step, onDone) {
             }
         };
         step.children.forEach((child) => {
-            if (step.waitForIds && !child.waitForIds) {
+            if (step.waitForIds && !child.waitForIds)
                 child.waitForIds = step.waitForIds;
-            }
-            const childPanel = renderStep(child, checkDone);
-            childWrap.appendChild(childPanel);
+            childWrap.appendChild(renderStep(child, checkDone));
         });
         applyLock(panel, step);
         return panel;
     }
-    // ── Timer step ───────────────────────────────────────────
     panel.textContent = step.text;
     if (step.type === 'timer') {
         let clickCount = 0;
@@ -1653,7 +1482,6 @@ function renderStep(step, onDone) {
         applyLock(panel, step);
         return panel;
     }
-    // ── Instruction / cleanup step ───────────────────────────
     panel.addEventListener('click', () => {
         if (panel.classList.contains('step-locked'))
             return;
@@ -1695,8 +1523,6 @@ function createStartOverButton() {
         state.searchQuery = '';
         state.cookingStartedAt = null;
         state.audioUnlocked = false;
-        // Drop ad-hoc recipes — they're transient session items and shouldn't
-        // outlive a Start Over. Real recipes stay registered for next time.
         for (const [id, recipe] of state.recipes) {
             if (recipe.adhoc)
                 state.recipes.delete(id);
@@ -1824,9 +1650,6 @@ h2 { margin-top: 0; font-size: 28px; }
     color: white;
 }
 
-/* Small "×N" badge inside the recipe button when more than one serving is
-   selected — placed inline after the name so the button stays tappable as a
-   whole and the count is obvious at a glance. */
 .count-badge {
     margin-left: 10px;
     font-size: 18px;
@@ -1836,9 +1659,6 @@ h2 { margin-top: 0; font-size: 28px; }
     border-radius: 12px;
 }
 
-/* The "−" button next to a selected recipe, used to remove one serving at a
-   time. Hidden (visibility:hidden, not display:none) when count is 0 so the
-   row layout doesn't shift as servings are added/removed. */
 .count-minus-btn {
     font-size: 28px;
     padding: 10px 16px;
@@ -1850,15 +1670,6 @@ h2 { margin-top: 0; font-size: 28px; }
     line-height: 1;
 }
 
-/* Reserved space where the star would go for ad-hoc rows — keeps the recipe
-   button column aligned across rows with and without favoriting. */
-.star-spacer {
-    display: inline-block;
-    width: 52px;  /* matches .star-btn padding + char width */
-}
-
-/* "×" delete on ad-hoc rows — removes the synthetic recipe entirely. Red so
-   it's visually distinguished from the "−" servings button. */
 .adhoc-remove-btn {
     font-size: 22px;
     padding: 10px 14px;
@@ -1870,14 +1681,7 @@ h2 { margin-top: 0; font-size: 28px; }
 }
 .adhoc-remove-btn:hover { color: #f87171; }
 
-/* ── Add-ingredient screen ── */
-
-/* The bottom "+ Add an ingredient" affordance on the recipe list — visually
-   distinct from the recipe rows so it reads as a separate action. */
-.add-ingredient-row {
-    margin-top: 16px;
-    display: flex;
-}
+.add-ingredient-row { margin-top: 16px; display: flex; }
 .add-ingredient-btn {
     flex: 1;
     font-size: 20px;
@@ -1888,18 +1692,10 @@ h2 { margin-top: 0; font-size: 28px; }
     color: #aaa;
     cursor: pointer;
 }
-.add-ingredient-btn:hover {
-    border-color: #888;
-    color: #f0f0f0;
-}
+.add-ingredient-btn:hover { border-color: #888; color: #f0f0f0; }
 
-.adhoc-sub {
-    color: #888;
-    margin: 0 0 16px 0;
-}
+.adhoc-sub { color: #888; margin: 0 0 16px 0; }
 
-/* Scrollable list of catalog ingredients in the picker. Capped height so the
-   quantity + unit controls below stay reachable on short screens. */
 #adhoc-list {
     max-height: 50vh;
     overflow-y: auto;
@@ -1921,12 +1717,8 @@ h2 { margin-top: 0; font-size: 28px; }
     margin: 4px 0;
     cursor: pointer;
 }
-.adhoc-item.selected {
-    background: #1a5c2a;
-    border-color: #2d9e4a;
-}
+.adhoc-item.selected { background: #1a5c2a; border-color: #2d9e4a; }
 
-/* Quantity + unit + confirm row, shown once an ingredient is picked. */
 .adhoc-detail {
     display: flex;
     flex-wrap: wrap;
@@ -1935,100 +1727,39 @@ h2 { margin-top: 0; font-size: 28px; }
     padding: 12px 0;
 }
 .adhoc-detail:empty { display: none; }
-.adhoc-detail-label {
-    flex-basis: 100%;
-    font-size: 18px;
-    color: #f0f0f0;
-}
+.adhoc-detail-label { flex-basis: 100%; font-size: 18px; color: #f0f0f0; }
 .adhoc-qty {
-    flex: 1;
-    min-width: 80px;
-    background: #222;
-    border: 2px solid #444;
-    border-radius: 10px;
-    color: #f0f0f0;
-    font-size: 20px;
-    padding: 12px;
+    flex: 1; min-width: 80px;
+    background: #222; border: 2px solid #444; border-radius: 10px;
+    color: #f0f0f0; font-size: 20px; padding: 12px;
 }
 .adhoc-unit {
-    flex: 1;
-    min-width: 100px;
-    background: #222;
-    border: 2px solid #444;
-    border-radius: 10px;
-    color: #f0f0f0;
-    font-size: 20px;
-    padding: 12px;
+    flex: 1; min-width: 100px;
+    background: #222; border: 2px solid #444; border-radius: 10px;
+    color: #f0f0f0; font-size: 20px; padding: 12px;
 }
 .adhoc-confirm {
     flex-basis: 100%;
-    background: #16a34a;
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-size: 22px;
-    font-weight: bold;
-    padding: 18px;
-    cursor: pointer;
+    background: #16a34a; color: white; border: none;
+    border-radius: 12px; font-size: 22px; font-weight: bold;
+    padding: 18px; cursor: pointer;
 }
 .adhoc-confirm:hover { background: #15803d; }
 
-.star-btn {
-    font-size: 28px;
-    padding: 12px;
-    background: none;
-    border: none;
-    color: #666;
-    cursor: pointer;
-    line-height: 1;
-}
+.fav-star { font-size: 20px; width: 32px; color: #f5c518; user-select: none; flex-shrink: 0; }
+.fav-star-spacer { color: transparent; }
 
-.star-btn.starred { color: #f5c518; }
-
-.copy-link-btn {
-    font-size: 18px;
-    padding: 10px 12px;
-    background: none;
-    border: none;
-    color: #666;
-    cursor: pointer;
-    line-height: 1;
-    transition: color 0.3s;
-}
-
-.copy-link-btn:hover {
-    color: #60a5fa;
-}
-
-.copy-link-btn:active {
-    color: #2d9e4a;
-}
+.copy-link-btn { font-size: 18px; padding: 10px 12px; background: none; border: none; color: #666; cursor: pointer; line-height: 1; transition: color 0.3s; }
+.copy-link-btn:hover  { color: #60a5fa; }
+.copy-link-btn:active { color: #2d9e4a; }
 
 .actions {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    background: #111;
-    border-top: 2px solid #333;
-    padding: 16px 24px;
-    display: flex;
-    gap: 16px;
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: #111; border-top: 2px solid #333;
+    padding: 16px 24px; display: flex; gap: 16px;
 }
 
-.action-btn {
-    flex: 1;
-    font-size: 24px;
-    padding: 20px;
-    border-radius: 12px;
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-/* Default positional coloring (used when all three buttons are present:
-   Shopping blue, Cooking green). When only Shopping + Nutrition are shown
-   (ad-hoc-only selection), the Nutrition button would otherwise inherit
-   the green :last-child rule — the more specific selector below overrides
-   that so Nutrition stays purple regardless of position. */
+.action-btn { flex: 1; font-size: 24px; padding: 20px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; }
 .action-btn:first-child { background: #2563eb; color: white; }
 .action-btn:last-child  { background: #16a34a; color: white; }
 .actions .action-btn-nutrition { background: #7c3aed; color: white; }
@@ -2036,288 +1767,104 @@ h2 { margin-top: 0; font-size: 28px; }
 #recipe-list { padding-bottom: 120px; }
 
 .panel {
-    border: 2px solid #444;
-    border-radius: 12px;
-    padding: 20px;
-    margin: 10px 0;
-    cursor: pointer;
-    font-size: 22px;
-    position: relative;
+    border: 2px solid #444; border-radius: 12px; padding: 20px; margin: 10px 0;
+    cursor: pointer; font-size: 22px; position: relative;
     transition: opacity 0.3s, border-color 0.3s, background 0.3s;
 }
 
-.panel.container-step {
-    border-color: #555;
-    background: #1a1a1a;
-    cursor: default;
-    padding: 0;
-}
+.panel.container-step { border-color: #555; background: #1a1a1a; cursor: default; padding: 0; }
 
 .container-header {
-    padding: 16px 20px 12px;
-    font-size: 18px;
-    color: #888;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    border-bottom: 1px solid #333;
+    padding: 16px 20px 12px; font-size: 18px; color: #888;
+    text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #333;
 }
 
-.container-children {
-    padding: 8px 12px 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.container-children .panel {
-    margin: 0;
-    font-size: 20px;
-    padding: 14px 16px;
-}
+.container-children { padding: 8px 12px 12px; display: flex; flex-direction: column; gap: 6px; }
+.container-children .panel { margin: 0; font-size: 20px; padding: 14px 16px; }
 
 .panel.timer     { background: #ca8a04; color: black; border-color: #ca8a04; }
 .panel.completed { background: #1a5c2a; color: white; border-color: #2d9e4a; }
 .panel.skipped   { background: #374151; color: #9ca3af; border-color: #4b5563; text-decoration: line-through; }
 
-/* Locked step — dimmed with a left red border accent */
-.panel.step-locked {
-    opacity: 0.45;
-    cursor: not-allowed;
-    border-left: 4px solid #ef4444;
-    border-color: #333;
-    border-left-color: #ef4444;
-}
+.panel.step-locked { opacity: 0.45; cursor: not-allowed; border-color: #333; border-left: 4px solid #ef4444; border-left-color: #ef4444; }
 
-/* Small pill shown inside locked steps */
 .waiting-pill {
-    display: inline-block;
-    margin-top: 8px;
-    font-size: 13px;
-    color: #ef4444;
-    background: rgba(239, 68, 68, 0.12);
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    border-radius: 20px;
-    padding: 2px 10px;
-    letter-spacing: 0.04em;
+    display: inline-block; margin-top: 8px; font-size: 13px;
+    color: #ef4444; background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 20px;
+    padding: 2px 10px; letter-spacing: 0.04em;
 }
 
-/* Brief green flash when a step unlocks */
 @keyframes unlockFlash {
     0%   { border-color: #2d9e4a; background: rgba(45, 158, 74, 0.15); }
     100% { border-color: #444;    background: transparent; }
 }
-
-.panel.step-unlocked {
-    animation: unlockFlash 0.8s ease-out forwards;
-}
+.panel.step-unlocked { animation: unlockFlash 0.8s ease-out forwards; }
 
 .purchase-links { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
-
 .purchase-link { color: #60a5fa; font-size: 16px; text-decoration: none; }
 .purchase-link:hover { text-decoration: underline; }
+.purchase-link.default-product { color: #2d9e4a; font-weight: bold; }
 
-/* The product selected as the default — its label drives nutrition, and it's
-   highlighted on the shopping list so the user can see which one is "the pick". */
-.purchase-link.default-product {
-    color: #2d9e4a;
-    font-weight: bold;
-}
-
-.start-over-btn {
-    margin-top: 32px;
-    font-size: 20px;
-    padding: 16px 32px;
-    border-radius: 12px;
-    border: 2px solid #444;
-    background: #222;
-    color: #f0f0f0;
-    cursor: pointer;
-}
+.start-over-btn { margin-top: 32px; font-size: 20px; padding: 16px 32px; border-radius: 12px; border: 2px solid #444; background: #222; color: #f0f0f0; cursor: pointer; }
 
 .empty { color: #666; font-style: italic; }
 
-/* Recipe title row with cook time badge */
-.recipe-title-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 4px;
-}
-
+.recipe-title-row { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
 .recipe-title-row h2 { margin: 0; flex: 1; }
+.recipe-title-row .copy-link-btn { margin-left: auto; }
+.cook-time-badge { font-size: 16px; color: #888; white-space: nowrap; }
+.cook-time-banner { font-size: 16px; color: #888; border: 1px solid #333; border-radius: 10px; padding: 10px 16px; margin-bottom: 16px; text-align: center; }
 
-.recipe-title-row .copy-link-btn {
-    margin-left: auto;
-}
-
-.cook-time-badge {
-    font-size: 16px;
-    color: #888;
-    white-space: nowrap;
-}
-
-.cook-time-elapsed {
-    font-size: 16px;
-    color: #60a5fa;
-    white-space: nowrap;
-    margin-left: auto;
-}
-
-/* Total cook time banner (multi-recipe) */
-.cook-time-banner {
-    font-size: 16px;
-    color: #888;
-    border: 1px solid #333;
-    border-radius: 10px;
-    padding: 10px 16px;
-    margin-bottom: 16px;
-    text-align: center;
-}
-
-/* ── Cooking layout zones ── */
-
-/* Ready section: unlocked, actionable steps */
-#ready-section {
-    margin-bottom: 8px;
-}
-
-/* Waiting section: locked steps, separated with a label */
-#waiting-section {
-    margin-top: 24px;
-    border-top: 1px solid #2a2a2a;
-    padding-top: 8px;
-}
-
-.waiting-section-label {
-    font-size: 14px;
-    color: #555;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    margin-bottom: 6px;
-    padding-left: 4px;
-    pointer-events: none;
-    user-select: none;
-}
+#ready-section   { margin-bottom: 8px; }
+#waiting-section { margin-top: 24px; border-top: 1px solid #2a2a2a; padding-top: 8px; }
+.waiting-section-label { font-size: 14px; color: #555; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 6px; padding-left: 4px; pointer-events: none; user-select: none; }
 
 /* ── Nutrition screen ── */
 
-/* Grand-total card pinned at the top */
-.panel.nutrition-total {
-    cursor: default;
-    border-color: #555;
-    background: #1a1a1a;
-}
+.panel.nutrition-total { cursor: default; border-color: #555; background: #1a1a1a; }
 
-.nutrition-total-title {
-    font-size: 16px;
-    color: #888;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 8px;
-}
+.nutrition-total-title { font-size: 16px; color: #888; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
 
-.nutrition-values {
-    font-size: 20px;
-    color: #f0f0f0;
-}
+.nutrition-values { font-size: 20px; color: #f0f0f0; }
 
-/* Coverage line — turns amber whenever anything is flagged so a
-   subtotal built from partial data is never read as complete */
-.nutrition-coverage {
-    font-size: 14px;
-    color: #888;
-    margin-top: 8px;
-}
-
+.nutrition-coverage { font-size: 14px; color: #888; margin-top: 8px; }
 .nutrition-coverage.flagged { color: #f59e0b; }
 
-/* Collapsible per-recipe section */
-.panel.nutrition-recipe {
-    cursor: default;
-    padding: 0;
-}
+/* Partial-cost note — shown when some but not all ingredients have price data */
+.nutrition-cost-note { font-size: 13px; color: #f59e0b; margin-top: 4px; font-style: italic; }
 
-.nutrition-recipe-header {
-    display: flex;
-    align-items: baseline;
-    gap: 10px;
-    padding: 16px 20px 6px;
-    cursor: pointer;
-}
-
+.panel.nutrition-recipe { cursor: default; padding: 0; }
+.nutrition-recipe-header { display: flex; align-items: baseline; gap: 10px; padding: 16px 20px 6px; cursor: pointer; }
 .nutrition-caret { color: #888; font-size: 16px; }
-
 .nutrition-recipe-name { font-size: 22px; flex: 1; }
+.nutrition-recipe-sub { font-size: 14px; color: #888; text-align: right; white-space: nowrap; }
+.panel.nutrition-recipe .nutrition-coverage { padding: 0 20px 14px; margin-top: 0; }
 
-.nutrition-recipe-sub {
-    font-size: 14px;
-    color: #888;
-    text-align: right;
-    white-space: nowrap;
-}
-
-.panel.nutrition-recipe .nutrition-coverage {
-    padding: 0 20px 14px;
-    margin-top: 0;
-}
-
-.nutrition-ingredients {
-    border-top: 1px solid #333;
-    padding: 6px 20px 14px;
-    display: flex;
-    flex-direction: column;
-}
-
+.nutrition-ingredients { border-top: 1px solid #333; padding: 6px 20px 14px; display: flex; flex-direction: column; }
 .nutrition-ingredients.collapsed { display: none; }
 
 .nutrition-ingredient-row {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 4px 14px;
-    font-size: 16px;
-    padding: 8px 0;
-    border-bottom: 1px solid #222;
+    display: flex; flex-wrap: wrap; justify-content: space-between;
+    align-items: baseline; gap: 4px 14px; font-size: 16px;
+    padding: 8px 0; border-bottom: 1px solid #222;
 }
-
 .nutrition-ingredient-row:last-child { border-bottom: none; }
-
 .nutrition-ingredient-name { color: #f0f0f0; }
-
 .nutrition-ingredient-value { color: #888; text-align: right; }
 
-/* Inline flag pill for missing / uncomputable ingredients */
 .nutrition-flag {
-    color: #f59e0b;
-    font-size: 13px;
-    background: rgba(245, 158, 11, 0.12);
-    border: 1px solid rgba(245, 158, 11, 0.3);
-    border-radius: 16px;
-    padding: 2px 10px;
-    white-space: nowrap;
+    color: #f59e0b; font-size: 13px;
+    background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: 16px; padding: 2px 10px; white-space: nowrap;
 }
 
-/* Full-width explanation under an uncomputable ingredient */
-.nutrition-flag-reason {
-    flex-basis: 100%;
-    font-size: 13px;
-    color: #d97706;
-    font-style: italic;
-    margin-top: 2px;
-}
+.nutrition-flag-reason { flex-basis: 100%; font-size: 13px; color: #d97706; font-style: italic; margin-top: 2px; }
 
-/* "via {brand}" provenance shown under an ingredient whose numbers came from
-   a selected product's label — full-width, muted, italic. Acknowledges that
-   nutrition is brand-specific and tells the reader where the figures came from. */
-.nutrition-provenance {
-    flex-basis: 100%;
-    font-size: 12px;
-    color: #666;
-    font-style: italic;
-    margin-top: 2px;
-}
+/* Cost flag — shown on a row where nutrition is ok but price is missing/uncomputable */
+.nutrition-cost-flag { flex-basis: 100%; font-size: 12px; color: #f59e0b; font-style: italic; margin-top: 1px; opacity: 0.8; }
 
+.nutrition-provenance { flex-basis: 100%; font-size: 12px; color: #666; font-style: italic; margin-top: 2px; }
 `;
 // ============================================================
 // BOOTSTRAP
@@ -2325,7 +1872,6 @@ h2 { margin-top: 0; font-size: 28px; }
 function bootstrap() {
     document.head.insertAdjacentHTML('beforeend', `<style>${styles}</style>`);
     document.body.innerHTML = `<div id="app"></div>`;
-    // Check if a recipe ID is provided in the URL (e.g. ?recipe=blueprint-smoothie)
     const recipeIdFromURL = getRecipeIdFromURL();
     if (recipeIdFromURL && state.recipes.has(recipeIdFromURL)) {
         state.selectedRecipeIds = [recipeIdFromURL];
@@ -2370,187 +1916,123 @@ function simpleIngredients(map) {
 // ============================================================
 export const i = {
     ...simpleIngredients({
-        apple: '',
-        frozenBerries: '',
-        cocoaFlavanols: '',
-        wheatGrassPowder: '',
-        creatine: '',
-        chlorellaPowder: '',
-        aminoComplex: '',
-        acaiFrozenMix: '',
-        blueprintBlueberryWalnut: '',
-        blueprintCacao: '',
-        frozenStrawberry: '',
-        frozenCauliflower: '',
-        frozenBroccoli: '',
-        frozenBlueberry: '',
-        blueprintNuttyPudding: '',
-        // The following Blueprint Smoothie ingredients are declared separately
-        // below with nutrition blocks: banana, lemonJuice, cocoaNibs, chiaSeed,
-        // hempSeed, cherry, antiOxidantBerryBlend, vanillaExtract, celery,
-        // spinach, kale (plus macadamiaNutMilk and macadamiaNut, already factories).
-        egg: '',
-        milk: '',
-        bread: '',
-        pomegranateSeeds: '',
-        water: '',
-        avocadoOil: '',
-        abbotPeaItalianSausage: '',
-        lentilSpaghetti: '',
-        spaghettiSauce: '',
-        pankoBreadCrumbs: '',
-        salt: '',
-        garlicPowder: '',
-        cornstarch: '',
-        cassavaFlour: '',
-        kingOysterMushroom: '',
+        apple: '', frozenBerries: '', cocoaFlavanols: '', wheatGrassPowder: '',
+        creatine: '', chlorellaPowder: '', aminoComplex: '', acaiFrozenMix: '',
+        blueprintBlueberryWalnut: '', blueprintCacao: '', frozenStrawberry: '',
+        frozenCauliflower: '', frozenBroccoli: '', frozenBlueberry: '',
+        blueprintNuttyPudding: '', egg: '', milk: '', bread: '',
+        pomegranateSeeds: '', water: '', avocadoOil: '',
+        abbotPeaItalianSausage: '', lentilSpaghetti: '', spaghettiSauce: '',
+        pankoBreadCrumbs: '', salt: '', garlicPowder: '', cornstarch: '',
+        cassavaFlour: '', kingOysterMushroom: '',
+        whiteVinegar: '', bakingSoda: '',
     }),
-    // ──────────────────────────────────────────────────────────────────────
-    // Blueprint Smoothie ingredients
-    //
-    // Packaged goods carry their nutrition on a Product (brand-specific), with
-    // defaultBrand pointing at the SKU actually used. Produce (lemon, cherry,
-    // celery, spinach, kale, banana) keeps a single brand-independent nutrition
-    // block on the ingredient itself. Each label is keyed by the exact unit the
-    // recipe uses — there's no unit conversion. Sodium in mg; sugar/protein in g.
-    // ──────────────────────────────────────────────────────────────────────
     macadamiaNutMilk: ingredientFactory('Macadamia Nut Milk', {
         requiresDateLabel: true,
         defaultBrand: 'Milkadamia',
-        products: [
-            {
-                brand: 'Milkadamia',
-                variant: 'Unsweetened',
-                store: stores.wholeFoods,
+        products: [{
+                brand: 'Milkadamia', variant: 'Unsweetened', store: stores.wholeFoods,
                 link: 'https://www.amazon.com/dp/B01JH2O854',
-                size: 32, sizeUnit: u.fluidOunce,
+                price: 6.19, size: 32, sizeUnit: u.fluidOunce,
                 nutrition: {
                     [u.cup.name]: { servings: 4, servingSize: 1, calories: 50, sodium: 75, sugar: 0, protein: 1 },
                 },
-            },
-        ],
+            }],
     }),
     macadamiaNut: ingredientFactory('Macadamia Nut', {
-        defaultBrand: '365',
+        defaultBrand: 'Blueprint',
+        conversions: {
+            [u.cup.name]: { to: u.ounce, factor: 4 }, // 1 cup ≈ 4 oz by weight
+        },
         products: [
             {
-                brand: '365',
-                variant: 'Organic Raw',
-                store: stores.wholeFoods,
+                brand: '365', variant: 'Organic Raw', store: stores.wholeFoods,
                 link: 'https://www.wholefoodsmarket.com/product/365-by-whole-foods-market-organic-macadamia-nuts-8-oz-b086hk83yf',
                 price: 10.79, size: 8, sizeUnit: u.ounce, organic: true,
                 nutrition: {
                     [u.cup.name]: { servings: 1, servingSize: 1, calories: 960, sodium: 7, sugar: 6, protein: 11 },
                 },
             },
+            {
+                brand: 'Blueprint', variant: 'Raw', store: stores.amazon,
+                link: 'https://www.amazon.com/Blueprint-Bryan-Johnson-Macadamia-Nuts/dp/B0DNGJFBS1',
+                price: 12, size: 4, sizeUnit: u.ounce, organic: false,
+                nutrition: {
+                    [u.ounce.name]: { servings: 4, servingSize: 1, calories: 210, sodium: 2, sugar: 1, protein: 2 },
+                },
+            },
         ],
     }),
     cocoaNibs: ingredientFactory('Cocoa Nibs', {
         defaultBrand: 'Navitas',
-        products: [
-            {
-                brand: 'Navitas',
-                variant: 'Organic Raw',
+        products: [{
+                brand: 'Navitas', variant: 'Organic Raw',
                 nutrition: {
                     [u.tsp.name]: { servings: 1, servingSize: 1, calories: 20, sodium: 0, sugar: 0, protein: 0.3 },
                 },
-            },
-        ],
+            }],
     }),
     chiaSeed: ingredientFactory('Chia Seed', {
         defaultBrand: '365',
-        products: [
-            {
-                brand: '365',
-                variant: 'Organic Black',
-                store: stores.wholeFoods,
+        products: [{
+                brand: '365', variant: 'Organic Black', store: stores.wholeFoods,
                 nutrition: {
                     [u.tsp.name]: { servings: 1, servingSize: 1, calories: 19, sodium: 0, sugar: 0, protein: 1 },
                 },
-            },
-        ],
+            }],
     }),
     hempSeed: ingredientFactory('Hemp Seed', {
         defaultBrand: 'Manitoba Harvest',
-        products: [
-            {
-                brand: 'Manitoba Harvest',
-                variant: 'Hemp Hearts',
-                store: stores.wholeFoods,
+        products: [{
+                brand: 'Manitoba Harvest', variant: 'Hemp Hearts', store: stores.wholeFoods,
                 nutrition: {
                     [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 55, sodium: 0, sugar: 0.5, protein: 3.3 },
                 },
-            },
-        ],
+            }],
     }),
     antiOxidantBerryBlend: ingredientFactory('Antioxidant Berry Blend', {
         defaultBrand: '365',
-        products: [
-            {
-                brand: '365',
-                variant: 'Organic Antioxidant Fruit Blend (frozen)',
-                store: stores.wholeFoods,
+        products: [{
+                brand: '365', variant: 'Organic Antioxidant Fruit Blend (frozen)', store: stores.wholeFoods,
                 size: 16, sizeUnit: u.ounce, organic: true,
                 nutrition: {
                     [u.cup.name]: { servings: 4, servingSize: 1, calories: 70, sodium: 0, sugar: 13, protein: 1 },
                 },
-            },
-        ],
+            }],
     }),
     vanillaExtract: ingredientFactory('Vanilla Extract', {
         defaultBrand: '365',
-        products: [
-            {
-                brand: '365',
-                variant: 'Pure Vanilla Extract',
-                store: stores.wholeFoods,
-                nutrition: {
-                    [u.tsp.name]: { servings: 1, servingSize: 1, calories: 12, sodium: 0, sugar: 0.5, protein: 0 },
-                },
-            },
-        ],
+        products: [{
+                brand: '365', variant: 'Organic Vanilla Extract', store: stores.wholeFoods,
+                nutrition: { [u.fluidOunce.name]: { servings: 2, servingSize: 2, calories: 0, sodium: 0, sugar: 0, protein: 0 } },
+                price: 8.79, size: 2, sizeUnit: u.fluidOunce, organic: true,
+                link: 'https://www.amazon.com/365-Everyday-Value-Organic-Vanilla/dp/B074VBL8R9',
+            }],
     }),
-    // Lemon juice — produce, brand-independent.
     lemonJuice: ingredientFactory('Lemon Juice', {
-        nutrition: {
-            [u.unit.name]: { servings: 1, servingSize: 1, calories: 10, sodium: 0, sugar: 2, protein: 0.2 },
-        },
+        defaultBrand: '365',
+        products: [{
+                brand: '365', variant: 'Organic Lemon Juice', store: stores.wholeFoods,
+                nutrition: { [u.tsp.name]: { servings: 59, servingSize: 1, calories: 0, sodium: 0, sugar: 0, protein: 0 } },
+                price: 3.49, size: 10, sizeUnit: u.fluidOunce, organic: true,
+                link: 'https://www.amazon.com/365-Everyday-Value-Organic-Concentrate/dp/B074J5WZS8?th=1',
+            }],
     }),
-    // Sweet cherries — produce.
     cherry: ingredientFactory('Cherry', {
-        nutrition: {
-            [u.unit.name]: { servings: 1, servingSize: 1, calories: 5, sodium: 0, sugar: 1, protein: 0 },
-        },
+        nutrition: { [u.unit.name]: { servings: 1, servingSize: 1, calories: 5, sodium: 0, sugar: 1, protein: 0 } },
     }),
-    // Celery — produce, per medium stalk (~40 g).
     celery: ingredientFactory('Celery', {
-        nutrition: {
-            [u.unit.name]: { servings: 1, servingSize: 1, calories: 6, sodium: 32, sugar: 1, protein: 0.3 },
-        },
+        nutrition: { [u.unit.name]: { servings: 1, servingSize: 1, calories: 6, sodium: 32, sugar: 1, protein: 0.3 } },
     }),
-    // Raw spinach — produce, per handful (≈ 1 cup / ~30 g).
     spinach: ingredientFactory('Spinach', {
-        nutrition: {
-            [u.handful.name]: { servings: 1, servingSize: 1, calories: 7, sodium: 24, sugar: 0.1, protein: 0.9 },
-        },
+        nutrition: { [u.handful.name]: { servings: 1, servingSize: 1, calories: 7, sodium: 24, sugar: 0.1, protein: 0.9 } },
     }),
-    // Raw kale — produce, per handful (≈ 1 cup chopped / ~21 g).
     kale: ingredientFactory('Kale', {
-        nutrition: {
-            [u.handful.name]: { servings: 1, servingSize: 1, calories: 8, sodium: 11, sugar: 0.2, protein: 0.7 },
-        },
+        nutrition: { [u.handful.name]: { servings: 1, servingSize: 1, calories: 8, sodium: 11, sugar: 0.2, protein: 0.7 } },
     }),
-    // Organic banana — produce, per medium banana (~118 g).
     banana: ingredientFactory('Organic Banana', {
-        nutrition: {
-            [u.unit.name]: { servings: 1, servingSize: 1, calories: 105, sodium: 1, sugar: 14, protein: 1.3 },
-        },
+        nutrition: { [u.unit.name]: { servings: 1, servingSize: 1, calories: 105, sodium: 1, sugar: 14, protein: 1.3 } },
     }),
-    // ──────────────────────────────────────────────────────────────────────
-    // Other ingredients (purchase info migrated from old purchaseLinks to
-    // products[]). Nutrition not yet researched — these will flag as `missing`
-    // in the Nutrition screen until labels are added per default brand.
-    // ──────────────────────────────────────────────────────────────────────
     peanutButter: ingredientFactory('Peanut Butter', {
         defaultBrand: '365',
         products: [
@@ -2572,8 +2054,7 @@ export const i = {
     pittedDates: ingredientFactory('Pitted Dates', {
         defaultBrand: '365',
         products: [
-            { brand: '365', store: stores.wholeFoods,
-                price: 3.99, size: 8, sizeUnit: u.ounce,
+            { brand: '365', store: stores.wholeFoods, price: 3.99, size: 8, sizeUnit: u.ounce,
                 link: 'https://www.amazon.com/365-Everyday-Value-Dates-Pitted/dp/B074VDMNH7/ref=sr_1_5_0o_wf' },
             { brand: 'Food to Live', variant: 'Organic Deglet Nour', store: stores.amazon,
                 price: 16.59, size: 2.5, sizeUnit: u.pound, organic: true,
@@ -2582,111 +2063,99 @@ export const i = {
         ],
     }),
     orangeJuice: ingredientFactory('Orange Juice', {
-        // No purchase link yet; nutrition on the ingredient until a brand is added.
         nutrition: {
             [u.fluidOunce.name]: { servings: 8, servingSize: 7, calories: 110, sodium: 0, sugar: 22, protein: 2 },
         },
     }),
     strawberry: ingredientFactory('Strawberry', {
         defaultBrand: '365',
-        products: [
-            { brand: '365', variant: 'Organic Whole Strawberries (frozen)', store: stores.wholeFoods,
+        products: [{
+                brand: '365', variant: 'Organic Whole Strawberries (frozen)', store: stores.wholeFoods,
                 price: 6.69, size: 32, sizeUnit: u.ounce, organic: true,
-                link: 'https://www.wholefoodsmarket.com/product/365-by-whole-foods-market-365-whole-foods-market-organic-whole-strawberries-b09gcp3jng' },
-        ],
+                link: 'https://www.wholefoodsmarket.com/product/365-by-whole-foods-market-365-whole-foods-market-organic-whole-strawberries-b09gcp3jng',
+            }],
     }),
     collagenPowder: ingredientFactory('Collagen Powder', {
         defaultBrand: 'Sports Research',
-        products: [
-            { brand: 'Sports Research', store: stores.amazon,
+        products: [{
+                brand: 'Sports Research', store: stores.amazon,
                 price: 17.99, size: 1, sizeUnit: u.pound,
                 link: 'https://www.amazon.com/gp/product/B071S8D69C/ref=ppx_yo_dt_b_asin_title_o00_s00',
-                discount: { subscribe5Products: 5 } },
-        ],
+                discount: { subscribe5Products: 5 },
+            }],
     }),
-    // ──────────────────────────────────────────────────────────────────────
-    // Added: Whole Foods 365 + Blueprint by Bryan Johnson products
-    // Each carries its label on a Product so the brand drives nutrition.
-    // ──────────────────────────────────────────────────────────────────────
-    // 365 Organic Psyllium Husk Whole Flakes — per 1 tbsp (5 g).
     psyllium: ingredientFactory('Psyllium Husk', {
         defaultBrand: '365',
-        products: [
-            { brand: '365', variant: 'Organic Whole Flakes', store: stores.wholeFoods,
+        products: [{
+                brand: '365', variant: 'Organic Whole Flakes', store: stores.wholeFoods,
                 link: 'https://www.amazon.com/365-Whole-Foods-Market-Psyllium/dp/B0CDQJRFGX',
                 nutrition: {
-                    [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 20, sodium: 0, sugar: 0, protein: 0 },
-                } },
-        ],
+                    [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 15, sodium: 5, sugar: 0, protein: 0 },
+                },
+            }],
     }),
-    // Blueprint Macadamia Nut Protein Bar (White Cocoa) — per 1 bar.
-    // Nutrition is keyed by 'unit' since the natural quantity is "1 bar".
     blueprintMacadamiaBar: ingredientFactory('Blueprint Macadamia Bar', {
         defaultBrand: 'Blueprint',
-        products: [
-            { brand: 'Blueprint', variant: 'White Cocoa Macadamia Protein Bar',
-                store: stores.amazon,
+        products: [{
+                brand: 'Blueprint', variant: 'White Cocoa Macadamia Protein Bar', store: stores.amazon,
                 link: 'https://www.amazon.com/Blueprint-Bryan-Johnson-Macadamia-White/dp/B0DQLV78BG',
                 nutrition: {
                     [u.unit.name]: { servings: 1, servingSize: 1, calories: 160, sodium: 80, sugar: 1, protein: 9 },
-                } },
-        ],
+                },
+            }],
     }),
-    // 365 Organic Black Lentils (dry) — per ¼ cup dry (35 g).
-    // Note: this is the dried legume, NOT the lentilSpaghetti pasta used by
-    // the dinner recipe. Keep them as separate ingredients.
     blackLentils: ingredientFactory('Black Lentils', {
         defaultBrand: '365',
-        products: [
-            { brand: '365', variant: 'Organic, Black, dry', store: stores.wholeFoods,
+        conversions: {
+            [u.gram.name]: { to: u.cup, factor: 1 / 172 }, // 43g = ¼ cup dry, per nutrition label
+        },
+        products: [{
+                brand: '365', variant: 'Organic, Black, dry', store: stores.wholeFoods,
                 size: 16, sizeUnit: u.ounce, organic: true,
                 link: 'https://www.amazon.com/365-Whole-Foods-Market-Organic/dp/B084NHD2R9',
                 nutrition: {
-                    // Recipe convention so far is to express recipe amounts in cups.
-                    // Label is per ¼ cup dry, so 1 cup dry = 4× label values.
-                    [u.cup.name]: { servings: 1, servingSize: 1, calories: 600, sodium: 0, sugar: 4, protein: 44 },
-                } },
-        ],
+                    [u.cup.name]: { servings: 1, servingSize: 1, calories: 600, sodium: 0, sugar: 0, protein: 44 },
+                },
+            }],
     }),
-    // Blueprint Extra Virgin Olive Oil ("Snake Oil") — per 1 tbsp (15 ml).
     blueprintOliveOil: ingredientFactory('Extra Virgin Olive Oil', {
         defaultBrand: 'Blueprint',
-        products: [
-            { brand: 'Blueprint', variant: 'Snake Oil (High Polyphenol EVOO)',
-                store: stores.amazon, size: 750, sizeUnit: u.fluidOunce,
+        conversions: {
+            [u.shot.name]: { to: u.fluidOunce, factor: 1 }, // 1 shot = 1 fl oz
+        },
+        products: [{
+                brand: 'Blueprint', variant: 'Snake Oil (High Polyphenol EVOO)', store: stores.amazon,
+                size: 25, sizeUnit: u.fluidOunce,
+                price: 35,
                 link: 'https://www.amazon.com/Blueprint-Bryan-Johnson-Olive-Oil/dp/B0F1P5SR2M',
                 nutrition: {
                     [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 120, sodium: 0, sugar: 0, protein: 0 },
-                } },
-        ],
+                },
+            }],
     }),
-    // Blueprint Longevity Protein (Chocolate) — per 1 scoop (~38 g).
-    // Plant protein (pea + hemp + flax) with allulose, cocoa, polyphenol extracts.
     longevityProtein: ingredientFactory('Longevity Protein', {
         defaultBrand: 'Blueprint',
-        products: [
-            { brand: 'Blueprint', variant: 'Chocolate (30 servings)',
-                store: stores.amazon,
+        products: [{
+                brand: 'Blueprint', variant: 'Chocolate (30 servings)', store: stores.amazon,
+                price: 94,
+                size: 30, sizeUnit: u.unit, // 30 scoops per container
                 link: 'https://www.amazon.com/Blueprint-Bryan-Johnson-Longevity-Protein/dp/B0DNGJRLQF',
                 nutrition: {
-                    // Keyed by 'scoop'? — units list doesn't include scoop. Use 'unit'
-                    // since the natural recipe amount is "1 scoop = 1 unit".
-                    [u.unit.name]: { servings: 1, servingSize: 1, calories: 200, sodium: 190, sugar: 0, protein: 26 },
-                } },
-        ],
+                    [u.unit.name]: { servings: 1, servingSize: 1, calories: 200, sodium: 200, sugar: 0, protein: 26 },
+                },
+            }],
     }),
-    // Blueprint Blueberry Nut Mix — per 1 scoop (15 g). Macadamias + walnuts +
-    // blueberries; no added sugar. Sugar listed is natural from the blueberries.
     blueberryNutMix: ingredientFactory('Blueberry Nut Mix', {
         defaultBrand: 'Blueprint',
-        products: [
-            { brand: 'Blueprint', variant: 'Macadamia + Walnut + Blueberry',
-                store: stores.amazon,
+        products: [{
+                brand: 'Blueprint', variant: 'Macadamia + Walnut + Blueberry', store: stores.amazon,
+                price: 37,
+                size: 30, sizeUnit: u.unit, // 30 scoops per container
                 link: 'https://www.amazon.com/Blueprint-Bryan-Johnson-Blueberry-Nut/dp/B0D3FZ29RJ',
                 nutrition: {
-                    [u.unit.name]: { servings: 1, servingSize: 1, calories: 70, sodium: 0, sugar: 2, protein: 1 },
-                } },
-        ],
+                    [u.unit.name]: { servings: 1, servingSize: 1, calories: 70, sodium: 0, sugar: 5, protein: 1 },
+                },
+            }],
     }),
 };
 // ============================================================
@@ -2698,11 +2167,10 @@ registerGroup('Breakfast', [
         const MACADAMIA_MILK = i.macadamiaNutMilk(1, u.cup);
         const steps = [];
         const s = (...newSteps) => steps.push(...newSteps);
-        // Step 1: Grind nuts/seeds smooth with liquid
         s(mixer.add([
             MACADAMIA_MILK,
-            i.lemonJuice(0.5, u.unit),
-            i.macadamiaNut(0.25, u.cup), // Hard items
+            i.lemonJuice(2, u.tbsp),
+            i.macadamiaNut(0.25, u.cup),
             i.cocoaNibs(1, u.tsp),
             i.chiaSeed(1, u.tsp),
             i.hempSeed(1, u.tbsp),
@@ -2710,8 +2178,7 @@ registerGroup('Breakfast', [
             i.antiOxidantBerryBlend(0.5, u.cup),
             i.vanillaExtract(0.25, u.tsp),
         ]));
-        s(mixer.mix()); // Blend until completely smooth
-        // Step 2: Add greens and soft fruits
+        s(mixer.mix());
         s(mixer.add([
             i.celery(1, u.unit),
             i.spinach(1, u.handful),
@@ -2719,10 +2186,34 @@ registerGroup('Breakfast', [
             i.banana(1, u.unit),
         ]));
         s(Timer.set(30, 's', 'Let mixer settle'));
-        s(mixer.mix()); // Final blend
+        s(mixer.mix());
         return steps;
-    })(), undefined, 8), // estimatedMinutes: 8
+    })(), undefined, 8),
 ]);
+// Moved out of the Dinner array — registers itself under its own 'Cleaning' group
+registerRecipe(createRecipe('clean-water-bottle', 'Clean Water Bottle', [
+    instruction('Make sure the straw is in the water bottle'),
+    instruction('Power wash the top to remove dust'),
+    instruction('Add about 10 seconds of water to the bottle'),
+    instruction('Add vinegar', {
+        ingredients: [i.whiteVinegar(1, u.tsp)],
+    }),
+    Timer.set(45, 's', 'Shake'),
+    instruction('Dump out the water'),
+    instruction('Clean the straw with a straw pipe cleaner'),
+    instruction('Add about 10 seconds of water to the bottle'),
+    instruction('Add baking soda', {
+        ingredients: [i.bakingSoda(0.5, u.tsp)],
+    }),
+    Timer.set(45, 's', 'Shake'),
+    instruction('Dump out the water'),
+    instruction('Add about 10 seconds of water to the bottle'),
+    Timer.set(20, 's', 'Shake'),
+    instruction('Dump out the water'),
+    instruction('Fill the bottle about ¼ full with water'),
+    instruction('Dump out the water'),
+    instruction('Let the bottle air dry'),
+], 'Cleaning'));
 registerGroup('Dinner', [
     createRecipe('breaded-mushrooms', 'Breaded Mushrooms', (() => {
         const pankoPan = e.pan('panko pan');
@@ -2734,14 +2225,11 @@ registerGroup('Dinner', [
         const MUSHROOMS = i.kingOysterMushroom(4, u.unit);
         const steps = [];
         const s = (...newSteps) => steps.push(...newSteps);
-        // Oven lane — longest lane (31 min), start first
         s(oven.preheat(450));
-        // Pan lane — place pan in oven to toast panko
         s(pankoPan.add([PANKO]));
         s(oven.place(pankoPan, 'Toast panko', time.minutes(5), 450));
         const transferToBowl = pankoPan.transfer(pankoBowl, [PANKO]);
         s(transferToBowl);
-        // Bowl lane — prep batter while panko toasts
         s(batter.add([
             i.water(7, u.ounce),
             i.salt(0.5, u.tsp),
@@ -2750,8 +2238,6 @@ registerGroup('Dinner', [
             i.cassavaFlour(0.5, u.cup),
         ]));
         s(batter.mix('batter'));
-        // Prep — slice, dip, coat
-        // dip must wait for panko transfer — culinary constraint, not derivable from code
         s(cuttingBoard.slice(MUSHROOMS));
         s(batter.combine([MUSHROOMS], 'dip, let drain').waitFor(transferToBowl));
         s(pankoPan.spray(i.avocadoOil(1, u.spray)));
@@ -2759,7 +2245,6 @@ registerGroup('Dinner', [
         pankoBowl.result.rename('Breaded King Oyster Mushroom');
         s(pankoBowl.transfer(pankoPan, [pankoBowl.result]));
         s(pankoPan.spray(i.avocadoOil(1, u.spray)));
-        // Oven lane resumes — locked until preheat done
         s(oven.place(pankoPan));
         s(oven.cook('Bake mushrooms (first half)', time.minutes(12), 450));
         s(pankoPan.flip());
@@ -2772,29 +2257,49 @@ registerGroup('Dinner', [
         const pan = e.pan();
         const steps = [];
         const s = (...newSteps) => steps.push(...newSteps);
-        // Pan lane — more total timer time, start first
         s(pan.add([i.avocadoOil(1, u.spray), i.abbotPeaItalianSausage(1, u.bag)]));
         s(pan.cook('Cook sausage', time.minutes(5), 5));
-        // Pot lane — runs in parallel
         s(pot.add([i.water(30, u.ounce)]));
         s(pot.cook('Bring water to boil', time.minutes(6), 9));
-        // Pot lane resumes — auto-locked until boil timer clears
         s(pot.add([
             i.avocadoOil(1, u.spray),
             [i.lentilSpaghetti(8, u.ounce), 'break into 3 even sections first'],
         ]));
-        // Pan lane continues freely
         s(pan.cook('Continue cooking sausage', time.minutes(10), 7));
-        // Pot lane — auto-locked until pan timer clears
         s(pot.cook('Cook spaghetti (first half)', time.minutes(7), 7));
         s(pot.stir());
         s(pot.cook('Cook spaghetti (second half)', time.minutes(7), 7));
-        // Pan lane — auto-locked until pot timer clears
         s(pan.add([i.spaghettiSauce(1, u.bag)]));
         s(pan.cook('Simmer sauce with sausage', time.minutes(5), 7));
         return steps;
     })()),
 ]);
+registerGroup('Ingredients', [
+    createRecipe('ing-black-lentils', 'Black Lentils (65g)', [
+        instruction('Have 65g black lentils on hand', { ingredients: [i.blackLentils(65, u.gram)] }),
+    ]),
+    createRecipe('ing-macadamia-bar', 'Blueprint Macadamia Bar', [
+        instruction('Have 1 Blueprint Macadamia Bar on hand', {
+            ingredients: [i.blueprintMacadamiaBar(1, u.unit)],
+        }),
+    ]),
+    createRecipe('ing-psyllium-husk', 'Psyllium Husk (1 tbsp)', [
+        instruction('Have 1 tbsp psyllium husk on hand', {
+            ingredients: [i.psyllium(1, u.tbsp)],
+        }),
+    ]),
+]);
+registerRecipe(createRecipe('protein-nutmix-oliveoil', 'Blueprint (Nutty Pudding) - Protein, Nut Mix & Olive Oil', [
+    instruction('Have 1 scoop Blueprint longevity protein on hand', {
+        ingredients: [i.longevityProtein(1, u.unit)],
+    }),
+    instruction('Have 1 scoop Blueprint blueberry nut mix on hand', {
+        ingredients: [i.blueberryNutMix(1, u.unit)],
+    }),
+    instruction('Take 2 shots of Blueprint olive oil', {
+        ingredients: [i.blueprintOliveOil(2, u.shot)],
+    }),
+]));
 // ============================================================
 // START APP
 // ============================================================

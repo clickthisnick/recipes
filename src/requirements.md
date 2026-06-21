@@ -11,7 +11,7 @@ There are five screens: Select, Shopping, Nutrition, Cooking, and Add Ingredient
 ### Select Screen
 - Shows a searchable list of all registered recipes
 - Recipes can be grouped under category headings (e.g. Breakfast, Dinner). Ad-hoc additions appear in a dedicated "Custom additions" group at the top
-- Each non-adhoc recipe row has a star/favorite toggle that floats favorited recipes (above non-favorited, below ad-hoc additions); ad-hoc rows show a star-spacer instead so column alignment is preserved
+- Each non-adhoc recipe row shows a static ★ indicator if the recipe is in `FAVORITE_RECIPE_IDS`; otherwise a transparent spacer preserves column alignment. Favorites are pinned above non-favorites (below ad-hoc additions). **Favorites are set at build time** in the `FAVORITE_RECIPE_IDS` const — there is no runtime toggle
 - Tapping a recipe row **adds one serving**. Tapping the same row again adds another serving; the same recipe can be selected any number of times. The button stays green while ≥ 1 serving is selected and shows a `×N` badge when N > 1
 - A `−` button appears next to selected recipes to remove one serving at a time. It's hidden (but reserves space) when count is 0 to keep the row layout stable
 - Real recipes get a 🔗 copy-link button on the right; ad-hoc rows get an `×` remove button instead (drops all servings and unregisters the synthetic recipe)
@@ -39,13 +39,15 @@ A reference screen — separate from cooking, since nutrition data is something 
 ```
 ┌─────────────────────────────────────────┐
 │  Grand total (pinned)                   │
-│  All selected recipes · X cal · …       │
+│  $X.XX · All selected recipes · X cal · …
+│  partial-cost note (amber, if applicable)
 │  coverage line (amber if anything flagged)
 ├─────────────────────────────────────────┤
-│  ▸ Recipe A      recipe subtotal        │   ← tap header to expand
-│  ▾ Recipe B      recipe subtotal        │
-│      • Ingredient — per-ingredient total│
+│  ▸ Recipe A      $X.XX · recipe subtotal│   ← tap header to expand
+│  ▾ Recipe B      $X.XX · recipe subtotal│
+│      • Ingredient — X cal … · $X.XX    │
 │      • Ingredient — ⚠ no nutrition data │
+│           ⚠ no price data               │
 │      • Ingredient — ⚠ can't compute     │
 │           reason text…                  │
 └─────────────────────────────────────────┘
@@ -56,18 +58,30 @@ A reference screen — separate from cooking, since nutrition data is something 
   - 1 recipe × N servings (N > 1) → `Recipe Name ×N`
   - Multiple recipes → `All selected recipes (N servings)` where N is the total servings across all recipes
 - **Per recipe** — each recipe is a collapsible section showing its subtotal (scaled by serving count) in the header; the header name shows `×N` when N > 1. Tapping the header toggles its ingredient breakdown (collapsed by default; a `▸`/`▾` caret reflects state). Inside the breakdown, the ingredient name's displayed quantity and the per-ingredient values are also scaled by N
-- **Per ingredient** — each ingredient row inside an expanded section shows either its computed contribution or a flag (see below).
-- Totals shown are calories, sodium (mg), sugar (g), and protein (g), rounded to whole numbers.
-- If a recipe (or the grand total) has **no** computable ingredients, the value line shows `— no computable data` instead of a row of zeros.
-- A "Start Over" button at the bottom resets everything. If no recipes are selected, the screen shows an empty message and the Start Over button.
+- **Per ingredient** — each ingredient row inside an expanded section shows its computed nutrition contribution with cost appended, or appropriate flags (see below)
+- Totals shown are calories, sodium (mg), sugar (g), and protein (g), rounded to whole numbers. Cost is shown as `$X.XX` to two decimal places
+- If a recipe (or the grand total) has **no** computable ingredients, the value line shows `— no computable data` instead of a row of zeros
+- A "Start Over" button at the bottom resets everything. If no recipes are selected, the screen shows an empty message and the Start Over button
+
+#### Cost display
+Cost is shown inline with nutrition wherever data is available, using the format:
+
+```
+$X.XX · N cal · N mg sodium · N g sugar · N g protein
+```
+
+- **Grand total** — shows cost prepended when at least one ingredient has price data. If some ingredients lack price data a partial-cost note appears below the value line: `⚠ cost is partial — N ingredient(s) missing price data`
+- **Per recipe header** — same format: cost prepended when available
+- **Per ingredient row** — cost appended to the nutrition line as ` · $X.XX` when both nutrition and cost are computable. If nutrition is ok but cost is not, a small flag appears on a sub-line: `⚠ no price data` or `⚠ cost can't compute — reason`
+- Cost is **never** shown when zero ingredients have price data (no misleading $0.00)
 
 #### Flagging missing / uncomputable nutrition
 Every ingredient falls into exactly one of three buckets so a subtotal is never silently built from partial data:
 
-- **ok** — the ingredient has a `nutrition` block **and** the recipe's unit matches a keyed unit. Shows the computed `X cal · Y mg sodium · …` contribution.
+- **ok** — the ingredient has a `nutrition` block **and** the recipe's unit can be matched to a keyed unit (either directly or via unit conversion). Shows the computed `X cal · Y mg sodium · …` contribution.
 - **missing** — the ingredient has no `nutrition` block at all. Flagged inline with an amber pill: `⚠ no nutrition data`.
 - **uncomputable** — the ingredient **has** a `nutrition` block, but it can't be applied here. Flagged with `⚠ can't compute` plus an italic reason line beneath it. Reasons:
-  - The recipe uses a unit the data isn't keyed by (there is **no unit conversion**) — e.g. `recipe uses "cup" but data is only keyed by "fl oz" (no unit conversion)`
+  - The recipe uses a unit the data isn't keyed by **and no conversion path exists** — e.g. `recipe uses "handful" but data is keyed by "cup" (no conversion path)`
   - The ingredient has no unit at all
   - The serving size is missing or zero
 
@@ -110,7 +124,7 @@ A one-off ingredient is wrapped into a synthetic `Recipe` with:
 
 Recipe-list behavior for ad-hoc rows:
 - Float to the top, above favorites and regular recipes
-- No star (favoriting one-offs is noise) and no copy-link (the synthetic ID won't survive a page reload, so a shareable URL is meaningless) — replaced with a star-spacer to keep column alignment
+- No star indicator (favoriting one-offs is noise) and no copy-link (the synthetic ID won't survive a page reload, so a shareable URL is meaningless) — a spacer preserves column alignment
 - Show an `×` remove button in place of the copy button — drops all servings AND unregisters the recipe so it disappears from the list
 - Same `×N` badge and `−` controls as real recipes for serving counts
 
@@ -170,8 +184,6 @@ Both the Select and Cooking screens display a link icon (🔗) next to each reci
 - **Cooking Screen** — Click the 🔗 button next to the recipe title to copy its link
 - The button briefly changes to ✓ after copying to confirm the action
 - The copied link is ready to paste and share with others
-
-This makes it easy to create and share recipe links without manually typing the URL.
 
 ---
 
@@ -244,6 +256,17 @@ A step "claims" its equipment and ingredients when it is a timer **or** when it 
 
 ---
 
+## Unit Conversion
+
+A two-cluster conversion graph allows nutrition and cost calculations to match recipe units against label or package units automatically. No conversion is performed across clusters (volume↔weight requires density, which is substance-dependent).
+
+**Volume cluster:** `tsp ↔ tbsp ↔ cup ↔ fl oz`
+**Weight cluster:** `oz ↔ lb`
+
+`convertUnits(quantity, from, to)` returns the converted quantity, or `null` if no path exists (different clusters, or an unmapped unit like `unit` / `handful`). Both nutrition and cost resolution call this before declaring an ingredient `uncomputable`.
+
+---
+
 ## Nutrition Calculation
 
 The app computes nutrition for the currently selected recipes at three levels: per ingredient, per recipe, and a grand total across all selected recipes.
@@ -267,16 +290,17 @@ Nutrition is brand-specific (a Milkadamia label is not a Califia label), so the 
 
 Nutrition is never blended across brands — a dish contains one carton of one product, and the calculation mirrors that.
 
-When the numbers come from a product, the Nutrition screen renders a muted **"via {brand} · {variant}"** provenance line under that ingredient row, so the reader can see where the figures came from and which brand to keep consistent.
+When the numbers come from a product, the Nutrition screen renders a muted **"via {brand} · {variant}"** provenance line under that ingredient row.
 
 ### Per-ingredient computation
 Given a recipe ingredient with `quantity` and `unit`:
 1. Resolve the nutrition label (per the order above).
-2. Look up `label[unit.name]`. If absent → **uncomputable** (unit mismatch; no conversion is performed).
-3. `servingsUsed = quantity / servingSize` (if `servingSize` ≤ 0 → **uncomputable**).
-4. Each nutrient = its per-serving value × `servingsUsed`.
+2. Look up `label[unit.name]`. If absent, attempt unit conversion into each keyed unit via `convertUnits()`. First match wins.
+3. If no match after conversion attempts → **uncomputable** (no conversion path).
+4. `servingsUsed = convertedQty / servingSize` (if `servingSize` ≤ 0 → **uncomputable**).
+5. Each nutrient = its per-serving value × `servingsUsed`.
 
-So 14 fl oz of the orange juice above = 2 servings = 220 cal, 44 g sugar, etc.
+So 14 fl oz of the orange juice above = 2 servings = 220 cal, 44 g sugar, etc. And 1 tbsp of hemp seed resolves against a `tbsp`-keyed label directly; 0.25 cup of macadamia nuts could resolve against a `cup`-keyed label directly or via conversion from `tbsp` if the label were keyed differently.
 
 ### Aggregation rules
 - Walk all steps (and children) of a recipe, collecting distinct ingredient **objects** (reference dedup).
@@ -287,11 +311,47 @@ So 14 fl oz of the orange juice above = 2 servings = 220 cal, 44 g sugar, etc.
 ### Three result states
 | State | Condition | UI |
 |---|---|---|
-| `ok` | has data + unit matches | shows computed contribution; brand provenance shown when from a product |
+| `ok` | has data + unit matches or converts | shows computed contribution; brand provenance shown when from a product |
 | `missing` | no `nutrition` block (neither on selected product nor ingredient) | `⚠ no nutrition data` pill |
-| `uncomputable` | has data but can't apply (unit mismatch / no unit / bad serving size) | `⚠ can't compute` pill + reason text |
+| `uncomputable` | has data but can't apply (no conversion path / no unit / bad serving size) | `⚠ can't compute` pill + reason text |
 
-> **Note:** The entire **Blueprint Smoothie** carries nutrition data and reports full coverage (~568 cal · 145 mg sodium · 28 g sugar · 12 g protein). Seven of its ingredients are packaged goods whose nutrition comes from a selected brand (Milkadamia macadamia milk, 365 macadamia nuts / chia / berry blend / vanilla, Navitas cacao nibs, Manitoba Harvest hemp hearts); the other six are produce (lemon, cherry, celery, spinach, kale, banana) with nutrition on the ingredient itself. The Dinner recipes don't yet carry nutrition data and flag as `missing` until labels are added — keyed by the unit each recipe actually uses, since there's no conversion.
+> **Note:** The entire **Blueprint Smoothie** carries nutrition data and reports full coverage (~568 cal · 145 mg sodium · 28 g sugar · 12 g protein). Seven of its ingredients are packaged goods whose nutrition comes from a selected brand (Milkadamia macadamia milk, 365 macadamia nuts / chia / berry blend / vanilla, Navitas cacao nibs, Manitoba Harvest hemp hearts); the other six are produce (lemon, cherry, celery, spinach, kale, banana) with nutrition on the ingredient itself. The Dinner recipes don't yet carry nutrition data and flag as `missing` until labels are added.
+
+---
+
+## Cost Calculation
+
+Cost is computed alongside nutrition in `recipeNutrition()` and displayed inline with nutrition on the Nutrition screen.
+
+### Per-ingredient cost
+Given a recipe ingredient with `quantity` and `unit`, and a selected product with `price`, `size`, and `sizeUnit`:
+1. `pricePerUnit = product.price / product.size`
+2. Convert recipe quantity into package units via `convertUnits(qty, recipeUnit, packageUnit)`. If recipe unit already matches package unit, no conversion needed.
+3. `cost = pricePerUnit × convertedQty`
+
+Falls into the same three-state model as nutrition:
+- **ok** — product has price/size/sizeUnit and unit converts successfully
+- **missing** — no selected product, or product lacks `price`, `size`, or `sizeUnit`
+- **uncomputable** — product has price data but recipe unit can't be converted to package unit (no conversion path)
+
+### Coverage
+`costMissing` counts ingredients whose cost is not `ok` (missing or uncomputable). When `costMissing > 0` but some ingredients do have price data, a partial-cost note is shown on the grand total and recipe headers.
+
+---
+
+## Favorites
+
+Favorites are **build-time configuration**, not a runtime toggle. There is no persistent storage, so a runtime favorite toggle would reset on every page load.
+
+To mark recipes as favorites, edit the `FAVORITE_RECIPE_IDS` const near the top of the file:
+
+```ts
+const FAVORITE_RECIPE_IDS: string[] = [
+    'blueprint-smoothie',
+];
+```
+
+Favorited recipes are sorted above non-favorites (but below ad-hoc additions) in the Select screen. Non-favorite non-adhoc recipes show an invisible spacer in the star column to keep row alignment. Favorite recipes show a static gold ★.
 
 ---
 
@@ -472,7 +532,7 @@ Dark theme (`#111` background, `#f0f0f0` text). Large touch-friendly cards (font
 
 Key visual states:
 - Selected recipe: green background
-- Starred recipe: gold star
+- Favorite recipe: static gold ★ (non-interactive)
 - Active timer: amber/yellow card
 - Completed timer: green card with ✓ and timestamp
 - Skipped timer: grey card with strikethrough and timestamp
@@ -482,10 +542,12 @@ Key visual states:
 - Ready zone (`#ready-section`): no decoration, appears at top
 - Waiting zone (`#waiting-section`): top border + muted label; hidden when empty; completed/skipped panels are pinned and never jumped over by promoted panels
 - Action bar: three buttons — Go Shopping (blue), Nutrition (purple), Start Cooking (green)
-- Nutrition grand-total card: dark inset card, muted uppercase title
-- Nutrition recipe section: collapsible, `▸`/`▾` caret, subtotal on the right of the header
+- Nutrition grand-total card: dark inset card, muted uppercase title; cost prepended when available
+- Nutrition recipe section: collapsible, `▸`/`▾` caret, cost + subtotal on the right of the header
+- Nutrition ingredient row: `X cal · … · $X.XX` when both nutrition and cost are ok; cost flag sub-line (`⚠ no price data`) when nutrition ok but cost missing
 - Nutrition flag pill: amber pill (`⚠ no nutrition data` / `⚠ can't compute`); coverage line turns amber whenever anything is flagged; uncomputable rows show an italic amber reason line beneath
 - Nutrition provenance: muted italic "via {brand} · {variant}" under any ingredient row whose numbers came from a selected product
+- Nutrition partial-cost note: amber italic note below grand-total value when some but not all ingredients have price data
 - Shopping purchase link: regular links are blue; the selected-default product is bold green with a `✓` suffix so the user can see at a glance which one is the pick (and matches what's driving nutrition)
 
 ---
