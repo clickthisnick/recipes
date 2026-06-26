@@ -2218,6 +2218,8 @@ export const i = {
         pankoBreadCrumbs: '', salt: '', garlicPowder: '', cornstarch: '',
         cassavaFlour: '', kingOysterMushroom: '',
         whiteVinegar: '', bakingSoda: '',
+        carrot: '', babyBellaMushroom: '', yellowOnion: '', oliveOil: '',
+        rosemary: '', thyme: '',
     }),
 
     macadamiaNutMilk: ingredientFactory('Macadamia Nut Milk', {
@@ -2584,6 +2586,39 @@ registerGroup('Dinner', [
 
         return steps;
     })()),
+
+    createRecipe('steakhouse-roasted-vegetables', 'Heart-Healthy "Steakhouse" Roasted Vegetables', (() => {
+        const oven      = e.oven();
+        const bowl      = e.bowl();
+        const CARROTS   = i.carrot(1, u.pound);
+        const MUSHROOMS = i.babyBellaMushroom(8, u.ounce);
+        const ONION     = i.yellowOnion(1, u.unit);
+        const steps: Step[] = [];
+        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+
+        s(oven.preheat(450));
+        s(instruction('Place sheet pan in oven while it preheats', { equipment: ['oven', 'sheet pan'] }));
+        s(bowl.add([
+            [CARROTS, 'peeled, cut lengthwise or into thick diagonals'],
+            [MUSHROOMS, 'halved'],
+            [ONION, 'cut into 8 wedges'],
+            i.oliveOil(1, u.tbsp),
+            i.salt(1, u.tsp),
+            i.rosemary(2, u.tsp),
+            i.thyme(2, u.tsp),
+        ]));
+        s(bowl.mix());
+        s(instruction('Carefully spread vegetables onto the hot sheet pan in a single layer, leaving space between pieces', {
+            equipment: ['sheet pan'],
+            ingredients: [CARROTS, MUSHROOMS, ONION],
+        }));
+        s(Timer.set(20, 'm', 'Roast — do not move'));
+        s(instruction('Flip everything on the sheet pan', { equipment: ['sheet pan'], ingredients: [CARROTS, MUSHROOMS, ONION] }));
+        s(Timer.set(17, 'm', 'Roast until carrots are caramelized, mushrooms deeply browned, onions soft with crispy tips'));
+        s(Timer.set(5, 'm', 'Rest vegetables before serving'));
+
+        return steps;
+    })(), undefined, 45),
 
     createRecipe('abbot-pea-protein-spaghetti', 'Abbot Pea Protein Spaghetti', (() => {
         const pot = e.pot();
