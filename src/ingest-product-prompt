@@ -1,0 +1,32 @@
+I'm going to paste Amazon product page content. Please add or update an ingredient entry in /home/mypi/Documents/recipes/src/file.ts.
+
+The file uses this pattern for ingredients with product data:
+
+  someIngredient: ingredientFactory('Display Name', {
+      defaultBrand: 'BrandName',
+      products: [{
+          brand: 'BrandName', variant: 'Variant description', store: stores.amazon,
+          link: 'https://www.amazon.com/dp/...',
+          price: 12.99, size: 16, sizeUnit: u.ounce,
+          discount: { subscribeAndSave: 11.04 },
+          nutrition: {
+              [u.cup.name]: { servings: 4, servingSize: 1, calories: 100, sodium: 50, sugar: 5, protein: 3, fiber: 2 },
+          },
+      }],
+  }),
+
+Key rules:
+- For Amazon links, strip everything after the ASIN — use https://www.amazon.com/dp/ASIN (e.g. https://www.amazon.com/dp/B0DQLSW6FB). Do not include query strings, referral tags, or the product title slug.
+- Store is stores.amazon for Amazon, stores.wholeFoods for Whole Foods, stores.amazonFresh for Amazon Fresh
+- sizeUnit uses u.ounce / u.pound / u.gram / u.cup / u.fluidOunce / u.unit / u.tbsp / u.tsp
+- Nutrition is keyed by the serving size unit (e.g. u.cup.name, u.tbsp.name, u.ounce.name, u.unit.name)
+- servingSize is the number of that unit per serving (usually 1); servings is servings per container
+- Always include fiber in nutrition — read it from the label if shown; estimate from USDA data if not
+- If the ingredient already exists in the i = { ... } block, add a new product entry to its products array instead of creating a duplicate
+- Add organic: true if it's an organic product
+- The ingredient key should be camelCase
+- If the product is sold at multiple stores in the page content, add a product entry for each store
+- If a Subscribe & Save price is shown, add discount: { subscribeAndSave: X.XX } to that product entry (omit if not shown)
+- For Whole Foods entries, use the same Amazon product link (https://www.amazon.com/dp/ASIN) — do not fabricate a separate Whole Foods URL
+
+Here is the Amazon page content:

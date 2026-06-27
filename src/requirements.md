@@ -9,13 +9,25 @@ A single-file TypeScript app that lets a user select recipes, view a shopping li
 There are five screens: Select, Shopping, Nutrition, Cooking, and Add Ingredient. Navigation is handled by a simple state machine — no URLs.
 
 ### Select Screen
-- Shows a searchable list of all registered recipes
+- Shows a searchable list of all registered recipes, with a **Bundles** section pinned above all recipe groups
 - Recipes can be grouped under category headings (e.g. Breakfast, Dinner). Ad-hoc additions appear in a dedicated "Custom additions" group at the top
 - Each non-adhoc recipe row shows a static ★ indicator if the recipe is in `FAVORITE_RECIPE_IDS`; otherwise a transparent spacer preserves column alignment. Favorites are pinned above non-favorites (below ad-hoc additions). **Favorites are set at build time** in the `FAVORITE_RECIPE_IDS` const — there is no runtime toggle
 - Tapping a recipe row **adds one serving**. Tapping the same row again adds another serving; the same recipe can be selected any number of times. The button stays green while ≥ 1 serving is selected and shows a `×N` badge when N > 1
 - A `−` button appears next to selected recipes to remove one serving at a time. It's hidden (but reserves space) when count is 0 to keep the row layout stable
 - Real recipes get a 🔗 copy-link button on the right; ad-hoc rows get an `×` remove button instead (drops all servings and unregisters the synthetic recipe)
 - A "+ Add an ingredient" button at the bottom opens the Add Ingredient screen for one-off shopping/nutrition entries
+
+#### Bundles
+A bundle is a named collection of recipe IDs that can be added to the selection in a single tap. Bundles appear in a "Bundles" section at the very top of the recipe list (hidden when searching). Each bundle renders as a blue card showing the bundle name and a muted sub-line listing the constituent recipe names.
+
+Clicking a bundle pushes all its `recipeIds` into `selectedRecipeIds` exactly as if each recipe had been tapped individually — servings stack and the `−` controls on individual recipe rows handle removal. A recipe ID can appear more than once in a bundle's `recipeIds` list to add multiple servings at once.
+
+To register a bundle:
+```ts
+registerBundle({ id: 'my-bundle', name: 'My Bundle', recipeIds: ['recipe-a', 'recipe-b', 'recipe-b'] });
+```
+
+Bundles are build-time configuration — there is no runtime UI to create or edit them.
 - A fixed bottom bar appears when any serving is selected, with up to three buttons: "Go Shopping", "Nutrition", and "Start Cooking". "Start Cooking" is hidden when only ad-hoc items are selected (nothing to cook)
 - Tapping "Start Cooking" navigates directly to the cooking screen with no intermediate panel
 
@@ -30,7 +42,7 @@ Selecting the same recipe N times means **N servings**, not N parallel cooks. Th
 - For each recipe: ingredient quantities are first deduped by **object reference** (so the same ingredient object referenced across steps, children, and mix contents is counted once), then scaled by that recipe's serving count, then summed across recipes by name+unit
 - Composites produced by `mix()` / `combine()` are excluded — their constituents are already counted individually
 - Each ingredient row can be tapped to mark it as completed (strikethrough/green)
-- If an ingredient has `products`, each is shown as a tappable URL: `Brand Variant · Store — $price / size unit`. The selected default (the one whose label drives nutrition) is rendered in green with a `✓` suffix
+- If an ingredient has `products`, each is shown as a tappable URL. Products are **sorted ascending by price per volume** (products with no price data sort last). Format: `Brand Variant · Store — $price / size unit ($X.XX/unit) · S&S $price ($X.XX/unit)`. The S&S price and its per-volume rate are shown when `discount.subscribeAndSave` is set. The selected default (the one whose label drives nutrition) is rendered in green with a `✓` suffix
 - A "Start Over" button returns to the Select screen and resets all state
 
 ### Nutrition Screen
@@ -57,11 +69,23 @@ A reference screen — separate from cooking, since nutrition data is something 
   - 1 recipe × 1 serving → the recipe's name
   - 1 recipe × N servings (N > 1) → `Recipe Name ×N`
   - Multiple recipes → `All selected recipes (N servings)` where N is the total servings across all recipes
-- **Per recipe** — each recipe is a collapsible section showing its subtotal (scaled by serving count) in the header; the header name shows `×N` when N > 1. Tapping the header toggles its ingredient breakdown (collapsed by default; a `▸`/`▾` caret reflects state). Inside the breakdown, the ingredient name's displayed quantity and the per-ingredient values are also scaled by N
+- **Per recipe** — each recipe is a collapsible section showing its subtotal (scaled by serving count) in the header; the header name shows `×N` when N > 1. Tapping the header toggles its ingredient breakdown (collapsed by default; a `▸`/`▾` caret reflects state). Inside the breakdown, the ingredient name's displayed quantity and the per-ingredient values are also scaled by N. Each recipe header also has inline `−` / `+` serving controls so servings can be adjusted without leaving the nutrition screen
 - **Per ingredient** — each ingredient row inside an expanded section shows its computed nutrition contribution with cost appended, or appropriate flags (see below)
-- Totals shown are calories, sodium (mg), sugar (g), and protein (g), rounded to whole numbers. Cost is shown as `$X.XX` to two decimal places
+- Totals shown are calories, fat (g), saturated fat (g), trans fat (g), cholesterol (mg), carbs (g), sodium (mg), sugar (g), fiber (g), and protein (g), rounded to whole numbers. Cost is shown as `$X.XX` to two decimal places
 - If a recipe (or the grand total) has **no** computable ingredients, the value line shows `— no computable data` instead of a row of zeros
 - A "Start Over" button at the bottom resets everything. If no recipes are selected, the screen shows an empty message and the Start Over button
+
+#### 30-day cost projection
+The grand total card shows a `$X.XX / 30 days` line beneath the cost total, computed as `grandTotal.cost × 30`. Useful for evaluating whether a daily eating pattern is sustainable month-to-month. Only shown when at least one ingredient has cost data.
+
+#### Recipe suggestions
+Below the grand total, a **Recipe Suggestions** panel scores every registered recipe against the remaining macro budget and shows the top 3 closest matches with a `+ Add` button to select them without leaving the Nutrition screen.
+
+Scoring algorithm (per recipe):
+- Compute fill ratio for each of calories (weight 0.4), protein (0.3), fat (0.15), carbs (0.15), where `fillRatio = min(recipeValue / remaining, 1)`
+- Weighted sum of fill ratios → raw score
+- Penalty multipliers: `×0.7` if recipe sodium exceeds remaining sodium budget; `×0.8` if recipe sat fat exceeds remaining sat fat cap
+- Top 3 non-zero scores are shown with their name, calories, and protein
 
 #### Cost display
 Cost is shown inline with nutrition wherever data is available, using the format:
@@ -191,7 +215,7 @@ Both the Select and Cooking screens display a link icon (🔗) next to each reci
 
 - **Instruction** — tap to dismiss (card disappears). Used for all active hands-on steps: prep, cleanup, notes, transfers, flips, sprays, slices, combines.
 - **Cleanup** — same as instruction, tap to dismiss
-- **Timer** — tap once to start countdown, tap 3× rapidly to skip. Shows MM:SS countdown while running. On completion plays a sound and marks the card green with a timestamp. On skip marks it grey with strikethrough and timestamp.
+- **Timer** — tap once to start countdown, tap 3× rapidly to skip. Shows MM:SS countdown while running. On completion plays a sound and marks the card green with a timestamp. On skip marks it grey with strikethrough and timestamp. **Before being tapped**, a small amber duration badge is shown on the right of the card (e.g. `15m`, `1h 30m`, `45s`) so the user can see how long the timer will run before starting it. The badge is hidden once the countdown begins.
 - **Container** — a step with child ingredient steps nested inside it. The header shows the action (e.g. "Add to batter bowl"). Each child is its own tappable row. When all children are dismissed the container disappears.
 
 ---
@@ -275,12 +299,34 @@ The app computes nutrition for the currently selected recipes at three levels: p
 An ingredient's `nutrition` is keyed by **unit name**, with each entry read as a standard nutrition label:
 ```ts
 nutrition: {
-    'fl oz': { servings: 8, servingSize: 7, calories: 110, sodium: 0, sugar: 22, protein: 2 },
+    'fl oz': { servings: 8, servingSize: 7, calories: 110, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 26, sodium: 0, sugar: 22, protein: 2, fiber: 0 },
 }
 ```
 - `servingSize` — number of (keyed) units in one serving
-- `calories`, `sodium`, `sugar`, `protein` — values **per serving**
+- All macro fields (`calories`, `fat`, `saturatedFat`, `transFat`, `cholesterol`, `carbs`, `sodium`, `sugar`, `protein`, `fiber`) are **required** — no `?` optional. The `NutritionLabel` type enforces this at compile time. A label entry is either absent (ingredient has no `nutrition`) or fully filled out
 - `servings` — servings per container (metadata; not used in the per-recipe computation)
+
+#### Daily Targets panel
+Below the grand total on the Nutrition screen, a **Daily Targets** panel shows a row for each tracked macro. Each row has a user-editable target input, an "Eaten" column (computed from the current selection), and a "Remaining" column that updates live when the target is changed.
+
+Tracked macros and their default targets:
+| Macro | Default | Unit | Direction |
+|---|---|---|---|
+| Calories | 2550 | kcal | reach target |
+| Protein | 147 | g (~23%) | reach target |
+| Fat (total) | 114 | g (~40%) | reach target |
+| ↳ Sat Fat | 20 | g | stay under (cap) |
+| ↳ Trans Fat | 0 | g | stay under (cap) |
+| Carbs | 234 | g (~37%) | reach target |
+| Sodium | 2300 | mg | stay under (cap) |
+
+"Cap" macros (sat fat, trans fat, sodium) use reversed colour coding: remaining shows neutral until the cap is exceeded, at which point it turns red and shows "X over". "Reach" macros turn green when the target is met or exceeded.
+
+The Eaten column for Protein, Fat, and Carbs shows two percentages:
+- Calorie % — what share of total calories eaten comes from that macro (e.g. `(protein_g × 4 / total_cal) × 100`)
+- Gram distribution % — that macro's share of the combined protein+fat+carbs gram total (e.g. 1g each → 33% each)
+
+Format: `Xg (Y% cal) / Z%`
 
 ### Brand-aware nutrition resolution
 Nutrition is brand-specific (a Milkadamia label is not a Califia label), so the value used for each ingredient comes from the **selected product's** label when one exists. Resolution order:
@@ -503,6 +549,17 @@ This single type replaces the older split between `purchaseLinks` and ingredient
 ### `rename(newName)`
 A method on `Ingredient` that silently mutates the display name — no step card is produced. Used when an ingredient changes state mid-recipe (e.g. raw mushrooms → breaded mushrooms). All subsequent steps that reference the same object will use the new name.
 
+### Ingredient-specific density conversions
+When a recipe uses a unit (e.g. `cup`) but the product is packaged in a different unit (e.g. `oz`), a `conversions` map on the ingredient bridges the gap for cost calculation:
+
+```ts
+conversions: {
+    [u.cup.name]: { to: u.ounce, factor: 8.93 },  // 1 cup → 8.93 oz
+}
+```
+
+This is distinct from the global unit-conversion graph (which only handles within-cluster conversions like tsp↔cup or oz↔lb). Ingredient-specific conversions handle density / packaging mismatches that are substance-dependent — e.g. cherry (unit→cup, ~15 cherries/cup), cannellini beans (cup→oz, 8.93 oz/cup), edamame (cup→oz, 5.3 oz/cup), carrot (cup→lb, 0.24 lb/cup).
+
 ### `simpleIngredients()` helper
 Bulk-declares ingredients with no metadata. Auto-derives display names from camelCase keys — e.g. `kingOysterMushroom` → `"King Oyster Mushroom"`. An explicit string is only needed when the auto-derived form is wrong.
 
@@ -559,6 +616,42 @@ A beep sound plays when a timer completes. The audio context is unlocked silentl
 
 ## Validation Script (`validate-recipes.ts`)
 A separate script that imports the recipe module and catches any `transfer()` validation errors thrown at definition time. Run with `npx ts-node validate-recipes.ts` before deploying. Returns exit code 0 on success, 1 on failure. Suitable for use as a `pre-push` git hook or CI check.
+
+---
+
+## Registered Ingredients (notable)
+
+### Blueprint supplements
+| Key | Name | Serving | Nutrition (per serving) | Product |
+|---|---|---|---|---|
+| `longevityMix` | Longevity Mix | 1 scoop (14.8g) | 10 cal, 3g carbs | Blueprint Blood Orange, 30 srv, $49 / $44.10 S&S |
+| `blueprintCollagen` | Collagen Peptides | 1 scoop (22.3g) | 80 cal, 20g protein | Blueprint Type I/II/III, 30 srv, $45 / $40.50 S&S |
+| `blueprintCreatine` | Creatine Monohydrate | 1 scoop (5.7g) | 0 cal | Blueprint Unflavored, 100 srv, $40 / $36 S&S |
+
+All three are combined in the **Blueprint Longevity Drink** recipe (`blueprint-longevity-drink`): mix all three powders in 8–12 oz water. This recipe is included in the Daily Blueprint bundle.
+
+### Asian Dense Bean Salad ingredients
+All produce and condiment ingredients used in the Asian Dense Bean Salad are registered as full `ingredientFactory` entries with USDA nutrition data:
+
+| Key | Unit | Cal | Protein | Carbs | Fat | Sodium |
+|---|---|---|---|---|---|---|
+| `chickpeas` | cup | 220 | 12g | 36g | 4g | 20mg |
+| `cannelliniBean` | cup | 180 | 12g | 32g | 0g | 10mg |
+| `edamame` | cup | 190 | 17g | 14g | 8g | 9mg |
+| `cabbage` | cup | 22 | 1g | 5g | 0g | 16mg |
+| `carrot` | cup | 52 | 1g | 12g | 0g | 88mg |
+| `greenOnion` | unit | 5 | 0g | 1g | 0g | 5mg |
+| `almond` | handful | 164 | 6g | 6g | 14g | 0mg |
+| `whiteMiso` | tbsp | 35 | 2g | 5g | 1g | 600mg |
+| `tamari` | tbsp | 11 | 2g | 1g | 0g | 700mg |
+| `riceVinegar` | tbsp | 3 | 0g | 1g | 0g | 0mg |
+| `sesameSeed` | tbsp | 52 | 2g | 2g | 4g | 1mg |
+| `limeJuice` | tbsp | 4 | 0g | 1g | 0g | 1mg |
+
+Chickpeas and cannellini beans both include a `cup → oz` conversion (≈8.93 oz/cup) so cost can be computed against their 13.4 oz packages. Edamame uses `cup → oz` at 5.3 oz/cup.
+
+### Asian Dense Bean Salad — Kit Version
+Recipe `asian-dense-bean-salad-kit` is a shortcut version of the full from-scratch salad. It uses the **365 Organic Asian Inspired Salad Kit** (12 oz, $5.99 — pre-shredded cabbage, carrots, green onion, almonds, and sesame dressing) as the base, then adds 1 cup each of chickpeas, cannellini beans, and edamame. The result is nutritionally similar to the scratch version with far less prep. This recipe is included in the Daily Blueprint bundle.
 
 ---
 

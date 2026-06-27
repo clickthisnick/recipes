@@ -18,12 +18,18 @@ export interface Unit {
 // A nutrition label, keyed by unit name (e.g. 'cup', 'tsp'). Values are per
 // serving; servingSize is in the keyed unit.
 export type NutritionLabel = Record<string, {
-    servings?: number;
-    servingSize?: number;
-    calories?: number;
-    sodium?: number;
-    sugar?: number;
-    protein?: number;
+    servings: number;
+    servingSize: number;
+    calories: number;
+    fat: number;
+    saturatedFat: number;
+    transFat: number;
+    cholesterol: number;
+    carbs: number;
+    sodium: number;
+    sugar: number;
+    protein: number;
+    fiber: number;
 }>;
 
 export interface Product {
@@ -83,6 +89,12 @@ export interface Recipe {
     adhoc?: boolean;
 }
 
+export interface RecipeBundle {
+    id: string;
+    name: string;
+    recipeIds: string[];
+}
+
 // ============================================================
 // GLOBAL STATE
 // ============================================================
@@ -94,6 +106,7 @@ const FAVORITE_RECIPE_IDS: string[] = [
 
 const state = {
     recipes:           new Map<string, Recipe>(),
+    bundles:           new Map<string, RecipeBundle>(),
     selectedRecipeIds: [] as string[],
     timers:            new Map<number, number>(),
     screen:            'select' as Screen,
@@ -103,6 +116,8 @@ const state = {
     cookingElapsedInterval: null as number | null,
     audioUnlocked:     false,
 };
+
+const macroTargets = { calories: 2550, protein: 147, fat: 114, saturatedFat: 20, transFat: 0, carbs: 234, sodium: 2300 };
 
 // ============================================================
 // ID HELPERS
@@ -526,6 +541,10 @@ export function registerGroup(group: string, recipes: Recipe[]): void {
     recipes.forEach((recipe) => registerRecipe({ ...recipe, group }));
 }
 
+export function registerBundle(bundle: RecipeBundle): void {
+    state.bundles.set(bundle.id, bundle);
+}
+
 // ============================================================
 // AD-HOC INGREDIENTS
 // ============================================================
@@ -676,7 +695,7 @@ function buildShoppingList(): Ingredient[] {
 // NUTRITION + COST
 // ============================================================
 
-interface NutritionTotals { calories: number; sodium: number; sugar: number; protein: number; }
+interface NutritionTotals { calories: number; fat: number; saturatedFat: number; transFat: number; cholesterol: number; carbs: number; sodium: number; sugar: number; protein: number; fiber: number; }
 
 type NutritionResult =
     | { status: 'ok'; totals: NutritionTotals; brand?: string }
@@ -688,20 +707,32 @@ type CostResult =
     | { status: 'missing' }
     | { status: 'uncomputable'; reason: string };
 
-const emptyTotals = (): NutritionTotals => ({ calories: 0, sodium: 0, sugar: 0, protein: 0 });
+const emptyTotals = (): NutritionTotals => ({ calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 });
 
 const addTotals = (a: NutritionTotals, b: NutritionTotals): NutritionTotals => ({
-    calories: a.calories + b.calories,
-    sodium:   a.sodium   + b.sodium,
-    sugar:    a.sugar    + b.sugar,
-    protein:  a.protein  + b.protein,
+    calories:     a.calories     + b.calories,
+    fat:          a.fat          + b.fat,
+    saturatedFat: a.saturatedFat + b.saturatedFat,
+    transFat:     a.transFat     + b.transFat,
+    cholesterol:  a.cholesterol  + b.cholesterol,
+    carbs:        a.carbs        + b.carbs,
+    sodium:       a.sodium       + b.sodium,
+    sugar:        a.sugar        + b.sugar,
+    protein:      a.protein      + b.protein,
+    fiber:        a.fiber        + b.fiber,
 });
 
 const scaleTotals = (t: NutritionTotals, n: number): NutritionTotals => ({
-    calories: t.calories * n,
-    sodium:   t.sodium   * n,
-    sugar:    t.sugar    * n,
-    protein:  t.protein  * n,
+    calories:     t.calories     * n,
+    fat:          t.fat          * n,
+    saturatedFat: t.saturatedFat * n,
+    transFat:     t.transFat     * n,
+    cholesterol:  t.cholesterol  * n,
+    carbs:        t.carbs        * n,
+    sodium:       t.sodium       * n,
+    sugar:        t.sugar        * n,
+    protein:      t.protein      * n,
+    fiber:        t.fiber        * n,
 });
 
 function isComposite(ing: Ingredient): boolean {
@@ -768,10 +799,16 @@ function ingredientNutrition(ing: Ingredient): NutritionResult {
         status: 'ok',
         brand,
         totals: {
-            calories: (facts.calories ?? 0) * servingsUsed,
-            sodium:   (facts.sodium   ?? 0) * servingsUsed,
-            sugar:    (facts.sugar    ?? 0) * servingsUsed,
-            protein:  (facts.protein  ?? 0) * servingsUsed,
+            calories:     (facts.calories     ?? 0) * servingsUsed,
+            fat:          (facts.fat          ?? 0) * servingsUsed,
+            saturatedFat: (facts.saturatedFat ?? 0) * servingsUsed,
+            transFat:     (facts.transFat     ?? 0) * servingsUsed,
+            cholesterol:  (facts.cholesterol  ?? 0) * servingsUsed,
+            carbs:        (facts.carbs        ?? 0) * servingsUsed,
+            sodium:       (facts.sodium       ?? 0) * servingsUsed,
+            sugar:        (facts.sugar        ?? 0) * servingsUsed,
+            protein:      (facts.protein      ?? 0) * servingsUsed,
+            fiber:        (facts.fiber        ?? 0) * servingsUsed,
         },
     };
 }
@@ -853,8 +890,11 @@ function recipeNutrition(recipe: Recipe): RecipeNutrition {
 
 function formatTotals(t: NutritionTotals, cost?: number): string {
     const costStr = cost !== undefined ? `$${cost.toFixed(2)} · ` : '';
-    return `${costStr}${Math.round(t.calories)} cal · ${Math.round(t.sodium)} mg sodium · ` +
-           `${Math.round(t.sugar)} g sugar · ${Math.round(t.protein)} g protein`;
+    return `${costStr}${Math.round(t.calories)} cal · ${Math.round(t.protein)} g protein · ` +
+           `${Math.round(t.fat)} g fat (${Math.round(t.saturatedFat)} sat${t.transFat > 0 ? ` / ${Math.round(t.transFat)} trans` : ''}) · ` +
+           `${Math.round(t.cholesterol)} mg chol · ` +
+           `${Math.round(t.carbs)} g carbs · ` +
+           `${Math.round(t.fiber)} g fiber · ${Math.round(t.sugar)} g sugar · ${Math.round(t.sodium)} mg sodium`;
 }
 
 function coverageLabel(covered: number, total: number, flagged: number): string {
@@ -981,6 +1021,39 @@ function renderRecipeList(): void {
         root.appendChild(empty);
         appendAddIngredientButton(root);
         return;
+    }
+
+    if (state.bundles.size > 0 && !state.searchQuery) {
+        const bundleHeading = document.createElement('h3');
+        bundleHeading.textContent = 'Bundles';
+        bundleHeading.className   = 'group-heading';
+        root.appendChild(bundleHeading);
+
+        state.bundles.forEach((bundle) => {
+            const row = document.createElement('div');
+            row.className = 'bundle-row';
+
+            const btn = document.createElement('button');
+            btn.className   = 'bundle-btn';
+            btn.textContent = bundle.name;
+
+            const sub = document.createElement('span');
+            sub.className   = 'bundle-sub';
+            sub.textContent = bundle.recipeIds
+                .map(id => state.recipes.get(id)?.name ?? id)
+                .join(' · ');
+
+            btn.appendChild(sub);
+            btn.addEventListener('click', () => {
+                for (const id of bundle.recipeIds) state.selectedRecipeIds.push(id);
+                unlockAudioContext();
+                renderRecipeList();
+                updateActionButtons();
+            });
+
+            row.appendChild(btn);
+            root.appendChild(row);
+        });
     }
 
     const groups = new Map<string, Recipe[]>();
@@ -1128,7 +1201,12 @@ function renderShoppingScreen(): void {
             const links = document.createElement('div');
             links.className = 'purchase-links';
             const chosen = selectedProduct(ingredient);
-            products.forEach((product) => {
+            const sorted = [...products].sort((a, b) => {
+                const aPpu = a.price !== undefined && a.size !== undefined ? a.price / a.size : Infinity;
+                const bPpu = b.price !== undefined && b.size !== undefined ? b.price / b.size : Infinity;
+                return aPpu - bPpu;
+            });
+            sorted.forEach((product) => {
                 const a    = document.createElement('a');
                 a.href     = product.link ?? '#';
                 a.target   = '_blank';
@@ -1139,8 +1217,15 @@ function renderShoppingScreen(): void {
                 const pkg     = product.price !== undefined && product.size !== undefined
                     ? ` — $${product.price} / ${product.size} ${product.sizeUnit?.name ?? ''}`.trimEnd()
                     : '';
+                const ppu     = product.price !== undefined && product.size !== undefined
+                    ? ` ($${(product.price / product.size).toFixed(2)}/${product.sizeUnit?.name ?? 'unit'})`
+                    : '';
+                const sasPpu  = product.discount?.subscribeAndSave !== undefined && product.size !== undefined
+                    ? ` ($${(product.discount.subscribeAndSave / product.size).toFixed(2)}/${product.sizeUnit?.name ?? 'unit'})` : '';
+                const sas     = product.discount?.subscribeAndSave !== undefined
+                    ? ` · S&S $${product.discount.subscribeAndSave}${sasPpu}` : '';
                 const pick    = product === chosen ? ' ✓' : '';
-                a.textContent = `${product.brand}${variant}${where}${pkg}${pick}`;
+                a.textContent = `${product.brand}${variant}${where}${pkg}${ppu}${sas}${pick}`;
                 links.appendChild(a);
             });
             panel.appendChild(links);
@@ -1154,6 +1239,160 @@ function renderShoppingScreen(): void {
     });
 
     root.appendChild(createStartOverButton());
+}
+
+// ============================================================
+// MACRO TARGETS PANEL
+// ============================================================
+
+function renderMacroTargetsPanel(grand: NutritionTotals): HTMLElement {
+    const panel = createPanel();
+    panel.className = 'panel macro-targets';
+
+    const title = document.createElement('div');
+    title.className   = 'macro-targets-title';
+    title.textContent = 'Daily Targets';
+    panel.appendChild(title);
+
+    const header = document.createElement('div');
+    header.className = 'macro-row macro-header';
+    ['', 'Target', 'Eaten', 'Remaining'].forEach(text => {
+        const cell = document.createElement('span');
+        cell.textContent = text;
+        header.appendChild(cell);
+    });
+    panel.appendChild(header);
+
+    const totalCals = grand.calories > 0 ? grand.calories : null;
+    const pct = (grams: number | null, calsPerGram: number): string =>
+        grams !== null && totalCals ? ` (${Math.round((grams * calsPerGram / totalCals) * 100)}%)` : '';
+
+    const totalMacroG = grand.protein + grand.fat + grand.carbs;
+    const macroPct = (grams: number | null): string =>
+        grams !== null && totalMacroG > 0 ? ` / ${Math.round((grams / totalMacroG) * 100)}%` : '';
+
+    const rows: { label: string; key: keyof typeof macroTargets; actual: number | null; unit: string; indent?: boolean; cap?: boolean; calPct?: string; macroPct?: string }[] = [
+        { label: 'Calories',    key: 'calories',    actual: grand.calories    > 0 ? Math.round(grand.calories)           : null, unit: 'kcal' },
+        { label: 'Protein',     key: 'protein',     actual: grand.protein     > 0 ? Math.round(grand.protein)            : null, unit: 'g', calPct: pct(grand.protein     > 0 ? grand.protein     : null, 4), macroPct: macroPct(grand.protein > 0 ? grand.protein : null) },
+        { label: 'Fat',         key: 'fat',         actual: grand.fat         > 0 ? Math.round(grand.fat)                : null, unit: 'g', calPct: pct(grand.fat         > 0 ? grand.fat         : null, 9), macroPct: macroPct(grand.fat     > 0 ? grand.fat     : null) },
+        { label: '↳ Sat Fat',   key: 'saturatedFat', actual: grand.saturatedFat > 0 ? Math.round(grand.saturatedFat * 10) / 10 : null, unit: 'g', indent: true, cap: true, calPct: pct(grand.saturatedFat > 0 ? grand.saturatedFat : null, 9) },
+        { label: '↳ Trans Fat', key: 'transFat',    actual: grand.transFat    > 0 ? Math.round(grand.transFat * 10) / 10 : null, unit: 'g', indent: true, cap: true, calPct: pct(grand.transFat    > 0 ? grand.transFat    : null, 9) },
+        { label: 'Carbs',       key: 'carbs',       actual: grand.carbs       > 0 ? Math.round(grand.carbs)              : null, unit: 'g', calPct: pct(grand.carbs       > 0 ? grand.carbs       : null, 4), macroPct: macroPct(grand.carbs   > 0 ? grand.carbs   : null) },
+        { label: 'Sodium',      key: 'sodium',      actual: grand.sodium      > 0 ? Math.round(grand.sodium)             : null, unit: 'mg', cap: true },
+    ];
+
+    rows.forEach(({ label, key, actual, unit, indent, cap, calPct, macroPct }) => {
+        const row = document.createElement('div');
+        row.className = 'macro-row' + (indent ? ' macro-row-indent' : '');
+
+        const labelEl = document.createElement('span');
+        labelEl.className   = 'macro-label' + (indent ? ' macro-label-sub' : '');
+        labelEl.textContent = label;
+        row.appendChild(labelEl);
+
+        const inputWrap = document.createElement('span');
+        inputWrap.className = 'macro-target-wrap';
+        const input = document.createElement('input');
+        input.type      = 'number';
+        input.min       = '0';
+        input.className = 'macro-target-input';
+        input.value     = String(macroTargets[key]);
+        const unitLabel = document.createElement('span');
+        unitLabel.className   = 'macro-unit-label';
+        unitLabel.textContent = unit;
+        inputWrap.appendChild(input);
+        inputWrap.appendChild(unitLabel);
+        row.appendChild(inputWrap);
+
+        const actualEl = document.createElement('span');
+        actualEl.className   = 'macro-actual';
+        actualEl.textContent = actual !== null ? `${actual} ${unit}${calPct ?? ''}${macroPct ?? ''}` : '—';
+        row.appendChild(actualEl);
+
+        const initRemaining = actual !== null ? macroTargets[key] - actual : null;
+        const remainClass = (rem: number | null) => {
+            if (rem === null) return 'macro-remaining';
+            if (cap) return rem < 0 ? 'macro-remaining over' : rem === 0 ? 'macro-remaining met' : 'macro-remaining';
+            return rem <= 0 ? 'macro-remaining met' : 'macro-remaining';
+        };
+        const remainText = (rem: number | null) => {
+            if (rem === null) return '—';
+            if (cap) return rem < 0 ? `${Math.round(-rem)} ${unit} over` : rem === 0 ? '✓ at limit' : `${Math.round(rem)} ${unit} left`;
+            return rem > 0 ? `${Math.round(rem)} ${unit}` : '✓ met';
+        };
+        const remainEl = document.createElement('span');
+        remainEl.className   = remainClass(initRemaining);
+        remainEl.textContent = remainText(initRemaining);
+        row.appendChild(remainEl);
+
+        input.addEventListener('change', () => {
+            const v = parseFloat(input.value);
+            if (!isNaN(v) && v > 0) {
+                macroTargets[key] = v;
+                const newRemaining = actual !== null ? v - actual : null;
+                remainEl.textContent = remainText(newRemaining);
+                remainEl.className   = remainClass(newRemaining);
+            }
+        });
+
+        panel.appendChild(row);
+    });
+
+    return panel;
+}
+
+// ============================================================
+// RECIPE SUGGESTIONS
+// ============================================================
+
+interface SuggestedRecipe { recipe: Recipe; score: number; totals: NutritionTotals; }
+
+function buildRecipeSuggestions(grand: NutritionTotals): SuggestedRecipe[] {
+    const remCals = macroTargets.calories - grand.calories;
+    if (remCals < 50) return [];  // nearly full — no suggestions needed
+
+    const remaining = {
+        calories: Math.max(0, remCals),
+        protein:  Math.max(0, macroTargets.protein - grand.protein),
+        fat:      Math.max(0, macroTargets.fat     - grand.fat),
+        carbs:    Math.max(0, macroTargets.carbs   - grand.carbs),
+    };
+
+    const results: SuggestedRecipe[] = [];
+
+    for (const recipe of state.recipes.values()) {
+        if (recipe.adhoc) continue;
+        const nutr = recipeNutrition(recipe);
+        if (nutr.covered === 0) continue;
+
+        const t = nutr.totals;
+        const macros = [
+            { val: t.calories, rem: remaining.calories, w: 0.4 },
+            { val: t.protein,  rem: remaining.protein,  w: 0.3 },
+            { val: t.fat,      rem: remaining.fat,      w: 0.15 },
+            { val: t.carbs,    rem: remaining.carbs,    w: 0.15 },
+        ];
+
+        let score = 0;
+        let totalWeight = 0;
+        for (const { val, rem, w } of macros) {
+            if (rem <= 0) continue;
+            score += Math.min(val / rem, 1) * w;
+            totalWeight += w;
+        }
+        if (totalWeight === 0) continue;
+        score /= totalWeight;
+
+        // Penalise recipes that would meaningfully bust cap nutrients
+        const sodiumRemaining = macroTargets.sodium - grand.sodium;
+        if (sodiumRemaining > 0 && t.sodium > sodiumRemaining * 1.5) score *= 0.7;
+        const satFatRemaining = macroTargets.saturatedFat - grand.saturatedFat;
+        if (satFatRemaining > 0 && t.saturatedFat > satFatRemaining * 1.5) score *= 0.8;
+
+        results.push({ recipe, score, totals: t });
+    }
+
+    return results.sort((a, b) => b.score - a.score).slice(0, 3);
 }
 
 // ============================================================
@@ -1220,6 +1459,14 @@ function renderNutritionScreen(): void {
     }
     totalCard.appendChild(totalValue);
 
+    // 30-day cost projection
+    if (hasCostData) {
+        const monthly = document.createElement('div');
+        monthly.className   = 'nutrition-monthly-cost';
+        monthly.textContent = `$${(grandCost * 30).toFixed(2)} / 30 days`;
+        totalCard.appendChild(monthly);
+    }
+
     // Partial cost warning
     if (gCostMissing > 0 && hasCostData) {
         const costNote = document.createElement('div');
@@ -1234,6 +1481,7 @@ function renderNutritionScreen(): void {
     totalCard.appendChild(totalCoverage);
 
     root.appendChild(totalCard);
+    root.appendChild(renderMacroTargetsPanel(grand));
 
     // ── Per recipe (expandable) ──────────────────────────────
     perRecipe.forEach(({ recipe, servings, nutrition }) => {
@@ -1266,8 +1514,39 @@ function renderNutritionScreen(): void {
             sub.textContent = '— no computable data';
         }
 
+        const servingControls = document.createElement('div');
+        servingControls.className = 'nutrition-serving-controls';
+
+        const minusBtn = document.createElement('button');
+        minusBtn.className   = 'nutrition-serving-btn';
+        minusBtn.textContent = '−';
+        minusBtn.addEventListener('click', (ev) => {
+            ev.stopPropagation();
+            const idx = state.selectedRecipeIds.lastIndexOf(recipe.id);
+            if (idx !== -1) state.selectedRecipeIds.splice(idx, 1);
+            renderNutritionScreen();
+        });
+
+        const countLabel = document.createElement('span');
+        countLabel.className   = 'nutrition-serving-count';
+        countLabel.textContent = `×${servings}`;
+
+        const plusBtn = document.createElement('button');
+        plusBtn.className   = 'nutrition-serving-btn';
+        plusBtn.textContent = '+';
+        plusBtn.addEventListener('click', (ev) => {
+            ev.stopPropagation();
+            state.selectedRecipeIds.push(recipe.id);
+            renderNutritionScreen();
+        });
+
+        servingControls.appendChild(minusBtn);
+        servingControls.appendChild(countLabel);
+        servingControls.appendChild(plusBtn);
+
         header.appendChild(caret);
         header.appendChild(name);
+        header.appendChild(servingControls);
         header.appendChild(sub);
         section.appendChild(header);
 
@@ -1343,13 +1622,58 @@ function renderNutritionScreen(): void {
 
         section.appendChild(list);
 
-        header.addEventListener('click', () => {
+        header.addEventListener('click', (ev) => {
+            if ((ev.target as HTMLElement).closest('.nutrition-serving-controls')) return;
             const collapsed = list.classList.toggle('collapsed');
             caret.textContent = collapsed ? '▸' : '▾';
         });
 
         root.appendChild(section);
     });
+
+    // ── Recipe suggestions ────────────────────────────────────
+    const suggestions = buildRecipeSuggestions(grand);
+    if (suggestions.length > 0) {
+        const suggestPanel = createPanel();
+        suggestPanel.className = 'panel nutrition-suggestions';
+
+        const suggestTitle = document.createElement('div');
+        suggestTitle.className   = 'nutrition-suggestions-title';
+        suggestTitle.textContent = 'Suggested to fill your gap';
+        suggestPanel.appendChild(suggestTitle);
+
+        suggestions.forEach(({ recipe, score, totals }) => {
+            const row = document.createElement('div');
+            row.className = 'suggestion-row';
+
+            const info = document.createElement('div');
+            info.className = 'suggestion-info';
+
+            const name = document.createElement('span');
+            name.className   = 'suggestion-name';
+            name.textContent = recipe.name;
+            info.appendChild(name);
+
+            const stats = document.createElement('span');
+            stats.className   = 'suggestion-stats';
+            stats.textContent = `${Math.round(totals.calories)} cal · ${Math.round(totals.protein)}g protein · ${Math.round(score * 100)}% match`;
+            info.appendChild(stats);
+
+            const addBtn = document.createElement('button');
+            addBtn.className   = 'suggestion-add-btn';
+            addBtn.textContent = '+ Add';
+            addBtn.addEventListener('click', () => {
+                state.selectedRecipeIds.push(recipe.id);
+                renderNutritionScreen();
+            });
+
+            row.appendChild(info);
+            row.appendChild(addBtn);
+            suggestPanel.appendChild(row);
+        });
+
+        root.appendChild(suggestPanel);
+    }
 
     root.appendChild(createStartOverButton());
 }
@@ -1733,6 +2057,21 @@ function renderStep(step: Step, onDone?: () => void): HTMLElement {
 
     panel.textContent = step.text;
 
+    if (step.type === 'timer' && step.durationSeconds) {
+        const secs = step.durationSeconds;
+        const h = Math.floor(secs / 3600);
+        const m = Math.floor((secs % 3600) / 60);
+        const s = secs % 60;
+        const parts = [];
+        if (h) parts.push(`${h}h`);
+        if (m) parts.push(`${m}m`);
+        if (s || parts.length === 0) parts.push(`${s}s`);
+        const badge = document.createElement('span');
+        badge.className = 'timer-duration-badge';
+        badge.textContent = parts.join(' ');
+        panel.appendChild(badge);
+    }
+
     if (step.type === 'timer') {
         let clickCount = 0;
         let clickTimer = 0;
@@ -2061,6 +2400,8 @@ h2 { margin-top: 0; font-size: 28px; }
 .container-children .panel { margin: 0; font-size: 20px; padding: 14px 16px; }
 
 .panel.timer     { background: #ca8a04; color: black; border-color: #ca8a04; }
+.timer-duration-badge { margin-left: 10px; font-size: 13px; font-weight: 600; color: #ca8a04; background: #1a1a0a; border: 1px solid #ca8a04; border-radius: 6px; padding: 1px 7px; vertical-align: middle; white-space: nowrap; }
+.panel.timer .timer-duration-badge { display: none; }
 .panel.completed { background: #1a5c2a; color: white; border-color: #2d9e4a; }
 .panel.skipped   { background: #374151; color: #9ca3af; border-color: #4b5563; text-decoration: line-through; }
 
@@ -2109,15 +2450,29 @@ h2 { margin-top: 0; font-size: 28px; }
 .nutrition-coverage { font-size: 14px; color: #888; margin-top: 8px; }
 .nutrition-coverage.flagged { color: #f59e0b; }
 
+/* 30-day cost projection */
+.nutrition-monthly-cost { font-size: 15px; color: #6b9fcf; margin-top: 6px; }
+
 /* Partial-cost note — shown when some but not all ingredients have price data */
 .nutrition-cost-note { font-size: 13px; color: #f59e0b; margin-top: 4px; font-style: italic; }
 
 .panel.nutrition-recipe { cursor: default; padding: 0; }
-.nutrition-recipe-header { display: flex; align-items: baseline; gap: 10px; padding: 16px 20px 6px; cursor: pointer; }
+.nutrition-recipe-header { display: flex; align-items: center; gap: 10px; padding: 16px 20px 6px; cursor: pointer; }
 .nutrition-caret { color: #888; font-size: 16px; }
 .nutrition-recipe-name { font-size: 22px; flex: 1; }
 .nutrition-recipe-sub { font-size: 14px; color: #888; text-align: right; white-space: nowrap; }
 .panel.nutrition-recipe .nutrition-coverage { padding: 0 20px 14px; margin-top: 0; }
+
+.nutrition-serving-controls { display: flex; align-items: center; gap: 4px; }
+.nutrition-serving-btn { font-size: 18px; width: 32px; height: 32px; border-radius: 8px; border: 1px solid #555; background: #2a2a2a; color: #f0f0f0; cursor: pointer; line-height: 1; padding: 0; }
+.nutrition-serving-btn:hover { background: #3a3a3a; border-color: #888; }
+.nutrition-serving-count { font-size: 14px; color: #aaa; min-width: 28px; text-align: center; }
+
+/* ── Bundles ── */
+.bundle-row { margin: 6px 0; }
+.bundle-btn { width: 100%; text-align: left; font-size: 20px; padding: 16px 20px; border-radius: 12px; border: 2px solid #2d5a8a; background: #0f2a45; color: #f0f0f0; cursor: pointer; display: flex; flex-direction: column; gap: 4px; }
+.bundle-btn:hover { background: #163556; border-color: #4a8ac4; }
+.bundle-sub { font-size: 13px; color: #6b9fcf; font-weight: normal; }
 
 .nutrition-ingredients { border-top: 1px solid #333; padding: 6px 20px 14px; display: flex; flex-direction: column; }
 .nutrition-ingredients.collapsed { display: none; }
@@ -2143,6 +2498,61 @@ h2 { margin-top: 0; font-size: 28px; }
 .nutrition-cost-flag { flex-basis: 100%; font-size: 12px; color: #f59e0b; font-style: italic; margin-top: 1px; opacity: 0.8; }
 
 .nutrition-provenance { flex-basis: 100%; font-size: 12px; color: #666; font-style: italic; margin-top: 2px; }
+
+/* ── Macro targets panel ── */
+
+.panel.macro-targets { cursor: default; border-color: #3b3b3b; background: #161616; }
+
+.macro-targets-title { font-size: 14px; color: #666; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px; }
+
+.macro-row {
+    display: grid;
+    grid-template-columns: 80px 1fr 1fr 1fr;
+    gap: 8px;
+    align-items: center;
+    padding: 7px 0;
+    border-bottom: 1px solid #222;
+}
+.macro-row:last-child { border-bottom: none; }
+
+.macro-header span { font-size: 12px; color: #555; text-transform: uppercase; letter-spacing: 0.06em; }
+
+.macro-label { font-size: 17px; color: #f0f0f0; }
+
+.macro-target-wrap { display: flex; align-items: center; gap: 5px; }
+
+.macro-target-input {
+    width: 72px;
+    background: #252525;
+    border: 1px solid #555;
+    border-radius: 8px;
+    color: #f0f0f0;
+    font-size: 15px;
+    padding: 4px 8px;
+}
+.macro-target-input:focus { outline: none; border-color: #60a5fa; background: #1e2a3a; }
+
+.macro-unit-label { font-size: 13px; color: #666; }
+
+.macro-actual { font-size: 16px; color: #aaa; }
+
+.macro-remaining { font-size: 16px; color: #aaa; }
+.macro-remaining.met  { color: #2d9e4a; font-weight: bold; }
+.macro-remaining.over { color: #ef4444; font-weight: bold; }
+
+.macro-row-indent { border-bottom: none; padding: 3px 0; }
+.macro-label-sub  { font-size: 14px; color: #888; padding-left: 12px; }
+
+/* ── Recipe suggestions ── */
+.panel.nutrition-suggestions { cursor: default; border-color: #2d4a2d; background: #0f1f0f; }
+.nutrition-suggestions-title { font-size: 14px; color: #4a8c4a; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 12px; }
+.suggestion-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #1a2a1a; }
+.suggestion-row:last-child { border-bottom: none; }
+.suggestion-info { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+.suggestion-name { font-size: 18px; color: #f0f0f0; }
+.suggestion-stats { font-size: 13px; color: #6b9c6b; }
+.suggestion-add-btn { font-size: 16px; padding: 8px 18px; border-radius: 10px; border: 1px solid #2d9e4a; background: transparent; color: #2d9e4a; cursor: pointer; white-space: nowrap; }
+.suggestion-add-btn:hover { background: #1a5c2a; color: #f0f0f0; }
 `;
 
 // ============================================================
@@ -2218,8 +2628,125 @@ export const i = {
         pankoBreadCrumbs: '', salt: '', garlicPowder: '', cornstarch: '',
         cassavaFlour: '', kingOysterMushroom: '',
         whiteVinegar: '', bakingSoda: '',
-        carrot: '', babyBellaMushroom: '', yellowOnion: '', oliveOil: '',
+        babyBellaMushroom: '', yellowOnion: '', oliveOil: '',
         rosemary: '', thyme: '',
+    }),
+
+    asianSaladKit: ingredientFactory('Asian Inspired Salad Kit', {
+        defaultBrand: '365',
+        products: [{
+            brand: '365', variant: 'Organic Asian Inspired (12 oz)', store: stores.wholeFoods,
+            price: 5.99, size: 1, sizeUnit: u.unit,
+            link: 'https://www.amazon.com/dp/B07B67Y9MH',
+        }],
+        nutrition: {
+            // per whole bag (2 × 1-cup servings): 170 cal × 2, estimated fat/carbs from ingredients
+            [u.unit.name]: { servings: 1, servingSize: 1, calories: 340, fat: 18, saturatedFat: 2, transFat: 0, cholesterol: 0, carbs: 28, sodium: 780, sugar: 12, protein: 6, fiber: 6 },
+        },
+    }),
+
+    carrot: ingredientFactory('Carrots', {
+        nutrition: {
+            [u.cup.name]:  { servings: 1, servingSize: 1, calories: 52,  fat: 0,    saturatedFat: 0,   transFat: 0, cholesterol: 0, carbs: 12, sodium: 88, sugar: 6, protein: 1,   fiber: 3   },
+            [u.pound.name]:{ servings: 1, servingSize: 1, calories: 186, fat: 0,    saturatedFat: 0,   transFat: 0, cholesterol: 0, carbs: 44, sodium: 317, sugar: 21, protein: 4, fiber: 12  },
+        },
+        conversions: {
+            [u.cup.name]: { to: u.pound, factor: 0.24 },
+        },
+    }),
+
+    edamame: ingredientFactory('Shelled Edamame', {
+        defaultBrand: '365',
+        products: [{
+            brand: '365', variant: 'Organic Frozen Shelled', store: stores.wholeFoods,
+            price: 3.49, size: 10, sizeUnit: u.ounce,
+            link: 'https://www.amazon.com/dp/B074H6S8D8',
+        }],
+        nutrition: {
+            [u.cup.name]: { servings: 1, servingSize: 1, calories: 190, fat: 8, saturatedFat: 1, transFat: 0, cholesterol: 0, carbs: 14, sodium: 9, sugar: 3, protein: 17, fiber: 8 },
+        },
+        conversions: {
+            [u.cup.name]: { to: u.ounce, factor: 5.3 },  // 1 cup shelled ≈ 5.3 oz
+        },
+    }),
+
+    cabbage: ingredientFactory('Green Cabbage', {
+        nutrition: {
+            [u.cup.name]: { servings: 1, servingSize: 1, calories: 22, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 5, sodium: 16, sugar: 3, protein: 1, fiber: 2 },
+        },
+    }),
+
+    greenOnion: ingredientFactory('Green Onion', {
+        nutrition: {
+            [u.unit.name]: { servings: 1, servingSize: 1, calories: 5, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 1, sodium: 5, sugar: 0, protein: 0, fiber: 0 },
+        },
+    }),
+
+    almond: ingredientFactory('Almonds', {
+        nutrition: {
+            [u.handful.name]: { servings: 1, servingSize: 1, calories: 164, fat: 14, saturatedFat: 1, transFat: 0, cholesterol: 0, carbs: 6, sodium: 0, sugar: 1, protein: 6, fiber: 3 },
+            [u.ounce.name]:   { servings: 1, servingSize: 1, calories: 164, fat: 14, saturatedFat: 1, transFat: 0, cholesterol: 0, carbs: 6, sodium: 0, sugar: 1, protein: 6, fiber: 3 },
+        },
+    }),
+
+    whiteMiso: ingredientFactory('White Miso', {
+        nutrition: {
+            [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 35, fat: 1, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 5, sodium: 600, sugar: 1, protein: 2, fiber: 0 },
+        },
+    }),
+
+    tamari: ingredientFactory('Tamari (Low-Sodium)', {
+        nutrition: {
+            [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 11, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 1, sodium: 700, sugar: 0, protein: 2, fiber: 0 },
+        },
+    }),
+
+    riceVinegar: ingredientFactory('Rice Vinegar', {
+        nutrition: {
+            [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 3, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 1, sodium: 0, sugar: 0, protein: 0, fiber: 0 },
+        },
+    }),
+
+    sesameSeed: ingredientFactory('Sesame Seeds', {
+        nutrition: {
+            [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 52, fat: 4, saturatedFat: 1, transFat: 0, cholesterol: 0, carbs: 2, sodium: 1, sugar: 0, protein: 2, fiber: 1 },
+        },
+    }),
+
+    limeJuice: ingredientFactory('Lime Juice', {
+        nutrition: {
+            [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 4, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 1, sodium: 1, sugar: 0, protein: 0, fiber: 0 },
+        },
+    }),
+
+    chickpeas: ingredientFactory('Chickpeas (Garbanzo Beans)', {
+        defaultBrand: '365',
+        conversions: {
+            [u.cup.name]: { to: u.ounce, factor: 13.4 / 1.5 },  // 13.4 oz per ~1.5 cups (3 × ½ cup servings)
+        },
+        products: [{
+            brand: '365', variant: 'Organic Unsalted (13.4 oz)', store: stores.wholeFoods,
+            price: 1.59, size: 13.4, sizeUnit: u.ounce,
+            link: 'https://www.amazon.com/dp/B074H5SRPW',
+        }],
+        nutrition: {
+            [u.cup.name]: { servings: 1, servingSize: 1, calories: 220, fat: 4, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 36, sodium: 20, sugar: 2, protein: 12, fiber: 10 },
+        },
+    }),
+
+    cannelliniBean: ingredientFactory('Cannellini Beans', {
+        defaultBrand: '365',
+        conversions: {
+            [u.cup.name]: { to: u.ounce, factor: 13.4 / 1.5 },  // 13.4 oz per 1.5 cups (3 × ½ cup servings)
+        },
+        products: [{
+            brand: '365', variant: 'Organic Unsalted (13.4 oz)', store: stores.wholeFoods,
+            price: 1.59, size: 13.4, sizeUnit: u.ounce,
+            link: 'https://www.amazon.com/dp/B074H5J2V7',
+        }],
+        nutrition: {
+            [u.cup.name]: { servings: 1, servingSize: 1, calories: 180, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 32, sodium: 10, sugar: 2, protein: 12, fiber: 12 },
+        },
     }),
 
     macadamiaNutMilk: ingredientFactory('Macadamia Nut Milk', {
@@ -2230,7 +2757,7 @@ export const i = {
             link: 'https://www.amazon.com/dp/B01JH2O854',
             price: 6.19, size: 32, sizeUnit: u.fluidOunce,
             nutrition: {
-                [u.cup.name]: { servings: 4, servingSize: 1, calories: 50, sodium: 75, sugar: 0, protein: 1 },
+                [u.cup.name]: { servings: 4, servingSize: 1, calories: 50, fat: 5, saturatedFat: 0.5, transFat: 0, cholesterol: 0, carbs: 1, sodium: 75, sugar: 0, protein: 1, fiber: 0 },
             },
         }],
     }),
@@ -2246,7 +2773,7 @@ export const i = {
                 link: 'https://www.wholefoodsmarket.com/product/365-by-whole-foods-market-organic-macadamia-nuts-8-oz-b086hk83yf',
                 price: 10.79, size: 8, sizeUnit: u.ounce, organic: true,
                 nutrition: {
-                    [u.cup.name]: { servings: 1, servingSize: 1, calories: 960, sodium: 7, sugar: 6, protein: 11 },
+                    [u.cup.name]: { servings: 1, servingSize: 1, calories: 960, fat: 95, saturatedFat: 15, transFat: 0, cholesterol: 0, carbs: 18, sodium: 7, sugar: 6, protein: 11, fiber: 9 },
                 },
             },
             {
@@ -2254,7 +2781,7 @@ export const i = {
                 link: 'https://www.amazon.com/Blueprint-Bryan-Johnson-Macadamia-Nuts/dp/B0DNGJFBS1',
                 price: 12, size: 4, sizeUnit: u.ounce, organic: false,
                 nutrition: {
-                    [u.ounce.name]: { servings: 4, servingSize: 1, calories: 210, sodium: 2, sugar: 1, protein: 2 },
+                    [u.ounce.name]: { servings: 4, servingSize: 1, calories: 210, fat: 21, saturatedFat: 3, transFat: 0, cholesterol: 0, carbs: 4, sodium: 2, sugar: 1, protein: 2, fiber: 2 },
                 },
             },
         ],
@@ -2265,7 +2792,7 @@ export const i = {
         products: [{
             brand: 'Navitas', variant: 'Organic Raw',
             nutrition: {
-                [u.tsp.name]: { servings: 1, servingSize: 1, calories: 20, sodium: 0, sugar: 0, protein: 0.3 },
+                [u.tsp.name]: { servings: 1, servingSize: 1, calories: 20, fat: 1.5, saturatedFat: 0.5, transFat: 0, cholesterol: 0, carbs: 1.5, sodium: 0, sugar: 0, protein: 0.3, fiber: 1 },
             },
         }],
     }),
@@ -2275,7 +2802,7 @@ export const i = {
         products: [{
             brand: '365', variant: 'Organic Black', store: stores.wholeFoods,
             nutrition: {
-                [u.tsp.name]: { servings: 1, servingSize: 1, calories: 19, sodium: 0, sugar: 0, protein: 1 },
+                [u.tsp.name]: { servings: 1, servingSize: 1, calories: 19, fat: 1, saturatedFat: 0.1, transFat: 0, cholesterol: 0, carbs: 1.5, sodium: 0, sugar: 0, protein: 1, fiber: 2 },
             },
         }],
     }),
@@ -2285,7 +2812,7 @@ export const i = {
         products: [{
             brand: 'Manitoba Harvest', variant: 'Hemp Hearts', store: stores.wholeFoods,
             nutrition: {
-                [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 55, sodium: 0, sugar: 0.5, protein: 3.3 },
+                [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 55, fat: 4, saturatedFat: 0.5, transFat: 0, cholesterol: 0, carbs: 1, sodium: 0, sugar: 0.5, protein: 3.3, fiber: 0 },
             },
         }],
     }),
@@ -2296,7 +2823,7 @@ export const i = {
             brand: '365', variant: 'Organic Antioxidant Fruit Blend (frozen)', store: stores.wholeFoods,
             size: 16, sizeUnit: u.ounce, organic: true,
             nutrition: {
-                [u.cup.name]: { servings: 4, servingSize: 1, calories: 70, sodium: 0, sugar: 13, protein: 1 },
+                [u.cup.name]: { servings: 4, servingSize: 1, calories: 70, fat: 0.5, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 17, sodium: 0, sugar: 13, protein: 1, fiber: 4 },
             },
         }],
     }),
@@ -2305,7 +2832,7 @@ export const i = {
         defaultBrand: '365',
         products: [{
             brand: '365', variant: 'Organic Vanilla Extract', store: stores.wholeFoods,
-            nutrition: { [u.fluidOunce.name]: { servings: 2, servingSize: 2, calories: 0, sodium: 0, sugar: 0, protein: 0 } },
+            nutrition: { [u.fluidOunce.name]: { servings: 2, servingSize: 2, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 } },
             price: 8.79, size: 2, sizeUnit: u.fluidOunce, organic: true,
             link: 'https://www.amazon.com/365-Everyday-Value-Organic-Vanilla/dp/B074VBL8R9',
         }],
@@ -2315,30 +2842,42 @@ export const i = {
         defaultBrand: '365',
         products: [{
             brand: '365', variant: 'Organic Lemon Juice', store: stores.wholeFoods,
-            nutrition: { [u.tsp.name]: { servings: 59, servingSize: 1, calories: 0, sodium: 0, sugar: 0, protein: 0 } },
+            nutrition: { [u.tsp.name]: { servings: 59, servingSize: 1, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 } },
             price: 3.49, size: 10, sizeUnit: u.fluidOunce, organic: true,
             link: 'https://www.amazon.com/365-Everyday-Value-Organic-Concentrate/dp/B074J5WZS8?th=1',
         }],
     }),
 
     cherry: ingredientFactory('Cherry', {
-        nutrition: { [u.unit.name]: { servings: 1, servingSize: 1, calories: 5, sodium: 0, sugar: 1, protein: 0 } },
+        defaultBrand: '365',
+        conversions: {
+            [u.unit.name]: { to: u.cup, factor: 1/15 },  // ~15 dark cherries per cup
+        },
+        products: [{
+            brand: '365', variant: 'Organic Sweet Dark Cherries (frozen)', store: stores.wholeFoods,
+            link: 'https://www.amazon.com/dp/B074H57SNZ',
+            price: 4.29, size: 10, sizeUnit: u.ounce,
+            organic: true,
+            nutrition: {
+                [u.cup.name]: { servings: 2, servingSize: 1, calories: 90, fat: 0.3, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 23, sodium: 0, sugar: 18, protein: 1, fiber: 3 },
+            },
+        }],
     }),
 
     celery: ingredientFactory('Celery', {
-        nutrition: { [u.unit.name]: { servings: 1, servingSize: 1, calories: 6, sodium: 32, sugar: 1, protein: 0.3 } },
+        nutrition: { [u.unit.name]: { servings: 1, servingSize: 1, calories: 6, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 1.5, sodium: 32, sugar: 1, protein: 0.3, fiber: 1 } },
     }),
 
     spinach: ingredientFactory('Spinach', {
-        nutrition: { [u.handful.name]: { servings: 1, servingSize: 1, calories: 7, sodium: 24, sugar: 0.1, protein: 0.9 } },
+        nutrition: { [u.handful.name]: { servings: 1, servingSize: 1, calories: 7, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 1, sodium: 24, sugar: 0.1, protein: 0.9, fiber: 1 } },
     }),
 
     kale: ingredientFactory('Kale', {
-        nutrition: { [u.handful.name]: { servings: 1, servingSize: 1, calories: 8, sodium: 11, sugar: 0.2, protein: 0.7 } },
+        nutrition: { [u.handful.name]: { servings: 1, servingSize: 1, calories: 8, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 1.5, sodium: 11, sugar: 0.2, protein: 0.7, fiber: 1 } },
     }),
 
     banana: ingredientFactory('Organic Banana', {
-        nutrition: { [u.unit.name]: { servings: 1, servingSize: 1, calories: 105, sodium: 1, sugar: 14, protein: 1.3 } },
+        nutrition: { [u.unit.name]: { servings: 1, servingSize: 1, calories: 105, fat: 0.3, saturatedFat: 0.1, transFat: 0, cholesterol: 0, carbs: 27, sodium: 1, sugar: 14, protein: 1.3, fiber: 3 } },
     }),
 
     peanutButter: ingredientFactory('Peanut Butter', {
@@ -2374,7 +2913,7 @@ export const i = {
 
     orangeJuice: ingredientFactory('Orange Juice', {
         nutrition: {
-            [u.fluidOunce.name]: { servings: 8, servingSize: 7, calories: 110, sodium: 0, sugar: 22, protein: 2 },
+            [u.fluidOunce.name]: { servings: 8, servingSize: 7, calories: 110, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 26, sodium: 0, sugar: 22, protein: 2, fiber: 0 },
         },
     }),
 
@@ -2399,37 +2938,54 @@ export const i = {
 
     psyllium: ingredientFactory('Psyllium Husk', {
         defaultBrand: '365',
+        conversions: {
+            [u.tbsp.name]: { to: u.ounce, factor: 0.214 },  // 12 oz / 56 tbsp servings
+        },
         products: [{
             brand: '365', variant: 'Organic Whole Flakes', store: stores.wholeFoods,
-            link: 'https://www.amazon.com/365-Whole-Foods-Market-Psyllium/dp/B0CDQJRFGX',
+            link: 'https://www.amazon.com/dp/B0CDQJRFGX',
+            price: 17.49, size: 12, sizeUnit: u.ounce,
+            organic: true,
             nutrition: {
-                [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 15, sodium: 5, sugar: 0, protein: 0 },
+                [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 15, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 5, sodium: 5, sugar: 0, protein: 0, fiber: 5 },
+            },
+        }, {
+            brand: '365', variant: 'Organic Whole Flakes', store: stores.amazon,
+            link: 'https://www.amazon.com/dp/B0CDQJJ5TF',
+            price: 18.48, size: 12, sizeUnit: u.ounce,
+            organic: true,
+            nutrition: {
+                [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 15, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 5, sodium: 5, sugar: 0, protein: 0, fiber: 5 },
             },
         }],
     }),
 
     blueprintMacadamiaBar: ingredientFactory('Blueprint Macadamia Bar', {
         defaultBrand: 'Blueprint',
-        products: [{
-            brand: 'Blueprint', variant: 'White Cocoa Macadamia Protein Bar', store: stores.amazon,
-            link: 'https://www.amazon.com/Blueprint-Bryan-Johnson-Macadamia-White/dp/B0DQLV78BG',
-            nutrition: {
-                [u.unit.name]: { servings: 1, servingSize: 1, calories: 160, sodium: 80, sugar: 1, protein: 9 },
+        products: [
+            {
+                brand: 'Blueprint', variant: 'Raspberry', store: stores.amazon,
+                link: 'https://www.amazon.com/dp/B0DQLSW6FB',
+                price: 29.00, size: 12, sizeUnit: u.unit,
+                discount: { subscribeAndSave: 26.10 },
+                nutrition: {
+                    [u.unit.name]: { servings: 12, servingSize: 1, calories: 160, fat: 12, saturatedFat: 2, transFat: 0, cholesterol: 0, carbs: 5, sodium: 80, sugar: 1, protein: 9, fiber: 2 },
+                },
             },
-        }],
+        ],
     }),
 
     blackLentils: ingredientFactory('Black Lentils', {
         defaultBrand: '365',
         conversions: {
-            [u.gram.name]: { to: u.cup, factor: 1/172 },  // 43g = ¼ cup dry, per nutrition label
+            [u.gram.name]: { to: u.cup, factor: 1/180 },  // 45g = ¼ cup dry, per nutrition label
         },
         products: [{
             brand: '365', variant: 'Organic, Black, dry', store: stores.wholeFoods,
-            size: 16, sizeUnit: u.ounce, organic: true,
-            link: 'https://www.amazon.com/365-Whole-Foods-Market-Organic/dp/B084NHD2R9',
+            price: 3.29, size: 16, sizeUnit: u.ounce, organic: true,
+            link: 'https://www.amazon.com/dp/B084NHD2R9',
             nutrition: {
-                [u.cup.name]: { servings: 1, servingSize: 1, calories: 600, sodium: 0, sugar: 0, protein: 44 },
+                [u.cup.name]: { servings: 11, servingSize: 1, calories: 600, fat: 2, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 106, sodium: 0, sugar: 4, protein: 44, fiber: 20 },
             },
         }],
     }),
@@ -2445,7 +3001,7 @@ export const i = {
             price: 35,
             link: 'https://www.amazon.com/Blueprint-Bryan-Johnson-Olive-Oil/dp/B0F1P5SR2M',
             nutrition: {
-                [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 120, sodium: 0, sugar: 0, protein: 0 },
+                [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 120, fat: 14, saturatedFat: 2, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 },
             },
         }],
     }),
@@ -2458,7 +3014,7 @@ export const i = {
             size: 30, sizeUnit: u.unit,   // 30 scoops per container
             link: 'https://www.amazon.com/Blueprint-Bryan-Johnson-Longevity-Protein/dp/B0DNGJRLQF',
             nutrition: {
-                [u.unit.name]: { servings: 1, servingSize: 1, calories: 200, sodium: 200, sugar: 0, protein: 26 },
+                [u.unit.name]: { servings: 1, servingSize: 1, calories: 200, fat: 5, saturatedFat: 0.5, transFat: 0, cholesterol: 0, carbs: 13, sodium: 200, sugar: 0, protein: 26, fiber: 1 },
             },
         }],
     }),
@@ -2471,9 +3027,91 @@ export const i = {
             size: 30, sizeUnit: u.unit,   // 30 scoops per container
             link: 'https://www.amazon.com/Blueprint-Bryan-Johnson-Blueberry-Nut/dp/B0D3FZ29RJ',
             nutrition: {
-                [u.unit.name]: { servings: 1, servingSize: 1, calories: 70, sodium: 0, sugar: 5, protein: 1 },
+                [u.unit.name]: { servings: 1, servingSize: 1, calories: 70, fat: 5, saturatedFat: 0.5, transFat: 0, cholesterol: 0, carbs: 6, sodium: 0, sugar: 5, protein: 1, fiber: 1 },
             },
         }],
+    }),
+
+    longevityMix: ingredientFactory('Longevity Mix', {
+        defaultBrand: 'Blueprint',
+        products: [{
+            brand: 'Blueprint', variant: 'Blood Orange (30 servings)', store: stores.amazon,
+            price: 49, size: 30, sizeUnit: u.unit,
+            link: 'https://www.amazon.com/dp/B0D3GBRNSX',
+            discount: { subscribeAndSave: 44.10 },
+        }],
+        nutrition: {
+            [u.unit.name]: { servings: 30, servingSize: 1, calories: 10, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 3, sodium: 0, sugar: 0, protein: 0, fiber: 0 },
+        },
+    }),
+
+    blueprintCollagen: ingredientFactory('Collagen Peptides', {
+        defaultBrand: 'Blueprint',
+        products: [{
+            brand: 'Blueprint', variant: 'Hydrolyzed Type I, II & III (30 servings)', store: stores.amazon,
+            price: 45, size: 30, sizeUnit: u.unit,
+            link: 'https://www.amazon.com/dp/B0DV1PQDWH',
+            discount: { subscribeAndSave: 40.50 },
+        }],
+        nutrition: {
+            [u.unit.name]: { servings: 30, servingSize: 1, calories: 80, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 20, fiber: 0 },
+        },
+    }),
+
+    blueprintCreatine: ingredientFactory('Creatine Monohydrate', {
+        defaultBrand: 'Blueprint',
+        products: [{
+            brand: 'Blueprint', variant: 'Unflavored (100 servings)', store: stores.amazon,
+            price: 40, size: 100, sizeUnit: u.unit,
+            link: 'https://www.amazon.com/dp/B0DQLW13S2',
+            discount: { subscribeAndSave: 36.00 },
+        }],
+        nutrition: {
+            [u.unit.name]: { servings: 100, servingSize: 1, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 },
+        },
+    }),
+
+    manukaHoney: ingredientFactory('Manuka Honey', {
+        defaultBrand: 'Blueprint',
+        products: [{
+            brand: 'Blueprint', variant: 'Manuka Honey', store: stores.amazon,
+            link: 'https://www.amazon.com/dp/B0DQLSXYZ',
+        }],
+    }),
+
+    nutThins: ingredientFactory('Nut Thins', {
+        defaultBrand: 'Blue Diamond',
+        products: [
+            {
+                brand: 'Blue Diamond', variant: 'Hint Of Sea Salt', store: stores.amazon,
+                link: 'https://www.amazon.com/dp/B00FBO8FF2',
+                price: 3.97, size: 4.25, sizeUnit: u.ounce,
+                discount: { subscribeAndSave: 3.37 },
+                nutrition: {
+                    // 19 crackers per serving, 4 servings per container
+                    [u.unit.name]: { servings: 4, servingSize: 19, calories: 130, fat: 4, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 22, sodium: 80, sugar: 0, protein: 3, fiber: 1 },
+                },
+            },
+            {
+                brand: 'Blue Diamond', variant: 'Hint Of Sea Salt', store: stores.wholeFoods,
+                price: 4.39, size: 4.25, sizeUnit: u.ounce,
+            },
+            {
+                brand: 'Blue Diamond', variant: 'Hint Of Sea Salt (Family Size)', store: stores.amazon,
+                link: 'https://www.amazon.com/dp/B07XHRRB1T',
+                price: 6.57, size: 7.7, sizeUnit: u.ounce,
+                discount: { subscribeAndSave: 5.58 },
+                nutrition: {
+                    // 19 crackers per serving, 7 servings per container
+                    [u.unit.name]: { servings: 7, servingSize: 19, calories: 130, fat: 4, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 22, sodium: 55, sugar: 0, protein: 3, fiber: 1 },
+                },
+            },
+            {
+                brand: 'Blue Diamond', variant: 'Hint Of Sea Salt (Family Size)', store: stores.wholeFoods,
+                link: 'https://www.amazon.com/dp/B07XHRRB1T',
+                price: 7.99, size: 7.7, sizeUnit: u.ounce,
+            },
+        ],
     }),
 
 };
@@ -2643,6 +3281,51 @@ registerGroup('Dinner', [
 
         return steps;
     })()),
+
+    createRecipe('asian-dense-bean-salad-kit', 'Asian Dense Bean Salad (Kit Version)', [
+        instruction('Open 1 bag 365 Asian Inspired Salad Kit into a large bowl', {
+            ingredients: [i.asianSaladKit(1, u.unit)],
+        }),
+        instruction('Add chickpeas, cannellini beans, and edamame', {
+            ingredients: [i.chickpeas(1, u.cup), i.cannelliniBean(1, u.cup), i.edamame(1, u.cup)],
+        }),
+        instruction('Add dressing and toppings from kit, toss to combine'),
+    ]),
+
+    createRecipe('asian-dense-bean-salad', 'Asian Dense Bean Salad', (() => {
+        const saladBowl = e.bowl('salad bowl');
+        const dressBowl = e.bowl('dressing bowl');
+        const ALMONDS   = i.almond(1, u.handful);
+        const steps: Step[] = [];
+        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+
+        s(saladBowl.add([
+            [i.chickpeas(1, u.cup),      'cooked, soaked overnight'],
+            [i.cannelliniBean(1, u.cup), 'cooked, soaked overnight'],
+            i.edamame(1, u.cup),
+            [i.cabbage(2, u.cup),        'shredded'],
+            [i.carrot(1, u.cup),         'shredded'],
+            [i.greenOnion(4, u.unit),    'thinly sliced'],
+        ]));
+
+        s(dressBowl.add([
+            i.whiteMiso(3, u.tbsp),
+            i.tamari(2, u.tbsp),
+            i.riceVinegar(2, u.tbsp),
+            i.sesameSeed(2, u.tbsp),
+            i.limeJuice(1, u.tbsp),
+            i.blueprintOliveOil(1, u.tsp),
+            i.manukaHoney(1, u.tsp),
+        ]));
+        const dressingReady = dressBowl.mix('miso sesame dressing');
+        s(dressingReady);
+
+        s(saladBowl.combine([dressBowl.result], 'pour dressing over salad, toss gently to coat').waitFor(dressingReady));
+        s(instruction('Divide into bowls and top with chopped almonds', { ingredients: [ALMONDS] }));
+        s(Timer.set(30, 'm', 'Optional: chill before serving'));
+
+        return steps;
+    })()),
 ]);
 
 registerGroup('Ingredients', [
@@ -2676,6 +3359,41 @@ registerRecipe(createRecipe(
         }),
     ],
 ));
+
+registerRecipe(createRecipe(
+    'blueprint-longevity-drink',
+    'Blueprint Longevity Drink (Longevity Mix, Collagen, Creatine)',
+    [
+        instruction('Add 1 scoop Blueprint Longevity Mix (Blood Orange) to a glass of water', {
+            ingredients: [i.longevityMix(1, u.unit)],
+        }),
+        instruction('Add 1 scoop Blueprint Collagen Peptides', {
+            ingredients: [i.blueprintCollagen(1, u.unit)],
+        }),
+        instruction('Add 1 scoop (5g) Blueprint Creatine Monohydrate and stir until dissolved', {
+            ingredients: [i.blueprintCreatine(1, u.unit)],
+        }),
+    ],
+));
+
+// ============================================================
+// BUNDLES
+// ============================================================
+
+registerBundle({
+    id: 'daily-blueprint',
+    name: 'Daily Blueprint',
+    recipeIds: [
+        'blueprint-smoothie',
+        'blueprint-longevity-drink',
+        'ing-black-lentils',
+        'ing-macadamia-bar',
+        'ing-macadamia-bar',
+        'ing-psyllium-husk',
+        'protein-nutmix-oliveoil',
+        'asian-dense-bean-salad-kit',
+    ],
+});
 
 // ============================================================
 // START APP
