@@ -6,7 +6,7 @@ A single-file TypeScript app that lets a user select recipes, view a shopping li
 ---
 
 ## Screens
-There are five screens: Select, Shopping, Nutrition, Cooking, and Add Ingredient. Navigation is handled by a simple state machine — no URLs.
+There are seven screens: Select, Shopping, Nutrition, Cooking, Add Ingredient, Prep, and Plan. Navigation is handled by a simple state machine — no URLs.
 
 ### Select Screen
 - Shows a searchable list of all registered recipes, with a **Bundles** section pinned above all recipe groups
@@ -28,7 +28,7 @@ registerBundle({ id: 'my-bundle', name: 'My Bundle', recipeIds: ['recipe-a', 're
 ```
 
 Bundles are build-time configuration — there is no runtime UI to create or edit them.
-- A fixed bottom bar appears when any serving is selected, with up to three buttons: "Go Shopping", "Nutrition", and "Start Cooking". "Start Cooking" is hidden when only ad-hoc items are selected (nothing to cook)
+- A fixed bottom bar appears when any serving is selected, with up to five buttons: "Go Shopping", "Nutrition", "📅 Plan", "🔪 Prep" (conditional), and "Start Cooking". "Start Cooking" is hidden when only ad-hoc items are selected (nothing to cook). "🔪 Prep" is only shown when at least one selected recipe has prep steps
 - Tapping "Start Cooking" navigates directly to the cooking screen with no intermediate panel
 
 #### Serving counts vs. cooking flow

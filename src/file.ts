@@ -8,7 +8,7 @@
 // ============================================================
 
 export type StepType = 'instruction' | 'timer' | 'cleanup';
-export type Screen   = 'select' | 'shopping' | 'cooking' | 'nutrition' | 'add-ingredient';
+export type Screen   = 'select' | 'shopping' | 'cooking' | 'nutrition' | 'add-ingredient' | 'prep' | 'plan';
 
 export interface Unit {
     name: string;
@@ -77,6 +77,7 @@ export interface Step {
     children?: Step[];
     recipeId?: string;
     waitForIds?: number[];
+    prep?: boolean;
     waitFor(...steps: Step[]): this;
 }
 
@@ -87,6 +88,47 @@ export interface Recipe {
     steps: Step[];
     estimatedMinutes?: number;
     adhoc?: boolean;
+    portable?: boolean;       // can be eaten away from home (no cooking needed)
+    planMinutes?: number;     // eating time on the day (assumes prepped if applicable)
+    prepMinutes?: number;     // advance prep/cook time (can be done ahead of eating)
+    perishableDays?: number;  // days the prepped item keeps in the fridge
+}
+
+export interface PlanBlock {
+    id: string;
+    start: string;  // "HH:MM" 24h
+    end: string;
+    type: 'home' | 'away' | 'portable';
+}
+
+export interface PlanConfig {
+    blocks: PlanBlock[];
+    caloriesCutoff: string;  // "HH:MM" — prefer placing all eating before this time
+}
+
+const PLAN_CONFIG_KEY = 'recipe-plan-config';
+
+const DEFAULT_PLAN_CONFIG: PlanConfig = {
+    blocks: [
+        { id: 'b1', start: '07:00', end: '08:00', type: 'home' },
+        { id: 'b2', start: '08:00', end: '12:00', type: 'away' },
+        { id: 'b3', start: '12:00', end: '12:30', type: 'portable' },
+        { id: 'b4', start: '12:30', end: '17:00', type: 'away' },
+        { id: 'b5', start: '17:00', end: '22:00', type: 'home' },
+    ],
+    caloriesCutoff: '14:00',
+};
+
+function loadPlanConfig(): PlanConfig {
+    try {
+        const raw = localStorage.getItem(PLAN_CONFIG_KEY);
+        if (raw) return JSON.parse(raw) as PlanConfig;
+    } catch {}
+    return JSON.parse(JSON.stringify(DEFAULT_PLAN_CONFIG));
+}
+
+function savePlanConfig(cfg: PlanConfig): void {
+    localStorage.setItem(PLAN_CONFIG_KEY, JSON.stringify(cfg));
 }
 
 export interface RecipeBundle {
@@ -248,6 +290,10 @@ function createStep(input: Partial<Step> & { type: StepType; text: string }): St
 
 export function instruction(text: string, opts: Partial<Step> = {}): Step {
     return createStep({ type: 'instruction', text, ...opts });
+}
+
+export function prep(text: string, opts: Partial<Step> = {}): Step {
+    return createStep({ type: 'instruction', text, prep: true, ...opts });
 }
 
 export function timerStep(
@@ -535,6 +581,10 @@ export function createRecipe(
 
 export function registerRecipe(recipe: Recipe): void {
     state.recipes.set(recipe.id, recipe);
+}
+
+function withPlan(recipe: Recipe, opts: { planMinutes?: number; portable?: boolean; prepMinutes?: number; perishableDays?: number }): Recipe {
+    return Object.assign(recipe, opts);
 }
 
 export function registerGroup(group: string, recipes: Recipe[]): void {
@@ -1166,10 +1216,26 @@ function updateActionButtons(): void {
     const nutritionBtn = createButton('📊 Nutrition', () => navigateTo('nutrition'));
     nutritionBtn.className = 'action-btn action-btn-nutrition';
 
+    const planBtn = createButton('📅 Plan', () => navigateTo('plan'));
+    planBtn.className = 'action-btn action-btn-plan';
+
     actions.appendChild(shopBtn);
     actions.appendChild(nutritionBtn);
+    actions.appendChild(planBtn);
 
-    const hasCookable = getSelectedRecipes().some(r => !r.adhoc);
+    const selectedRecipes = getSelectedRecipes();
+    const hasPrep = selectedRecipes.some(r =>
+        r.steps.some(function walk(s: Step): boolean {
+            return !!s.prep || (s.children?.some(walk) ?? false);
+        })
+    );
+    if (hasPrep) {
+        const prepBtn = createButton('🔪 Prep', () => navigateTo('prep'));
+        prepBtn.className = 'action-btn action-btn-prep';
+        actions.appendChild(prepBtn);
+    }
+
+    const hasCookable = selectedRecipes.some(r => !r.adhoc);
     if (hasCookable) {
         const cookBtn = createButton('🍳 Start Cooking', () => navigateTo('cooking'));
         cookBtn.className = 'action-btn';
@@ -2192,6 +2258,74 @@ function getRecipeIdFromURL(): string | null {
 }
 
 // ============================================================
+// SCREEN: PREP
+// ============================================================
+
+function renderPrepScreen(): void {
+    const root = getElement<HTMLDivElement>('app');
+    clear(root);
+
+    const heading = document.createElement('h2');
+    heading.textContent = 'Prep';
+    root.appendChild(heading);
+
+    function collectPrepSteps(steps: Step[]): Step[] {
+        const out: Step[] = [];
+        for (const s of steps) {
+            if (s.prep) out.push(s);
+            if (s.children) out.push(...collectPrepSteps(s.children));
+        }
+        return out;
+    }
+
+    let anyFound = false;
+    getSelectedRecipes().filter(r => !r.adhoc).forEach(recipe => {
+        const count = state.selectedRecipeIds.filter(id => id === recipe.id).length;
+        const prepSteps = collectPrepSteps(recipe.steps);
+        if (prepSteps.length === 0) return;
+        anyFound = true;
+
+        const title = document.createElement('div');
+        title.className = 'prep-recipe-title';
+        title.textContent = recipe.name + (count > 1 ? ` ×${count}` : '');
+        root.appendChild(title);
+
+        prepSteps.forEach(step => {
+            const card = createPanel();
+            card.className += ' prep-step';
+
+            const text = document.createElement('span');
+            text.textContent = step.text;
+            card.appendChild(text);
+
+            if (step.ingredients && step.ingredients.length > 0) {
+                const ingList = document.createElement('div');
+                ingList.className = 'prep-step-ingredients';
+                ingList.textContent = step.ingredients.map(i => formatIngredient(i)).join(', ');
+                card.appendChild(ingList);
+            }
+
+            card.addEventListener('click', () => {
+                card.classList.toggle('prep-done');
+            });
+
+            root.appendChild(card);
+        });
+    });
+
+    if (!anyFound) {
+        const empty = document.createElement('p');
+        empty.textContent = 'No prep steps in the selected recipes.';
+        empty.style.color = '#888';
+        root.appendChild(empty);
+    }
+
+    const backBtn = createButton('← Back', () => navigateTo('select'));
+    backBtn.className = 'start-over-btn';
+    root.appendChild(backBtn);
+}
+
+// ============================================================
 // RENDER
 // ============================================================
 
@@ -2202,7 +2336,255 @@ function render(): void {
         case 'cooking':        return renderCookingScreen();
         case 'nutrition':      return renderNutritionScreen();
         case 'add-ingredient': return renderAddIngredientScreen();
+        case 'prep':           return renderPrepScreen();
+        case 'plan':           return renderPlanScreen();
     }
+}
+
+// ============================================================
+// SCREEN: PLAN
+// ============================================================
+
+function toMinutes(hhmm: string): number {
+    const [h, m] = hhmm.split(':').map(Number);
+    return h * 60 + m;
+}
+
+function fromMinutes(mins: number): string {
+    const h = Math.floor(mins / 60) % 24;
+    const m = mins % 60;
+    const ampm = h < 12 ? 'AM' : 'PM';
+    const h12 = h % 12 === 0 ? 12 : h % 12;
+    return `${h12}:${String(m).padStart(2, '0')} ${ampm}`;
+}
+
+interface ScheduledItem {
+    recipe: Recipe;
+    count: number;
+    startMin: number;
+    blockType: 'home' | 'portable';
+    afterCutoff: boolean;
+}
+
+function schedulePlan(cfg: PlanConfig, recipes: { recipe: Recipe; count: number }[]): { scheduled: ScheduledItem[]; unscheduled: { recipe: Recipe; count: number }[] } {
+    const cutoffMin = toMinutes(cfg.caloriesCutoff);
+    const blocks = [...cfg.blocks]
+        .filter(b => b.type !== 'away')
+        .sort((a, b) => toMinutes(a.start) - toMinutes(b.start));
+
+    const cursors = new Map<string, number>();
+    blocks.forEach(b => cursors.set(b.id, toMinutes(b.start)));
+
+    const scheduled: ScheduledItem[] = [];
+    const unscheduled: { recipe: Recipe; count: number }[] = [];
+
+    for (const { recipe, count } of recipes) {
+        const dur = recipe.planMinutes ?? 0;
+        const needsHome = !recipe.portable;
+
+        const compatible = blocks.filter(b => needsHome ? b.type === 'home' : true);
+        let placed = false;
+
+        for (const block of compatible) {
+            const cursor = cursors.get(block.id)!;
+            const blockEnd = toMinutes(block.end);
+            const startMin = cursor;
+            if (startMin + dur <= blockEnd) {
+                const afterCutoff = startMin >= cutoffMin;
+                scheduled.push({ recipe, count, startMin, blockType: block.type === 'home' ? 'home' : 'portable', afterCutoff });
+                cursors.set(block.id, startMin + Math.max(dur, 1));
+                placed = true;
+                break;
+            }
+        }
+        if (!placed) unscheduled.push({ recipe, count });
+    }
+
+    scheduled.sort((a, b) => a.startMin - b.startMin);
+    return { scheduled, unscheduled };
+}
+
+function renderPlanScreen(): void {
+    const root = getElement<HTMLDivElement>('app');
+    clear(root);
+    let cfg = loadPlanConfig();
+
+    const heading = document.createElement('h2');
+    heading.textContent = 'Day Planner';
+    root.appendChild(heading);
+
+    // ── Config panel ──────────────────────────────────────────
+    const configPanel = document.createElement('div');
+    configPanel.className = 'plan-config-panel';
+
+    const configTitle = document.createElement('div');
+    configTitle.className = 'plan-section-title';
+    configTitle.textContent = 'Time Blocks';
+    configPanel.appendChild(configTitle);
+
+    const blockList = document.createElement('div');
+    blockList.className = 'plan-block-list';
+    configPanel.appendChild(blockList);
+
+    function renderBlocks() {
+        clear(blockList);
+        cfg.blocks.forEach((block, idx) => {
+            const row = document.createElement('div');
+            row.className = 'plan-block-row';
+
+            const startIn = document.createElement('input');
+            startIn.type = 'time'; startIn.value = block.start; startIn.className = 'plan-time-input';
+            startIn.addEventListener('change', () => { cfg.blocks[idx].start = startIn.value; savePlanConfig(cfg); scheduleAndRender(); });
+
+            const sep = document.createElement('span');
+            sep.textContent = '→'; sep.className = 'plan-block-sep';
+
+            const endIn = document.createElement('input');
+            endIn.type = 'time'; endIn.value = block.end; endIn.className = 'plan-time-input';
+            endIn.addEventListener('change', () => { cfg.blocks[idx].end = endIn.value; savePlanConfig(cfg); scheduleAndRender(); });
+
+            const typeSelect = document.createElement('select');
+            typeSelect.className = 'plan-type-select';
+            [['home', '🏠 Home'], ['portable', '🎒 Portable'], ['away', '🏢 Away']].forEach(([val, label]) => {
+                const opt = document.createElement('option');
+                opt.value = val; opt.textContent = label;
+                if (val === block.type) opt.selected = true;
+                typeSelect.appendChild(opt);
+            });
+            typeSelect.addEventListener('change', () => { cfg.blocks[idx].type = typeSelect.value as PlanBlock['type']; savePlanConfig(cfg); scheduleAndRender(); });
+
+            const delBtn = document.createElement('button');
+            delBtn.textContent = '×'; delBtn.className = 'plan-block-del';
+            delBtn.addEventListener('click', () => { cfg.blocks.splice(idx, 1); savePlanConfig(cfg); renderBlocks(); scheduleAndRender(); });
+
+            row.appendChild(startIn); row.appendChild(sep); row.appendChild(endIn);
+            row.appendChild(typeSelect); row.appendChild(delBtn);
+            blockList.appendChild(row);
+        });
+
+        const addBtn = document.createElement('button');
+        addBtn.textContent = '+ Add Block'; addBtn.className = 'plan-add-block-btn';
+        addBtn.addEventListener('click', () => {
+            const last = cfg.blocks[cfg.blocks.length - 1];
+            const newStart = last ? last.end : '07:00';
+            const [h, m] = newStart.split(':').map(Number);
+            const newEnd = `${String(Math.min(h + 1, 23)).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+            cfg.blocks.push({ id: String(Date.now()), start: newStart, end: newEnd, type: 'home' });
+            savePlanConfig(cfg); renderBlocks(); scheduleAndRender();
+        });
+        blockList.appendChild(addBtn);
+    }
+
+    const cutoffRow = document.createElement('div');
+    cutoffRow.className = 'plan-cutoff-row';
+    const cutoffLabel = document.createElement('span');
+    cutoffLabel.textContent = '🎯 Calorie cutoff (eat before):';
+    cutoffLabel.className = 'plan-cutoff-label';
+    const cutoffIn = document.createElement('input');
+    cutoffIn.type = 'time'; cutoffIn.value = cfg.caloriesCutoff; cutoffIn.className = 'plan-time-input';
+    cutoffIn.addEventListener('change', () => { cfg.caloriesCutoff = cutoffIn.value; savePlanConfig(cfg); scheduleAndRender(); });
+    cutoffRow.appendChild(cutoffLabel); cutoffRow.appendChild(cutoffIn);
+    configPanel.appendChild(cutoffRow);
+    root.appendChild(configPanel);
+
+    // ── Schedule output ───────────────────────────────────────
+    const scheduleTitle = document.createElement('div');
+    scheduleTitle.className = 'plan-section-title';
+    scheduleTitle.style.marginTop = '24px';
+    root.appendChild(scheduleTitle);
+
+    const scheduleOut = document.createElement('div');
+    root.appendChild(scheduleOut);
+
+    function scheduleAndRender() {
+        clear(scheduleOut);
+        const selectedRecipes = getSelectedRecipes().filter(r => !r.adhoc);
+        const deduped: { recipe: Recipe; count: number }[] = [];
+        const seen = new Set<string>();
+        for (const id of state.selectedRecipeIds) {
+            const r = state.recipes.get(id);
+            if (!r || r.adhoc) continue;
+            if (seen.has(id)) { const e = deduped.find(x => x.recipe.id === id); if (e) e.count++; }
+            else { seen.add(id); deduped.push({ recipe: r, count: 1 }); }
+        }
+
+        if (deduped.length === 0) {
+            const empty = document.createElement('p');
+            empty.textContent = 'No recipes selected.';
+            empty.style.color = '#888';
+            scheduleOut.appendChild(empty);
+            return;
+        }
+
+        scheduleTitle.textContent = `📋 Suggested Schedule`;
+
+        const { scheduled, unscheduled } = schedulePlan(cfg, deduped);
+
+        scheduled.forEach(({ recipe, count, startMin, blockType, afterCutoff }) => {
+            const card = document.createElement('div');
+            card.className = 'plan-slot' + (afterCutoff ? ' plan-slot-late' : '');
+
+            const timeEl = document.createElement('span');
+            timeEl.className = 'plan-slot-time';
+            timeEl.textContent = fromMinutes(startMin);
+
+            const nameEl = document.createElement('span');
+            nameEl.className = 'plan-slot-name';
+            nameEl.textContent = recipe.name + (count > 1 ? ` ×${count}` : '');
+
+            const meta: string[] = [];
+            if (recipe.planMinutes) meta.push(`${recipe.planMinutes} min`);
+            if (recipe.portable) meta.push('portable');
+            if (afterCutoff) meta.push('⚠ after cutoff');
+
+            const metaEl = document.createElement('span');
+            metaEl.className = 'plan-slot-meta';
+            metaEl.textContent = meta.join(' · ');
+
+            card.appendChild(timeEl); card.appendChild(nameEl); card.appendChild(metaEl);
+            scheduleOut.appendChild(card);
+        });
+
+        if (unscheduled.length > 0) {
+            const warn = document.createElement('div');
+            warn.className = 'plan-unscheduled';
+            warn.textContent = '⚠ No available slot: ' + unscheduled.map(x => x.recipe.name).join(', ');
+            scheduleOut.appendChild(warn);
+        }
+
+        const noPlan = deduped.filter(x => !x.recipe.planMinutes);
+        if (noPlan.length > 0) {
+            const note = document.createElement('div');
+            note.className = 'plan-no-duration';
+            note.textContent = 'No duration set (won\'t block time): ' + noPlan.map(x => x.recipe.name).join(', ');
+            scheduleOut.appendChild(note);
+        }
+
+        const batchPrep = deduped.filter(x => x.recipe.prepMinutes);
+        if (batchPrep.length > 0) {
+            const batchTitle = document.createElement('div');
+            batchTitle.className = 'plan-section-title';
+            batchTitle.style.marginTop = '24px';
+            batchTitle.textContent = '🥘 Batch Prep (cook ahead)';
+            scheduleOut.appendChild(batchTitle);
+
+            batchPrep.forEach(({ recipe }) => {
+                const row = document.createElement('div');
+                row.className = 'plan-batch-row';
+                const mins = recipe.prepMinutes!;
+                const days = recipe.perishableDays;
+                row.textContent = `${recipe.name} — ${mins} min cook time` + (days ? ` · keeps ${days} day${days > 1 ? 's' : ''} in fridge` : '');
+                scheduleOut.appendChild(row);
+            });
+        }
+    }
+
+    renderBlocks();
+    scheduleAndRender();
+
+    const backBtn = createButton('← Back', () => navigateTo('select'));
+    backBtn.className = 'start-over-btn';
+    root.appendChild(backBtn);
 }
 
 // ============================================================
@@ -2380,6 +2762,34 @@ h2 { margin-top: 0; font-size: 28px; }
 .action-btn:first-child { background: #2563eb; color: white; }
 .action-btn:last-child  { background: #16a34a; color: white; }
 .actions .action-btn-nutrition { background: #7c3aed; color: white; }
+.actions .action-btn-prep { background: #b45309; color: white; }
+.actions .action-btn-plan { background: #0e7490; color: white; }
+/* ── Plan screen ── */
+.plan-config-panel { background: #1a1a1a; border-radius: 12px; padding: 16px; margin-bottom: 8px; }
+.plan-section-title { font-size: 14px; color: #888; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 12px; }
+.plan-block-list { display: flex; flex-direction: column; gap: 8px; }
+.plan-block-row { display: flex; align-items: center; gap: 8px; }
+.plan-time-input { background: #222; color: #f0f0f0; border: 1px solid #333; border-radius: 8px; padding: 6px 10px; font-size: 16px; width: 110px; }
+.plan-block-sep { color: #666; font-size: 18px; }
+.plan-type-select { background: #222; color: #f0f0f0; border: 1px solid #333; border-radius: 8px; padding: 6px 10px; font-size: 15px; flex: 1; }
+.plan-block-del { background: none; border: 1px solid #444; color: #888; border-radius: 8px; padding: 6px 12px; font-size: 18px; cursor: pointer; }
+.plan-add-block-btn { background: none; border: 1px dashed #444; color: #888; border-radius: 8px; padding: 8px 14px; font-size: 15px; cursor: pointer; margin-top: 4px; width: 100%; }
+.plan-cutoff-row { display: flex; align-items: center; gap: 12px; margin-top: 14px; padding-top: 14px; border-top: 1px solid #222; }
+.plan-cutoff-label { font-size: 15px; color: #aaa; flex: 1; }
+.plan-slot { display: flex; align-items: baseline; gap: 12px; padding: 12px 0; border-bottom: 1px solid #1a1a1a; }
+.plan-slot:last-of-type { border-bottom: none; }
+.plan-slot-late { opacity: 0.55; }
+.plan-slot-time { font-size: 15px; color: #6b9c6b; min-width: 80px; font-variant-numeric: tabular-nums; }
+.plan-slot-name { font-size: 19px; flex: 1; }
+.plan-slot-meta { font-size: 13px; color: #666; white-space: nowrap; }
+.plan-unscheduled { margin-top: 16px; color: #f87171; font-size: 14px; }
+.plan-no-duration { margin-top: 8px; color: #888; font-size: 13px; font-style: italic; }
+.plan-batch-row { padding: 10px 0; border-bottom: 1px solid #1a1a1a; font-size: 16px; color: #c4a35a; }
+/* ── Prep screen ── */
+.prep-recipe-title { font-size: 16px; color: #888; text-transform: uppercase; letter-spacing: 0.07em; margin: 20px 0 8px; }
+.prep-step { cursor: pointer; user-select: none; }
+.prep-step.prep-done { opacity: 0.4; text-decoration: line-through; }
+.prep-step-ingredients { font-size: 14px; color: #888; margin-top: 6px; }
 
 #recipe-list { padding-bottom: 120px; }
 
@@ -3121,7 +3531,7 @@ export const i = {
 // ============================================================
 
 registerGroup('Breakfast', [
-    createRecipe('blueprint-smoothie', 'Blueprint Smoothie', (() => {
+    withPlan(createRecipe('blueprint-smoothie', 'Blueprint Smoothie', (() => {
         const mixer = e.bulletMixer();
         const MACADAMIA_MILK = i.macadamiaNutMilk(1, u.cup);
         const steps: Step[] = [];
@@ -3150,7 +3560,7 @@ registerGroup('Breakfast', [
         s(mixer.mix());
 
         return steps;
-    })(), undefined, 8),
+    })(), undefined, 8), { planMinutes: 8, portable: false }),
 ]);
 
 // Moved out of the Dinner array — registers itself under its own 'Cleaning' group
@@ -3282,7 +3692,7 @@ registerGroup('Dinner', [
         return steps;
     })()),
 
-    createRecipe('asian-dense-bean-salad-kit', 'Asian Dense Bean Salad (Kit Version)', [
+    withPlan(createRecipe('asian-dense-bean-salad-kit', 'Asian Dense Bean Salad (Kit Version)', [
         instruction('Open 1 bag 365 Asian Inspired Salad Kit into a large bowl', {
             ingredients: [i.asianSaladKit(1, u.unit)],
         }),
@@ -3290,21 +3700,29 @@ registerGroup('Dinner', [
             ingredients: [i.chickpeas(1, u.cup), i.cannelliniBean(1, u.cup), i.edamame(1, u.cup)],
         }),
         instruction('Add dressing and toppings from kit, toss to combine'),
-    ]),
+    ]), { planMinutes: 10, portable: false }),
 
     createRecipe('asian-dense-bean-salad', 'Asian Dense Bean Salad', (() => {
         const saladBowl = e.bowl('salad bowl');
         const dressBowl = e.bowl('dressing bowl');
         const ALMONDS   = i.almond(1, u.handful);
+        const CARROTS   = i.carrot(1, u.cup);
+        const CABBAGE   = i.cabbage(2, u.cup);
+        const CHICKPEAS = i.chickpeas(1, u.cup);
+        const CANNELLINI = i.cannelliniBean(1, u.cup);
         const steps: Step[] = [];
         const s = (...newSteps: Step[]) => steps.push(...newSteps);
 
+        s(prep('Soak chickpeas and cannellini beans overnight', { ingredients: [CHICKPEAS, CANNELLINI] }));
+        s(prep('Peel and shred carrots', { ingredients: [CARROTS] }));
+        s(prep('Shred cabbage (can be done the day before)', { ingredients: [CABBAGE] }));
+
         s(saladBowl.add([
-            [i.chickpeas(1, u.cup),      'cooked, soaked overnight'],
-            [i.cannelliniBean(1, u.cup), 'cooked, soaked overnight'],
+            [CHICKPEAS,                  'cooked, soaked overnight'],
+            [CANNELLINI,                 'cooked, soaked overnight'],
             i.edamame(1, u.cup),
-            [i.cabbage(2, u.cup),        'shredded'],
-            [i.carrot(1, u.cup),         'shredded'],
+            [CABBAGE,                    'shredded'],
+            [CARROTS,                    'shredded'],
             [i.greenOnion(4, u.unit),    'thinly sliced'],
         ]));
 
@@ -3329,22 +3747,29 @@ registerGroup('Dinner', [
 ]);
 
 registerGroup('Ingredients', [
-    createRecipe('ing-black-lentils', 'Black Lentils (65g)', [
-        instruction('Have 65g black lentils on hand', { ingredients: [i.blackLentils(65, u.gram)] }),
-    ]),
-    createRecipe('ing-macadamia-bar', 'Blueprint Macadamia Bar', [
+    withPlan(createRecipe('ing-black-lentils', 'Black Lentils (65g)', (() => {
+        const LENTILS = i.blackLentils(65, u.gram);
+        return [
+            prep('Cook black lentils: bring water to boil, add 65g lentils, simmer 21 min on heat 6, drain', {
+                ingredients: [LENTILS],
+                durationSeconds: 21 * 60,
+            }),
+            instruction('Portion 65g cooked black lentils', { ingredients: [LENTILS] }),
+        ];
+    })()), { planMinutes: 3, portable: true, prepMinutes: 21, perishableDays: 2 }),
+    withPlan(createRecipe('ing-macadamia-bar', 'Blueprint Macadamia Bar', [
         instruction('Have 1 Blueprint Macadamia Bar on hand', {
             ingredients: [i.blueprintMacadamiaBar(1, u.unit)],
         }),
-    ]),
-    createRecipe('ing-psyllium-husk', 'Psyllium Husk (1 tbsp)', [
+    ]), { planMinutes: 2, portable: true }),
+    withPlan(createRecipe('ing-psyllium-husk', 'Psyllium Husk (1 tbsp)', [
         instruction('Have 1 tbsp psyllium husk on hand', {
             ingredients: [i.psyllium(1, u.tbsp)],
         }),
-    ]),
+    ]), { planMinutes: 3, portable: false }),
 ]);
 
-registerRecipe(createRecipe(
+registerRecipe(withPlan(createRecipe(
     'protein-nutmix-oliveoil',
     'Blueprint (Nutty Pudding) - Protein, Nut Mix & Olive Oil',
     [
@@ -3358,9 +3783,9 @@ registerRecipe(createRecipe(
             ingredients: [i.blueprintOliveOil(2, u.shot)],
         }),
     ],
-));
+), { planMinutes: 5, portable: false }));
 
-registerRecipe(createRecipe(
+registerRecipe(withPlan(createRecipe(
     'blueprint-longevity-drink',
     'Blueprint Longevity Drink (Longevity Mix, Collagen, Creatine)',
     [
@@ -3374,7 +3799,7 @@ registerRecipe(createRecipe(
             ingredients: [i.blueprintCreatine(1, u.unit)],
         }),
     ],
-));
+), { planMinutes: 3, portable: false }));
 
 // ============================================================
 // BUNDLES
