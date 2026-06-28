@@ -55,22 +55,25 @@ A reference screen — separate from cooking, since nutrition data is something 
 │  partial-cost note (amber, if applicable)
 │  coverage line (amber if anything flagged)
 ├─────────────────────────────────────────┤
-│  ▸ Recipe A      $X.XX · recipe subtotal│   ← tap header to expand
-│  ▾ Recipe B      $X.XX · recipe subtotal│
-│      • Ingredient — X cal … · $X.XX    │
-│      • Ingredient — ⚠ no nutrition data │
-│           ⚠ no price data               │
-│      • Ingredient — ⚠ can't compute     │
-│           reason text…                  │
+│  ▸ Recipe A  −/+ ○  $X.XX · subtotal   │   ← tap header to expand; ○ = eaten toggle
+│  ▾ Recipe B  −/+ ✓  $X.XX · subtotal   │   ← ✓ = marked eaten (green border)
+│    − Ingredient — X cal … · $X.XX      │   ← − = exclude from totals
+│    + Ingredient — excluded              │   ← + = re-include (row dimmed)
+│    − Ingredient — ⚠ no nutrition data  │
+│           ⚠ no price data              │
+│    − Ingredient — ⚠ can't compute      │
+│           reason text…                 │
 └─────────────────────────────────────────┘
 ```
 
-- **Grand total** — a card at the top sums every selected recipe, scaled by each recipe's serving count. Title varies by selection shape:
+- **Grand total** — a card at the top sums every selected recipe, scaled by each recipe's serving count, accounting for any excluded ingredients. Title varies by selection shape:
   - 1 recipe × 1 serving → the recipe's name
   - 1 recipe × N servings (N > 1) → `Recipe Name ×N`
   - Multiple recipes → `All selected recipes (N servings)` where N is the total servings across all recipes
-- **Per recipe** — each recipe is a collapsible section showing its subtotal (scaled by serving count) in the header; the header name shows `×N` when N > 1. Tapping the header toggles its ingredient breakdown (collapsed by default; a `▸`/`▾` caret reflects state). Inside the breakdown, the ingredient name's displayed quantity and the per-ingredient values are also scaled by N. Each recipe header also has inline `−` / `+` serving controls so servings can be adjusted without leaving the nutrition screen
-- **Per ingredient** — each ingredient row inside an expanded section shows its computed nutrition contribution with cost appended, or appropriate flags (see below)
+- **Per recipe** — each recipe is a collapsible section showing its subtotal (scaled by serving count, minus excluded ingredients) in the header; the header name shows `×N` when N > 1. Tapping the header toggles its ingredient breakdown (collapsed by default; a `▸`/`▾` caret reflects state). Expanded/collapsed state persists across re-renders (e.g. when toggling ingredient exclusions) so the section doesn't snap shut. Each recipe header also has:
+  - Inline `−` / `+` serving controls so servings can be adjusted without leaving the screen
+  - An **eaten toggle** button (`○` / `✓`) to mark the recipe as consumed for the day. When marked, the section border and recipe name turn green. This is a visual to-do indicator only — it does not affect nutrition totals
+- **Per ingredient** — each ingredient row inside an expanded section shows a `−` / `+` toggle button, the ingredient name, and its computed nutrition contribution with cost appended, or appropriate flags (see below). Tapping `−` **excludes** the ingredient: its contribution is zeroed from the section subtotal and grand total, the row dims to 40% opacity, and the value becomes `— excluded`. Tapping `+` re-includes it. The ingredient always remains in the list (never disappears). Exclusions persist across re-renders but clear on Start Over.
 - Totals shown are calories, fat (g), saturated fat (g), trans fat (g), cholesterol (mg), carbs (g), sodium (mg), sugar (g), fiber (g), and protein (g), rounded to whole numbers. Cost is shown as `$X.XX` to two decimal places
 - If a recipe (or the grand total) has **no** computable ingredients, the value line shows `— no computable data` instead of a row of zeros
 - A "Start Over" button at the bottom resets everything. If no recipes are selected, the screen shows an empty message and the Start Over button
@@ -321,6 +324,7 @@ Tracked macros and their default targets:
 | ↳ Sat Fat | 20 | g | stay under (cap) |
 | ↳ Trans Fat | 0 | g | stay under (cap) |
 | Carbs | 234 | g (~37%) | reach target |
+| Fiber | 38 | g | reach target |
 | Sodium | 2300 | mg | stay under (cap) |
 
 "Cap" macros (sat fat, trans fat, sodium) use reversed colour coding: remaining shows neutral until the cap is exceeded, at which point it turns red and shows "X over". "Reach" macros turn green when the target is met or exceeded.
@@ -617,8 +621,10 @@ Key visual states:
 - Waiting zone (`#waiting-section`): top border + muted label; hidden when empty; completed/skipped panels are pinned and never jumped over by promoted panels
 - Action bar: three buttons — Go Shopping (blue), Nutrition (purple), Start Cooking (green)
 - Nutrition grand-total card: dark inset card, muted uppercase title; cost prepended when available
-- Nutrition recipe section: collapsible, `▸`/`▾` caret, cost + subtotal on the right of the header
-- Nutrition ingredient row: `X cal · … · $X.XX` when both nutrition and cost are ok; cost flag sub-line (`⚠ no price data`) when nutrition ok but cost missing
+- Nutrition recipe section: collapsible, `▸`/`▾` caret, cost + subtotal on the right of the header; eaten toggle (`○`/`✓`) between serving controls and subtotal
+- Nutrition eaten state: green border + green recipe name; `✓` button filled green
+- Nutrition ingredient row: `−`/`+` toggle button on the left, then ingredient name, then `X cal · … · $X.XX` when both nutrition and cost are ok; cost flag sub-line (`⚠ no price data`) when nutrition ok but cost missing
+- Nutrition excluded ingredient: row dimmed to 40% opacity; value shows `— excluded`; toggle shows `+`
 - Nutrition flag pill: amber pill (`⚠ no nutrition data` / `⚠ can't compute`); coverage line turns amber whenever anything is flagged; uncomputable rows show an italic amber reason line beneath
 - Nutrition provenance: muted italic "via {brand} · {variant}" under any ingredient row whose numbers came from a selected product
 - Nutrition partial-cost note: amber italic note below grand-total value when some but not all ingredients have price data

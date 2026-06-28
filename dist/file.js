@@ -44,7 +44,15 @@ const state = {
     cookingElapsedInterval: null,
     audioUnlocked: false,
 };
-const macroTargets = { calories: 2550, protein: 147, fat: 114, saturatedFat: 20, transFat: 0, carbs: 234, sodium: 2300 };
+const macroTargets = { calories: 2550, protein: 147, fat: 114, saturatedFat: 20, transFat: 0, carbs: 234, sodium: 2300, fiber: 38 };
+const nutritionExclusions = new Map();
+const eatenRecipeIds = new Set();
+const nutritionExpanded = new Set();
+function getNutritionExcluded(recipeId) {
+    if (!nutritionExclusions.has(recipeId))
+        nutritionExclusions.set(recipeId, new Set());
+    return nutritionExclusions.get(recipeId);
+}
 // ============================================================
 // ID HELPERS
 // ============================================================
@@ -98,9 +106,8 @@ function convertUnits(quantity, from, to) {
         return null;
     return quantity * factor;
 }
-// Extends convertUnits with ingredient-specific density conversions (e.g. cup → oz).
-// Tries: physical → density → density + physical chained.
-// Returns null if no path exists.
+// Extends convertUnits with ingredient-specific density conversions (e.g. unit → cup → oz).
+// Recursively chains density hops until a physical conversion closes the gap, or returns null.
 function convertWithDensity(quantity, from, to, conversions) {
     const physical = convertUnits(quantity, from, to);
     if (physical !== null)
@@ -114,7 +121,7 @@ function convertWithDensity(quantity, from, to, conversions) {
     const intermediate = density.to.name;
     if (intermediate === to)
         return afterDensity;
-    return convertUnits(afterDensity, intermediate, to);
+    return convertWithDensity(afterDensity, intermediate, to, conversions);
 }
 // ============================================================
 // FORMATTERS
@@ -1084,6 +1091,7 @@ function renderMacroTargetsPanel(grand) {
         { label: '↳ Sat Fat', key: 'saturatedFat', actual: grand.saturatedFat > 0 ? Math.round(grand.saturatedFat * 10) / 10 : null, unit: 'g', indent: true, cap: true, calPct: pct(grand.saturatedFat > 0 ? grand.saturatedFat : null, 9) },
         { label: '↳ Trans Fat', key: 'transFat', actual: grand.transFat > 0 ? Math.round(grand.transFat * 10) / 10 : null, unit: 'g', indent: true, cap: true, calPct: pct(grand.transFat > 0 ? grand.transFat : null, 9) },
         { label: 'Carbs', key: 'carbs', actual: grand.carbs > 0 ? Math.round(grand.carbs) : null, unit: 'g', calPct: pct(grand.carbs > 0 ? grand.carbs : null, 4), macroPct: macroPct(grand.carbs > 0 ? grand.carbs : null) },
+        { label: 'Fiber', key: 'fiber', actual: grand.fiber > 0 ? Math.round(grand.fiber) : null, unit: 'g' },
         { label: 'Sodium', key: 'sodium', actual: grand.sodium > 0 ? Math.round(grand.sodium) : null, unit: 'mg', cap: true },
     ];
     rows.forEach(({ label, key, actual, unit, indent, cap, calPct, macroPct }) => {
@@ -1211,9 +1219,16 @@ function renderNutritionScreen() {
         servings: getServings(r.id),
         nutrition: recipeNutrition(r),
     }));
+    // Pre-compute effective totals per recipe, zeroing out excluded ingredients
+    const perRecipeEff = perRecipe.map(({ recipe, servings, nutrition }) => {
+        const excluded = getNutritionExcluded(recipe.id);
+        const effTotals = nutrition.breakdown.reduce((acc, b) => excluded.has(b.ing) || b.result.status !== 'ok' ? acc : addTotals(acc, b.result.totals), emptyTotals());
+        const effCost = nutrition.breakdown.reduce((acc, b) => excluded.has(b.ing) || b.costResult.status !== 'ok' ? acc : acc + b.costResult.cost, 0);
+        return { recipe, servings, nutrition, excluded, effTotals, effCost };
+    });
     // ── Grand total ──────────────────────────────────────────
-    const grand = perRecipe.reduce((acc, p) => addTotals(acc, scaleTotals(p.nutrition.totals, p.servings)), emptyTotals());
-    const grandCost = perRecipe.reduce((acc, p) => acc + p.nutrition.cost * p.servings, 0);
+    const grand = perRecipeEff.reduce((acc, p) => addTotals(acc, scaleTotals(p.effTotals, p.servings)), emptyTotals());
+    const grandCost = perRecipeEff.reduce((acc, p) => acc + p.effCost * p.servings, 0);
     const gCovered = perRecipe.reduce((a, p) => a + p.nutrition.covered, 0);
     const gFlagged = perRecipe.reduce((a, p) => a + p.nutrition.missing + p.nutrition.uncomputable, 0);
     const gTotal = perRecipe.reduce((a, p) => a + p.nutrition.total, 0);
@@ -1267,18 +1282,20 @@ function renderNutritionScreen() {
     root.appendChild(totalCard);
     root.appendChild(renderMacroTargetsPanel(grand));
     // ── Per recipe (expandable) ──────────────────────────────
-    perRecipe.forEach(({ recipe, servings, nutrition }) => {
+    perRecipeEff.forEach(({ recipe, servings, nutrition, excluded, effTotals, effCost }) => {
         const section = createPanel();
         section.className = 'panel nutrition-recipe';
+        if (eatenRecipeIds.has(recipe.id))
+            section.classList.add('nutrition-recipe-eaten');
         const flaggedCount = nutrition.missing + nutrition.uncomputable;
-        const sectionTotals = scaleTotals(nutrition.totals, servings);
-        const sectionCost = nutrition.cost * servings;
+        const sectionTotals = scaleTotals(effTotals, servings);
+        const sectionCost = effCost * servings;
         const recipeHasCostData = nutrition.total > nutrition.costMissing;
         const header = document.createElement('div');
         header.className = 'nutrition-recipe-header';
         const caret = document.createElement('span');
         caret.className = 'nutrition-caret';
-        caret.textContent = '▸';
+        caret.textContent = nutritionExpanded.has(recipe.id) ? '▾' : '▸';
         const name = document.createElement('span');
         name.className = 'nutrition-recipe-name';
         name.textContent = servings > 1 ? `${recipe.name} ×${servings}` : recipe.name;
@@ -1319,9 +1336,22 @@ function renderNutritionScreen() {
         servingControls.appendChild(minusBtn);
         servingControls.appendChild(countLabel);
         servingControls.appendChild(plusBtn);
+        const eatenBtn = document.createElement('button');
+        eatenBtn.className = 'nutrition-eaten-btn';
+        eatenBtn.textContent = eatenRecipeIds.has(recipe.id) ? '✓' : '○';
+        eatenBtn.title = eatenRecipeIds.has(recipe.id) ? 'Mark as not eaten' : 'Mark as eaten';
+        eatenBtn.addEventListener('click', (ev) => {
+            ev.stopPropagation();
+            if (eatenRecipeIds.has(recipe.id))
+                eatenRecipeIds.delete(recipe.id);
+            else
+                eatenRecipeIds.add(recipe.id);
+            renderNutritionScreen();
+        });
         header.appendChild(caret);
         header.appendChild(name);
         header.appendChild(servingControls);
+        header.appendChild(eatenBtn);
         header.appendChild(sub);
         section.appendChild(header);
         const cov = document.createElement('div');
@@ -1331,19 +1361,38 @@ function renderNutritionScreen() {
         section.appendChild(cov);
         // Per-ingredient breakdown
         const list = document.createElement('div');
-        list.className = 'nutrition-ingredients collapsed';
+        const isExpanded = nutritionExpanded.has(recipe.id);
+        list.className = 'nutrition-ingredients' + (isExpanded ? '' : ' collapsed');
         nutrition.breakdown.forEach(({ ing, result, costResult }) => {
+            const isExcluded = excluded.has(ing);
             const row = document.createElement('div');
             row.className = 'nutrition-ingredient-row';
+            if (isExcluded)
+                row.classList.add('nutrition-ingredient-excluded');
+            const toggleBtn = document.createElement('button');
+            toggleBtn.className = 'nutrition-ingredient-toggle';
+            toggleBtn.textContent = isExcluded ? '+' : '−';
+            toggleBtn.title = isExcluded ? 'Include in totals' : 'Exclude from totals';
+            toggleBtn.addEventListener('click', () => {
+                if (isExcluded)
+                    excluded.delete(ing);
+                else
+                    excluded.add(ing);
+                renderNutritionScreen();
+            });
+            row.appendChild(toggleBtn);
             const ingName = document.createElement('span');
             ingName.className = 'nutrition-ingredient-name';
             const scaledIng = { ...ing, quantity: (ing.quantity ?? 0) * servings };
             ingName.textContent = formatIngredient(scaledIng);
             row.appendChild(ingName);
             const detail = document.createElement('span');
-            if (result.status === 'ok') {
+            if (isExcluded) {
                 detail.className = 'nutrition-ingredient-value';
-                // Append cost to the nutrition line when available
+                detail.textContent = '— excluded';
+            }
+            else if (result.status === 'ok') {
+                detail.className = 'nutrition-ingredient-value';
                 const costSuffix = costResult.status === 'ok'
                     ? ` · $${(costResult.cost * servings).toFixed(2)}`
                     : '';
@@ -1361,14 +1410,13 @@ function renderNutritionScreen() {
                 detail.title = result.reason;
             }
             row.appendChild(detail);
-            if (result.status === 'uncomputable') {
+            if (!isExcluded && result.status === 'uncomputable') {
                 const reason = document.createElement('div');
                 reason.className = 'nutrition-flag-reason';
                 reason.textContent = result.reason;
                 row.appendChild(reason);
             }
-            // Cost flag — only shown when nutrition resolved fine but cost didn't
-            if (result.status === 'ok' && costResult.status !== 'ok') {
+            if (!isExcluded && result.status === 'ok' && costResult.status !== 'ok') {
                 const costFlag = document.createElement('div');
                 costFlag.className = 'nutrition-cost-flag';
                 costFlag.textContent = costResult.status === 'missing'
@@ -1376,8 +1424,7 @@ function renderNutritionScreen() {
                     : `⚠ cost can't compute — ${costResult.reason}`;
                 row.appendChild(costFlag);
             }
-            // Brand provenance
-            if (result.status === 'ok' && result.brand) {
+            if (!isExcluded && result.status === 'ok' && result.brand) {
                 const product = selectedProduct(ing);
                 const variant = product?.variant ? ` · ${product.variant}` : '';
                 const via = document.createElement('div');
@@ -1391,8 +1438,14 @@ function renderNutritionScreen() {
         header.addEventListener('click', (ev) => {
             if (ev.target.closest('.nutrition-serving-controls'))
                 return;
+            if (ev.target.closest('.nutrition-eaten-btn'))
+                return;
             const collapsed = list.classList.toggle('collapsed');
             caret.textContent = collapsed ? '▸' : '▾';
+            if (collapsed)
+                nutritionExpanded.delete(recipe.id);
+            else
+                nutritionExpanded.add(recipe.id);
         });
         root.appendChild(section);
     });
@@ -1882,6 +1935,9 @@ function createStartOverButton() {
         state.searchQuery = '';
         state.cookingStartedAt = null;
         state.audioUnlocked = false;
+        nutritionExclusions.clear();
+        eatenRecipeIds.clear();
+        nutritionExpanded.clear();
         for (const [id, recipe] of state.recipes) {
             if (recipe.adhoc)
                 state.recipes.delete(id);
@@ -2596,6 +2652,14 @@ h2 { margin-top: 0; font-size: 28px; }
 .nutrition-cost-flag { flex-basis: 100%; font-size: 12px; color: #f59e0b; font-style: italic; margin-top: 1px; opacity: 0.8; }
 
 .nutrition-provenance { flex-basis: 100%; font-size: 12px; color: #666; font-style: italic; margin-top: 2px; }
+.nutrition-recipe-eaten { border-color: #2d9e4a; }
+.nutrition-recipe-eaten .nutrition-recipe-name { color: #2d9e4a; }
+.nutrition-eaten-btn { background: none; border: 1px solid #555; color: #888; border-radius: 50%; width: 26px; height: 26px; font-size: 13px; cursor: pointer; flex-shrink: 0; padding: 0; line-height: 1; }
+.nutrition-eaten-btn:hover { border-color: #2d9e4a; color: #2d9e4a; }
+.nutrition-recipe-eaten .nutrition-eaten-btn { background: #2d9e4a; border-color: #2d9e4a; color: white; }
+.nutrition-ingredient-toggle { background: none; border: 1px solid #444; color: #666; border-radius: 4px; width: 20px; height: 20px; font-size: 13px; cursor: pointer; flex-shrink: 0; padding: 0; line-height: 1; margin-right: 6px; }
+.nutrition-ingredient-toggle:hover { border-color: #aaa; color: #f0f0f0; }
+.nutrition-ingredient-excluded { opacity: 0.4; }
 
 /* ── Macro targets panel ── */
 
@@ -2914,6 +2978,7 @@ export const i = {
         defaultBrand: '365',
         conversions: {
             [u.unit.name]: { to: u.cup, factor: 1 / 15 }, // ~15 dark cherries per cup
+            [u.cup.name]: { to: u.ounce, factor: 5 }, // 1 cup dark cherries ≈ 5 oz
         },
         products: [{
                 brand: '365', variant: 'Organic Sweet Dark Cherries (frozen)', store: stores.wholeFoods,
@@ -3301,15 +3366,21 @@ registerGroup('Dinner', [
         s(pan.cook('Simmer sauce with sausage', time.minutes(5), 7));
         return steps;
     })()),
-    withPlan(createRecipe('asian-dense-bean-salad-kit', 'Asian Dense Bean Salad (Kit Version)', [
-        instruction('Open 1 bag 365 Asian Inspired Salad Kit into a large bowl', {
-            ingredients: [i.asianSaladKit(1, u.unit)],
-        }),
-        instruction('Add chickpeas, cannellini beans, and edamame', {
-            ingredients: [i.chickpeas(1, u.cup), i.cannelliniBean(1, u.cup), i.edamame(1, u.cup)],
-        }),
-        instruction('Add dressing and toppings from kit, toss to combine'),
-    ]), { planMinutes: 10, portable: false }),
+    withPlan(createRecipe('asian-dense-bean-salad-kit', 'Asian Dense Bean Salad (Kit Version)', (() => {
+        const steps = [];
+        const s = (...newSteps) => steps.push(...newSteps);
+        const bowl = e.bowl('salad bowl');
+        const EDAMAME = i.edamame(1, u.cup);
+        s(bowl.add([i.asianSaladKit(1, u.unit)]));
+        s(Timer.set(80, 's', 'Microwave edamame until just thawed'));
+        s(instruction('Pat edamame dry, then add to bowl', { ingredients: [EDAMAME], equipment: [bowl.name] }));
+        s(bowl.add([
+            i.chickpeas(1, u.cup),
+            i.cannelliniBean(1, u.cup),
+        ]));
+        s(instruction('Add dressing and toppings from kit, toss to combine', { equipment: [bowl.name] }));
+        return steps;
+    })()), { planMinutes: 10, portable: false }),
     createRecipe('asian-dense-bean-salad', 'Asian Dense Bean Salad', (() => {
         const saladBowl = e.bowl('salad bowl');
         const dressBowl = e.bowl('dressing bowl');
