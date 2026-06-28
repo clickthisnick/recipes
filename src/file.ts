@@ -7,7 +7,7 @@
 // TYPES
 // ============================================================
 
-export type StepType = 'instruction' | 'timer' | 'cleanup';
+export type StepType = 'instruction' | 'timer' | 'cleanup' | 'info';
 export type Screen   = 'select' | 'shopping' | 'cooking' | 'nutrition' | 'add-ingredient' | 'prep' | 'plan';
 
 export interface Unit {
@@ -78,6 +78,7 @@ export interface Step {
     recipeId?: string;
     waitForIds?: number[];
     prep?: boolean;
+    prepOnly?: boolean;
     waitFor(...steps: Step[]): this;
 }
 
@@ -222,9 +223,8 @@ function convertUnits(quantity: number, from: string, to: string): number | null
     return quantity * factor;
 }
 
-// Extends convertUnits with ingredient-specific density conversions (e.g. cup → oz).
-// Tries: physical → density → density + physical chained.
-// Returns null if no path exists.
+// Extends convertUnits with ingredient-specific density conversions (e.g. unit → cup → oz).
+// Recursively chains density hops until a physical conversion closes the gap, or returns null.
 function convertWithDensity(
     quantity: number,
     from: string,
@@ -239,7 +239,7 @@ function convertWithDensity(
     const afterDensity = quantity * density.factor;
     const intermediate = density.to.name;
     if (intermediate === to) return afterDensity;
-    return convertUnits(afterDensity, intermediate, to);
+    return convertWithDensity(afterDensity, intermediate, to, conversions);
 }
 
 // ============================================================
@@ -296,6 +296,10 @@ export function prep(text: string, opts: Partial<Step> = {}): Step {
     return createStep({ type: 'instruction', text, prep: true, ...opts });
 }
 
+export function prepOnly(text: string, opts: Partial<Step> = {}): Step {
+    return createStep({ type: 'instruction', text, prep: true, prepOnly: true, ...opts });
+}
+
 export function timerStep(
     label: string,
     durationSeconds: number,
@@ -317,6 +321,10 @@ export function cleanup(equipmentName: string): Step {
         text: `Clean and put away ${equipmentName}`,
         equipment: [equipmentName],
     });
+}
+
+export function info(text: string, opts: Partial<Step> = {}): Step {
+    return createStep({ type: 'info', text, ...opts });
 }
 
 export function generateCleanupLabels(
@@ -676,7 +684,7 @@ function formatCookTime(seconds: number): string {
 // ============================================================
 
 function buildCookingPlan(recipes: Recipe[]): Step[] {
-    const steps = recipes.flatMap(r => r.steps);
+    const steps = recipes.flatMap(r => r.steps.filter(s => !s.prepOnly));
     const manualWaits = new Map<number, number[]>();
     steps.forEach(s => {
         if (s.waitForIds && s.waitForIds.length > 0) manualWaits.set(s.id, [...s.waitForIds]);
@@ -2154,6 +2162,39 @@ function renderStep(step: Step, onDone?: () => void): HTMLElement {
         return panel;
     }
 
+    if (step.type === 'info') {
+        panel.textContent = '';
+        panel.className = 'panel info-step info-step-collapsed';
+
+        const header = document.createElement('div');
+        header.className = 'info-step-header';
+
+        const caret = document.createElement('span');
+        caret.className   = 'info-step-caret';
+        caret.textContent = '▸';
+
+        const label = document.createElement('span');
+        label.className   = 'info-step-label';
+        label.textContent = 'Notes';
+
+        header.appendChild(caret);
+        header.appendChild(label);
+
+        const body = document.createElement('div');
+        body.className   = 'info-step-body';
+        body.textContent = step.text;
+
+        panel.appendChild(header);
+        panel.appendChild(body);
+
+        header.addEventListener('click', () => {
+            const collapsed = panel.classList.toggle('info-step-collapsed');
+            caret.textContent = collapsed ? '▸' : '▾';
+        });
+
+        return panel;
+    }
+
     panel.addEventListener('click', () => {
         if (panel.classList.contains('step-locked')) return;
         panel.classList.add('done-child');
@@ -2278,6 +2319,15 @@ function renderPrepScreen(): void {
         return out;
     }
 
+    function collectInfoSteps(steps: Step[]): Step[] {
+        const out: Step[] = [];
+        for (const s of steps) {
+            if (s.type === 'info') out.push(s);
+            if (s.children) out.push(...collectInfoSteps(s.children));
+        }
+        return out;
+    }
+
     let anyFound = false;
     getSelectedRecipes().filter(r => !r.adhoc).forEach(recipe => {
         const count = state.selectedRecipeIds.filter(id => id === recipe.id).length;
@@ -2289,6 +2339,31 @@ function renderPrepScreen(): void {
         title.className = 'prep-recipe-title';
         title.textContent = recipe.name + (count > 1 ? ` ×${count}` : '');
         root.appendChild(title);
+
+        const infoSteps = collectInfoSteps(recipe.steps);
+        infoSteps.forEach(step => {
+            const note = document.createElement('div');
+            note.className = 'prep-info-note prep-info-collapsed';
+
+            const noteHeader = document.createElement('div');
+            noteHeader.className = 'prep-info-header';
+            const noteCaret = document.createElement('span');
+            noteCaret.textContent = '▸';
+            noteHeader.appendChild(noteCaret);
+            noteHeader.appendChild(document.createTextNode(' Notes'));
+            noteHeader.addEventListener('click', () => {
+                const collapsed = note.classList.toggle('prep-info-collapsed');
+                noteCaret.textContent = collapsed ? '▸' : '▾';
+            });
+
+            const noteBody = document.createElement('div');
+            noteBody.className   = 'prep-info-body';
+            noteBody.textContent = step.text;
+
+            note.appendChild(noteHeader);
+            note.appendChild(noteBody);
+            root.appendChild(note);
+        });
 
         prepSteps.forEach(step => {
             const card = createPanel();
@@ -2790,6 +2865,16 @@ h2 { margin-top: 0; font-size: 28px; }
 .prep-step { cursor: pointer; user-select: none; }
 .prep-step.prep-done { opacity: 0.4; text-decoration: line-through; }
 .prep-step-ingredients { font-size: 14px; color: #888; margin-top: 6px; }
+.prep-info-note { border: 1px dashed #374151; border-radius: 10px; padding: 10px 14px; margin: 0 0 8px; }
+.prep-info-header { display: flex; align-items: center; gap: 6px; cursor: pointer; color: #6b7280; font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; user-select: none; }
+.prep-info-body { margin-top: 8px; font-size: 16px; color: #d1d5db; }
+.prep-info-collapsed .prep-info-body { display: none; }
+/* ── Info step (cooking screen) ── */
+.info-step { cursor: default !important; border-color: #2a2a2a; background: #111827; }
+.info-step-header { display: flex; align-items: center; gap: 8px; cursor: pointer; color: #6b7280; font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; user-select: none; }
+.info-step-caret { font-size: 11px; }
+.info-step-body { margin-top: 12px; font-size: 18px; color: #d1d5db; }
+.info-step-collapsed .info-step-body { display: none; }
 
 #recipe-list { padding-bottom: 120px; }
 
@@ -3262,6 +3347,7 @@ export const i = {
         defaultBrand: '365',
         conversions: {
             [u.unit.name]: { to: u.cup, factor: 1/15 },  // ~15 dark cherries per cup
+            [u.cup.name]:  { to: u.ounce, factor: 5 },   // 1 cup dark cherries ≈ 5 oz
         },
         products: [{
             brand: '365', variant: 'Organic Sweet Dark Cherries (frozen)', store: stores.wholeFoods,
@@ -3748,14 +3834,16 @@ registerGroup('Dinner', [
 
 registerGroup('Ingredients', [
     withPlan(createRecipe('ing-black-lentils', 'Black Lentils (65g)', (() => {
+        const steps: Step[] = [];
+        const s = (...newSteps: Step[]) => steps.push(...newSteps);
         const LENTILS = i.blackLentils(65, u.gram);
-        return [
-            prep('Cook black lentils: bring water to boil, add 65g lentils, simmer 21 min on heat 6, drain', {
-                ingredients: [LENTILS],
-                durationSeconds: 21 * 60,
-            }),
-            instruction('Portion 65g cooked black lentils', { ingredients: [LENTILS] }),
-        ];
+        const pot = e.pot();
+        s(info('65g dry lentils → 165g cooked'));
+        s(pot.add([LENTILS]));
+        s(instruction('Add water to pot', { equipment: [pot.name] }));
+        s(Timer.set(21, 'm', 'Cook lentils'));
+        s(prepOnly('Portion 65g cooked lentils into stainless steel container', { ingredients: [LENTILS] }));
+        return steps;
     })()), { planMinutes: 3, portable: true, prepMinutes: 21, perishableDays: 2 }),
     withPlan(createRecipe('ing-macadamia-bar', 'Blueprint Macadamia Bar', [
         instruction('Have 1 Blueprint Macadamia Bar on hand', {

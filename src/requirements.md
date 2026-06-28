@@ -217,6 +217,7 @@ Both the Select and Cooking screens display a link icon (🔗) next to each reci
 - **Cleanup** — same as instruction, tap to dismiss
 - **Timer** — tap once to start countdown, tap 3× rapidly to skip. Shows MM:SS countdown while running. On completion plays a sound and marks the card green with a timestamp. On skip marks it grey with strikethrough and timestamp. **Before being tapped**, a small amber duration badge is shown on the right of the card (e.g. `15m`, `1h 30m`, `45s`) so the user can see how long the timer will run before starting it. The badge is hidden once the countdown begins.
 - **Container** — a step with child ingredient steps nested inside it. The header shows the action (e.g. "Add to batter bowl"). Each child is its own tappable row. When all children are dismissed the container disappears.
+- **Info** — a non-interactive, collapsible notes panel. Rendered as a dark card with a `▸ Notes` header; collapsed by default. Tapping the header expands/collapses the content. Not part of the cooking flow — no tap-to-complete, no locking, no dependency claims. Use for static contextual notes (e.g. yield ratios like "65g dry → 165g cooked"). Also shown in the Prep screen above the recipe's prep steps.
 
 ---
 
@@ -285,9 +286,11 @@ A step "claims" its equipment and ingredients when it is a timer **or** when it 
 A two-cluster conversion graph allows nutrition and cost calculations to match recipe units against label or package units automatically. No conversion is performed across clusters (volume↔weight requires density, which is substance-dependent).
 
 **Volume cluster:** `tsp ↔ tbsp ↔ cup ↔ fl oz`
-**Weight cluster:** `oz ↔ lb`
+**Weight cluster:** `oz ↔ lb ↔ g`
 
 `convertUnits(quantity, from, to)` returns the converted quantity, or `null` if no path exists (different clusters, or an unmapped unit like `unit` / `handful`). Both nutrition and cost resolution call this before declaring an ingredient `uncomputable`.
+
+`convertWithDensity(quantity, from, to, conversions?)` extends `convertUnits` by recursively chaining ingredient-specific density conversions. For example, cherries use `unit → cup` (15 cherries/cup) and `cup → ounce` (5 oz/cup), so `convertWithDensity(qty, 'unit', 'ounce', conversions)` resolves the two-hop chain automatically. The function recurses until a physical conversion closes the final gap, or returns `null` if no path exists.
 
 ---
 
@@ -405,8 +408,11 @@ Favorited recipes are sorted above non-favorites (but below ad-hoc additions) in
 
 - `instruction(text, opts?)` → creates an instruction step
 - `timerStep(label, durationSeconds, opts?)` → creates a timer step
-- `Timer.set(amount, unit, label)` → creates an inline timer step (unit: `'s'`, `'m'`, `'h'`)
+- `Timer.set(amount, unit, label)` → creates an inline timer step (unit: `'s'`, `'m'`, `'h'`). Prefer this over `timerStep` when no extra opts are needed; use `timerStep` when attaching `ingredients`, `equipment`, `prep: true`, etc.
 - `cleanup(equipmentName)` → creates a cleanup step `"Clean and put away {equipmentName}"`
+- `info(text, opts?)` → creates a non-interactive collapsible notes panel (type `'info'`). Collapsed by default with a `▸ Notes` header. Not part of the cooking flow — no locking or completion behaviour. Shown in both cooking and prep screens.
+- `prep(text, opts?)` → instruction step with `prep: true`. Appears in both the Prep screen and the Cooking screen.
+- `prepOnly(text, opts?)` → instruction step with `prep: true` **and** `prepOnly: true`. Appears in the Prep screen only — filtered out of `buildCookingPlan` so it never shows in the Cooking screen. Use when a prep step (e.g. portioning into a container) has no place in the cook flow.
 - `generateCleanupLabels(ingredients, customTexts?)` → creates instruction steps for ingredients that need date labels
   - Filters `ingredients[]` for those with `requiresDateLabel: true`
   - Default text: `"Write today's date on the {ingredient name} bottle with a Sharpie"`
@@ -558,7 +564,18 @@ conversions: {
 }
 ```
 
-This is distinct from the global unit-conversion graph (which only handles within-cluster conversions like tsp↔cup or oz↔lb). Ingredient-specific conversions handle density / packaging mismatches that are substance-dependent — e.g. cherry (unit→cup, ~15 cherries/cup), cannellini beans (cup→oz, 8.93 oz/cup), edamame (cup→oz, 5.3 oz/cup), carrot (cup→lb, 0.24 lb/cup).
+This is distinct from the global unit-conversion graph (which only handles within-cluster conversions like tsp↔cup or oz↔lb). Ingredient-specific conversions handle density / packaging mismatches that are substance-dependent.
+
+Conversions can be **chained**: `convertWithDensity` recursively follows density hops until a physical conversion closes the final gap. For example, cherries declare two hops:
+```ts
+conversions: {
+    [u.unit.name]: { to: u.cup,   factor: 1/15 },  // 1 cherry → 1/15 cup
+    [u.cup.name]:  { to: u.ounce, factor: 5    },  // 1 cup → 5 oz
+}
+```
+A recipe using `unit` and a package in `ounce` resolves as `unit →(×1/15)→ cup →(×5)→ ounce` automatically.
+
+Other examples: cannellini beans (cup→oz, 8.93 oz/cup), edamame (cup→oz, 5.3 oz/cup), carrot (cup→lb, 0.24 lb/cup).
 
 ### `simpleIngredients()` helper
 Bulk-declares ingredients with no metadata. Auto-derives display names from camelCase keys — e.g. `kingOysterMushroom` → `"King Oyster Mushroom"`. An explicit string is only needed when the auto-derived form is wrong.
@@ -655,7 +672,125 @@ Recipe `asian-dense-bean-salad-kit` is a shortcut version of the full from-scrat
 
 ---
 
+## Prep Mode
+
+A dedicated screen for advance prep steps — anything that can (or must) be done before the cooking session itself. Opened from the **🔪 Prep** button on the action bar; the button only appears when at least one selected recipe has at least one `prep: true` step.
+
+### `prep()` and `prepOnly()` factories
+```ts
+prep(text, opts?)      // instruction with prep: true — shows in Prep screen AND Cooking screen
+prepOnly(text, opts?)  // instruction with prep: true + prepOnly: true — Prep screen only
+```
+
+The `prep: true` flag on a `Step` marks it as a prep step. Behaviour differs by variant:
+
+| Factory | Prep screen | Cooking screen |
+|---|---|---|
+| `prep()` | ✓ shown | ✓ shown (tap again if not done yet) |
+| `prepOnly()` | ✓ shown | ✗ filtered out by `buildCookingPlan` |
+
+Use `prepOnly` for steps that make no sense mid-cook — e.g. "Portion 65g cooked lentils into stainless steel container" — where the user does the action ahead of time and it's irrelevant during the cook session.
+
+Prep-done state does **not** sync between modes; tapping a step in Prep mode does not mark it complete in Cook mode.
+
+### Prep screen layout
+- `info` steps for a recipe are shown first as a collapsed `▸ Notes` panel (same collapsible behaviour as in the cooking screen)
+- Prep steps are collected from all selected non-adhoc recipes, walking the step tree for any step with `prep: true` (including `prepOnly` steps)
+- Grouped by recipe title (muted uppercase heading per recipe)
+- Each step is a tappable card — tapping toggles `.prep-done` class (strikethrough + 40% opacity)
+- No locking, no timers — just a simple checklist
+- "← Back" returns to Select screen
+
+### Prep-flagged steps in existing recipes
+- **Black Lentils** (`ing-black-lentils`): `timerStep('Bring water to boil…', time.minutes(21), { prep: true })` (cooking timer) + `prepOnly('Portion 65g cooked lentils into stainless steel container')` (prep-only)
+- **Asian Dense Bean Salad** (scratch version): soak chickpeas/cannellini overnight, peel/shred carrots, shred cabbage
+
+---
+
+## Planning Mode
+
+A day-planner screen that schedules the selected recipes into time blocks based on a user-configured daily schedule. Opened from the **📅 Plan** button on the action bar (always visible when any recipe is selected).
+
+### Time block config
+The user's schedule is represented as a list of `PlanBlock` entries. Each block has:
+- `start` / `end` — 24h time strings (`"HH:MM"`)
+- `type` — `'home'` (can cook), `'portable'` (portable foods only), or `'away'` (unavailable)
+
+Config is persisted in `localStorage` under the key `recipe-plan-config` and survives page reloads. Default config mirrors a typical weekday:
+
+| Block | Type |
+|---|---|
+| 07:00 – 08:00 | 🏠 Home |
+| 08:00 – 12:00 | 🏢 Away |
+| 12:00 – 12:30 | 🎒 Portable |
+| 12:30 – 17:00 | 🏢 Away |
+| 17:00 – 22:00 | 🏠 Home |
+
+The user can add, remove, and edit blocks directly on the Plan screen. Changes save immediately to localStorage.
+
+### Calorie cutoff
+A separate time field (`caloriesCutoff`, default `14:00`) marks the user's goal of eating all calories before that time. Recipes placed after the cutoff are shown at 55% opacity with an `⚠ after cutoff` meta tag.
+
+### Recipe planning fields
+Added to the `Recipe` interface:
+
+| Field | Type | Description |
+|---|---|---|
+| `portable` | `boolean?` | Can be eaten away from home (no kitchen needed) |
+| `planMinutes` | `number?` | Total time to consume on the day (eating time, assuming any advance prep is already done) |
+| `prepMinutes` | `number?` | Advance cook/prep time (can be done ahead of the eating day) |
+| `perishableDays` | `number?` | How many days the prepped item keeps in the fridge |
+
+Use `withPlan(createRecipe(...), { planMinutes, portable, prepMinutes, perishableDays })` to tag recipes.
+
+Current tags:
+
+| Recipe | planMinutes | portable | prepMinutes | perishableDays |
+|---|---|---|---|---|
+| Blueprint Smoothie | 8 | no | — | — |
+| Blueprint Longevity Drink | 3 | no | — | — |
+| Black Lentils | 3 | yes | 21 | 2 days |
+| Blueprint Macadamia Bar | 2 | yes | — | — |
+| Psyllium Husk | 3 | no | — | — |
+| Protein / Nut Mix / Olive Oil | 5 | no | — | — |
+| Asian Dense Bean Salad (Kit) | 10 | no | — | — |
+
+### Scheduling algorithm
+Greedy in recipe-list order:
+1. Filter blocks to those compatible with the recipe (`home` + `portable` blocks for home recipes; all non-`away` blocks for portable recipes)
+2. For each compatible block, maintain a cursor (current time within that block)
+3. Place the recipe at the cursor if `cursor + planMinutes ≤ block.end`; advance cursor
+4. If no block fits → recipe is listed as **Unscheduled** with a warning
+
+### Plan screen layout
+```
+📅 Day Planner
+
+[ Time Blocks editor — list of editable rows ]
+[ Calorie cutoff row ]
+
+📋 Suggested Schedule
+  7:00 AM  Blueprint Smoothie         8 min
+  7:08 AM  Blueprint Longevity Drink  3 min
+  7:11 AM  Black Lentils              3 min · portable
+  7:14 AM  Psyllium Husk              3 min
+  7:17 AM  Protein / Nut Mix          5 min
+  7:22 AM  Macadamia Bar ×2           2 min · portable
+ 12:00 PM  Macadamia Bar (2nd)        2 min · portable
+ 17:00 PM  Asian Dense Bean Salad Kit 10 min
+             (⚠ after cutoff)
+
+🥘 Batch Prep (cook ahead)
+  Black Lentils — 21 min cook time · keeps 2 days in fridge
+
+⚠ No available slot: [recipe name]
+```
+
+Recipes without `planMinutes` are listed under "No duration set (won't block time)" and are placed in the schedule conceptually but don't advance the time cursor.
+
+---
+
 ## Bootstrap
-The app mounts on `DOMContentLoaded`, injects styles, renders `<div id="app">`, and calls `render()`. All state lives in a single `state` object. No persistence between page loads.
+The app mounts on `DOMContentLoaded`, injects styles, renders `<div id="app">`, and calls `render()`. All state lives in a single `state` object. Plan config is persisted in `localStorage` (`recipe-plan-config`); all other state resets on page load.
 
 When the app boots, it checks for a `?recipe=recipe-id` URL parameter. If found and the recipe exists, it auto-selects that recipe, unlocks the audio context, and jumps directly to the Cooking screen.
