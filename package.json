@@ -5,6 +5,7 @@
     "main": "index.js",
     "scripts": {
     "build": "tsc",
+    "postbuild": "node scripts/validate-recipes.js",
     "dev": "vite"
     },
     "repository": {

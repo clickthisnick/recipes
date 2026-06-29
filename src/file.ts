@@ -2727,11 +2727,15 @@ function renderPlanScreen(): void {
 const styles = `
 * { box-sizing: border-box; }
 
+/* Prevent double-tap zoom on interactive elements without breaking scroll */
+button, a, input, select { touch-action: manipulation; }
+
 body {
     background: #111;
     color: #f0f0f0;
     font-family: sans-serif;
     padding: 24px;
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
     font-size: 20px;
 }
 
@@ -2888,7 +2892,8 @@ h2 { margin-top: 0; font-size: 28px; }
 .actions {
     position: fixed; bottom: 0; left: 0; right: 0;
     background: #111; border-top: 2px solid #333;
-    padding: 16px 24px; display: flex; gap: 16px;
+    padding: 16px 24px; padding-bottom: max(16px, env(safe-area-inset-bottom));
+    display: flex; gap: 16px; flex-wrap: wrap;
 }
 
 .action-btn { flex: 1; font-size: 24px; padding: 20px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; }
@@ -3114,6 +3119,32 @@ h2 { margin-top: 0; font-size: 28px; }
 .suggestion-stats { font-size: 13px; color: #6b9c6b; }
 .suggestion-add-btn { font-size: 16px; padding: 8px 18px; border-radius: 10px; border: 1px solid #2d9e4a; background: transparent; color: #2d9e4a; cursor: pointer; white-space: nowrap; }
 .suggestion-add-btn:hover { background: #1a5c2a; color: #f0f0f0; }
+
+@media (max-width: 500px) {
+    body { padding: 14px; padding-bottom: max(14px, env(safe-area-inset-bottom)); font-size: 18px; }
+    h2 { font-size: 22px; }
+
+    .search-input { font-size: 20px; padding: 12px; }
+    .recipe-btn { font-size: 18px; padding: 14px 16px; }
+
+    /* Actions bar: 2-per-row wrap on narrow screens */
+    .actions { gap: 8px; padding: 10px 12px; padding-bottom: max(10px, env(safe-area-inset-bottom)); }
+    .action-btn { font-size: 17px; padding: 14px 8px; flex: 1 1 calc(50% - 4px); }
+    #recipe-list { padding-bottom: 180px; }
+
+    /* Macro targets: tighter grid */
+    .macro-row { grid-template-columns: 65px 70px 1fr 1fr; gap: 4px; }
+    .macro-label { font-size: 14px; }
+    .macro-target-input { width: 58px; font-size: 13px; }
+    .macro-actual, .macro-remaining { font-size: 13px; }
+
+    /* Nutrition header: allow sub to wrap below the name row */
+    .nutrition-recipe-header { flex-wrap: wrap; }
+    .nutrition-recipe-sub { white-space: normal; flex-basis: 100%; text-align: left; padding-left: 26px; }
+    .nutrition-recipe-name { font-size: 18px; }
+
+    .panel { font-size: 18px; padding: 14px; }
+}
 `;
 
 // ============================================================
@@ -3184,7 +3215,7 @@ export const i = {
         blueprintBlueberryWalnut: '', blueprintCacao: '', frozenStrawberry: '',
         frozenCauliflower: '', frozenBroccoli: '', frozenBlueberry: '',
         blueprintNuttyPudding: '', egg: '', milk: '', bread: '',
-        pomegranateSeeds: '', water: '', avocadoOil: '',
+        pomegranateSeeds: '', avocadoOil: '',
         abbotPeaItalianSausage: '', lentilSpaghetti: '', spaghettiSauce: '',
         pankoBreadCrumbs: '', salt: '', garlicPowder: '', cornstarch: '',
         cassavaFlour: '', kingOysterMushroom: '',
@@ -3479,6 +3510,15 @@ export const i = {
         },
     }),
 
+    water: ingredientFactory('Water', {
+        conversions: {
+            [u.ounce.name]: { to: u.fluidOunce, factor: 1 },
+        },
+        nutrition: {
+            [u.fluidOunce.name]: { servings: 1, servingSize: 1, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 },
+        },
+    }),
+
     strawberry: ingredientFactory('Strawberry', {
         defaultBrand: '365',
         products: [{
@@ -3585,11 +3625,12 @@ export const i = {
         defaultBrand: 'Blueprint',
         products: [{
             brand: 'Blueprint', variant: 'Macadamia + Walnut + Blueberry', store: stores.amazon,
-            price: 37,
-            size: 30, sizeUnit: u.unit,   // 30 scoops per container
+            price: 37, size: 30, sizeUnit: u.unit,
+            discount: { subscribeAndSave: 33.30 },
             link: 'https://www.amazon.com/Blueprint-Bryan-Johnson-Blueberry-Nut/dp/B0D3FZ29RJ',
             nutrition: {
-                [u.unit.name]: { servings: 1, servingSize: 1, calories: 70, fat: 5, saturatedFat: 0.5, transFat: 0, cholesterol: 0, carbs: 6, sodium: 0, sugar: 5, protein: 1, fiber: 1 },
+                // Per 1 scoop (15g), 30 servings per container
+                [u.unit.name]: { servings: 30, servingSize: 1, calories: 70, fat: 4.5, saturatedFat: 0.5, transFat: 0, cholesterol: 0, carbs: 8, sodium: 0, sugar: 5, protein: 1, fiber: 2 },
             },
         }],
     }),
@@ -3907,7 +3948,7 @@ registerGroup('Dinner', [
 ]);
 
 registerGroup('Ingredients', [
-    withPlan(createRecipe('ing-black-lentils', 'Black Lentils (65g)', (() => {
+    withPlan(createRecipe('ing-black-lentils-gas', 'Black Lentils (65g) (Gas Stovetop)', (() => {
         const steps: Step[] = [];
         const s = (...newSteps: Step[]) => steps.push(...newSteps);
         const LENTILS = i.blackLentils(65, u.gram);
@@ -3915,6 +3956,20 @@ registerGroup('Ingredients', [
         s(info('65g dry lentils → 165g cooked'));
         s(pot.add([LENTILS]));
         s(instruction('Add water to pot', { equipment: [pot.name] }));
+        s(Timer.set(21, 'm', 'Cook lentils'));
+        s(prepOnly('Portion 65g cooked lentils into stainless steel container', { ingredients: [LENTILS] }));
+        return steps;
+    })()), { planMinutes: 3, portable: true, prepMinutes: 21, perishableDays: 2 }),
+    withPlan(createRecipe('ing-black-lentils-induction', 'Black Lentils (65g) (Induction Stovetop)', (() => {
+        const steps: Step[] = [];
+        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        const LENTILS = i.blackLentils(65, u.gram);
+        const WATER = i.water(15, u.fluidOunce);
+        const pot = e.pot();
+        s(info('65g dry lentils → 165g cooked'));
+        s(pot.add([LENTILS, WATER]));
+        s(instruction('Place lid fully on pot', { equipment: [pot.name] }));
+        s(instruction('Set induction stovetop to 215°', { equipment: [pot.name] }));
         s(Timer.set(21, 'm', 'Cook lentils'));
         s(prepOnly('Portion 65g cooked lentils into stainless steel container', { ingredients: [LENTILS] }));
         return steps;
@@ -3973,7 +4028,7 @@ registerBundle({
     recipeIds: [
         'blueprint-smoothie',
         'blueprint-longevity-drink',
-        'ing-black-lentils',
+        'ing-black-lentils-induction',
         'ing-macadamia-bar',
         'ing-macadamia-bar',
         'ing-psyllium-husk',
