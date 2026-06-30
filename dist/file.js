@@ -1745,14 +1745,9 @@ function renderCookingScreen() {
                     }
                     updateBadge();
                 }, 1000);
-                const soundCheckBtn = document.createElement('button');
-                soundCheckBtn.className = 'sound-check-btn';
-                soundCheckBtn.textContent = '🔔';
-                soundCheckBtn.title = 'Test timer sound';
-                soundCheckBtn.addEventListener('click', () => playSoundCheck());
                 header.appendChild(title);
                 header.appendChild(badge);
-                header.appendChild(soundCheckBtn);
+                header.appendChild(createSoundTestPanel());
                 header.appendChild(createCopyButton(recipe.id));
                 ready.appendChild(header);
             }
@@ -1995,16 +1990,11 @@ function startTimer(step, panel, onDone) {
 // ============================================================
 const audio = new Audio('../src/sounds/pager-beep.mp3');
 function playSound() { audio.currentTime = 0; audio.play().catch(console.error); }
-const audioCheck = new Audio('../src/sounds/pager-beep.mp3');
-let soundCheckTimeout = null;
-function playSoundCheck() {
-    if (soundCheckTimeout !== null) {
-        window.clearTimeout(soundCheckTimeout);
-        soundCheckTimeout = null;
-    }
-    audioCheck.currentTime = 0;
-    audioCheck.play().catch(console.error);
-    soundCheckTimeout = window.setTimeout(() => { audioCheck.pause(); audioCheck.currentTime = 0; soundCheckTimeout = null; }, 1000);
+function createSoundTestPanel() {
+    const step = timerStep('🔔 Sound Test', 1);
+    const panel = renderStep(step, () => panel.replaceWith(createSoundTestPanel()));
+    panel.classList.add('sound-check-btn');
+    return panel;
 }
 // ============================================================
 // URL ROUTING
@@ -2383,16 +2373,18 @@ h2 { margin-top: 0; font-size: 28px; }
     margin-bottom: 16px;
 }
 
-.sound-check-btn {
+.panel.sound-check-btn {
     padding: 4px 8px;
     font-size: 16px;
     background: transparent;
     color: #666;
     border: 1px solid #444;
     border-radius: 8px;
-    cursor: pointer;
+    margin: 0;
 }
-.sound-check-btn:hover { color: #aaa; border-color: #666; }
+.panel.sound-check-btn:hover { color: #aaa; border-color: #666; }
+.panel.sound-check-btn .timer-duration-badge { display: none; }
+.panel.sound-check-btn.timer { font-size: 14px; padding: 4px 8px; margin: 0; }
 
 .recipe-row {
     display: flex;
@@ -2785,6 +2777,7 @@ h2 { margin-top: 0; font-size: 28px; }
 function bootstrap() {
     document.head.insertAdjacentHTML('beforeend', `<style>${styles}</style>`);
     document.body.innerHTML = `<div id="app"></div>`;
+    document.addEventListener('click', () => unlockAudioContext(), { once: true });
     const recipeIdFromURL = getRecipeIdFromURL();
     if (recipeIdFromURL && state.recipes.has(recipeIdFromURL)) {
         state.selectedRecipeIds = [recipeIdFromURL];
