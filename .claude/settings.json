@@ -3,7 +3,8 @@
     "allow": [
       "Bash(npx tsc *)",
       "Bash(npm run *)",
-      "Bash(node scripts/validate-recipes.js)"
+      "Bash(node scripts/validate-recipes.js)",
+      "Bash(node /home/mypi/Documents/recipes/scripts/validate-recipes.js)"
     ]
   }
 }

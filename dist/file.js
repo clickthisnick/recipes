@@ -372,6 +372,7 @@ export const e = {
     bulletMixer: (label) => new Equipment('bullet mixer', label),
     knife: (label) => new Equipment('knife', label),
     cuttingBoard: (label) => new Equipment('cutting board', label),
+    colander: (label) => new Equipment('colander', label),
 };
 // ============================================================
 // RECIPE REGISTRATION
@@ -1744,8 +1745,14 @@ function renderCookingScreen() {
                     }
                     updateBadge();
                 }, 1000);
+                const soundCheckBtn = document.createElement('button');
+                soundCheckBtn.className = 'sound-check-btn';
+                soundCheckBtn.textContent = '🔔';
+                soundCheckBtn.title = 'Test timer sound';
+                soundCheckBtn.addEventListener('click', () => playSoundCheck());
                 header.appendChild(title);
                 header.appendChild(badge);
+                header.appendChild(soundCheckBtn);
                 header.appendChild(createCopyButton(recipe.id));
                 ready.appendChild(header);
             }
@@ -1988,6 +1995,17 @@ function startTimer(step, panel, onDone) {
 // ============================================================
 const audio = new Audio('../src/sounds/pager-beep.mp3');
 function playSound() { audio.currentTime = 0; audio.play().catch(console.error); }
+const audioCheck = new Audio('../src/sounds/pager-beep.mp3');
+let soundCheckTimeout = null;
+function playSoundCheck() {
+    if (soundCheckTimeout !== null) {
+        window.clearTimeout(soundCheckTimeout);
+        soundCheckTimeout = null;
+    }
+    audioCheck.currentTime = 0;
+    audioCheck.play().catch(console.error);
+    soundCheckTimeout = window.setTimeout(() => { audioCheck.pause(); audioCheck.currentTime = 0; soundCheckTimeout = null; }, 1000);
+}
 // ============================================================
 // URL ROUTING
 // ============================================================
@@ -2364,6 +2382,17 @@ h2 { margin-top: 0; font-size: 28px; }
     color: #f0f0f0;
     margin-bottom: 16px;
 }
+
+.sound-check-btn {
+    padding: 4px 8px;
+    font-size: 16px;
+    background: transparent;
+    color: #666;
+    border: 1px solid #444;
+    border-radius: 8px;
+    cursor: pointer;
+}
+.sound-check-btn:hover { color: #aaa; border-color: #666; }
 
 .recipe-row {
     display: flex;
@@ -2805,7 +2834,7 @@ export const i = {
         blueprintBlueberryWalnut: '', blueprintCacao: '', frozenStrawberry: '',
         frozenCauliflower: '', frozenBroccoli: '', frozenBlueberry: '',
         blueprintNuttyPudding: '', egg: '', milk: '', bread: '',
-        pomegranateSeeds: '', water: '', avocadoOil: '',
+        pomegranateSeeds: '', avocadoOil: '',
         abbotPeaItalianSausage: '', lentilSpaghetti: '', spaghettiSauce: '',
         pankoBreadCrumbs: '', salt: '', garlicPowder: '', cornstarch: '',
         cassavaFlour: '', kingOysterMushroom: '',
@@ -2828,7 +2857,6 @@ export const i = {
     carrot: ingredientFactory('Carrots', {
         nutrition: {
             [u.cup.name]: { servings: 1, servingSize: 1, calories: 52, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 12, sodium: 88, sugar: 6, protein: 1, fiber: 3 },
-            [u.pound.name]: { servings: 1, servingSize: 1, calories: 186, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 44, sodium: 317, sugar: 21, protein: 4, fiber: 12 },
         },
         conversions: {
             [u.cup.name]: { to: u.pound, factor: 0.24 },
@@ -2861,7 +2889,9 @@ export const i = {
     almond: ingredientFactory('Almonds', {
         nutrition: {
             [u.handful.name]: { servings: 1, servingSize: 1, calories: 164, fat: 14, saturatedFat: 1, transFat: 0, cholesterol: 0, carbs: 6, sodium: 0, sugar: 1, protein: 6, fiber: 3 },
-            [u.ounce.name]: { servings: 1, servingSize: 1, calories: 164, fat: 14, saturatedFat: 1, transFat: 0, cholesterol: 0, carbs: 6, sodium: 0, sugar: 1, protein: 6, fiber: 3 },
+        },
+        conversions: {
+            [u.handful.name]: { to: u.ounce, factor: 1 },
         },
     }),
     whiteMiso: ingredientFactory('White Miso', {
@@ -2947,9 +2977,6 @@ export const i = {
                 brand: 'Blueprint', variant: 'Raw', store: stores.amazon,
                 link: 'https://www.amazon.com/Blueprint-Bryan-Johnson-Macadamia-Nuts/dp/B0DNGJFBS1',
                 price: 12, size: 4, sizeUnit: u.ounce, organic: false,
-                nutrition: {
-                    [u.ounce.name]: { servings: 4, servingSize: 1, calories: 210, fat: 21, saturatedFat: 3, transFat: 0, cholesterol: 0, carbs: 4, sodium: 2, sugar: 1, protein: 2, fiber: 2 },
-                },
             },
         ],
     }),
@@ -3070,6 +3097,14 @@ export const i = {
             [u.fluidOunce.name]: { servings: 8, servingSize: 7, calories: 110, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 26, sodium: 0, sugar: 22, protein: 2, fiber: 0 },
         },
     }),
+    water: ingredientFactory('Water', {
+        conversions: {
+            [u.ounce.name]: { to: u.fluidOunce, factor: 1 },
+        },
+        nutrition: {
+            [u.fluidOunce.name]: { servings: 1, servingSize: 1, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 },
+        },
+    }),
     strawberry: ingredientFactory('Strawberry', {
         defaultBrand: '365',
         products: [{
@@ -3105,9 +3140,6 @@ export const i = {
                 link: 'https://www.amazon.com/dp/B0CDQJJ5TF',
                 price: 18.48, size: 12, sizeUnit: u.ounce,
                 organic: true,
-                nutrition: {
-                    [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 15, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 5, sodium: 5, sugar: 0, protein: 0, fiber: 5 },
-                },
             }],
     }),
     blueprintMacadamiaBar: ingredientFactory('Blueprint Macadamia Bar', {
@@ -3454,33 +3486,83 @@ registerGroup('Dinner', [
         return steps;
     })()),
 ]);
-registerGroup('Ingredients', [
+registerGroup('Blueprint', [
+    withPlan(createRecipe('protein-nutmix-oliveoil', 'Blueprint (Nutty Pudding) - Protein, Nut Mix & Olive Oil', [
+        instruction('Have 1 scoop Blueprint longevity protein on hand', {
+            ingredients: [i.longevityProtein(1, u.unit)],
+        }),
+        instruction('Have 1 scoop Blueprint blueberry nut mix on hand', {
+            ingredients: [i.blueberryNutMix(1, u.unit)],
+        }),
+        instruction('Take 2 shots of Blueprint olive oil', {
+            ingredients: [i.blueprintOliveOil(2, u.shot)],
+        }),
+    ]), { planMinutes: 5, portable: false }),
+    withPlan(createRecipe('blueprint-longevity-drink', 'Blueprint Longevity Drink (Longevity Mix, Collagen, Creatine)', [
+        instruction('Add 1 scoop Blueprint Longevity Mix (Blood Orange) to a glass of water', {
+            ingredients: [i.longevityMix(1, u.unit)],
+        }),
+        instruction('Add 1 scoop Blueprint Collagen Peptides', {
+            ingredients: [i.blueprintCollagen(1, u.unit)],
+        }),
+        instruction('Add 1 scoop (5g) Blueprint Creatine Monohydrate and stir until dissolved', {
+            ingredients: [i.blueprintCreatine(1, u.unit)],
+        }),
+    ]), { planMinutes: 3, portable: false }),
+]);
+registerGroup('Lentils', [
     withPlan(createRecipe('ing-black-lentils-gas', 'Black Lentils (65g) (Gas Stovetop)', (() => {
         const steps = [];
         const s = (...newSteps) => steps.push(...newSteps);
         const LENTILS = i.blackLentils(65, u.gram);
         const pot = e.pot();
-        s(info('65g dry lentils → 165g cooked'));
+        const colander = e.colander();
+        s(info('65g dry lentils → 165g cooked. Keeps in the fridge for 3 days.'));
         s(pot.add([LENTILS]));
         s(instruction('Add water to pot', { equipment: [pot.name] }));
         s(Timer.set(21, 'm', 'Cook lentils'));
-        s(prepOnly('Portion 65g cooked lentils into stainless steel container', { ingredients: [LENTILS] }));
+        s(instruction('Strain lentils through a colander', { equipment: [pot.name, colander.name] }));
+        s(instruction('Portion 65g cooked lentils into stainless steel container', { ingredients: [LENTILS] }));
+        s(instruction('Rinse pot and wipe dry with a paper towel (Otherwise Pot Stains)', { equipment: [pot.name] }));
         return steps;
-    })()), { planMinutes: 3, portable: true, prepMinutes: 21, perishableDays: 2 }),
+    })()), { planMinutes: 3, portable: true, prepMinutes: 21, perishableDays: 3 }),
     withPlan(createRecipe('ing-black-lentils-induction', 'Black Lentils (65g) (Induction Stovetop)', (() => {
         const steps = [];
         const s = (...newSteps) => steps.push(...newSteps);
         const LENTILS = i.blackLentils(65, u.gram);
         const WATER = i.water(15, u.fluidOunce);
         const pot = e.pot();
-        s(info('65g dry lentils → 165g cooked'));
+        const colander = e.colander();
+        s(info('65g dry lentils → 165g cooked. Keeps in the fridge for 3 days.'));
         s(pot.add([LENTILS, WATER]));
         s(instruction('Place lid fully on pot', { equipment: [pot.name] }));
         s(instruction('Set induction stovetop to 215°', { equipment: [pot.name] }));
         s(Timer.set(21, 'm', 'Cook lentils'));
-        s(prepOnly('Portion 65g cooked lentils into stainless steel container', { ingredients: [LENTILS] }));
+        s(instruction('Strain lentils through a colander', { equipment: [pot.name, colander.name] }));
+        s(instruction('Portion 65g cooked lentils into stainless steel container', { ingredients: [LENTILS] }));
+        s(instruction('Rinse pot and wipe dry with a paper towel (Otherwise Pot Stains)', { equipment: [pot.name] }));
         return steps;
-    })()), { planMinutes: 3, portable: true, prepMinutes: 21, perishableDays: 2 }),
+    })()), { planMinutes: 3, portable: true, prepMinutes: 21, perishableDays: 3 }),
+    withPlan(createRecipe('ing-black-lentils-induction-130g', 'Black Lentils (130g) (Induction Stovetop)', (() => {
+        const steps = [];
+        const s = (...newSteps) => steps.push(...newSteps);
+        const LENTILS = i.blackLentils(130, u.gram);
+        const WATER = i.water(28, u.fluidOunce);
+        const pot = e.pot();
+        const colander = e.colander();
+        s(info('130g dry lentils → ~330g cooked. Keeps in the fridge for 3 days.'));
+        s(pot.add([LENTILS, WATER]));
+        s(instruction('Place lid fully on pot', { equipment: [pot.name] }));
+        s(instruction('Set induction stovetop to 215°', { equipment: [pot.name] }));
+        s(Timer.set(24, 'm', 'Cook lentils'));
+        s(instruction('Strain lentils through a colander', { equipment: [pot.name, colander.name] }));
+        s(Timer.set(10, 'm', 'Let lentils cool'));
+        s(instruction('Portion cooked lentils in half (~165g each) into two stainless steel containers', { ingredients: [LENTILS] }));
+        s(instruction('Rinse pot and wipe dry with a paper towel (Otherwise Pot Stains)', { equipment: [pot.name] }));
+        return steps;
+    })()), { planMinutes: 3, portable: true, prepMinutes: 24, perishableDays: 3 }),
+]);
+registerGroup('Ingredients', [
     withPlan(createRecipe('ing-macadamia-bar', 'Blueprint Macadamia Bar', [
         instruction('Have 1 Blueprint Macadamia Bar on hand', {
             ingredients: [i.blueprintMacadamiaBar(1, u.unit)],
@@ -3492,28 +3574,6 @@ registerGroup('Ingredients', [
         }),
     ]), { planMinutes: 3, portable: false }),
 ]);
-registerRecipe(withPlan(createRecipe('protein-nutmix-oliveoil', 'Blueprint (Nutty Pudding) - Protein, Nut Mix & Olive Oil', [
-    instruction('Have 1 scoop Blueprint longevity protein on hand', {
-        ingredients: [i.longevityProtein(1, u.unit)],
-    }),
-    instruction('Have 1 scoop Blueprint blueberry nut mix on hand', {
-        ingredients: [i.blueberryNutMix(1, u.unit)],
-    }),
-    instruction('Take 2 shots of Blueprint olive oil', {
-        ingredients: [i.blueprintOliveOil(2, u.shot)],
-    }),
-]), { planMinutes: 5, portable: false }));
-registerRecipe(withPlan(createRecipe('blueprint-longevity-drink', 'Blueprint Longevity Drink (Longevity Mix, Collagen, Creatine)', [
-    instruction('Add 1 scoop Blueprint Longevity Mix (Blood Orange) to a glass of water', {
-        ingredients: [i.longevityMix(1, u.unit)],
-    }),
-    instruction('Add 1 scoop Blueprint Collagen Peptides', {
-        ingredients: [i.blueprintCollagen(1, u.unit)],
-    }),
-    instruction('Add 1 scoop (5g) Blueprint Creatine Monohydrate and stir until dissolved', {
-        ingredients: [i.blueprintCreatine(1, u.unit)],
-    }),
-]), { planMinutes: 3, portable: false }));
 // ============================================================
 // BUNDLES
 // ============================================================
