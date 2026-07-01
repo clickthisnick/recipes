@@ -317,9 +317,9 @@ export function timerStep(
 }
 
 export const Timer = {
-    set: (amount: number, unit: 's' | 'm' | 'h', label: string): Step => {
+    set: (amount: number, unit: 's' | 'm' | 'h', label: string, opts: Partial<Step> = {}): Step => {
         const seconds = unit === 's' ? amount : unit === 'm' ? amount * 60 : amount * 3600;
-        return createStep({ type: 'timer', text: label, durationSeconds: seconds });
+        return createStep({ type: 'timer', text: label, durationSeconds: seconds, ...opts });
     },
 };
 
@@ -528,6 +528,14 @@ class Equipment {
     }
 }
 
+class NuwaveEquipment extends Equipment {
+    constructor(label?: string) { super('Nuwave pan', label); }
+    preheat(temperature: number): Step {
+        const duration = temperature === 350 ? time.minutes(2) : time.minutes(3);
+        return timerStep(`Preheat ${this.name} to ${temperature}°`, duration, { equipment: [this.name] });
+    }
+}
+
 export const e = {
     bowl:         (label?: string) => new Equipment('bowl',          label),
     pan:          (label?: string) => new Equipment('pan',           label),
@@ -539,6 +547,7 @@ export const e = {
     knife:        (label?: string) => new Equipment('knife',         label),
     cuttingBoard: (label?: string) => new Equipment('cutting board', label),
     colander:     (label?: string) => new Equipment('colander',      label),
+    nuwavePan:    (label?: string) => new NuwaveEquipment(label),
 };
 
 // ============================================================
@@ -3243,6 +3252,7 @@ export const i = {
         pomegranateSeeds: '', avocadoOil: '',
         abbotPeaItalianSausage: '', lentilSpaghetti: '', spaghettiSauce: '',
         pankoBreadCrumbs: '', salt: '', garlicPowder: '', cornstarch: '',
+        blackPepper: '', paprika: '',
         cassavaFlour: '', kingOysterMushroom: '',
         whiteVinegar: '', bakingSoda: '',
         babyBellaMushroom: '', yellowOnion: '', oliveOil: '',
@@ -3737,6 +3747,16 @@ export const i = {
         ],
     }),
 
+    chickenThigh: ingredientFactory('Chicken Thighs (Boneless Skinless)', {
+        isMeatProduct: true,
+        defaultBrand: '365',
+        products: [{
+            brand: '365', variant: 'Organic Boneless Skinless (1.5 lb)', store: stores.wholeFoods,
+            price: 9.99, size: 1.5, sizeUnit: u.pound,
+            link: 'https://www.amazon.com/dp/B07813VZHR',
+        }],
+    }),
+
 };
 
 // ============================================================
@@ -3765,9 +3785,9 @@ registerGroup('Breakfast', [
 
         s(mixer.add([
             i.celery(1, u.unit),
-            i.spinach(1, u.handful),
-            i.kale(1, u.handful),
             i.banana(1, u.unit),
+            i.kale(1, u.handful),
+            i.spinach(1, u.handful),
         ]));
         s(Timer.set(30, 's', 'Let mixer settle'));
         s(mixer.mix());
@@ -3962,6 +3982,34 @@ registerGroup('Dinner', [
         s(saladBowl.combine([dressBowl.result], 'pour dressing over salad, toss gently to coat').waitFor(dressingReady));
         s(instruction('Divide into bowls and top with chopped almonds', { ingredients: [ALMONDS] }));
         s(Timer.set(30, 'm', 'Optional: chill before serving'));
+
+        return steps;
+    })()),
+
+    createRecipe('nuwave-chicken-thighs', 'Nuwave Chicken Thighs (350°F)', (() => {
+        const pan = e.nuwavePan();
+        const seasoningBowl = e.bowl('seasoning bowl');
+        const THIGHS = i.chickenThigh();
+        const steps: Step[] = [];
+        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+
+        s(seasoningBowl.add([
+            i.salt(0.5, u.tsp),
+            i.blackPepper(0.5, u.tsp),
+            i.paprika(0.5, u.tsp),
+            i.garlicPowder(0.5, u.tsp),
+        ]));
+        s(seasoningBowl.mix());
+        s(instruction(`Season ${THIGHS.name} on both sides with seasoning mixture`, { ingredients: [THIGHS] }));
+        s(pan.preheat(350));
+        s(pan.add([i.avocadoOil(1, u.spray)]));
+        s(pan.add([THIGHS], 'smooth side down'));
+        s(pan.cook('Cook first side — do not move', time.minutes(8), 350));
+        s(pan.flip());
+        s(pan.cook('Cook second side', time.minutes(8), 350));
+        s(instruction('Check internal temperature in the thickest thigh — target 175–180°F', { ingredients: [THIGHS], equipment: [pan.name] }));
+        s(instruction('If 170–174°F, cook another 1–2 minutes and recheck', { equipment: [pan.name], ingredients: [THIGHS] }));
+        s(Timer.set(5, 'm', `Rest ${THIGHS.name} before eating`, { ingredients: [THIGHS], equipment: [pan.name] }));
 
         return steps;
     })()),
