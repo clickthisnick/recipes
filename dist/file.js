@@ -3583,7 +3583,7 @@ registerGroup('Lentils', [
         const steps = [];
         const s = (...newSteps) => steps.push(...newSteps);
         const LENTILS = i.blackLentils(130, u.gram);
-        const WATER = i.water(28, u.fluidOunce);
+        const WATER = i.water(26, u.fluidOunce);
         const pot = e.pot();
         const colander = e.colander();
         s(info('130g dry lentils → ~330g cooked. Keeps in the fridge for 3 days.'));
@@ -3594,6 +3594,24 @@ registerGroup('Lentils', [
         s(instruction('Strain lentils through a colander', { equipment: [pot.name, colander.name] }));
         s(Timer.set(10, 'm', 'Let lentils cool'));
         s(instruction('Portion cooked lentils in half (~165g each) into two stainless steel containers', { ingredients: [LENTILS] }));
+        s(instruction('Rinse pot and wipe dry with a paper towel (Otherwise Pot Stains)', { equipment: [pot.name] }));
+        return steps;
+    })()), { planMinutes: 3, portable: true, prepMinutes: 24, perishableDays: 3 }),
+    withPlan(createRecipe('ing-black-lentils-induction-195g', 'Black Lentils (195g) (Induction Stovetop)', (() => {
+        const steps = [];
+        const s = (...newSteps) => steps.push(...newSteps);
+        const LENTILS = i.blackLentils(195, u.gram);
+        const WATER = i.water(26, u.fluidOunce);
+        const pot = e.pot();
+        const colander = e.colander();
+        s(info('195g dry lentils → ~495g cooked. Keeps in the fridge for 3 days.'));
+        s(pot.add([LENTILS, WATER]));
+        s(instruction('Place lid fully on pot', { equipment: [pot.name] }));
+        s(instruction('Set induction stovetop to 215°', { equipment: [pot.name] }));
+        s(Timer.set(24, 'm', 'Cook lentils'));
+        s(instruction('Strain lentils through a colander', { equipment: [pot.name, colander.name] }));
+        s(Timer.set(10, 'm', 'Let lentils cool'));
+        s(instruction('Portion cooked lentils into thirds (~165g each) into three stainless steel containers', { ingredients: [LENTILS] }));
         s(instruction('Rinse pot and wipe dry with a paper towel (Otherwise Pot Stains)', { equipment: [pot.name] }));
         return steps;
     })()), { planMinutes: 3, portable: true, prepMinutes: 24, perishableDays: 3 }),
