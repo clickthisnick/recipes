@@ -5,7 +5,13 @@
       "Bash(npm run *)",
       "Bash(node scripts/validate-recipes.js)",
       "Bash(node /home/mypi/Documents/recipes/scripts/validate-recipes.js)",
-      "Bash(node -e ' *)"
+      "Bash(node -e ' *)",
+      "Skill(run)",
+      "Skill(run:*)",
+      "Bash(node -e \"require.resolve\\('playwright'\\)\")",
+      "Bash(npx --no-install playwright --version)",
+      "Bash(npm ping *)",
+      "Bash(npm install *)"
     ]
   }
 }

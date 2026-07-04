@@ -4,9 +4,9 @@
     "description": "Recipes",
     "main": "index.js",
     "scripts": {
-    "build": "tsc",
-    "postbuild": "node scripts/validate-recipes.js",
-    "dev": "vite"
+        "build": "tsc",
+        "postbuild": "node scripts/validate-recipes.js",
+        "dev": "vite"
     },
     "repository": {
         "type": "git",
@@ -21,5 +21,8 @@
     "dependencies": {
         "typescript": "^5.9.3",
         "vite": "^8.0.14"
+    },
+    "devDependencies": {
+        "playwright": "^1.61.1"
     }
 }

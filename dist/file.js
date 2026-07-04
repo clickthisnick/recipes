@@ -181,6 +181,12 @@ export const Timer = {
         const seconds = unit === 's' ? amount : unit === 'm' ? amount * 60 : amount * 3600;
         return createStep({ type: 'timer', text: label, durationSeconds: seconds, ...opts });
     },
+    // Asks `question` immediately. "No" cooks for `retryAmount retryUnit` (with an alarm at
+    // the end) and re-asks; "Yes" completes the step. Loops until answered "Yes".
+    gate: (question, retryAmount, retryUnit, opts = {}) => {
+        const seconds = retryUnit === 's' ? retryAmount : retryUnit === 'm' ? retryAmount * 60 : retryAmount * 3600;
+        return createStep({ type: 'gate', text: question, durationSeconds: seconds, ...opts });
+    },
 };
 export function cleanup(equipmentName) {
     return createStep({
@@ -405,7 +411,7 @@ function findLastStepIndexForIngredient(steps, targetIng) {
     for (let i = 0; i < steps.length; i++) {
         const step = steps[i];
         const isContainerOrTimer = (step.type === 'instruction' && step.children && step.children.length > 0) ||
-            step.type === 'timer';
+            step.type === 'timer' || step.type === 'gate';
         if (isContainerOrTimer) {
             for (const ing of (step.ingredients ?? [])) {
                 if (ing === targetIng) {
@@ -504,7 +510,7 @@ function recipeCookSeconds(recipe) {
     }
     let totalTime = 0;
     for (const step of recipe.steps) {
-        if (step.type !== 'timer')
+        if (step.type !== 'timer' && step.type !== 'gate')
             continue;
         const keys = claimKeysForStep(step);
         const startAt = keys.reduce((m, k) => Math.max(m, releaseAt.get(k) ?? 0), 0);
@@ -564,7 +570,7 @@ function buildCookingPlan(recipes) {
             waitFor.add(id);
         if (waitFor.size > 0)
             step.waitForIds = [...waitFor];
-        if (step.type === 'timer' || (step.waitForIds && step.waitForIds.length > 0))
+        if (step.type === 'timer' || step.type === 'gate' || (step.waitForIds && step.waitForIds.length > 0))
             setClaims(step);
     }
     return steps;
@@ -1885,6 +1891,29 @@ function renderStep(step, onDone) {
         applyLock(panel, step);
         return panel;
     }
+    if (step.type === 'gate') {
+        let clickCount = 0;
+        let clickTimer = 0;
+        panel.addEventListener('click', () => {
+            if (panel.classList.contains('step-locked'))
+                return;
+            if (panel.classList.contains('completed') || panel.classList.contains('skipped'))
+                return;
+            if (!state.timers.has(step.id))
+                return; // awaiting a Yes/No answer, not a countdown
+            clickCount++;
+            window.clearTimeout(clickTimer);
+            if (clickCount >= 3) {
+                clickCount = 0;
+                skipGateRetryTimer(step, panel, onDone);
+                return;
+            }
+            clickTimer = window.setTimeout(() => { clickCount = 0; }, 600);
+        });
+        applyLock(panel, step);
+        renderGateQuestion(step, panel, onDone);
+        return panel;
+    }
     if (step.type === 'info') {
         panel.textContent = '';
         panel.className = 'panel info-step info-step-collapsed';
@@ -1994,6 +2023,71 @@ function startTimer(step, panel, onDone) {
         }
     }, 1000);
     state.timers.set(step.id, intervalId);
+}
+// ============================================================
+// GATE (check-then-loop) STEPS
+// ============================================================
+function renderGateQuestion(step, panel, onDone) {
+    panel.classList.remove('timer');
+    panel.textContent = '';
+    const question = document.createElement('div');
+    question.className = 'gate-question';
+    question.textContent = step.text;
+    panel.appendChild(question);
+    const buttonRow = document.createElement('div');
+    buttonRow.className = 'gate-button-row';
+    const yesBtn = document.createElement('button');
+    yesBtn.type = 'button';
+    yesBtn.className = 'gate-yes-btn';
+    yesBtn.textContent = 'Yes';
+    yesBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (panel.classList.contains('step-locked'))
+            return;
+        completeTimer(step, panel, onDone);
+    });
+    const noBtn = document.createElement('button');
+    noBtn.type = 'button';
+    noBtn.className = 'gate-no-btn';
+    noBtn.textContent = 'No';
+    noBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (panel.classList.contains('step-locked'))
+            return;
+        startGateRetryTimer(step, panel, onDone);
+    });
+    buttonRow.appendChild(yesBtn);
+    buttonRow.appendChild(noBtn);
+    panel.appendChild(buttonRow);
+}
+function startGateRetryTimer(step, panel, onDone) {
+    if (!step.durationSeconds || state.timers.has(step.id))
+        return;
+    let remaining = step.durationSeconds;
+    panel.textContent = '';
+    panel.classList.add('timer');
+    const intervalId = window.setInterval(() => {
+        const mm = String(Math.floor(remaining / 60)).padStart(2, '0');
+        const ss = String(remaining % 60).padStart(2, '0');
+        panel.textContent = `${mm}:${ss} cooking more — tap 3× to skip`;
+        remaining--;
+        if (remaining < 0) {
+            window.clearInterval(intervalId);
+            state.timers.delete(step.id);
+            playSound();
+            renderGateQuestion(step, panel, onDone);
+        }
+    }, 1000);
+    state.timers.set(step.id, intervalId);
+}
+function skipGateRetryTimer(step, panel, onDone) {
+    const intervalId = state.timers.get(step.id);
+    if (intervalId !== undefined) {
+        window.clearInterval(intervalId);
+        state.timers.delete(step.id);
+    }
+    panel.classList.remove('timer');
+    renderGateQuestion(step, panel, onDone);
 }
 // ============================================================
 // AUDIO
@@ -2597,6 +2691,15 @@ h2 { margin-top: 0; font-size: 28px; }
 .panel.timer .timer-duration-badge { display: none; }
 .panel.completed { background: #1a5c2a; color: white; border-color: #2d9e4a; }
 .panel.skipped   { background: #374151; color: #9ca3af; border-color: #4b5563; text-decoration: line-through; }
+
+.gate-question { margin-bottom: 14px; }
+.gate-button-row { display: flex; gap: 12px; }
+.gate-yes-btn, .gate-no-btn {
+    flex: 1; font-size: 20px; padding: 14px; border-radius: 10px; border: 2px solid;
+    cursor: pointer; font-weight: 600;
+}
+.gate-yes-btn { background: #1a5c2a; border-color: #2d9e4a; color: white; }
+.gate-no-btn  { background: #7f1d1d; border-color: #ef4444; color: white; }
 
 .panel.step-locked { opacity: 0.45; cursor: not-allowed; border-color: #333; border-left: 4px solid #ef4444; border-left-color: #ef4444; }
 
@@ -3513,13 +3616,14 @@ registerGroup('Dinner', [
         s(seasoningBowl.mix());
         s(instruction(`Season ${THIGHS.name} on both sides with seasoning mixture`, { ingredients: [THIGHS] }));
         s(pan.preheat(350));
-        s(pan.add([i.avocadoOil(1, u.spray)]));
-        s(pan.add([THIGHS], 'smooth side down'));
+        s(pan.add([
+            i.avocadoOil(1, u.spray),
+            [THIGHS, 'smooth side down'],
+        ]));
         s(pan.cook('Cook first side — do not move', time.minutes(8), 350));
         s(pan.flip());
         s(pan.cook('Cook second side', time.minutes(8), 350));
-        s(instruction('Check internal temperature in the thickest thigh — target 175–180°F', { ingredients: [THIGHS], equipment: [pan.name] }));
-        s(instruction('If 170–174°F, cook another 1–2 minutes and recheck', { equipment: [pan.name], ingredients: [THIGHS] }));
+        s(Timer.gate('Is the thickest thigh at least 175°F?', 2, 'm', { ingredients: [THIGHS], equipment: [pan.name] }));
         s(Timer.set(5, 'm', `Rest ${THIGHS.name} before eating`, { ingredients: [THIGHS], equipment: [pan.name] }));
         return steps;
     })()),
