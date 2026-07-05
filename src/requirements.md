@@ -55,8 +55,8 @@ A reference screen — separate from cooking, since nutrition data is something 
 │  partial-cost note (amber, if applicable)
 │  coverage line (amber if anything flagged)
 ├─────────────────────────────────────────┤
-│  ▸ Recipe A  −/+ ○  $X.XX · subtotal   │   ← tap header to expand; ○ = eaten toggle
-│  ▾ Recipe B  −/+ ✓  $X.XX · subtotal   │   ← ✓ = marked eaten (green border)
+│  ▸ Recipe A  −/+ ✓  $X.XX · subtotal   │   ← tap header to expand; ✓ = counted (default)
+│  ▾ Recipe B  −/+ ○  $X.XX · subtotal   │   ← ○ = deselected (dimmed, excluded from totals)
 │    − Ingredient — X cal … · $X.XX      │   ← − = exclude from totals
 │    + Ingredient — excluded              │   ← + = re-include (row dimmed)
 │    − Ingredient — ⚠ no nutrition data  │
@@ -66,14 +66,14 @@ A reference screen — separate from cooking, since nutrition data is something 
 └─────────────────────────────────────────┘
 ```
 
-- **Grand total** — a card at the top sums every selected recipe, scaled by each recipe's serving count, accounting for any excluded ingredients. Title varies by selection shape:
+- **Grand total** — a card at the top sums every selected recipe that hasn't been deselected, scaled by each recipe's serving count, accounting for any excluded ingredients within it. Title varies by selection shape:
   - 1 recipe × 1 serving → the recipe's name
   - 1 recipe × N servings (N > 1) → `Recipe Name ×N`
-  - Multiple recipes → `All selected recipes (N servings)` where N is the total servings across all recipes
-- **Per recipe** — each recipe is a collapsible section showing its subtotal (scaled by serving count, minus excluded ingredients) in the header; the header name shows `×N` when N > 1. Tapping the header toggles its ingredient breakdown (collapsed by default; a `▸`/`▾` caret reflects state). Expanded/collapsed state persists across re-renders (e.g. when toggling ingredient exclusions) so the section doesn't snap shut. Each recipe header also has:
+  - Multiple recipes → `All selected recipes (N servings)` where N is the total servings across all selected recipes (this count is not affected by deselection)
+- **Per recipe** — each recipe is a collapsible section showing its own subtotal (scaled by serving count, minus excluded ingredients) in the header; the header name shows `×N` when N > 1. Tapping the header toggles its ingredient breakdown (collapsed by default; a `▸`/`▾` caret reflects state). Expanded/collapsed state persists across re-renders (e.g. when toggling ingredient exclusions) so the section doesn't snap shut. Each recipe header also has:
   - Inline `−` / `+` serving controls so servings can be adjusted without leaving the screen
-  - An **eaten toggle** button (`○` / `✓`) to mark the recipe as consumed for the day. When marked, the section border and recipe name turn green. This is a visual to-do indicator only — it does not affect nutrition totals
-- **Per ingredient** — each ingredient row inside an expanded section shows a `−` / `+` toggle button, the ingredient name, and its computed nutrition contribution with cost appended, or appropriate flags (see below). Tapping `−` **excludes** the ingredient: its contribution is zeroed from the section subtotal and grand total, the row dims to 40% opacity, and the value becomes `— excluded`. Tapping `+` re-includes it. The ingredient always remains in the list (never disappears). Exclusions persist across re-renders but clear on Start Over.
+  - A **selection toggle** button (`○` / `✓`) — every recipe is selected (`✓`, counted) by default. Tapping it deselects the recipe (`○`): the section dims to 50% opacity and its nutrition/cost is subtracted from the grand total and Daily Targets "Eaten" column. The recipe stays visible and its own subtotal keeps showing what it would contribute — only the grand total changes. Deselecting a recipe does not touch its per-ingredient exclusions underneath. Selections persist across re-renders but clear (back to all-selected) on Start Over
+- **Per ingredient** — each ingredient row inside an expanded section shows a `−` / `+` toggle button, the ingredient name, and its computed nutrition contribution with cost appended, or appropriate flags (see below). Tapping `−` **excludes** the ingredient: its contribution is zeroed from the section subtotal and grand total, the row dims to 40% opacity, and the value becomes `— excluded`. Tapping `+` re-includes it. The ingredient always remains in the list (never disappears). This works whether or not the parent recipe is selected — think of it as two independent layers: recipe-level selection gates the whole recipe's contribution, ingredient-level exclusion further trims what counts within a selected recipe. Exclusions persist across re-renders but clear on Start Over.
 - Totals shown are calories, fat (g), saturated fat (g), trans fat (g), cholesterol (mg), carbs (g), sodium (mg), sugar (g), fiber (g), and protein (g), rounded to whole numbers. Cost is shown as `$X.XX` to two decimal places
 - If a recipe (or the grand total) has **no** computable ingredients, the value line shows `— no computable data` instead of a row of zeros
 - A "Start Over" button at the bottom resets everything. If no recipes are selected, the screen shows an empty message and the Start Over button
@@ -622,8 +622,9 @@ Key visual states:
 - Waiting zone (`#waiting-section`): top border + muted label; hidden when empty; completed/skipped panels are pinned and never jumped over by promoted panels
 - Action bar: three buttons — Go Shopping (blue), Nutrition (purple), Start Cooking (green)
 - Nutrition grand-total card: dark inset card, muted uppercase title; cost prepended when available
-- Nutrition recipe section: collapsible, `▸`/`▾` caret, cost + subtotal on the right of the header; eaten toggle (`○`/`✓`) between serving controls and subtotal
-- Nutrition eaten state: green border + green recipe name; `✓` button filled green
+- Nutrition recipe section: collapsible, `▸`/`▾` caret, cost + subtotal on the right of the header; selection toggle (`○`/`✓`) between serving controls and subtotal
+- Nutrition selected state (default): green border + green recipe name; `✓` button filled green
+- Nutrition deselected recipe: whole section dimmed to 50% opacity; `○` button; excluded from the grand total
 - Nutrition ingredient row: `−`/`+` toggle button on the left, then ingredient name, then `X cal · … · $X.XX` when both nutrition and cost are ok; cost flag sub-line (`⚠ no price data`) when nutrition ok but cost missing
 - Nutrition excluded ingredient: row dimmed to 40% opacity; value shows `— excluded`; toggle shows `+`
 - Nutrition flag pill: amber pill (`⚠ no nutrition data` / `⚠ can't compute`); coverage line turns amber whenever anything is flagged; uncomputable rows show an italic amber reason line beneath
@@ -674,8 +675,11 @@ All produce and condiment ingredients used in the Asian Dense Bean Salad are reg
 
 Chickpeas and cannellini beans both include a `cup → oz` conversion (≈8.93 oz/cup) so cost can be computed against their 13.4 oz packages. Edamame uses `cup → oz` at 5.3 oz/cup.
 
-### Asian Dense Bean Salad — Kit Version
-Recipe `asian-dense-bean-salad-kit` is a shortcut version of the full from-scratch salad. It uses the **365 Organic Asian Inspired Salad Kit** (12 oz, $5.99 — pre-shredded cabbage, carrots, green onion, almonds, and sesame dressing) as the base, then adds 1 cup each of chickpeas, cannellini beans, and edamame. The result is nutritionally similar to the scratch version with far less prep. This recipe is included in the Daily Blueprint bundle.
+### Asian Dense Bean Salad — variants
+Three registered recipes cover this dish:
+- `asian-dense-bean-salad-original` ("Original Blueprint Version") — the full from-scratch recipe: soak chickpeas/cannellini overnight, peel and shred carrots, shred cabbage, and mix a homemade miso-sesame dressing.
+- `asian-dense-bean-salad` ("Asian Dense Bean Salad") — the simplified default: pre-shredded carrots + Coleslaw Mix (store-bought cabbage/carrot blend) + chopped scallions + canned beans, dressed with 2 tbsp of a store-bought Creamy Sesame Dressing instead of a homemade one. **This is the recipe included in the Daily Blueprint bundle.**
+- `asian-dense-bean-salad-kit` ("Asian Dense Bean Salad (Kit Version)") — uses the **365 Organic Asian Inspired Salad Kit** (12 oz, $5.99 — pre-shredded cabbage, carrots, green onion, almonds, and sesame dressing) as the base, then adds 1 cup each of chickpeas, cannellini beans, and edamame.
 
 ---
 

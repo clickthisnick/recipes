@@ -47,7 +47,8 @@ const state = {
 };
 const macroTargets = { calories: 2550, protein: 147, fat: 114, saturatedFat: 20, transFat: 0, carbs: 234, sodium: 2300, fiber: 38 };
 const nutritionExclusions = new Map();
-const eatenRecipeIds = new Set();
+// Recipes explicitly deselected from nutrition totals. Absence = counted (selected by default).
+const nutritionRecipeExclusions = new Set();
 const nutritionExpanded = new Set();
 function getNutritionExcluded(recipeId) {
     if (!nutritionExclusions.has(recipeId))
@@ -1246,8 +1247,9 @@ function renderNutritionScreen() {
         return { recipe, servings, nutrition, excluded, effTotals, effCost };
     });
     // ── Grand total ──────────────────────────────────────────
-    const grand = perRecipeEff.reduce((acc, p) => addTotals(acc, scaleTotals(p.effTotals, p.servings)), emptyTotals());
-    const grandCost = perRecipeEff.reduce((acc, p) => acc + p.effCost * p.servings, 0);
+    // Deselected recipes (nutritionRecipeExclusions) contribute nothing to the grand total.
+    const grand = perRecipeEff.reduce((acc, p) => nutritionRecipeExclusions.has(p.recipe.id) ? acc : addTotals(acc, scaleTotals(p.effTotals, p.servings)), emptyTotals());
+    const grandCost = perRecipeEff.reduce((acc, p) => nutritionRecipeExclusions.has(p.recipe.id) ? acc : acc + p.effCost * p.servings, 0);
     const gCovered = perRecipe.reduce((a, p) => a + p.nutrition.covered, 0);
     const gFlagged = perRecipe.reduce((a, p) => a + p.nutrition.missing + p.nutrition.uncomputable, 0);
     const gTotal = perRecipe.reduce((a, p) => a + p.nutrition.total, 0);
@@ -1304,7 +1306,9 @@ function renderNutritionScreen() {
     perRecipeEff.forEach(({ recipe, servings, nutrition, excluded, effTotals, effCost }) => {
         const section = createPanel();
         section.className = 'panel nutrition-recipe';
-        if (eatenRecipeIds.has(recipe.id))
+        if (nutritionRecipeExclusions.has(recipe.id))
+            section.classList.add('nutrition-recipe-excluded');
+        else
             section.classList.add('nutrition-recipe-eaten');
         const flaggedCount = nutrition.missing + nutrition.uncomputable;
         const sectionTotals = scaleTotals(effTotals, servings);
@@ -1355,16 +1359,17 @@ function renderNutritionScreen() {
         servingControls.appendChild(minusBtn);
         servingControls.appendChild(countLabel);
         servingControls.appendChild(plusBtn);
+        const isRecipeExcluded = nutritionRecipeExclusions.has(recipe.id);
         const eatenBtn = document.createElement('button');
         eatenBtn.className = 'nutrition-eaten-btn';
-        eatenBtn.textContent = eatenRecipeIds.has(recipe.id) ? '✓' : '○';
-        eatenBtn.title = eatenRecipeIds.has(recipe.id) ? 'Mark as not eaten' : 'Mark as eaten';
+        eatenBtn.textContent = isRecipeExcluded ? '○' : '✓';
+        eatenBtn.title = isRecipeExcluded ? 'Include in totals' : 'Exclude from totals';
         eatenBtn.addEventListener('click', (ev) => {
             ev.stopPropagation();
-            if (eatenRecipeIds.has(recipe.id))
-                eatenRecipeIds.delete(recipe.id);
+            if (isRecipeExcluded)
+                nutritionRecipeExclusions.delete(recipe.id);
             else
-                eatenRecipeIds.add(recipe.id);
+                nutritionRecipeExclusions.add(recipe.id);
             renderNutritionScreen();
         });
         header.appendChild(caret);
@@ -1985,7 +1990,7 @@ function createStartOverButton() {
         state.cookingStartedAt = null;
         state.audioUnlocked = false;
         nutritionExclusions.clear();
-        eatenRecipeIds.clear();
+        nutritionRecipeExclusions.clear();
         nutritionExpanded.clear();
         for (const [id, recipe] of state.recipes) {
             if (recipe.adhoc)
@@ -2810,6 +2815,7 @@ h2 { margin-top: 0; font-size: 28px; }
 .nutrition-provenance { flex-basis: 100%; font-size: 12px; color: #666; font-style: italic; margin-top: 2px; }
 .nutrition-recipe-eaten { border-color: #2d9e4a; }
 .nutrition-recipe-eaten .nutrition-recipe-name { color: #2d9e4a; }
+.nutrition-recipe-excluded { opacity: 0.5; }
 .nutrition-eaten-btn { background: none; border: 1px solid #555; color: #888; border-radius: 50%; width: 26px; height: 26px; font-size: 13px; cursor: pointer; flex-shrink: 0; padding: 0; line-height: 1; }
 .nutrition-eaten-btn:hover { border-color: #2d9e4a; color: #2d9e4a; }
 .nutrition-recipe-eaten .nutrition-eaten-btn { background: #2d9e4a; border-color: #2d9e4a; color: white; }
@@ -3009,13 +3015,21 @@ export const i = {
         },
     }),
     coleslawMix: ingredientFactory('Coleslaw Mix', {
-        // Green cabbage, red cabbage, and carrots — no nutrition facts panel captured yet
+        // Green cabbage, red cabbage, and carrots
         defaultBrand: '365',
         products: [{
                 brand: '365', variant: 'Organic (12 oz)', store: stores.wholeFoods,
                 price: 3.49, size: 12, sizeUnit: u.ounce,
                 link: 'https://www.amazon.com/dp/B07FWN3244',
             }],
+        nutrition: {
+            // Label: ~4 servings per bag, serving size 1 cup (85g)
+            [u.cup.name]: { servings: 4, servingSize: 1, calories: 25, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 6, sodium: 30, sugar: 3, protein: 1, fiber: 2 },
+        },
+        conversions: {
+            // 12 oz bag / 4 servings = 3 oz per cup serving (matches label's 85g ≈ 3 oz)
+            [u.cup.name]: { to: u.ounce, factor: 3 },
+        },
     }),
     greenOnion: ingredientFactory('Green Onion', {
         defaultBrand: 'Whole Foods Market',
@@ -3065,13 +3079,16 @@ export const i = {
         },
     }),
     creamySesameDressing: ingredientFactory('Creamy Sesame Salad Dressing', {
-        // No nutrition facts panel captured yet
         defaultBrand: 'SideDish',
         products: [{
                 brand: 'SideDish', variant: 'Creamy Sesame (8 fl oz)', store: stores.wholeFoods,
                 price: 6.53, size: 8, sizeUnit: u.fluidOunce,
                 link: 'https://www.amazon.com/dp/B0CR56SHBK',
             }],
+        nutrition: {
+            // Label: ~7 servings per container, serving size 2 tbsp (30g)
+            [u.tbsp.name]: { servings: 7, servingSize: 2, calories: 100, fat: 7, saturatedFat: 1, transFat: 0, cholesterol: 0, carbs: 9, sodium: 330, sugar: 6, protein: 2, fiber: 1 },
+        },
     }),
     chickpeas: ingredientFactory('Chickpeas (Garbanzo Beans)', {
         defaultBrand: '365',
@@ -3131,6 +3148,10 @@ export const i = {
                 brand: 'Blueprint', variant: 'Raw', store: stores.amazon,
                 link: 'https://www.amazon.com/Blueprint-Bryan-Johnson-Macadamia-Nuts/dp/B0DNGJFBS1',
                 price: 12, size: 4, sizeUnit: u.ounce, organic: false,
+                nutrition: {
+                    // Label: 1 oz (28g) serving = 210 cal etc; scaled ×4 to a per-cup value (1 cup ≈ 4 oz, per the ingredient's conversion factor above)
+                    [u.cup.name]: { servings: 1, servingSize: 1, calories: 840, fat: 88, saturatedFat: 16, transFat: 0, cholesterol: 0, carbs: 16, sodium: 8, sugar: 4, protein: 8, fiber: 12 },
+                },
             },
         ],
     }),
@@ -3671,14 +3692,15 @@ registerGroup('Dinner', [
     createRecipe('asian-dense-bean-salad', 'Asian Dense Bean Salad', (() => {
         const saladBowl = e.bowl('salad bowl');
         const CARROTS = i.carrot(1, u.cup);
-        const CABBAGE = i.cabbage(2, u.cup);
+        const COLESLAW_MIX = i.coleslawMix(2, u.cup);
         const CHICKPEAS = i.chickpeas(1, u.cup);
         const CANNELLINI = i.cannelliniBean(1, u.cup);
         const steps = [];
         const s = (...newSteps) => steps.push(...newSteps);
+        s(Timer.set(80, 's', 'If eating right away and edamame is frozen: microwave edamame'));
         const addProduce = saladBowl.add([
             [CARROTS, 'pre-shredded'],
-            [CABBAGE, 'pre-shredded'],
+            COLESLAW_MIX,
             [i.greenOnion(2, u.unit), 'chopped'],
             CHICKPEAS,
             CANNELLINI,
@@ -3836,7 +3858,7 @@ registerBundle({
         'ing-macadamia-bar',
         'ing-psyllium-husk',
         'protein-nutmix-oliveoil',
-        'asian-dense-bean-salad-kit',
+        'asian-dense-bean-salad',
     ],
 });
 // ============================================================
