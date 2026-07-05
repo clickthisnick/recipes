@@ -11,7 +11,9 @@
       "Bash(node -e \"require.resolve\\('playwright'\\)\")",
       "Bash(npx --no-install playwright --version)",
       "Bash(npm ping *)",
-      "Bash(npm install *)"
+      "Bash(npm install *)",
+      "Bash(git -C /home/mypi/Documents/recipes diff --stat)",
+      "Bash(git -C /home/mypi/Documents/recipes log --oneline -1 -- dist/file.js)"
     ]
   }
 }

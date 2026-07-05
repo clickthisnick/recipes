@@ -221,7 +221,7 @@ Both the Select and Cooking screens display a link icon (🔗) next to each reci
 - **Timer** — tap once to start countdown, tap 3× rapidly to skip. Shows MM:SS countdown while running. On completion plays a sound and marks the card green with a timestamp. On skip marks it grey with strikethrough and timestamp. **Before being tapped**, a small amber duration badge is shown on the right of the card (e.g. `15m`, `1h 30m`, `45s`) so the user can see how long the timer will run before starting it. The badge is hidden once the countdown begins.
 - **Container** — a step with child ingredient steps nested inside it. The header shows the action (e.g. "Add to batter bowl"). Each child is its own tappable row. When all children are dismissed the container disappears.
 - **Info** — a non-interactive, collapsible notes panel. Rendered as a dark card with a `▸ Notes` header; collapsed by default. Tapping the header expands/collapses the content. Not part of the cooking flow — no tap-to-complete, no locking, no dependency claims. Use for static contextual notes (e.g. yield ratios like "65g dry → 165g cooked"). Also shown in the Prep screen above the recipe's prep steps.
-- **Gate** — a check-then-loop step for things like "cook until it hits temperature X" where a fixed cook time can't be predicted up front. Created with `Timer.gate(question, retryAmount, retryUnit, opts)`. Immediately shows the question with Yes/No buttons (no countdown). "Yes" completes the step like a timer (green, timestamped). "No" starts a `retryAmount retryUnit` countdown (tap 3× to skip, same as Timer); on completion it plays the alarm sound and re-asks the same question — looping until answered "Yes". Claims its equipment/ingredients like a Timer step for locking purposes.
+- **Gate** — a check-then-loop step for things like "cook until it hits temperature X" where a fixed cook time can't be predicted up front. Created with `Timer.gate(question, retryAmount, retryUnit, opts)`. Immediately shows the question with Yes/No buttons (no countdown). "Yes" completes the step like a timer (green, timestamped). "No" starts a `retryAmount retryUnit` countdown (tap 3× to skip, same as Timer); on completion it plays the alarm sound and re-asks the same question — looping until answered "Yes". Claims its equipment/ingredients like a Timer step for locking purposes. Each time a retry countdown starts, a per-step run counter increments; once it's ≥ 1, the re-asked question shows a muted `Checked N×` line beneath it so the user can see how many times the check has looped. The final "Yes"-completed card also carries the count, e.g. `✓ {question} — completed at 4:32 PM (checked 2×)`, omitted if it was answered "Yes" on the first ask. The counter resets on Start Over.
 
 ---
 
@@ -588,7 +588,7 @@ Bulk-declares ingredients with no metadata. Auto-derives display names from came
 ---
 
 ## Units
-Supported: none, cup, tbsp, tsp, ounce, pound, fl oz, unit, handful, spray, bag.
+Supported: none, cup, tbsp, tsp, ounce, pound, fl oz, unit, handful, spray, bag, bunch, gram, shot.
 
 Quantities are formatted with unicode fractions (¼, ½, ¾, etc.) where applicable.
 

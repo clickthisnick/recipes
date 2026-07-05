@@ -153,6 +153,7 @@ const state = {
     bundles:           new Map<string, RecipeBundle>(),
     selectedRecipeIds: [] as string[],
     timers:            new Map<number, number>(),
+    gateRunCounts:     new Map<number, number>(),
     screen:            'select' as Screen,
     searchQuery:       '',
     cookingPlanSteps:  [] as Step[],
@@ -204,6 +205,7 @@ export const u = {
     handful:    { name: 'handful' },
     spray:      { name: 'spray' },
     bag:        { name: 'bag' },
+    bunch:      { name: 'bunch', plural: 'bunches' },
     gram:       { name: 'g', plural: 'g' },
     shot:       { name: 'shot', plural: 'shots' },
 
@@ -2301,7 +2303,9 @@ function completeTimer(step: Step, panel: HTMLElement, onDone?: () => void): voi
     panel.classList.remove('timer');
     panel.classList.add('completed');
     const completedAt = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    panel.textContent = `✓ ${step.text} — completed at ${completedAt}`;
+    const runCount = state.gateRunCounts.get(step.id) ?? 0;
+    const checkedSuffix = runCount > 0 ? ` (checked ${runCount}×)` : '';
+    panel.textContent = `✓ ${step.text} — completed at ${completedAt}${checkedSuffix}`;
     onDone?.();
 }
 
@@ -2323,6 +2327,7 @@ function createStartOverButton(): HTMLButtonElement {
     const btn = createButton('↩ Start Over', () => {
         state.timers.forEach((id) => window.clearInterval(id));
         state.timers.clear();
+        state.gateRunCounts.clear();
         state.selectedRecipeIds = [];
         state.cookingPlanSteps  = [];
         state.searchQuery       = '';
@@ -2389,6 +2394,14 @@ function renderGateQuestion(step: Step, panel: HTMLElement, onDone?: () => void)
     question.textContent = step.text;
     panel.appendChild(question);
 
+    const runCount = state.gateRunCounts.get(step.id) ?? 0;
+    if (runCount > 0) {
+        const runCountLabel = document.createElement('div');
+        runCountLabel.className   = 'gate-run-count';
+        runCountLabel.textContent = `Checked ${runCount}×`;
+        panel.appendChild(runCountLabel);
+    }
+
     const buttonRow = document.createElement('div');
     buttonRow.className = 'gate-button-row';
 
@@ -2419,6 +2432,7 @@ function renderGateQuestion(step: Step, panel: HTMLElement, onDone?: () => void)
 
 function startGateRetryTimer(step: Step, panel: HTMLElement, onDone?: () => void): void {
     if (!step.durationSeconds || state.timers.has(step.id)) return;
+    state.gateRunCounts.set(step.id, (state.gateRunCounts.get(step.id) ?? 0) + 1);
     let remaining = step.durationSeconds;
     panel.textContent = '';
     panel.classList.add('timer');
@@ -3090,6 +3104,7 @@ h2 { margin-top: 0; font-size: 28px; }
 .panel.skipped   { background: #374151; color: #9ca3af; border-color: #4b5563; text-decoration: line-through; }
 
 .gate-question { margin-bottom: 14px; }
+.gate-run-count { margin: -8px 0 14px; font-size: 13px; opacity: 0.75; }
 .gate-button-row { display: flex; gap: 12px; }
 .gate-yes-btn, .gate-no-btn {
     flex: 1; font-size: 20px; padding: 14px; border-radius: 10px; border: 2px solid;
@@ -3375,6 +3390,12 @@ export const i = {
     }),
 
     carrot: ingredientFactory('Carrots', {
+        defaultBrand: '365',
+        products: [{
+            brand: '365', variant: 'Organic Shredded (10 oz)', store: stores.wholeFoods,
+            price: 2.99, size: 10, sizeUnit: u.ounce,
+            link: 'https://www.amazon.com/dp/B078J1FS9V',
+        }],
         nutrition: {
             [u.cup.name]:  { servings: 1, servingSize: 1, calories: 52,  fat: 0,    saturatedFat: 0,   transFat: 0, cholesterol: 0, carbs: 12, sodium: 88, sugar: 6, protein: 1,   fiber: 3   },
         },
@@ -3404,9 +3425,28 @@ export const i = {
         },
     }),
 
+    coleslawMix: ingredientFactory('Coleslaw Mix', {
+        // Green cabbage, red cabbage, and carrots — no nutrition facts panel captured yet
+        defaultBrand: '365',
+        products: [{
+            brand: '365', variant: 'Organic (12 oz)', store: stores.wholeFoods,
+            price: 3.49, size: 12, sizeUnit: u.ounce,
+            link: 'https://www.amazon.com/dp/B07FWN3244',
+        }],
+    }),
+
     greenOnion: ingredientFactory('Green Onion', {
+        defaultBrand: 'Whole Foods Market',
+        products: [{
+            brand: 'Whole Foods Market', variant: 'Organic Scallions (1 Bunch)', store: stores.wholeFoods,
+            price: 1.99, size: 1, sizeUnit: u.bunch,
+            link: 'https://www.amazon.com/dp/B07883LXVL',
+        }],
         nutrition: {
             [u.unit.name]: { servings: 1, servingSize: 1, calories: 5, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 1, sodium: 5, sugar: 0, protein: 0, fiber: 0 },
+        },
+        conversions: {
+            [u.unit.name]: { to: u.bunch, factor: 1 / 5 },  // 5 scallions per bunch
         },
     }),
 
@@ -3447,6 +3487,16 @@ export const i = {
         nutrition: {
             [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 4, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 1, sodium: 1, sugar: 0, protein: 0, fiber: 0 },
         },
+    }),
+
+    creamySesameDressing: ingredientFactory('Creamy Sesame Salad Dressing', {
+        // No nutrition facts panel captured yet
+        defaultBrand: 'SideDish',
+        products: [{
+            brand: 'SideDish', variant: 'Creamy Sesame (8 fl oz)', store: stores.wholeFoods,
+            price: 6.53, size: 8, sizeUnit: u.fluidOunce,
+            link: 'https://www.amazon.com/dp/B0CR56SHBK',
+        }],
     }),
 
     chickpeas: ingredientFactory('Chickpeas (Garbanzo Beans)', {
@@ -3597,11 +3647,31 @@ export const i = {
     }),
 
     spinach: ingredientFactory('Spinach', {
-        nutrition: { [u.handful.name]: { servings: 1, servingSize: 1, calories: 7, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 1, sodium: 24, sugar: 0.1, protein: 0.9, fiber: 1 } },
+        defaultBrand: '365',
+        products: [{
+            brand: '365', variant: 'Organic Whole Leaf (Frozen, 16 oz)', store: stores.wholeFoods,
+            price: 3.59, size: 16, sizeUnit: u.ounce,
+            link: 'https://www.amazon.com/dp/B074H5Y441',
+        }],
+        nutrition: { [u.ounce.name]: { servings: 1, servingSize: 1, calories: 7, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 1, sodium: 24, sugar: 0.1, protein: 0.9, fiber: 1 } },
+        conversions: {
+            // Package label: 1 cup (100g) per serving → 100g / 28.3495 g/oz ≈ 3.53 oz/cup
+            [u.cup.name]: { to: u.ounce, factor: 3.53 },
+        },
     }),
 
     kale: ingredientFactory('Kale', {
-        nutrition: { [u.handful.name]: { servings: 1, servingSize: 1, calories: 8, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 1.5, sodium: 11, sugar: 0.2, protein: 0.7, fiber: 1 } },
+        defaultBrand: '365',
+        products: [{
+            brand: '365', variant: 'Organic Chopped (Frozen, 16 oz)', store: stores.wholeFoods,
+            price: 3.59, size: 16, sizeUnit: u.ounce,
+            link: 'https://www.amazon.com/dp/B074H5Y3WB',
+        }],
+        nutrition: { [u.ounce.name]: { servings: 1, servingSize: 1, calories: 8, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 1.5, sodium: 11, sugar: 0.2, protein: 0.7, fiber: 1 } },
+        conversions: {
+            // Package label: 1⅓ cup (85g) per serving → 85g / 1.333 cup / 28.3495 g/oz ≈ 2.25 oz/cup
+            [u.cup.name]: { to: u.ounce, factor: 2.25 },
+        },
     }),
 
     banana: ingredientFactory('Organic Banana', {
@@ -3888,8 +3958,8 @@ registerGroup('Breakfast', [
         s(mixer.add([
             i.celery(1, u.unit),
             i.banana(1, u.unit),
-            i.kale(1, u.handful),
-            i.spinach(1, u.handful),
+            i.kale(0.5, u.cup),
+            i.spinach(0.25, u.cup),
         ]));
         s(Timer.set(30, 's', 'Let mixer settle'));
         s(mixer.mix());
@@ -4045,7 +4115,7 @@ registerGroup('Dinner', [
         return steps;
     })()), { planMinutes: 10, portable: false }),
 
-    createRecipe('asian-dense-bean-salad', 'Asian Dense Bean Salad', (() => {
+    createRecipe('asian-dense-bean-salad-original', 'Asian Dense Bean Salad (Original Blueprint Version)', (() => {
         const saladBowl = e.bowl('salad bowl');
         const dressBowl = e.bowl('dressing bowl');
         const ALMONDS   = i.almond(1, u.handful);
@@ -4084,6 +4154,31 @@ registerGroup('Dinner', [
         s(saladBowl.combine([dressBowl.result], 'pour dressing over salad, toss gently to coat').waitFor(dressingReady));
         s(instruction('Divide into bowls and top with chopped almonds', { ingredients: [ALMONDS] }));
         s(Timer.set(30, 'm', 'Optional: chill before serving'));
+
+        return steps;
+    })()),
+
+    createRecipe('asian-dense-bean-salad', 'Asian Dense Bean Salad', (() => {
+        const saladBowl = e.bowl('salad bowl');
+        const CARROTS   = i.carrot(1, u.cup);
+        const CABBAGE   = i.cabbage(2, u.cup);
+        const CHICKPEAS = i.chickpeas(1, u.cup);
+        const CANNELLINI = i.cannelliniBean(1, u.cup);
+        const steps: Step[] = [];
+        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+
+        const addProduce = saladBowl.add([
+            [CARROTS,                 'pre-shredded'],
+            [CABBAGE,                 'pre-shredded'],
+            [i.greenOnion(2, u.unit), 'chopped'],
+            CHICKPEAS,
+            CANNELLINI,
+            i.edamame(1, u.cup),
+        ]);
+        addProduce.prep = true;
+        s(addProduce);
+
+        s(saladBowl.add([i.creamySesameDressing(2, u.tbsp)], 'pour dressing over salad, toss gently to coat'));
 
         return steps;
     })()),
