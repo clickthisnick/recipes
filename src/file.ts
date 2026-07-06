@@ -3374,11 +3374,30 @@ export const i = {
         pomegranateSeeds: '', avocadoOil: '',
         abbotPeaItalianSausage: '', lentilSpaghetti: '', spaghettiSauce: '',
         pankoBreadCrumbs: '', salt: '', garlicPowder: '', cornstarch: '',
-        blackPepper: '', paprika: '',
+        paprika: '',
         cassavaFlour: '', kingOysterMushroom: '',
         whiteVinegar: '', bakingSoda: '',
         babyBellaMushroom: '', yellowOnion: '', oliveOil: '',
         rosemary: '', thyme: '',
+    }),
+
+    blackPepper: ingredientFactory('Black Pepper', {
+        defaultBrand: '365',
+        products: [{
+            brand: '365', variant: 'Organic Ground (1.8 oz)', store: stores.wholeFoods,
+            price: 4.29, size: 1.8, sizeUnit: u.ounce, organic: true,
+            link: 'https://www.amazon.com/dp/B074H6GRM7',
+        }, {
+            brand: '365', variant: 'Organic Ground (1.8 oz)', store: stores.amazon,
+            price: 4.69, size: 1.8, sizeUnit: u.ounce, organic: true,
+            discount: { subscribeAndSave: 4.46 },
+            link: 'https://www.amazon.com/dp/B075M4KPWW',
+        }, {
+            brand: 'Watkins', variant: 'Organic Ground (4 oz Tin)', store: stores.amazon,
+            price: 6.99, size: 4, sizeUnit: u.ounce, organic: true,
+            discount: { subscribeAndSave: 6.64 },
+            link: 'https://www.amazon.com/dp/B0B5YCWGST',
+        }],
     }),
 
     asianSaladKit: ingredientFactory('Asian Inspired Salad Kit', {
