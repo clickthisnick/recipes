@@ -172,7 +172,209 @@ for (let i = 0; i < lines.length; i++) {
 }
 flushIngredient(); // catch the last ingredient
 
+// ── Check 3 (warning-only): step text mentions equipment/ingredients it doesn't declare ──
+//
+// Heuristic, not exhaustive: scans the literal text passed to instruction()/prep()/info()/
+// Timer.set()/Timer.gate()/timerStep() calls for words that match a known equipment type or
+// ingredient name, then checks whether that step's `equipment:`/`ingredients:` options array
+// actually references it (by literal string, by an `X.name` where X is a var built from the
+// matching equipment factory, or by a var/inline call built from the matching ingredient
+// factory). Steps built via Equipment methods (.add(), .mix(), etc.) already populate these
+// arrays automatically and aren't scanned. False positives are expected — this never fails
+// the build.
+
+const warnings = [];
+
+function escapeRegex(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+// Equipment vocabulary: types declared in `export const e = { ... }`, plus any ad-hoc string
+// literals used directly in an `equipment: [...]` array (covers e.g. 'sheet pan', which isn't
+// backed by an Equipment instance).
+const equipmentWords = new Set();
+const factoryType = {};
+{
+    const eBlock = src.match(/export const e = \{([\s\S]*?)\n\};/);
+    if (eBlock) {
+        for (const m of eBlock[1].matchAll(/(\w+):\s*\([^)]*\)\s*=>\s*new (\w+)\((?:'([^']+)')?/g)) {
+            const type = (m[3] || (m[2] === 'NuwaveEquipment' ? 'Nuwave pan' : m[1])).toLowerCase();
+            factoryType[m[1]] = type;
+            equipmentWords.add(type);
+        }
+    }
+    for (const m of src.matchAll(/equipment:\s*\[([^\]]*)\]/g)) {
+        for (const lit of m[1].matchAll(/'([^']+)'/g)) equipmentWords.add(lit[1].toLowerCase());
+    }
+}
+
+// var name -> equipment type, from `const X = e.pot(...)` etc.
+const equipmentVarType = {};
+for (const m of src.matchAll(/const (\w+)\s*=\s*e\.(\w+)\(/g)) {
+    if (factoryType[m[2]]) equipmentVarType[m[1]] = factoryType[m[2]];
+}
+
+// Ingredient vocabulary: display names from `key: ingredientFactory('Display Name'`. For
+// multi-word names, also index the trailing noun alone (e.g. "lentils" for "Black Lentils")
+// since step text is often brief ("Cook lentils").
+const ingredientKeyByPhrase = new Map();
+for (const m of src.matchAll(/(\w+):\s*ingredientFactory\('([^']+)'/g)) {
+    const key = m[1];
+    const display = m[2].replace(/\s*\([^)]*\)/g, '').trim(); // strip parenthetical notes
+    const full = display.toLowerCase();
+    if (full.length >= 3 && !ingredientKeyByPhrase.has(full)) ingredientKeyByPhrase.set(full, key);
+    const words = full.split(/\s+/);
+    const last = words[words.length - 1];
+    if (words.length > 1 && last.length >= 4 && !ingredientKeyByPhrase.has(last)) {
+        ingredientKeyByPhrase.set(last, key);
+    }
+}
+
+// var name -> ingredient key, from `const X = i.someKey(...)`. Not scope-aware (global
+// approximation), but good enough for a best-effort lint check.
+const ingredientVarKey = {};
+for (const m of src.matchAll(/const (\w+)\s*=\s*i\.(\w+)\(/g)) {
+    ingredientVarKey[m[1]] = m[2];
+}
+
+const equipmentPhrases    = [...equipmentWords].sort((a, b) => b.length - a.length);
+const ingredientPhraseList = [...ingredientKeyByPhrase.keys()].sort((a, b) => b.length - a.length);
+
+// Returns matched phrases, masking each match before testing shorter phrases so e.g. "oven"
+// isn't separately reported when "toaster oven" already matched the same words.
+function matchPhrases(text, phrases) {
+    let masked = text;
+    const found = [];
+    for (const phrase of phrases) {
+        const re = new RegExp(`\\b${escapeRegex(phrase)}\\b`, 'i');
+        if (re.test(masked)) {
+            found.push(phrase);
+            masked = masked.replace(new RegExp(`\\b${escapeRegex(phrase)}\\b`, 'ig'), (s) => ' '.repeat(s.length));
+        }
+    }
+    return found;
+}
+
+// Splits a raw argument-list string on top-level commas (ignoring commas nested inside
+// (), [], {}, or string/template literals).
+function splitTopLevelArgs(str) {
+    const args = [];
+    let depth = 0;
+    let current = '';
+    for (let i = 0; i < str.length; i++) {
+        const ch = str[i];
+        if (ch === "'" || ch === '"' || ch === '`') {
+            const quote = ch;
+            current += ch;
+            i++;
+            while (i < str.length && str[i] !== quote) {
+                if (str[i] === '\\') { current += str[i]; i++; }
+                if (i < str.length) { current += str[i]; i++; }
+            }
+            if (i < str.length) current += str[i];
+            continue;
+        }
+        if (ch === '(' || ch === '[' || ch === '{') depth++;
+        else if (ch === ')' || ch === ']' || ch === '}') depth--;
+        if (ch === ',' && depth === 0) { args.push(current); current = ''; continue; }
+        current += ch;
+    }
+    if (current.trim().length) args.push(current);
+    return args.map(a => a.trim());
+}
+
+// Finds the matching closing ')' for the '(' at str[openIdx], skipping over parens inside
+// string/template literals.
+function readBalanced(str, openIdx) {
+    let depth = 0;
+    for (let i = openIdx; i < str.length; i++) {
+        const ch = str[i];
+        if (ch === "'" || ch === '"' || ch === '`') {
+            const quote = ch;
+            i++;
+            while (i < str.length && str[i] !== quote) {
+                if (str[i] === '\\') i++;
+                i++;
+            }
+            continue;
+        }
+        if (ch === '(') depth++;
+        else if (ch === ')') { depth--; if (depth === 0) return i; }
+    }
+    return -1;
+}
+
+function extractArray(optsStr, key) {
+    const m = optsStr.match(new RegExp(`${key}\\s*:\\s*\\[`));
+    if (!m) return '';
+    const start = m.index + m[0].length - 1; // index of '['
+    let depth = 0;
+    for (let i = start; i < optsStr.length; i++) {
+        if (optsStr[i] === '[') depth++;
+        else if (optsStr[i] === ']') { depth--; if (depth === 0) return optsStr.slice(start + 1, i); }
+    }
+    return '';
+}
+
+// Which positional argument holds the step's literal text, per factory function.
+const TEXT_ARG_INDEX = {
+    instruction: 0, prep: 0, prepOnly: 0, info: 0, timerStep: 0,
+    'Timer.set': 2, 'Timer.gate': 0,
+};
+
+const STEP_FACTORY_RE = /\b(instruction|prep|prepOnly|info|Timer\.set|Timer\.gate|timerStep)\(/g;
+
+let sm;
+while ((sm = STEP_FACTORY_RE.exec(src)) !== null) {
+    const callStart  = sm.index;
+    const openParen   = callStart + sm[0].length - 1;
+    const closeParen  = readBalanced(src, openParen);
+    if (closeParen === -1) continue;
+    const argsStr = src.slice(openParen + 1, closeParen);
+    const lineNum = src.slice(0, callStart).split('\n').length;
+
+    const args = splitTopLevelArgs(argsStr);
+    const idx  = TEXT_ARG_INDEX[sm[1]];
+    const rawTextArg = args[idx];
+    if (!rawTextArg) continue;
+
+    // Only handle a plain string or template literal — skips definition sites (e.g.
+    // `function instruction(text: string, ...)`) and steps with dynamic/variable text.
+    const literalMatch = rawTextArg.match(/^(?:'((?:[^'\\]|\\.)*)'|`((?:[^`\\]|\\.)*)`)$/);
+    if (!literalMatch) continue;
+    const text = (literalMatch[1] ?? literalMatch[2] ?? '').toLowerCase();
+    if (!text) continue;
+
+    const rest    = args.slice(idx + 1).join(', ');
+    const equipArr = extractArray(rest, 'equipment').toLowerCase();
+    const ingArr   = extractArray(rest, 'ingredients');
+
+    for (const phrase of matchPhrases(text, equipmentPhrases)) {
+        const coveredLiteral = equipArr.includes(`'${phrase}'`);
+        const coveredVar = Object.entries(equipmentVarType).some(
+            ([varName, type]) => type === phrase && new RegExp(`\\b${varName}\\.name\\b`).test(equipArr)
+        );
+        if (!coveredLiteral && !coveredVar) {
+            warnings.push(`line ${lineNum}: text mentions "${phrase}" but step doesn't declare it in \`equipment\``);
+        }
+    }
+
+    for (const phrase of matchPhrases(text, ingredientPhraseList)) {
+        const key = ingredientKeyByPhrase.get(phrase);
+        const coveredInline = new RegExp(`\\bi\\.${key}\\(`).test(ingArr);
+        const coveredVar = Object.entries(ingredientVarKey).some(
+            ([varName, k]) => k === key && new RegExp(`\\b${varName}\\b`).test(ingArr)
+        );
+        if (!coveredInline && !coveredVar) {
+            warnings.push(`line ${lineNum}: text mentions "${phrase}" but step doesn't declare it in \`ingredients\``);
+        }
+    }
+}
+
 // ── Report ────────────────────────────────────────────────────────────────────
+
+if (warnings.length > 0) {
+    console.warn('Recipe validation warnings (non-blocking):');
+    warnings.forEach(w => console.warn(`  ${w}`));
+}
 
 if (errors.length > 0) {
     console.error('Recipe validation failed:');
@@ -180,4 +382,7 @@ if (errors.length > 0) {
     process.exit(1);
 }
 
-console.log(`Recipe validation passed (${addCalls.length} add() calls, ${Object.keys(unitNameMap).length} units checked).`);
+console.log(
+    `Recipe validation passed (${addCalls.length} add() calls, ${Object.keys(unitNameMap).length} units checked)` +
+    `${warnings.length > 0 ? `, ${warnings.length} warning(s)` : ''}.`
+);
