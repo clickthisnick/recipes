@@ -153,6 +153,7 @@ const state = {
     bundles:           new Map<string, RecipeBundle>(),
     selectedRecipeIds: [] as string[],
     timers:            new Map<number, number>(),
+    ringingAlarms:     new Map<number, number>(),
     gateRunCounts:     new Map<number, number>(),
     screen:            'select' as Screen,
     searchQuery:       '',
@@ -553,6 +554,7 @@ export const e = {
     oven:         (label?: string) => new Equipment('oven',          label),
     toasterOven:  (label?: string) => new Equipment('toaster oven',  label),
     instantPot:   (label?: string) => new Equipment('instant pot',   label),
+    microwave:    (label?: string) => new Equipment('microwave',     label),
     bulletMixer:  (label?: string) => new Equipment('bullet mixer',  label),
     knife:        (label?: string) => new Equipment('knife',         label),
     cuttingBoard: (label?: string) => new Equipment('cutting board', label),
@@ -742,7 +744,7 @@ function buildCookingPlan(recipes: Recipe[]): Step[] {
         for (const id of (manualWaits.get(step.id) ?? [])) waitFor.add(id);
         for (const id of getBlockingIds(step)) waitFor.add(id);
         if (waitFor.size > 0) step.waitForIds = [...waitFor];
-        if (step.type === 'timer' || step.type === 'gate' || (step.waitForIds && step.waitForIds.length > 0)) setClaims(step);
+        setClaims(step);
     }
     return steps;
 }
@@ -2232,6 +2234,9 @@ function renderStep(step: Step, onDone?: () => void): HTMLElement {
         panel.addEventListener('click', () => {
             if (panel.classList.contains('step-locked')) return;
             if (panel.classList.contains('completed') || panel.classList.contains('skipped')) return;
+            // While ringing, the document-wide click listener (see startAlarm) handles
+            // dismissal — just make sure this handler doesn't restart the timer.
+            if (panel.classList.contains('ringing')) return;
             if (!state.timers.has(step.id)) { startTimer(step, panel, onDone); return; }
             clickCount++;
             window.clearTimeout(clickTimer);
@@ -2248,6 +2253,8 @@ function renderStep(step: Step, onDone?: () => void): HTMLElement {
         panel.addEventListener('click', () => {
             if (panel.classList.contains('step-locked')) return;
             if (panel.classList.contains('completed') || panel.classList.contains('skipped')) return;
+            // While ringing, the document-wide click listener (see startAlarm) handles dismissal.
+            if (panel.classList.contains('ringing')) return;
             if (!state.timers.has(step.id)) return; // awaiting a Yes/No answer, not a countdown
             clickCount++;
             window.clearTimeout(clickTimer);
@@ -2331,6 +2338,13 @@ function createStartOverButton(): HTMLButtonElement {
     const btn = createButton('↩ Start Over', () => {
         state.timers.forEach((id) => window.clearInterval(id));
         state.timers.clear();
+        state.ringingAlarms.forEach((id) => window.clearInterval(id));
+        state.ringingAlarms.clear();
+        activeAlarms.clear();
+        continuousRingSteps.clear();
+        audio.loop = false;
+        audio.pause();
+        audio.currentTime = 0;
         state.gateRunCounts.clear();
         state.selectedRecipeIds = [];
         state.cookingPlanSteps  = [];
@@ -2378,8 +2392,14 @@ function startTimer(step: Step, panel: HTMLElement, onDone?: () => void): void {
         if (remaining < 0) {
             window.clearInterval(intervalId);
             state.timers.delete(step.id);
-            completeTimer(step, panel, onDone);
-            playSound();
+            panel.classList.remove('timer');
+            if (panel.classList.contains('sound-check-btn')) {
+                // Quick sound test button — beep once and reset immediately, no alarm loop.
+                playSound();
+                completeTimer(step, panel, onDone);
+            } else {
+                startAlarm(step, panel, () => completeTimer(step, panel, onDone));
+            }
         }
     }, 1000);
     state.timers.set(step.id, intervalId);
@@ -2448,8 +2468,8 @@ function startGateRetryTimer(step: Step, panel: HTMLElement, onDone?: () => void
         if (remaining < 0) {
             window.clearInterval(intervalId);
             state.timers.delete(step.id);
-            playSound();
-            renderGateQuestion(step, panel, onDone);
+            panel.classList.remove('timer');
+            startAlarm(step, panel, () => renderGateQuestion(step, panel, onDone));
         }
     }, 1000);
     state.timers.set(step.id, intervalId);
@@ -2468,6 +2488,97 @@ function skipGateRetryTimer(step: Step, panel: HTMLElement, onDone?: () => void)
 
 const audio = new Audio('../src/sounds/pager-beep.mp3');
 function playSound(): void { audio.currentTime = 0; audio.play().catch(console.error); }
+
+// A timer/gate step that reaches zero shows a 30s countdown ("in case the
+// initial sound is missed"), then rings continuously until the user taps
+// anywhere on the site or hits Stop Alarm.
+const ALARM_WARNING_SECONDS = 30;
+
+// Steps whose alarm is currently ringing (countdown or continuous phase),
+// keyed by step id, so a click anywhere on the page can dismiss them.
+const activeAlarms = new Map<number, { panel: HTMLElement; onAcknowledge: () => void }>();
+// Steps currently in the continuous-loop phase — the shared `audio` element only
+// truly stops once none of them are ringing anymore.
+const continuousRingSteps = new Set<number>();
+
+function startAlarm(step: Step, panel: HTMLElement, onAcknowledge: () => void): void {
+    panel.classList.add('ringing');
+    panel.textContent = '';
+
+    const label = document.createElement('div');
+    label.className   = 'ringing-label';
+    label.textContent = `⏰ ${step.text} — time's up!`;
+    panel.appendChild(label);
+
+    const countdown = document.createElement('div');
+    countdown.className = 'ringing-countdown';
+    panel.appendChild(countdown);
+
+    const stopBtn = document.createElement('button');
+    stopBtn.type        = 'button';
+    stopBtn.className   = 'stop-alarm-btn';
+    stopBtn.textContent = 'Stop Alarm';
+    stopBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        acknowledgeAlarm(step.id);
+    });
+    panel.appendChild(stopBtn);
+
+    activeAlarms.set(step.id, { panel, onAcknowledge });
+
+    let remaining = ALARM_WARNING_SECONDS;
+    countdown.textContent = `Next alarm in ${remaining}s`;
+    playSound();
+
+    const intervalId = window.setInterval(() => {
+        remaining--;
+        if (remaining <= 0) {
+            window.clearInterval(intervalId);
+            state.ringingAlarms.delete(step.id);
+            countdown.textContent = 'Ringing…';
+            startContinuousRing(step.id);
+            return;
+        }
+        countdown.textContent = `Next alarm in ${remaining}s`;
+    }, 1000);
+    state.ringingAlarms.set(step.id, intervalId);
+}
+
+function startContinuousRing(stepId: number): void {
+    continuousRingSteps.add(stepId);
+    audio.loop = true;
+    playSound();
+}
+
+function stopContinuousRing(stepId: number): void {
+    continuousRingSteps.delete(stepId);
+    if (continuousRingSteps.size === 0) {
+        audio.loop = false;
+        audio.pause();
+        audio.currentTime = 0;
+    }
+}
+
+function stopAlarm(stepId: number): void {
+    const intervalId = state.ringingAlarms.get(stepId);
+    if (intervalId !== undefined) { window.clearInterval(intervalId); state.ringingAlarms.delete(stepId); }
+    stopContinuousRing(stepId);
+    activeAlarms.delete(stepId);
+}
+
+function acknowledgeAlarm(stepId: number): void {
+    const alarm = activeAlarms.get(stepId);
+    if (!alarm) return; // already acknowledged
+    stopAlarm(stepId);
+    alarm.panel.classList.remove('ringing');
+    alarm.onAcknowledge();
+}
+
+// Any interaction anywhere on the page — any button, any click — dismisses
+// whatever alarm(s) are currently ringing.
+document.addEventListener('click', () => {
+    for (const stepId of [...activeAlarms.keys()]) acknowledgeAlarm(stepId);
+});
 
 function createSoundTestPanel(): HTMLElement {
     const step = timerStep('🔔 Sound Test', 1);
@@ -3106,6 +3217,17 @@ h2 { margin-top: 0; font-size: 28px; }
 .panel.timer .timer-duration-badge { display: none; }
 .panel.completed { background: #1a5c2a; color: white; border-color: #2d9e4a; }
 .panel.skipped   { background: #374151; color: #9ca3af; border-color: #4b5563; text-decoration: line-through; }
+
+.panel.ringing { background: #7f1d1d; color: white; border-color: #ef4444; animation: alarmPulse 1s ease-in-out infinite; }
+@keyframes alarmPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.65; } }
+.ringing-label { font-weight: 600; }
+.ringing-countdown { margin-top: 6px; font-size: 15px; opacity: 0.85; }
+.stop-alarm-btn {
+    display: block; width: 100%; margin-top: 14px; font-size: 20px; padding: 14px;
+    border-radius: 10px; border: 2px solid #fca5a5; background: #991b1b; color: white;
+    cursor: pointer; font-weight: 600;
+}
+.stop-alarm-btn:hover { background: #b91c1c; }
 
 .gate-question { margin-bottom: 14px; }
 .gate-run-count { margin: -8px 0 14px; font-size: 13px; opacity: 0.75; }
@@ -3761,6 +3883,7 @@ export const i = {
         nutrition: {
             [u.fluidOunce.name]: { servings: 1, servingSize: 1, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 },
         },
+        products: [{ brand: 'Tap', price: 0, size: 1, sizeUnit: u.fluidOunce }],
     }),
 
     strawberry: ingredientFactory('Strawberry', {
@@ -4000,7 +4123,7 @@ registerGroup('Breakfast', [
             i.kale(0.5, u.cup),
             i.spinach(0.25, u.cup),
         ]));
-        s(Timer.set(30, 's', 'Let mixer settle'));
+        s(Timer.set(30, 's', 'Let mixer settle', { equipment: [mixer.name] }));
         s(mixer.mix());
 
         return steps;
@@ -4140,10 +4263,11 @@ registerGroup('Dinner', [
         const steps: Step[] = [];
         const s = (...newSteps: Step[]) => steps.push(...newSteps);
         const bowl = e.bowl('salad bowl');
+        const microwave = e.microwave();
 
         const EDAMAME = i.edamame(1, u.cup);
         s(bowl.add([i.asianSaladKit(1, u.unit)]));
-        s(Timer.set(80, 's', 'Microwave edamame until just thawed'));
+        s(Timer.set(80, 's', 'Microwave edamame until just thawed', { equipment: [microwave.name], ingredients: [EDAMAME] }));
         s(instruction('Pat edamame dry, then add to bowl', { ingredients: [EDAMAME], equipment: [bowl.name] }));
         s(bowl.add([
             i.chickpeas(1, u.cup),
@@ -4203,10 +4327,12 @@ registerGroup('Dinner', [
         const COLESLAW_MIX = i.coleslawMix(2, u.cup);
         const CHICKPEAS    = i.chickpeas(1, u.cup);
         const CANNELLINI   = i.cannelliniBean(1, u.cup);
+        const EDAMAME      = i.edamame(1, u.cup);
         const steps: Step[] = [];
         const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        const microwave = e.microwave();
 
-        s(Timer.set(80, 's', 'If eating right away and edamame is frozen: microwave edamame'));
+        s(Timer.set(80, 's', 'If eating right away and edamame is frozen: microwave edamame', { equipment: [microwave.name], ingredients: [EDAMAME] }));
 
         const addProduce = saladBowl.add([
             [CARROTS,                 'pre-shredded'],
@@ -4214,7 +4340,7 @@ registerGroup('Dinner', [
             [i.greenOnion(2, u.unit), 'chopped'],
             CHICKPEAS,
             CANNELLINI,
-            i.edamame(1, u.cup),
+            EDAMAME,
         ]);
         addProduce.prep = true;
         s(addProduce);
@@ -4292,16 +4418,16 @@ registerGroup('Lentils', [
         const steps: Step[] = [];
         const s = (...newSteps: Step[]) => steps.push(...newSteps);
         const LENTILS = i.blackLentils(195, u.gram);
-        const WATER = i.water(26, u.fluidOunce);
+        const WATER = i.water(24, u.fluidOunce);
         const pot = e.pot();
         const colander = e.colander();
         s(info('195g dry lentils → ~495g cooked. Keeps in the fridge for 3 days.'));
         s(pot.add([LENTILS, WATER]));
         s(instruction('Place lid fully on pot', { equipment: [pot.name] }));
         s(instruction('Set induction stovetop to 215°', { equipment: [pot.name] }));
-        s(Timer.set(24, 'm', 'Cook lentils'));
+        s(Timer.set(24, 's', 'Cook lentils', { equipment: [pot.name], ingredients: [LENTILS, WATER] }));
         s(instruction('Strain lentils through a colander', { equipment: [pot.name, colander.name] }));
-        s(Timer.set(10, 'm', 'Let lentils cool'));
+        s(Timer.set(10, 'm', 'Let lentils cool', { ingredients: [LENTILS] }));
         s(instruction('Portion cooked lentils into thirds (~165g each) into three stainless steel containers', { ingredients: [LENTILS] }));
         s(instruction('Rinse pot and wipe dry with a paper towel (Otherwise Pot Stains)', { equipment: [pot.name] }));
         return steps;
@@ -4310,16 +4436,16 @@ registerGroup('Lentils', [
         const steps: Step[] = [];
         const s = (...newSteps: Step[]) => steps.push(...newSteps);
         const LENTILS = i.blackLentils(130, u.gram);
-        const WATER = i.water(26, u.fluidOunce);
+        const WATER = i.water(24, u.fluidOunce);
         const pot = e.pot();
         const colander = e.colander();
         s(info('130g dry lentils → ~330g cooked. Keeps in the fridge for 3 days.'));
         s(pot.add([LENTILS, WATER]));
         s(instruction('Place lid fully on pot', { equipment: [pot.name] }));
         s(instruction('Set induction stovetop to 215°', { equipment: [pot.name] }));
-        s(Timer.set(24, 'm', 'Cook lentils'));
+        s(Timer.set(24, 'm', 'Cook lentils', { equipment: [pot.name], ingredients: [LENTILS, WATER] }));
         s(instruction('Strain lentils through a colander', { equipment: [pot.name, colander.name] }));
-        s(Timer.set(10, 'm', 'Let lentils cool'));
+        s(Timer.set(10, 'm', 'Let lentils cool', { ingredients: [LENTILS] }));
         s(instruction('Portion cooked lentils in half (~165g each) into two stainless steel containers', { ingredients: [LENTILS] }));
         s(instruction('Rinse pot and wipe dry with a paper towel (Otherwise Pot Stains)', { equipment: [pot.name] }));
         return steps;
@@ -4335,7 +4461,7 @@ registerGroup('Lentils', [
         s(pot.add([LENTILS, WATER]));
         s(instruction('Place lid fully on pot', { equipment: [pot.name] }));
         s(instruction('Set induction stovetop to 215°', { equipment: [pot.name] }));
-        s(Timer.set(21, 'm', 'Cook lentils'));
+        s(Timer.set(21, 'm', 'Cook lentils', { equipment: [pot.name], ingredients: [LENTILS, WATER] }));
         s(instruction('Strain lentils through a colander', { equipment: [pot.name, colander.name] }));
         s(instruction('Portion 65g cooked lentils into stainless steel container', { ingredients: [LENTILS] }));
         s(instruction('Rinse pot and wipe dry with a paper towel (Otherwise Pot Stains)', { equipment: [pot.name] }));
@@ -4345,12 +4471,13 @@ registerGroup('Lentils', [
         const steps: Step[] = [];
         const s = (...newSteps: Step[]) => steps.push(...newSteps);
         const LENTILS = i.blackLentils(65, u.gram);
+        const WATER = i.water(15, u.fluidOunce);
         const pot = e.pot();
         const colander = e.colander();
         s(info('65g dry lentils → 165g cooked. Keeps in the fridge for 3 days.'));
         s(pot.add([LENTILS]));
-        s(instruction('Add water to pot', { equipment: [pot.name] }));
-        s(Timer.set(21, 'm', 'Cook lentils'));
+        s(instruction('Add water to pot', { equipment: [pot.name], ingredients: [WATER] }));
+        s(Timer.set(21, 'm', 'Cook lentils', { equipment: [pot.name], ingredients: [LENTILS, WATER] }));
         s(instruction('Strain lentils through a colander', { equipment: [pot.name, colander.name] }));
         s(instruction('Portion 65g cooked lentils into stainless steel container', { ingredients: [LENTILS] }));
         s(instruction('Rinse pot and wipe dry with a paper towel (Otherwise Pot Stains)', { equipment: [pot.name] }));
