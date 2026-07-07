@@ -16,7 +16,8 @@
       "Bash(git -C /home/mypi/Documents/recipes log --oneline -1 -- dist/file.js)",
       "Bash(grep -rn \"nutrition-eaten-btn\\\\|\\\\.nutrition-total \\\\|nutrition-total{\" /home/mypi/Documents/recipes -not -path \"*/node_modules/*\")",
       "Bash(grep -n \"nutrition-eaten-btn\\\\|<style\\\\|css\\\\`\\\\|injectStyles\\\\|const styles\" /home/mypi/Documents/recipes/src/file.ts)",
-      "Bash(node /tmp/claude-1000/-home-mypi-Documents-recipes/4e360051-1fb0-4b25-b16f-108d2cf54e07/scratchpad/test_alarm.js)"
+      "Bash(node /tmp/claude-1000/-home-mypi-Documents-recipes/4e360051-1fb0-4b25-b16f-108d2cf54e07/scratchpad/test_alarm.js)",
+      "Bash(python3 -)"
     ]
   }
 }

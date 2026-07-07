@@ -1804,7 +1804,7 @@ function applyLock(panel, step) {
         return;
     const isUnlocked = () => waitForIds.every(id => {
         const el = document.getElementById(`step-${id}`);
-        return !el || el.classList.contains('completed') || el.classList.contains('skipped');
+        return !el || el.classList.contains('completed') || el.classList.contains('skipped') || el.classList.contains('ringing');
     });
     panel.classList.add('step-locked');
     const pill = document.createElement('div');
@@ -3911,8 +3911,8 @@ registerGroup('Lentils', [
         s(pot.add([LENTILS, WATER]));
         s(instruction('Place lid fully on pot', { equipment: [pot.name] }));
         s(instruction('Set induction stovetop to 215°', { equipment: [pot.name] }));
-        s(Timer.set(24, 's', 'Cook lentils', { equipment: [pot.name], ingredients: [LENTILS, WATER] }));
-        s(instruction('Strain lentils through a colander', { equipment: [pot.name, colander.name] }));
+        s(Timer.set(2, 's', 'Cook lentils', { equipment: [pot.name], ingredients: [LENTILS, WATER] }));
+        s(instruction('Strain lentils through a colander', { equipment: [pot.name, colander.name], ingredients: [LENTILS] }));
         s(Timer.set(10, 'm', 'Let lentils cool', { ingredients: [LENTILS] }));
         s(instruction('Portion cooked lentils into thirds (~165g each) into three stainless steel containers', { ingredients: [LENTILS] }));
         s(instruction('Rinse pot and wipe dry with a paper towel (Otherwise Pot Stains)', { equipment: [pot.name] }));
@@ -3930,7 +3930,7 @@ registerGroup('Lentils', [
         s(instruction('Place lid fully on pot', { equipment: [pot.name] }));
         s(instruction('Set induction stovetop to 215°', { equipment: [pot.name] }));
         s(Timer.set(24, 'm', 'Cook lentils', { equipment: [pot.name], ingredients: [LENTILS, WATER] }));
-        s(instruction('Strain lentils through a colander', { equipment: [pot.name, colander.name] }));
+        s(instruction('Strain lentils through a colander', { equipment: [pot.name, colander.name], ingredients: [LENTILS] }));
         s(Timer.set(10, 'm', 'Let lentils cool', { ingredients: [LENTILS] }));
         s(instruction('Portion cooked lentils in half (~165g each) into two stainless steel containers', { ingredients: [LENTILS] }));
         s(instruction('Rinse pot and wipe dry with a paper towel (Otherwise Pot Stains)', { equipment: [pot.name] }));
@@ -3948,7 +3948,7 @@ registerGroup('Lentils', [
         s(instruction('Place lid fully on pot', { equipment: [pot.name] }));
         s(instruction('Set induction stovetop to 215°', { equipment: [pot.name] }));
         s(Timer.set(21, 'm', 'Cook lentils', { equipment: [pot.name], ingredients: [LENTILS, WATER] }));
-        s(instruction('Strain lentils through a colander', { equipment: [pot.name, colander.name] }));
+        s(instruction('Strain lentils through a colander', { equipment: [pot.name, colander.name], ingredients: [LENTILS] }));
         s(instruction('Portion 65g cooked lentils into stainless steel container', { ingredients: [LENTILS] }));
         s(instruction('Rinse pot and wipe dry with a paper towel (Otherwise Pot Stains)', { equipment: [pot.name] }));
         return steps;
@@ -3964,7 +3964,7 @@ registerGroup('Lentils', [
         s(pot.add([LENTILS]));
         s(instruction('Add water to pot', { equipment: [pot.name], ingredients: [WATER] }));
         s(Timer.set(21, 'm', 'Cook lentils', { equipment: [pot.name], ingredients: [LENTILS, WATER] }));
-        s(instruction('Strain lentils through a colander', { equipment: [pot.name, colander.name] }));
+        s(instruction('Strain lentils through a colander', { equipment: [pot.name, colander.name], ingredients: [LENTILS] }));
         s(instruction('Portion 65g cooked lentils into stainless steel container', { ingredients: [LENTILS] }));
         s(instruction('Rinse pot and wipe dry with a paper towel (Otherwise Pot Stains)', { equipment: [pot.name] }));
         return steps;
