@@ -1059,10 +1059,21 @@ function createCopyButton(recipeId: string): HTMLButtonElement {
 
 function unlockAudioContext(): void {
     if (state.audioUnlocked) return;
-    const silentAudio = new Audio();
-    silentAudio.src = 'data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQIAAAAAAA==';
-    silentAudio.play().catch(() => {});
     state.audioUnlocked = true;
+    // Prime the *actual* alarm element with a direct, gesture-triggered play(), not a
+    // separate throwaway one — some browsers (notably Safari) grant "allowed to autoplay"
+    // per media element based on it having been played directly during a user gesture at
+    // least once, rather than unlocking playback page-wide. Without this, the alarm's
+    // audio.play() call — which always fires later from a setInterval callback, not a
+    // gesture — gets rejected with NotAllowedError the first time a real (non-test) timer
+    // tries to ring.
+    const wasMuted = audio.muted;
+    audio.muted = true;
+    audio.play().then(() => {
+        audio.pause();
+        audio.currentTime = 0;
+        audio.muted = wasMuted;
+    }).catch(() => { audio.muted = wasMuted; });
 }
 
 // ============================================================
@@ -2009,55 +2020,10 @@ function formatElapsed(seconds: number): string {
     return m > 0 ? `${m}m ${String(s).padStart(2, '0')}s` : `${s}s`;
 }
 
-let readySection:   HTMLElement | null = null;
-let waitingSection: HTMLElement | null = null;
-
-function getOrCreateCookingSections(): { ready: HTMLElement; waiting: HTMLElement } {
-    if (!readySection || !document.body.contains(readySection)) {
-        readySection = document.createElement('div');
-        readySection.id = 'ready-section';
-    }
-    if (!waitingSection || !document.body.contains(waitingSection)) {
-        waitingSection = document.createElement('div');
-        waitingSection.id = 'waiting-section';
-        const waitLabel = document.createElement('div');
-        waitLabel.className   = 'waiting-section-label';
-        waitLabel.textContent = '⏳ Waiting on timers';
-        waitingSection.appendChild(waitLabel);
-    }
-    return { ready: readySection, waiting: waitingSection };
-}
-
-function promotePanelToReady(panel: HTMLElement): void {
-    if (!readySection) return;
-    if (readySection.contains(panel)) return;
-    if (panel.closest('.container-children')) return;
-
-    const incomingIndex = parseInt(panel.dataset.stepIndex ?? '0', 10);
-    const panels = Array.from(readySection.querySelectorAll<HTMLElement>(':scope > .panel[data-step-index]'));
-    const insertBefore = panels.find(p => {
-        if (p.classList.contains('completed') || p.classList.contains('skipped')) return false;
-        return parseInt(p.dataset.stepIndex ?? '0', 10) > incomingIndex;
-    });
-
-    if (insertBefore) {
-        readySection.insertBefore(panel, insertBefore);
-    } else {
-        readySection.appendChild(panel);
-    }
-
-    if (waitingSection) {
-        const remainingLocked = waitingSection.querySelectorAll('.panel:not(.waiting-section-label)');
-        if (remainingLocked.length === 0) waitingSection.style.display = 'none';
-    }
-}
 
 function renderCookingScreen(): void {
     const root = getElement<HTMLDivElement>('app');
     clear(root);
-
-    readySection   = null;
-    waitingSection = null;
 
     if (state.cookingStartedAt === null) state.cookingStartedAt = Date.now();
 
@@ -2075,12 +2041,11 @@ function renderCookingScreen(): void {
         root.appendChild(banner);
     }
 
-    const { ready, waiting } = getOrCreateCookingSections();
-    root.appendChild(ready);
-    root.appendChild(waiting);
-
     let lastRecipeId: string | undefined;
 
+    // Every step renders in its natural recipe order, whether locked or not — a locked
+    // step just looks/behaves locked in place (see applyLock). Nothing ever moves once
+    // it's on screen, so unlocking never shifts the layout around it.
     for (const step of state.cookingPlanSteps) {
         if (step.recipeId && step.recipeId !== lastRecipeId) {
             lastRecipeId = step.recipeId;
@@ -2123,20 +2088,12 @@ function renderCookingScreen(): void {
                 header.appendChild(badge);
                 header.appendChild(createSoundTestPanel());
                 header.appendChild(createCopyButton(recipe.id));
-                ready.appendChild(header);
+                root.appendChild(header);
             }
         }
 
-        const panel     = renderStep(step);
-        const stepIndex = state.cookingPlanSteps.indexOf(step);
-        panel.dataset.stepIndex = String(stepIndex);
-        const isLocked  = !!(step.waitForIds && step.waitForIds.length > 0);
-
-        if (isLocked) { waiting.appendChild(panel); } else { ready.appendChild(panel); }
+        root.appendChild(renderStep(step));
     }
-
-    const lockedPanels = waiting.querySelectorAll('.panel');
-    if (lockedPanels.length === 0) waiting.style.display = 'none';
 
     root.appendChild(createStartOverButton());
 }
@@ -2169,10 +2126,7 @@ function applyLock(panel: HTMLElement, step: Step): void {
         panel.classList.remove('step-locked');
         pill.remove();
         panel.classList.add('step-unlocked');
-        setTimeout(() => {
-            panel.classList.remove('step-unlocked');
-            promotePanelToReady(panel);
-        }, 800);
+        setTimeout(() => panel.classList.remove('step-unlocked'), 800);
     };
 
     const observer = new MutationObserver(unlock);
@@ -3370,10 +3324,6 @@ h2 { margin-top: 0; font-size: 28px; }
 .cook-time-badge { font-size: 16px; color: #888; white-space: nowrap; }
 .cook-time-banner { font-size: 16px; color: #888; border: 1px solid #333; border-radius: 10px; padding: 10px 16px; margin-bottom: 16px; text-align: center; }
 
-#ready-section   { margin-bottom: 8px; }
-#waiting-section { margin-top: 24px; border-top: 1px solid #2a2a2a; padding-top: 8px; }
-.waiting-section-label { font-size: 14px; color: #555; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 6px; padding-left: 4px; pointer-events: none; user-select: none; }
-
 /* ── Nutrition screen ── */
 
 .panel.nutrition-total { cursor: default; border-color: #555; background: #1a1a1a; }
@@ -4551,7 +4501,7 @@ registerGroup('Lentils', [
         s(Timer.set(24, 'm', 'Cook lentils', { equipment: [pot.name], ingredients: [LENTILS, WATER] }));
         s(instruction('Strain lentils through a colander', { equipment: [pot.name, colander.name], ingredients: [LENTILS] }));
         s(Timer.set(10, 'm', 'Let lentils cool', { ingredients: [LENTILS] }));
-        s(instruction('Portion cooked lentils into thirds (~165g each) into three stainless steel containers', { ingredients: [LENTILS] }));
+        s(instruction('Portion cooked lentils into thirds (~165g each) into three stainless steel containers', { equipment: [pot.name], ingredients: [LENTILS] }));
         s(instruction('Rinse pot and wipe dry with a paper towel (Otherwise Pot Stains)', { equipment: [pot.name] }));
         return steps;
     })()), { planMinutes: 3, portable: true, prepMinutes: 24, perishableDays: 3, sortOrder: 0 }),
