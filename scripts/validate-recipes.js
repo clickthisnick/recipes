@@ -212,19 +212,38 @@ for (const m of src.matchAll(/const (\w+)\s*=\s*e\.(\w+)\(/g)) {
     if (factoryType[m[2]]) equipmentVarType[m[1]] = factoryType[m[2]];
 }
 
-// Ingredient vocabulary: display names from `key: ingredientFactory('Display Name'`. For
-// multi-word names, also index the trailing noun alone (e.g. "lentils" for "Black Lentils")
-// since step text is often brief ("Cook lentils").
-const ingredientKeyByPhrase = new Map();
-for (const m of src.matchAll(/(\w+):\s*ingredientFactory\('([^']+)'/g)) {
-    const key = m[1];
-    const display = m[2].replace(/\s*\([^)]*\)/g, '').trim(); // strip parenthetical notes
-    const full = display.toLowerCase();
-    if (full.length >= 3 && !ingredientKeyByPhrase.has(full)) ingredientKeyByPhrase.set(full, key);
+// Ingredient vocabulary: display names from `key: ingredientFactory('Display Name'` plus
+// `key: ingredientFactory(name || keyToName(key))` shorthand entries declared via
+// `simpleIngredients({ key: 'Override' | '' })`. For multi-word names, also index the
+// trailing noun alone (e.g. "lentils" for "Black Lentils") since step text is often brief
+// ("Cook lentils"). A phrase can map to more than one ingredient key (e.g. "vinegar" from
+// both "White Vinegar" and "Rice Vinegar") — coverage passes if any of them is declared.
+function keyToName(key) {
+    return key.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase());
+}
+
+const ingredientKeyByPhrase = new Map(); // phrase -> Set<key>
+function registerIngredientPhrase(display, key) {
+    const full = display.toLowerCase().replace(/\s*\([^)]*\)/g, '').trim(); // strip parenthetical notes
+    if (full.length >= 3) {
+        if (!ingredientKeyByPhrase.has(full)) ingredientKeyByPhrase.set(full, new Set());
+        ingredientKeyByPhrase.get(full).add(key);
+    }
     const words = full.split(/\s+/);
     const last = words[words.length - 1];
-    if (words.length > 1 && last.length >= 4 && !ingredientKeyByPhrase.has(last)) {
-        ingredientKeyByPhrase.set(last, key);
+    if (words.length > 1 && last.length >= 4) {
+        if (!ingredientKeyByPhrase.has(last)) ingredientKeyByPhrase.set(last, new Set());
+        ingredientKeyByPhrase.get(last).add(key);
+    }
+}
+
+for (const m of src.matchAll(/(\w+):\s*ingredientFactory\('([^']+)'/g)) {
+    registerIngredientPhrase(m[2], m[1]);
+}
+const simpleBlock = src.match(/\.\.\.simpleIngredients\(\{([\s\S]*?)\}\)/);
+if (simpleBlock) {
+    for (const m of simpleBlock[1].matchAll(/(\w+):\s*'([^']*)'/g)) {
+        registerIngredientPhrase(m[2] || keyToName(m[1]), m[1]);
     }
 }
 
@@ -314,13 +333,15 @@ function extractArray(optsStr, key) {
     return '';
 }
 
-// Which positional argument holds the step's literal text, per factory function.
+// Which positional argument holds the step's literal text, per factory function. `info()`
+// is deliberately excluded — it's a narrative note shown to the user, not an action step,
+// so it has no reason to declare equipment/ingredients.
 const TEXT_ARG_INDEX = {
-    instruction: 0, prep: 0, prepOnly: 0, info: 0, timerStep: 0,
+    instruction: 0, prep: 0, prepOnly: 0, timerStep: 0,
     'Timer.set': 2, 'Timer.gate': 0,
 };
 
-const STEP_FACTORY_RE = /\b(instruction|prep|prepOnly|info|Timer\.set|Timer\.gate|timerStep)\(/g;
+const STEP_FACTORY_RE = /\b(instruction|prep|prepOnly|Timer\.set|Timer\.gate|timerStep)\(/g;
 
 let sm;
 while ((sm = STEP_FACTORY_RE.exec(src)) !== null) {
@@ -358,10 +379,10 @@ while ((sm = STEP_FACTORY_RE.exec(src)) !== null) {
     }
 
     for (const phrase of matchPhrases(text, ingredientPhraseList)) {
-        const key = ingredientKeyByPhrase.get(phrase);
-        const coveredInline = new RegExp(`\\bi\\.${key}\\(`).test(ingArr);
+        const keys = ingredientKeyByPhrase.get(phrase);
+        const coveredInline = [...keys].some((key) => new RegExp(`\\bi\\.${key}\\(`).test(ingArr));
         const coveredVar = Object.entries(ingredientVarKey).some(
-            ([varName, k]) => k === key && new RegExp(`\\b${varName}\\b`).test(ingArr)
+            ([varName, k]) => keys.has(k) && new RegExp(`\\b${varName}\\b`).test(ingArr)
         );
         if (!coveredInline && !coveredVar) {
             warnings.push(`line ${lineNum}: text mentions "${phrase}" but step doesn't declare it in \`ingredients\``);
