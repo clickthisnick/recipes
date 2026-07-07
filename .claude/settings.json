@@ -17,7 +17,13 @@
       "Bash(grep -rn \"nutrition-eaten-btn\\\\|\\\\.nutrition-total \\\\|nutrition-total{\" /home/mypi/Documents/recipes -not -path \"*/node_modules/*\")",
       "Bash(grep -n \"nutrition-eaten-btn\\\\|<style\\\\|css\\\\`\\\\|injectStyles\\\\|const styles\" /home/mypi/Documents/recipes/src/file.ts)",
       "Bash(node /tmp/claude-1000/-home-mypi-Documents-recipes/4e360051-1fb0-4b25-b16f-108d2cf54e07/scratchpad/test_alarm.js)",
-      "Bash(python3 -)"
+      "Bash(python3 -)",
+      "Bash(timeout 5 npx vite --port 5183)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:5183/)",
+      "Read(//tmp/**)",
+      "Bash(git log *)",
+      "Bash(timeout 5 npx vite --port 5185)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:5185/)"
     ]
   }
 }

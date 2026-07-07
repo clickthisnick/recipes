@@ -2323,6 +2323,7 @@ function completeTimer(step: Step, panel: HTMLElement, onDone?: () => void): voi
 function skipTimer(step: Step, panel: HTMLElement, onDone?: () => void): void {
     const intervalId = state.timers.get(step.id);
     if (intervalId !== undefined) { window.clearInterval(intervalId); state.timers.delete(step.id); }
+    releaseWakeLockIfIdle();
     panel.classList.remove('timer');
     panel.classList.add('skipped');
     const skippedAt = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -2338,6 +2339,7 @@ function createStartOverButton(): HTMLButtonElement {
     const btn = createButton('↩ Start Over', () => {
         state.timers.forEach((id) => window.clearInterval(id));
         state.timers.clear();
+        releaseWakeLockIfIdle();
         state.ringingAlarms.forEach((id) => window.clearInterval(id));
         state.ringingAlarms.clear();
         activeAlarms.clear();
@@ -2377,32 +2379,83 @@ function navigateTo(screen: Screen): void {
 }
 
 // ============================================================
+// WAKE LOCK
+// ============================================================
+//
+// Prevents the screen from auto-locking while a timer/gate countdown is running. Without
+// it, the screen sleeps mid-cook, the browser suspends the page's JS (including the
+// countdown's setInterval), and a long timer can silently fail to ring.
+
+let wakeLockSentinel: WakeLockSentinel | null = null;
+
+async function acquireWakeLock(): Promise<void> {
+    if (wakeLockSentinel || !('wakeLock' in navigator)) return;
+    try {
+        wakeLockSentinel = await navigator.wakeLock.request('screen');
+        wakeLockSentinel.addEventListener('release', () => { wakeLockSentinel = null; });
+    } catch (err) {
+        console.error('Wake lock request failed:', err);
+    }
+}
+
+function releaseWakeLockIfIdle(): void {
+    if (state.timers.size > 0) return;
+    wakeLockSentinel?.release();
+    wakeLockSentinel = null;
+}
+
+// The wake lock is auto-released by the browser whenever the document is hidden (e.g. the
+// user switches apps) — if a timer is still running when the page becomes visible again,
+// re-acquire it rather than leaving the screen free to sleep for the rest of the cook.
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && state.timers.size > 0) acquireWakeLock();
+});
+
+// ============================================================
 // TIMERS
 // ============================================================
 
-function startTimer(step: Step, panel: HTMLElement, onDone?: () => void): void {
-    if (!step.durationSeconds || state.timers.has(step.id)) return;
-    let remaining = step.durationSeconds;
+// Ticks against an absolute deadline (rather than decrementing a counter once per tick) so
+// that a countdown suspended by the browser (backgrounded tab, locked screen) still fires
+// immediately once the page wakes back up, instead of needing to "catch up" one tick at a
+// time for however many seconds were left when it was suspended.
+function runCountdown(
+    step: Step,
+    panel: HTMLElement,
+    durationSeconds: number,
+    formatLabel: (mm: string, ss: string) => string,
+    onComplete: () => void
+): void {
+    const endAt = Date.now() + durationSeconds * 1000;
     panel.classList.add('timer');
+    acquireWakeLock();
     const intervalId = window.setInterval(() => {
+        const remaining = Math.max(0, Math.round((endAt - Date.now()) / 1000));
         const mm = String(Math.floor(remaining / 60)).padStart(2, '0');
         const ss = String(remaining % 60).padStart(2, '0');
-        panel.textContent = `${mm}:${ss} ${step.text} — tap 3× to skip`;
-        remaining--;
-        if (remaining < 0) {
+        panel.textContent = formatLabel(mm, ss);
+        if (Date.now() >= endAt) {
             window.clearInterval(intervalId);
             state.timers.delete(step.id);
+            releaseWakeLockIfIdle();
             panel.classList.remove('timer');
-            if (panel.classList.contains('sound-check-btn')) {
-                // Quick sound test button — beep once and reset immediately, no alarm loop.
-                playSound();
-                completeTimer(step, panel, onDone);
-            } else {
-                startAlarm(step, panel, () => completeTimer(step, panel, onDone));
-            }
+            onComplete();
         }
     }, 1000);
     state.timers.set(step.id, intervalId);
+}
+
+function startTimer(step: Step, panel: HTMLElement, onDone?: () => void): void {
+    if (!step.durationSeconds || state.timers.has(step.id)) return;
+    runCountdown(step, panel, step.durationSeconds, (mm, ss) => `${mm}:${ss} ${step.text} — tap 3× to skip`, () => {
+        if (panel.classList.contains('sound-check-btn')) {
+            // Quick sound test button — beep once and reset immediately, no alarm loop.
+            playSound(panel);
+            completeTimer(step, panel, onDone);
+        } else {
+            startAlarm(step, panel, () => completeTimer(step, panel, onDone));
+        }
+    });
 }
 
 // ============================================================
@@ -2457,27 +2510,16 @@ function renderGateQuestion(step: Step, panel: HTMLElement, onDone?: () => void)
 function startGateRetryTimer(step: Step, panel: HTMLElement, onDone?: () => void): void {
     if (!step.durationSeconds || state.timers.has(step.id)) return;
     state.gateRunCounts.set(step.id, (state.gateRunCounts.get(step.id) ?? 0) + 1);
-    let remaining = step.durationSeconds;
     panel.textContent = '';
-    panel.classList.add('timer');
-    const intervalId = window.setInterval(() => {
-        const mm = String(Math.floor(remaining / 60)).padStart(2, '0');
-        const ss = String(remaining % 60).padStart(2, '0');
-        panel.textContent = `${mm}:${ss} cooking more — tap 3× to skip`;
-        remaining--;
-        if (remaining < 0) {
-            window.clearInterval(intervalId);
-            state.timers.delete(step.id);
-            panel.classList.remove('timer');
-            startAlarm(step, panel, () => renderGateQuestion(step, panel, onDone));
-        }
-    }, 1000);
-    state.timers.set(step.id, intervalId);
+    runCountdown(step, panel, step.durationSeconds, (mm, ss) => `${mm}:${ss} cooking more — tap 3× to skip`, () => {
+        startAlarm(step, panel, () => renderGateQuestion(step, panel, onDone));
+    });
 }
 
 function skipGateRetryTimer(step: Step, panel: HTMLElement, onDone?: () => void): void {
     const intervalId = state.timers.get(step.id);
     if (intervalId !== undefined) { window.clearInterval(intervalId); state.timers.delete(step.id); }
+    releaseWakeLockIfIdle();
     panel.classList.remove('timer');
     renderGateQuestion(step, panel, onDone);
 }
@@ -2487,7 +2529,50 @@ function skipGateRetryTimer(step: Step, panel: HTMLElement, onDone?: () => void)
 // ============================================================
 
 const audio = new Audio('../src/sounds/pager-beep.mp3');
-function playSound(): void { audio.currentTime = 0; audio.play().catch(console.error); }
+
+// audio.play() can silently reject (e.g. autoplay blocked after the page has sat idle/
+// backgrounded for a while) — surface that visibly instead of only logging it, since a
+// failed alarm sound is otherwise indistinguishable from a timer that's still running.
+let soundBlockedBanner: HTMLElement | null = null;
+
+function showSoundBlockedBanner(): void {
+    if (soundBlockedBanner) return;
+    const banner = document.createElement('div');
+    banner.className   = 'sound-blocked-banner';
+    banner.textContent = '🔇 Alarm sound was blocked by the browser — tap anywhere to enable it';
+    document.body.appendChild(banner);
+    soundBlockedBanner = banner;
+}
+
+function hideSoundBlockedBanner(): void {
+    if (!soundBlockedBanner) return;
+    soundBlockedBanner.remove();
+    soundBlockedBanner = null;
+}
+
+// Attaches the specific error to the step that tried to ring, so it's visible without
+// opening devtools. Skipped if the panel's already been replaced/removed (e.g. the sound
+// test panel swaps itself out immediately after triggering the failed play()).
+function showSoundErrorOnPanel(panel: HTMLElement, err: unknown): void {
+    if (!panel.isConnected) return;
+    const message = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
+    let errEl = panel.querySelector<HTMLElement>('.sound-error');
+    if (!errEl) {
+        errEl = document.createElement('div');
+        errEl.className = 'sound-error';
+        panel.appendChild(errEl);
+    }
+    errEl.textContent = `🔇 sound failed: ${message}`;
+}
+
+function playSound(panel?: HTMLElement): void {
+    audio.currentTime = 0;
+    audio.play().then(hideSoundBlockedBanner).catch((err) => {
+        console.error(err);
+        showSoundBlockedBanner();
+        if (panel) showSoundErrorOnPanel(panel, err);
+    });
+}
 
 // A timer/gate step that reaches zero shows a 30s countdown ("in case the
 // initial sound is missed"), then rings continuously until the user taps
@@ -2528,7 +2613,7 @@ function startAlarm(step: Step, panel: HTMLElement, onAcknowledge: () => void): 
 
     let remaining = ALARM_WARNING_SECONDS;
     countdown.textContent = `Next alarm in ${remaining}s`;
-    playSound();
+    playSound(panel);
 
     const intervalId = window.setInterval(() => {
         remaining--;
@@ -2547,7 +2632,7 @@ function startAlarm(step: Step, panel: HTMLElement, onAcknowledge: () => void): 
 function startContinuousRing(stepId: number): void {
     continuousRingSteps.add(stepId);
     audio.loop = true;
-    playSound();
+    playSound(activeAlarms.get(stepId)?.panel);
 }
 
 function stopContinuousRing(stepId: number): void {
@@ -2578,6 +2663,8 @@ function acknowledgeAlarm(stepId: number): void {
 // whatever alarm(s) are currently ringing.
 document.addEventListener('click', () => {
     for (const stepId of [...activeAlarms.keys()]) acknowledgeAlarm(stepId);
+    // A real click is a user gesture, so it's a good moment to retry blocked playback.
+    if (soundBlockedBanner) playSound();
 });
 
 function createSoundTestPanel(): HTMLElement {
@@ -3222,6 +3309,17 @@ h2 { margin-top: 0; font-size: 28px; }
 @keyframes alarmPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.65; } }
 .ringing-label { font-weight: 600; }
 .ringing-countdown { margin-top: 6px; font-size: 15px; opacity: 0.85; }
+
+.sound-blocked-banner {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    background: #7f1d1d; color: white; border-bottom: 2px solid #ef4444;
+    padding: 10px 16px; text-align: center; font-size: 15px; font-weight: 600;
+    cursor: pointer; animation: alarmPulse 1s ease-in-out infinite;
+}
+.sound-error {
+    margin-top: 8px; font-size: 13px; font-weight: 600; color: #fecaca;
+    background: rgba(0, 0, 0, 0.25); border-radius: 6px; padding: 4px 8px;
+}
 .stop-alarm-btn {
     display: block; width: 100%; margin-top: 14px; font-size: 20px; padding: 14px;
     border-radius: 10px; border: 2px solid #fca5a5; background: #991b1b; color: white;
@@ -4229,7 +4327,7 @@ registerGroup('Dinner', [
         }));
         s(Timer.set(20, 'm', 'Roast — do not move'));
         s(instruction('Flip everything on the sheet pan', { equipment: ['sheet pan'], ingredients: [CARROTS, MUSHROOMS, ONION] }));
-        s(Timer.set(17, 'm', 'Roast until carrots are caramelized, mushrooms deeply browned, onions soft with crispy tips'));
+        s(Timer.set(17, 'm', 'Roast until carrots are caramelized, mushrooms deeply browned, onions soft with crispy tips', { equipment: ['sheet pan'], ingredients: [CARROTS, MUSHROOMS, ONION] }));
         s(Timer.set(5, 'm', 'Rest vegetables before serving'));
 
         return steps;
