@@ -1109,6 +1109,7 @@ function renderRecipeList(): void {
         empty.className   = 'empty';
         root.appendChild(empty);
         appendAddIngredientButton(root);
+        appendBuildFooter(root);
         return;
     }
 
@@ -1233,6 +1234,7 @@ function renderRecipeList(): void {
     });
 
     appendAddIngredientButton(root);
+    appendBuildFooter(root);
 }
 
 function appendAddIngredientButton(root: HTMLElement): void {
@@ -3282,6 +3284,7 @@ h2 { margin-top: 0; font-size: 28px; }
 .info-step-collapsed .info-step-body { display: none; }
 
 #recipe-list { padding-bottom: 120px; }
+.build-footer { margin-top: 24px; text-align: center; font-size: 12px; color: #666; }
 
 .panel {
     border: 2px solid #444; border-radius: 12px; padding: 20px; margin: 10px 0;
@@ -3521,6 +3524,28 @@ h2 { margin-top: 0; font-size: 28px; }
     .panel { font-size: 18px; padding: 14px; }
 }
 `;
+
+// ============================================================
+// BUILD INFO
+// ============================================================
+
+// Replaced with the real compile timestamp by scripts/validate-recipes.js's postbuild
+// step, right after `tsc` emits dist/file.js. Left as-is (and reported as "dev build")
+// when running straight from source, e.g. under `vite`.
+const BUILD_TIME = '__BUILD_TIME__';
+
+function formatBuildTime(): string {
+    const date = new Date(BUILD_TIME);
+    if (isNaN(date.getTime())) return 'dev build';
+    return date.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
+}
+
+function appendBuildFooter(root: HTMLElement): void {
+    const footer = document.createElement('div');
+    footer.className   = 'build-footer';
+    footer.textContent = `Last compiled: ${formatBuildTime()}`;
+    root.appendChild(footer);
+}
 
 // ============================================================
 // BOOTSTRAP

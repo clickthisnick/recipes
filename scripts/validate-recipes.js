@@ -1,12 +1,30 @@
 'use strict';
 
-const { readFileSync } = require('fs');
+const { readFileSync, writeFileSync } = require('fs');
 const { resolve } = require('path');
 
 const src = readFileSync(resolve(__dirname, '../src/file.ts'), 'utf8');
 const lines = src.split('\n');
 
 const errors = [];
+
+// ── Stamp the real compile time into the freshly-built dist bundle ────────────────────────
+//
+// src/file.ts declares `const BUILD_TIME = '__BUILD_TIME__';` as a placeholder. `tsc` just
+// copied that literal string into dist/file.js — replace it here, now that we know an actual
+// compile just happened, so the app can show when it was last built. A no-op if the bundle's
+// already been stamped (e.g. this script re-run without a fresh `tsc` in between).
+{
+    const distPath = resolve(__dirname, '../dist/file.js');
+    try {
+        const distSrc = readFileSync(distPath, 'utf8');
+        if (distSrc.includes('__BUILD_TIME__')) {
+            writeFileSync(distPath, distSrc.replace(/__BUILD_TIME__/g, new Date().toISOString()));
+        }
+    } catch (err) {
+        console.error(`Could not stamp build time into dist/file.js: ${err.message}`);
+    }
+}
 
 // ── Check 1: consecutive .add() calls on the same equipment ──────────────────
 
