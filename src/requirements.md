@@ -167,14 +167,8 @@ Ad-hoc recipes are session-only:
 - Don't survive a hard refresh — including any deep-link `?recipe=adhoc:...` URL, which won't resolve and falls back to the Select screen
 
 ### Cooking Screen
-- Shows all steps from all selected recipes split into two zones: **Ready** (top) and **Waiting** (bottom)
-- Steps the user can act on immediately — those with no `waitForIds`, or whose waited-on steps are already done — appear in the **Ready** zone at the top
-- Steps that are still locked appear in the **Waiting** zone below, separated by a muted "⏳ Waiting on timers" label and a divider line
-- When a locked step unlocks, it flashes green and is physically moved from the Waiting zone into the Ready zone at its correct authored position
-- Promoted panels are inserted in authored order using `data-step-index`; completed/skipped panels are treated as pinned (index −1) and never jumped over
-- Container child panels are never independently promoted — only the parent container moves
-- The Waiting zone is hidden entirely if there are no locked steps
-- Recipe title headings always appear in the Ready zone, above the first step of their recipe
+- Shows every step from every selected recipe in **one continuous flow**, in natural authored order — there is no separate "ready" vs "waiting" zone. A locked step renders exactly where it belongs in the sequence; it just looks and behaves locked (dimmed, red left border, "⏳ waiting…" pill, unclickable) until its dependencies clear. Nothing is ever physically relocated in the DOM, so unlocking a step never shifts the surrounding layout or scroll position — see [Locking System](#locking-system)
+- Recipe title headings appear once, above the first step of their recipe, regardless of that step's locked state
 - Each recipe title heading shows a live badge, updating every second:
   - If a hardcoded `estimatedMinutes` is set: `estimated 20 min (14m 32s calculated) · actual 4m 32s`
     - Shows the user's hardcoded target, followed by the calculated critical path in parentheses
@@ -227,15 +221,15 @@ Both the Select and Cooking screens display a link icon (🔗) next to each reci
 
 ## Locking System
 
-A step "claims" its equipment and ingredients when it is a timer **or** when it has `waitForIds` set. Any subsequent step that references the same equipment (by name) or the same ingredient (by object reference) is locked — rendered dimmed with a red left border and a "⏳ waiting…" pill — and cannot be tapped until all blocking steps are done.
+**Every** step "claims" its equipment and ingredients the moment it's processed into the cooking plan — this isn't limited to timers or already-locked steps. Any subsequent step that references the same equipment (by name) or the same ingredient (by object reference) is locked — rendered dimmed with a red left border and a "⏳ waiting…" pill — and cannot be tapped until all blocking steps are done. In effect, every step in a chain that touches the same resource hands off to the next one automatically, without needing an explicit `waitFor()` at each link.
 
 ### Claim keys
 - Equipment claims are keyed by `"recipeId::eq::equipmentName"` — equipment is identified by name, so a named vessel like `"panko pan"` is distinct from `"pan"`
 - Ingredient claims are keyed by **object reference**, not by name — two calls to `i.avocadoOil()` produce separate objects and are treated as independent instances with no shared claim
 
 ### Propagation
-- Claims propagate transitively: if step B is locked (has `waitForIds`), it also creates claims on its equipment and ingredients. Any step C that shares equipment or ingredients with B will automatically wait for B without needing an explicit `waitFor()` declaration.
-- This means a single `waitFor()` at the head of a dependency chain locks all downstream steps that share the same resources.
+- Claims propagate transitively: any step that touches a given equipment/ingredient claims it, so any later step C that shares equipment or ingredients with an earlier step B will automatically wait for B without needing an explicit `waitFor()` declaration
+- This means a single `waitFor()` at the head of a dependency chain locks all downstream steps that share the same resources, and a plain sequence of instruction steps reusing the same vessel (e.g. `pot.add()` → "place lid" → "set stovetop" → cook timer → "strain") naturally chains in authored order with no manual wiring at all
 
 ### Manual dependencies
 - `step.waitFor(...steps)` is a fluent method on `Step` that appends to `waitForIds` and returns `this`
@@ -244,32 +238,17 @@ A step "claims" its equipment and ingredients when it is a timer **or** when it 
 
 ### Unlock behaviour
 - A locked step watches the DOM via `MutationObserver` (observing `childList`, `subtree`, and `class` attribute changes)
-- It unlocks when every waited-on step element is either absent from the DOM or has the `.completed` or `.skipped` class — covering both timer completion and instruction dismissal
-- On unlock: flashes green for 800 ms, then `promotePanelToReady()` moves it to the Ready zone at its authored position
+- It unlocks when every waited-on step element is either absent from the DOM, or has the `.completed`, `.skipped`, or **`.ringing`** class. `.ringing` counts as unlocked because it means the timer's cook time has already elapsed and its alarm is sounding — the dependent step becomes usable during that 30-second warning window rather than waiting for the alarm to be dismissed
+- On unlock: the panel briefly flashes green (`.step-unlocked`, 800 ms) in place, then returns to normal. It never moves — see [Cooking Layout](#cooking-layout)
 
 ### Recipe scoping
 - Two recipes using the same equipment name are treated as separate lanes because equipment claims are scoped by `recipeId`
 
 ---
 
-## Cooking Layout — Actionable Steps First
+## Cooking Layout
 
-```
-┌─────────────────────────────────────────┐
-│  #ready-section                         │
-│  Recipe title headings + all steps      │
-│  that are currently actionable          │
-├─────────────────────────────────────────┤
-│  #waiting-section  (hidden if empty)    │
-│  ⏳ Waiting on timers  ← muted label    │
-│  Steps that are still locked            │
-└─────────────────────────────────────────┘
-```
-
-- Each step panel is rendered once, assigned a `data-step-index` (its position in `cookingPlanSteps`), and placed in the appropriate zone
-- Panels are never re-rendered — they are physically moved via DOM insertion
-- `promotePanelToReady(panel)` inserts at the correct authored position by finding the first non-completed/skipped panel with a higher `data-step-index`
-- Child panels inside `.container-children` are never independently promoted
+All steps for all selected recipes render once, in a single continuous flow, in authored order — interleaved with each recipe's title heading. There is no separate "ready" vs "waiting" section and no DOM relocation of any kind: a step's locked/unlocked state is purely a class toggle (see [Unlock behaviour](#unlock-behaviour)) applied to the panel sitting exactly where it was originally rendered. This keeps the whole recipe readable top-to-bottom regardless of lock state, and means unlocking a step never shifts scroll position or reflows anything else on the page.
 
 ---
 
@@ -457,7 +436,7 @@ const saucePan = e.pan('sauce pan');   // claim key: "recipeId::eq::sauce pan"
 const plainPan = e.pan();              // claim key: "recipeId::eq::pan"
 ```
 
-Available factories: `e.bowl()`, `e.pan()`, `e.pot()`, `e.oven()`, `e.toasterOven()`, `e.instantPot()`, `e.bulletMixer()`, `e.knife()`, `e.cuttingBoard()`.
+Available factories: `e.bowl()`, `e.pan()`, `e.pot()`, `e.oven()`, `e.toasterOven()`, `e.instantPot()`, `e.bulletMixer()`, `e.knife()`, `e.cuttingBoard()`, `e.colander()`, `e.nuwavePan()`, `e.microwave()`.
 
 ### Contents tracking
 Each `Equipment` instance tracks its current `contents: Ingredient[]`, updated by `add()`, `transfer()`, `mix()`, and `combine()`. `cook()` and `broil()` automatically inherit the contents of nested vessels (registered via `place()`) so downstream steps are locked correctly without manual ingredient listing.
@@ -616,10 +595,8 @@ Key visual states:
 - Completed timer: green card with ✓ and timestamp
 - Skipped timer: grey card with strikethrough and timestamp
 - Locked step: 45% opacity, red left border, "⏳ waiting…" pill
-- Unlock flash: green border/background animation (800 ms), then panel moves to Ready zone at authored position
+- Unlock flash: green border/background animation (800 ms) in place — the panel never moves
 - Recipe title: name + `estimated X min · actual Xm XXs` badge (muted colour, updates every second, freezes when all steps done)
-- Ready zone (`#ready-section`): no decoration, appears at top
-- Waiting zone (`#waiting-section`): top border + muted label; hidden when empty; completed/skipped panels are pinned and never jumped over by promoted panels
 - Action bar: three buttons — Go Shopping (blue), Nutrition (purple), Start Cooking (green)
 - Nutrition grand-total card: dark inset card, muted uppercase title; cost prepended when available
 - Nutrition recipe section: collapsible, `▸`/`▾` caret, cost + subtotal on the right of the header; selection toggle (`○`/`✓`) between serving controls and subtotal
@@ -635,12 +612,49 @@ Key visual states:
 ---
 
 ## Audio
-A beep sound plays when a timer completes. The audio context is unlocked silently on first recipe selection (when clicking a recipe button to select it), bypassing browser autoplay restrictions without producing any audible sound. This also happens when a recipe is accessed directly via URL parameter. This ensures timer sounds will play reliably during the cooking session.
+A beep sound plays when a timer's countdown reaches zero, and repeats every 30 seconds (see [Step Types](#step-types) — "time's up" warning window) until acknowledged.
+
+### Unlocking playback
+`unlockAudioContext()` runs on the first click anywhere on the page (or immediately if a recipe is opened via `?recipe=` URL). It mutes and directly plays/pauses the **actual shared alarm `Audio` element** (not a separate throwaway clip) so that specific element is granted "allowed to autoplay" status by the browser — some browsers (notably Safari) scope that permission per media element based on it having been played directly during a user gesture, rather than unlocking playback page-wide. Without this, the alarm's `play()` call — which always fires later from a `setInterval` callback, never a gesture — can be rejected outright the first time a real (non-instant) timer tries to ring.
+
+### Failure handling
+`playSound()` no longer just logs a failed `audio.play()` to the console:
+- It shows a fixed, pulsing red banner across the top of the page ("🔇 Alarm sound was blocked by the browser — tap anywhere to enable it"). Any click anywhere retries playback and clears the banner once it succeeds.
+- It also writes the specific error (e.g. `NotAllowedError: …`) directly onto the ringing step's own panel, so the failure is visible in context without opening devtools.
+
+### Wake Lock
+While any timer or gate countdown is running, the app requests a Screen Wake Lock (feature-detected; a no-op on unsupported browsers) to stop the device from auto-locking its screen. This matters because a locked/backgrounded screen typically suspends the page's JavaScript entirely — killing the countdown and preventing the alarm from ever firing. The lock releases once no timers are active (on completion, skip, or Start Over), and is re-acquired if the page becomes visible again mid-timer (the browser auto-releases it whenever the document is hidden, per spec).
+
+### Countdown reliability
+Timer/gate countdowns compute a fixed target end timestamp (`Date.now() + durationSeconds * 1000`) once, up front, rather than decrementing a counter once per tick. If the page gets suspended for a stretch (background throttling despite the Wake Lock, an unsupported browser, etc.) and resumes late, the next tick immediately detects the countdown is overdue and fires right away — instead of needing to keep ticking for however many seconds were left when it was suspended.
 
 ---
 
-## Validation Script (`validate-recipes.ts`)
-A separate script that imports the recipe module and catches any `transfer()` validation errors thrown at definition time. Run with `npx ts-node validate-recipes.ts` before deploying. Returns exit code 0 on success, 1 on failure. Suitable for use as a `pre-push` git hook or CI check.
+## Validation Script (`scripts/validate-recipes.js`)
+Runs automatically as the `postbuild` step after `tsc` (`npm run build`). Checks:
+1. **`unlockAudioContext()` primes the real alarm element** — regression guard for a real production bug (see [Audio](#audio)): fails the build if `unlockAudioContext()`'s body creates a separate `new Audio(...)` instead of calling `audio.play()` directly on the shared alarm element, or if that call is removed entirely. Fails the build.
+2. **Consecutive `.add()` calls** on the same equipment variable with no step between them — should be consolidated into one `.add()`. Fails the build.
+3. **Redundant nutrition entries** — flags an ingredient whose `nutrition` label has entries for both units of a declared `conversions` pair (or two entries with identical values, implying an unstated `factor: 1`), since the conversion system already derives one from the other. Fails the build.
+4. **Equipment/ingredient mention scan** (warning-only, never fails the build) — a heuristic, non-exhaustive scan of the literal text passed to `instruction()`/`prep()`/`Timer.set()`/`Timer.gate()`/`timerStep()` calls, checking whether words matching a known equipment type or ingredient name are actually declared in that step's `equipment:`/`ingredients:` arrays. Steps built via `Equipment` methods (`.add()`, `.mix()`, etc.) already populate those arrays automatically and aren't scanned; `info()` steps are excluded too (narrative notes, not action steps). Expect some false positives — printed as non-blocking warnings for a human to judge (e.g. "text mentions X but doesn't declare it").
+
+The script also stamps the real compile timestamp into the freshly-built `dist/file.js`, replacing the `__BUILD_TIME__` placeholder `src/file.ts` declares — see [Build Info](#build-info).
+
+`transfer()` validation errors are caught separately, at recipe-definition time (the IIFE throws immediately if an ingredient being transferred isn't actually in the source vessel) — this happens naturally whenever the module loads/compiles, not as a separate check in this script.
+
+---
+
+## Build Info
+The Select screen shows a small "Last compiled: {date}" footer at the bottom of the recipe list (part of the normal scrollable content, not the fixed action bar). `src/file.ts` declares a `BUILD_TIME` placeholder constant (`'__BUILD_TIME__'`); the `validate-recipes.js` postbuild step rewrites it in `dist/file.js` with the real compile timestamp (see [Validation Script](#validation-script-scriptsvalidate-recipesjs)). Running straight from source (e.g. under `vite`, without a `tsc` build) leaves the placeholder in place, which renders as `"dev build"` instead of a date.
+
+---
+
+## Touch & Zoom Behavior
+Since this is a kitchen app typically used one-handed or with messy hands, pinch/double-tap zoom is suppressed:
+- The viewport meta tag (`dist/main.html`) sets `maximum-scale=1.0, user-scalable=no`
+- `html, body { touch-action: pan-x pan-y; }` blocks pinch-zoom gestures at the CSS level while still allowing normal scrolling
+- A `gesturestart` listener (feature-detected, WebKit-only) calls `preventDefault()` to cover iOS Safari's non-standard pinch gesture events, which aren't fully covered by `touch-action` alone
+
+None of this is guaranteed absolute — iOS accessibility zoom settings can still override page-level zoom blocking on some versions.
 
 ---
 

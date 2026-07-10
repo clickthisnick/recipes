@@ -27,7 +27,29 @@
       "Bash(grep -n \"^const styles = \\\\`\" /home/mypi/Documents/recipes/src/file.ts)",
       "Bash(timeout 6 npx vite --port 5190)",
       "Bash(curl -s http://localhost:5190/dist/main.html)",
-      "Bash(curl -s http://localhost:5190/dist/file.js)"
+      "Bash(curl -s http://localhost:5190/dist/file.js)",
+      "Bash(cp src/file.ts /tmp/file.ts.bak)",
+      "Bash(python3 -c ' *)",
+      "Bash(echo \"exit code: $?\")",
+      "Bash(cp /tmp/file.ts.bak src/file.ts)",
+      "Bash(rm -f /tmp/file.ts.bak)",
+      "Read(//usr/local/bin/**)",
+      "Bash(ls -la /usr/local/bin/server; hostname)",
+      "Bash(grep -rln \"8001\\\\|8444\\\\|proxy\" /home/mypi/Documents/recipes --include=\"*.ts\" --include=\"*.js\" --include=\"*.json\" --include=\"*.html\" 2>/dev/null | grep -v node_modules; echo \"---dist main.html---\"; find /home/mypi/Documents/recipes/dist -maxdepth 1; echo \"---server bin---\"; ls -la /usr/local/bin/ 2>/dev/null | grep -i server)",
+      "Bash(env)",
+      "Bash(npx --version)",
+      "Bash(command -v chromium-cli)",
+      "Bash(node -e \"console.log\\(require.resolve\\('playwright'\\)\\)\")",
+      "Bash(awk ' *)",
+      "Bash(node /tmp/claude-1000/-home-mypi-Documents-recipes/61895248-319e-47dd-b0f7-2d2db1fc4581/scratchpad/probe.js)",
+      "Bash(NODE_PATH=/home/mypi/Documents/recipes/node_modules node /tmp/claude-1000/-home-mypi-Documents-recipes/61895248-319e-47dd-b0f7-2d2db1fc4581/scratchpad/probe.js)",
+      "Read(//home/mypi/.cache/ms-playwright/**)",
+      "Bash(apt list *)",
+      "Bash(grep -n \"\\\\.nutrition-eaten-btn\\\\|const style\\\\|styleSheet\\\\|insertRule\\\\|<style>\\\\|css\\\\`\" /home/mypi/Documents/recipes/src/file.ts)"
+    ],
+    "additionalDirectories": [
+      "/tmp",
+      "/usr/local/bin"
     ]
   }
 }

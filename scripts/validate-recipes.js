@@ -26,6 +26,35 @@ const errors = [];
     }
 }
 
+// ── Check 0: unlockAudioContext() must prime the actual shared alarm audio element ────────
+//
+// Regression guard for a real production bug: unlockAudioContext() used to instantiate a
+// separate throwaway `new Audio(...)` to "unlock" playback on first click. Some browsers
+// (notably Safari) scope autoplay permission per media element, granted only once that
+// specific element has been played directly during a user gesture — unlocking an unrelated
+// element doesn't transfer to the real alarm `audio` singleton. Its later play() calls
+// (always triggered from a setInterval callback when a timer rings, never a gesture) then
+// get rejected with NotAllowedError the first time a real (non-instant) timer tries to fire —
+// exactly the failure mode this check exists to prevent from ever being reintroduced.
+{
+    const fnMatch = src.match(/function unlockAudioContext\(\): void \{([\s\S]*?)\n\}/);
+    if (!fnMatch) {
+        errors.push('Could not find unlockAudioContext() to verify it primes the shared alarm audio element.');
+    } else {
+        const body = fnMatch[1];
+        if (/new Audio\(/.test(body)) {
+            errors.push(
+                'unlockAudioContext() creates a separate "new Audio(...)" instance instead of priming the ' +
+                'shared alarm `audio` element — this regresses the NotAllowedError bug (see comment above ' +
+                'this check). It must call `audio.play()` on the shared element directly.'
+            );
+        }
+        if (!/\baudio\.play\(\)/.test(body)) {
+            errors.push('unlockAudioContext() no longer calls audio.play() on the shared alarm element — real timers may fail to ring with NotAllowedError.');
+        }
+    }
+}
+
 // ── Check 1: consecutive .add() calls on the same equipment ──────────────────
 
 const addCalls = [];

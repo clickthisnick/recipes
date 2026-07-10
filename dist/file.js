@@ -32,6 +32,7 @@ function savePlanConfig(cfg) {
 const FAVORITE_RECIPE_IDS = [
     'blueprint-smoothie',
 ];
+const SHOW_HIDDEN_RECIPES_KEY = 'recipe-show-hidden';
 const state = {
     recipes: new Map(),
     bundles: new Map(),
@@ -45,7 +46,12 @@ const state = {
     cookingStartedAt: null,
     cookingElapsedInterval: null,
     audioUnlocked: false,
+    showHidden: localStorage.getItem(SHOW_HIDDEN_RECIPES_KEY) === 'true',
 };
+function setShowHidden(value) {
+    state.showHidden = value;
+    localStorage.setItem(SHOW_HIDDEN_RECIPES_KEY, String(value));
+}
 const macroTargets = { calories: 2550, protein: 147, fat: 114, saturatedFat: 20, transFat: 0, carbs: 234, sodium: 2300, fiber: 38 };
 const nutritionExclusions = new Map();
 // Recipes explicitly deselected from nutrition totals. Absence = counted (selected by default).
@@ -85,7 +91,10 @@ export const u = {
     spray: { name: 'spray' },
     bag: { name: 'bag' },
     bunch: { name: 'bunch', plural: 'bunches' },
+    can: { name: 'can' },
+    package: { name: 'package', plural: 'packages' },
     gram: { name: 'g', plural: 'g' },
+    milliliter: { name: 'ml', plural: 'ml' },
     shot: { name: 'shot', plural: 'shots' },
 };
 // ============================================================
@@ -154,6 +163,16 @@ function formatIngredient(ingredient) {
         ? unit.name
         : unit.plural || pluralize(unit.name, quantity ?? 0);
     return `${formatQuantity(quantity ?? 0)} ${unitText} ${name}`;
+}
+// Same as formatIngredient but without the item name — used to describe an
+// arbitrary quantity (e.g. "how much is still needed") in an ingredient's unit.
+function formatQuantityUnit(quantity, unit) {
+    if (!unit || !unit.name)
+        return formatQuantity(quantity);
+    const unitText = quantity === 1
+        ? unit.name
+        : unit.plural || pluralize(unit.name, quantity);
+    return `${formatQuantity(quantity)} ${unitText}`;
 }
 // ============================================================
 // STEP FACTORIES
@@ -391,6 +410,7 @@ export const e = {
     knife: (label) => new Equipment('knife', label),
     cuttingBoard: (label) => new Equipment('cutting board', label),
     colander: (label) => new Equipment('colander', label),
+    platter: (label) => new Equipment('platter', label),
     nuwavePan: (label) => new NuwaveEquipment(label),
 };
 // ============================================================
@@ -485,7 +505,11 @@ export function getServings(recipeId) {
 function getFilteredRecipes() {
     const q = state.searchQuery.toLowerCase();
     const all = [...state.recipes.values()];
-    const matched = q ? all.filter((r) => r.name.toLowerCase().includes(q)) : all;
+    // Hidden recipes are excluded from the unfiltered list, but still turn up
+    // when the user searches by name, or once "Show hidden" has been toggled on.
+    const matched = q
+        ? all.filter((r) => r.name.toLowerCase().includes(q))
+        : all.filter((r) => !r.hidden || state.showHidden);
     return matched.sort((a, b) => {
         const aAdhoc = a.adhoc ? 0 : 1;
         const bAdhoc = b.adhoc ? 0 : 1;
@@ -612,6 +636,32 @@ function buildShoppingList() {
     });
     return [...combined.values()];
 }
+// ============================================================
+// PANTRY INVENTORY
+// ============================================================
+// How much of each ingredient (name + unit) is already on hand, independent of
+// which recipes are selected. Persisted in localStorage so it survives reloads.
+const INVENTORY_KEY = 'recipe-inventory';
+function loadInventory() {
+    try {
+        const raw = localStorage.getItem(INVENTORY_KEY);
+        if (raw)
+            return JSON.parse(raw);
+    }
+    catch { }
+    return {};
+}
+function saveInventory(inventory) {
+    localStorage.setItem(INVENTORY_KEY, JSON.stringify(inventory));
+}
+// Same key shape buildShoppingList() combines on, so "have" quantities line up
+// with combined shopping-list quantities regardless of which recipes contributed them.
+// byPackage gets its own key suffix so a value entered as "packages" is never
+// misread as raw recipe-unit quantity (or vice versa) if the tracking mode changes.
+function inventoryKey(ingredient, byPackage) {
+    const base = `${ingredient.name}-${ingredient.unit?.name ?? ''}`;
+    return byPackage ? `${base}::pkg` : base;
+}
 const emptyTotals = () => ({ calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 });
 const addTotals = (a, b) => ({
     calories: a.calories + b.calories,
@@ -730,6 +780,21 @@ function ingredientCost(ing) {
         brand: product.brand,
         cost: (product.price / product.size) * convertedQty,
     };
+}
+// How many recipe-unit quantities (e.g. cups) a single package (e.g. a 13.4oz can)
+// contains — the inverse of the recipeUnit → packageUnit conversion used above, derived
+// from the same physical/density conversion data rather than a separately entered figure.
+function unitsPerPackage(ing, product) {
+    const recipeUnit = ing.unit?.name;
+    if (!recipeUnit || product.size === undefined || !product.sizeUnit)
+        return null;
+    const packageUnit = product.sizeUnit.name;
+    if (recipeUnit === packageUnit)
+        return product.size;
+    const packageUnitsPerRecipeUnit = convertWithDensity(1, recipeUnit, packageUnit, ing.conversions);
+    if (!packageUnitsPerRecipeUnit)
+        return null;
+    return product.size / packageUnitsPerRecipeUnit;
 }
 function recipeNutrition(recipe) {
     const seen = new Set();
@@ -864,6 +929,16 @@ function renderSelectScreen() {
         renderRecipeList();
     });
     root.appendChild(searchInput);
+    const hasHiddenRecipes = [...state.recipes.values()].some(r => r.hidden);
+    if (hasHiddenRecipes) {
+        const toggleBtn = createButton(state.showHidden ? 'Hide hidden recipes' : 'Show hidden recipes', () => {
+            setShowHidden(!state.showHidden);
+            renderRecipeList();
+            toggleBtn.textContent = state.showHidden ? 'Hide hidden recipes' : 'Show hidden recipes';
+        });
+        toggleBtn.className = 'show-hidden-toggle';
+        root.appendChild(toggleBtn);
+    }
     const recipeList = document.createElement('div');
     recipeList.id = 'recipe-list';
     root.appendChild(recipeList);
@@ -950,6 +1025,12 @@ function renderRecipeList() {
             const nameSpan = document.createElement('span');
             nameSpan.textContent = recipe.name;
             btn.appendChild(nameSpan);
+            if (recipe.hidden) {
+                const hiddenBadge = document.createElement('span');
+                hiddenBadge.className = 'hidden-badge';
+                hiddenBadge.textContent = 'hidden';
+                btn.appendChild(hiddenBadge);
+            }
             if (count > 1) {
                 const badge = document.createElement('span');
                 badge.className = 'count-badge';
@@ -1047,11 +1128,80 @@ function renderShoppingScreen() {
     const heading = document.createElement('h2');
     heading.textContent = 'Shopping List';
     root.appendChild(heading);
+    const inventory = loadInventory();
     buildShoppingList().forEach((ingredient) => {
         const panel = createPanel();
         const label = document.createElement('span');
         label.textContent = formatIngredient(ingredient);
         panel.appendChild(label);
+        const required = ingredient.quantity ?? 0;
+        const product = selectedProduct(ingredient);
+        // Track "have" in whole packages by default — size/sizeUnit already describe
+        // one real container for almost every product. Bulk items (cabbage sold loose
+        // per lb) opt out via `bulk`, falling back to entering the recipe unit directly
+        // rather than guessing a fake "package".
+        const packageUnit = product && !product.bulk ? (product.packageUnit ?? u.package) : undefined;
+        const perPackage = packageUnit && product ? unitsPerPackage(ingredient, product) : null;
+        const trackByPackage = perPackage !== null && perPackage > 0;
+        const key = inventoryKey(ingredient, trackByPackage);
+        const packageWord = (count) => {
+            const unit = packageUnit;
+            return count === 1 ? unit.name : (unit.plural || pluralize(unit.name, count));
+        };
+        const invRow = document.createElement('div');
+        invRow.className = 'inventory-row';
+        const haveLabel = document.createElement('label');
+        haveLabel.className = 'inventory-have-label';
+        haveLabel.textContent = trackByPackage ? `Have (${packageWord(2)}):` : 'Have:';
+        invRow.appendChild(haveLabel);
+        const haveInput = document.createElement('input');
+        haveInput.type = 'number';
+        haveInput.min = '0';
+        haveInput.step = 'any';
+        haveInput.className = 'inventory-have-input';
+        haveInput.placeholder = '0';
+        haveInput.value = inventory[key] ? String(inventory[key]) : '';
+        invRow.appendChild(haveInput);
+        const neededEl = document.createElement('span');
+        neededEl.className = 'inventory-needed';
+        invRow.appendChild(neededEl);
+        if (trackByPackage) {
+            const hint = document.createElement('span');
+            hint.className = 'inventory-package-hint';
+            hint.textContent = `1 ${packageWord(1)} ≈ ${formatQuantityUnit(perPackage, ingredient.unit)}${product?.variant ? ` (${product.variant})` : ''}`;
+            invRow.appendChild(hint);
+        }
+        const updateNeeded = (have) => {
+            const haveInRecipeUnits = trackByPackage ? have * perPackage : have;
+            const needed = Math.max(0, required - haveInRecipeUnits);
+            if (needed <= 0 && required > 0) {
+                neededEl.textContent = '✓ have enough';
+                neededEl.classList.add('inventory-satisfied');
+            }
+            else {
+                let text = `Need ${formatQuantityUnit(needed, ingredient.unit)} more`;
+                if (trackByPackage) {
+                    const packagesNeeded = Math.ceil(needed / perPackage);
+                    if (packagesNeeded > 0)
+                        text += ` (~${packagesNeeded} more ${packageWord(packagesNeeded)})`;
+                }
+                neededEl.textContent = text;
+                neededEl.classList.remove('inventory-satisfied');
+            }
+        };
+        updateNeeded(inventory[key] ?? 0);
+        haveInput.addEventListener('click', (ev) => ev.stopPropagation());
+        haveInput.addEventListener('input', () => {
+            const v = parseFloat(haveInput.value);
+            const have = isNaN(v) || v < 0 ? 0 : v;
+            if (have > 0)
+                inventory[key] = have;
+            else
+                delete inventory[key];
+            saveInventory(inventory);
+            updateNeeded(have);
+        });
+        panel.appendChild(invRow);
         const products = ingredient.products ?? [];
         if (products.length > 0) {
             const links = document.createElement('div');
@@ -1088,7 +1238,8 @@ function renderShoppingScreen() {
             panel.appendChild(links);
         }
         panel.addEventListener('click', (ev) => {
-            if (ev.target.tagName === 'A')
+            const tag = ev.target.tagName;
+            if (tag === 'A' || tag === 'INPUT' || tag === 'LABEL')
                 return;
             panel.classList.toggle('completed');
         });
@@ -1316,6 +1467,22 @@ function renderNutritionScreen() {
     totalCard.appendChild(totalCoverage);
     root.appendChild(totalCard);
     root.appendChild(renderMacroTargetsPanel(grand));
+    // ── Bulk select/unselect ─────────────────────────────────
+    const bulkActions = document.createElement('div');
+    bulkActions.className = 'nutrition-bulk-actions';
+    const selectAllBtn = createButton('Select All', () => {
+        recipes.forEach(r => nutritionRecipeExclusions.delete(r.id));
+        renderNutritionScreen();
+    });
+    selectAllBtn.className = 'nutrition-bulk-btn';
+    const unselectAllBtn = createButton('Unselect All', () => {
+        recipes.forEach(r => nutritionRecipeExclusions.add(r.id));
+        renderNutritionScreen();
+    });
+    unselectAllBtn.className = 'nutrition-bulk-btn';
+    bulkActions.appendChild(selectAllBtn);
+    bulkActions.appendChild(unselectAllBtn);
+    root.appendChild(bulkActions);
     // ── Per recipe (expandable) ──────────────────────────────
     perRecipeEff.forEach(({ recipe, servings, nutrition, excluded, effTotals, effCost }) => {
         const section = createPanel();
@@ -1704,7 +1871,8 @@ function renderCookingScreen() {
     // Every step renders in its natural recipe order, whether locked or not — a locked
     // step just looks/behaves locked in place (see applyLock). Nothing ever moves once
     // it's on screen, so unlocking never shifts the layout around it.
-    for (const step of state.cookingPlanSteps) {
+    for (let idx = 0; idx < state.cookingPlanSteps.length; idx++) {
+        const step = state.cookingPlanSteps[idx];
         if (step.recipeId && step.recipeId !== lastRecipeId) {
             lastRecipeId = step.recipeId;
             const recipe = state.recipes.get(step.recipeId);
@@ -1744,9 +1912,58 @@ function renderCookingScreen() {
                 root.appendChild(header);
             }
         }
+        if (step.type === 'info') {
+            const group = [step];
+            while (idx + 1 < state.cookingPlanSteps.length &&
+                state.cookingPlanSteps[idx + 1].type === 'info' &&
+                state.cookingPlanSteps[idx + 1].recipeId === step.recipeId) {
+                idx++;
+                group.push(state.cookingPlanSteps[idx]);
+            }
+            root.appendChild(renderInfoGroup(group));
+            continue;
+        }
         root.appendChild(renderStep(step));
     }
     root.appendChild(createStartOverButton());
+}
+function renderInfoGroup(steps) {
+    const panel = document.createElement('div');
+    panel.className = 'panel info-step info-step-collapsed';
+    const header = document.createElement('div');
+    header.className = 'info-step-header';
+    const caret = document.createElement('span');
+    caret.className = 'info-step-caret';
+    caret.textContent = '▸';
+    const label = document.createElement('span');
+    label.className = 'info-step-label';
+    label.textContent = 'Notes';
+    header.appendChild(caret);
+    header.appendChild(label);
+    const body = document.createElement('div');
+    body.className = 'info-step-body';
+    steps.forEach(step => {
+        const line = document.createElement('div');
+        line.className = 'info-step-note';
+        line.textContent = step.text;
+        body.appendChild(line);
+        if (step.linkRecipeId) {
+            const targetRecipe = state.recipes.get(step.linkRecipeId);
+            const link = document.createElement('a');
+            link.className = 'info-step-link';
+            link.href = getRecipeURL(step.linkRecipeId);
+            link.textContent = `→ ${targetRecipe?.name ?? 'Open recipe'}`;
+            link.addEventListener('click', (ev) => ev.stopPropagation());
+            line.appendChild(link);
+        }
+    });
+    panel.appendChild(header);
+    panel.appendChild(body);
+    header.addEventListener('click', () => {
+        const collapsed = panel.classList.toggle('info-step-collapsed');
+        caret.textContent = collapsed ? '▸' : '▾';
+    });
+    return panel;
 }
 // ============================================================
 // STEP LOCKING
@@ -1898,6 +2115,15 @@ function renderStep(step, onDone) {
         const body = document.createElement('div');
         body.className = 'info-step-body';
         body.textContent = step.text;
+        if (step.linkRecipeId) {
+            const targetRecipe = state.recipes.get(step.linkRecipeId);
+            const link = document.createElement('a');
+            link.className = 'info-step-link';
+            link.href = getRecipeURL(step.linkRecipeId);
+            link.textContent = `→ ${targetRecipe?.name ?? 'Open recipe'}`;
+            link.addEventListener('click', (ev) => ev.stopPropagation());
+            body.appendChild(link);
+        }
         panel.appendChild(header);
         panel.appendChild(body);
         header.addEventListener('click', () => {
@@ -2230,6 +2456,10 @@ function stopAlarm(stepId) {
     }
     stopContinuousRing(stepId);
     activeAlarms.delete(stepId);
+    // Dismissing an alarm means the user has already dealt with it — don't leave the
+    // "retry on next click" banner armed to unexpectedly blast sound on some later,
+    // unrelated click (e.g. navigating away) that has nothing to do with this alarm.
+    hideSoundBlockedBanner();
 }
 function acknowledgeAlarm(stepId) {
     const alarm = activeAlarms.get(stepId);
@@ -2242,10 +2472,13 @@ function acknowledgeAlarm(stepId) {
 // Any interaction anywhere on the page — any button, any click — dismisses
 // whatever alarm(s) are currently ringing.
 document.addEventListener('click', () => {
+    // Capture before dismissing: retry blocked playback only when this click is actually
+    // dismissing a still-active (blocked) alarm, so the user hears at least one beep for
+    // it — not for every future unrelated click for the rest of the session.
+    const retryBlockedSound = activeAlarms.size > 0 && soundBlockedBanner !== null;
     for (const stepId of [...activeAlarms.keys()])
         acknowledgeAlarm(stepId);
-    // A real click is a user gesture, so it's a good moment to retry blocked playback.
-    if (soundBlockedBanner)
+    if (retryBlockedSound)
         playSound();
 });
 function createSoundTestPanel() {
@@ -2302,7 +2535,7 @@ function renderPrepScreen() {
         title.textContent = recipe.name + (count > 1 ? ` ×${count}` : '');
         root.appendChild(title);
         const infoSteps = collectInfoSteps(recipe.steps);
-        infoSteps.forEach(step => {
+        if (infoSteps.length > 0) {
             const note = document.createElement('div');
             note.className = 'prep-info-note prep-info-collapsed';
             const noteHeader = document.createElement('div');
@@ -2317,11 +2550,16 @@ function renderPrepScreen() {
             });
             const noteBody = document.createElement('div');
             noteBody.className = 'prep-info-body';
-            noteBody.textContent = step.text;
+            infoSteps.forEach(step => {
+                const line = document.createElement('div');
+                line.className = 'prep-info-line';
+                line.textContent = step.text;
+                noteBody.appendChild(line);
+            });
             note.appendChild(noteHeader);
             note.appendChild(noteBody);
             root.appendChild(note);
-        });
+        }
         prepSteps.forEach(step => {
             const card = createPanel();
             card.className += ' prep-step';
@@ -2600,6 +2838,11 @@ const styles = `
 /* Prevent double-tap zoom on interactive elements without breaking scroll */
 button, a, input, select { touch-action: manipulation; }
 
+/* Block pinch-zoom gestures page-wide (belt-and-suspenders alongside the viewport meta
+   tag's maximum-scale/user-scalable, which some iOS versions/accessibility settings can
+   partially override) — still allow normal scrolling in both directions. */
+html, body { touch-action: pan-x pan-y; }
+
 body {
     background: #111;
     color: #f0f0f0;
@@ -2629,6 +2872,29 @@ h2 { margin-top: 0; font-size: 28px; }
     background: #222;
     color: #f0f0f0;
     margin-bottom: 16px;
+}
+
+.show-hidden-toggle {
+    font-size: 14px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid #555;
+    background: #2a2a2a;
+    color: #aaa;
+    cursor: pointer;
+    margin-bottom: 16px;
+}
+.show-hidden-toggle:hover { background: #3a3a3a; border-color: #888; color: #f0f0f0; }
+
+.hidden-badge {
+    margin-left: 10px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #888;
+    border: 1px solid #555;
+    border-radius: 10px;
+    padding: 2px 8px;
 }
 
 .panel.sound-check-btn {
@@ -2815,11 +3081,19 @@ h2 { margin-top: 0; font-size: 28px; }
 .prep-info-header { display: flex; align-items: center; gap: 6px; cursor: pointer; color: #6b7280; font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; user-select: none; }
 .prep-info-body { margin-top: 8px; font-size: 16px; color: #d1d5db; }
 .prep-info-collapsed .prep-info-body { display: none; }
+.prep-info-line { padding: 8px 0; }
+.prep-info-line:first-child { padding-top: 0; }
+.prep-info-line:not(:first-child) { border-top: 1px dashed #374151; }
 /* ── Info step (cooking screen) ── */
 .info-step { cursor: default !important; border-color: #2a2a2a; background: #111827; }
 .info-step-header { display: flex; align-items: center; gap: 8px; cursor: pointer; color: #6b7280; font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; user-select: none; }
 .info-step-caret { font-size: 11px; }
 .info-step-body { margin-top: 12px; font-size: 18px; color: #d1d5db; }
+.info-step-note { padding: 10px 0; }
+.info-step-note:first-child { padding-top: 0; }
+.info-step-note:not(:first-child) { border-top: 1px dashed #2a2a2a; }
+.info-step-link { display: block; margin-top: 10px; color: #60a5fa; font-size: 17px; text-decoration: none; }
+.info-step-link:hover { text-decoration: underline; }
 .info-step-collapsed .info-step-body { display: none; }
 
 #recipe-list { padding-bottom: 120px; }
@@ -2899,6 +3173,17 @@ h2 { margin-top: 0; font-size: 28px; }
 .purchase-link:hover { text-decoration: underline; }
 .purchase-link.default-product { color: #2d9e4a; font-weight: bold; }
 
+.inventory-row { margin-top: 10px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; cursor: default; }
+.inventory-have-label { font-size: 14px; color: #888; }
+.inventory-have-input {
+    width: 70px; font-size: 16px; padding: 4px 8px; border-radius: 6px;
+    border: 1px solid #444; background: #1a1a1a; color: #f0f0f0;
+}
+.inventory-have-input:focus { outline: none; border-color: #60a5fa; background: #1e2a3a; }
+.inventory-needed { font-size: 14px; color: #f59e0b; }
+.inventory-needed.inventory-satisfied { color: #2d9e4a; font-weight: 600; }
+.inventory-package-hint { font-size: 12px; color: #666; font-style: italic; width: 100%; }
+
 .start-over-btn { margin-top: 32px; font-size: 20px; padding: 16px 32px; border-radius: 12px; border: 2px solid #444; background: #222; color: #f0f0f0; cursor: pointer; }
 
 .empty { color: #666; font-style: italic; }
@@ -2937,6 +3222,10 @@ h2 { margin-top: 0; font-size: 28px; }
 .nutrition-serving-btn { font-size: 18px; width: 32px; height: 32px; border-radius: 8px; border: 1px solid #555; background: #2a2a2a; color: #f0f0f0; cursor: pointer; line-height: 1; padding: 0; }
 .nutrition-serving-btn:hover { background: #3a3a3a; border-color: #888; }
 .nutrition-serving-count { font-size: 14px; color: #aaa; min-width: 28px; text-align: center; }
+
+.nutrition-bulk-actions { display: flex; gap: 8px; margin: 0 0 14px; }
+.nutrition-bulk-btn { font-size: 13px; padding: 6px 12px; border-radius: 8px; border: 1px solid #555; background: #2a2a2a; color: #aaa; cursor: pointer; }
+.nutrition-bulk-btn:hover { background: #3a3a3a; border-color: #888; color: #f0f0f0; }
 
 /* ── Bundles ── */
 .bundle-row { margin: 6px 0; }
@@ -3051,6 +3340,9 @@ h2 { margin-top: 0; font-size: 28px; }
     .macro-target-input { width: 58px; font-size: 13px; }
     .macro-actual, .macro-remaining { font-size: 13px; }
 
+    .inventory-have-input { width: 58px; font-size: 14px; }
+    .inventory-have-label, .inventory-needed { font-size: 13px; }
+
     /* Nutrition header: allow sub to wrap below the name row */
     .nutrition-recipe-header { flex-wrap: wrap; }
     .nutrition-recipe-sub { white-space: normal; flex-basis: 100%; text-align: left; padding-left: 26px; }
@@ -3065,7 +3357,7 @@ h2 { margin-top: 0; font-size: 28px; }
 // Replaced with the real compile timestamp by scripts/validate-recipes.js's postbuild
 // step, right after `tsc` emits dist/file.js. Left as-is (and reported as "dev build")
 // when running straight from source, e.g. under `vite`.
-const BUILD_TIME = '2026-07-07T23:24:47.576Z';
+const BUILD_TIME = '2026-07-10T16:45:53.723Z';
 function formatBuildTime() {
     const date = new Date(BUILD_TIME);
     if (isNaN(date.getTime()))
@@ -3085,6 +3377,12 @@ function bootstrap() {
     document.head.insertAdjacentHTML('beforeend', `<style>${styles}</style>`);
     document.body.innerHTML = `<div id="app"></div>`;
     document.addEventListener('click', () => unlockAudioContext(), { once: true });
+    // iOS Safari fires its own non-standard gesture events for pinch-zoom that aren't
+    // fully covered by touch-action — block those directly. Feature-detected since only
+    // WebKit dispatches them.
+    if ('ongesturestart' in document) {
+        document.addEventListener('gesturestart', (e) => e.preventDefault());
+    }
     const recipeIdFromURL = getRecipeIdFromURL();
     if (recipeIdFromURL && state.recipes.has(recipeIdFromURL)) {
         state.selectedRecipeIds = [recipeIdFromURL];
@@ -3142,6 +3440,9 @@ export const i = {
         whiteVinegar: '', bakingSoda: '',
         babyBellaMushroom: '', yellowOnion: '', oliveOil: '',
         rosemary: '', thyme: '',
+        fennel: '', radicchio: '', arugula: '', orange: '',
+        grapefruit: 'Pink Grapefruit', champagneVinegar: '',
+        honeyDijonMustard: '', fennelFronds: '',
     }),
     blackPepper: ingredientFactory('Black Pepper', {
         defaultBrand: '365',
@@ -3179,9 +3480,14 @@ export const i = {
                 brand: '365', variant: 'Organic Shredded (10 oz)', store: stores.wholeFoods,
                 price: 2.99, size: 10, sizeUnit: u.ounce,
                 link: 'https://www.amazon.com/dp/B078J1FS9V',
+            }, {
+                brand: 'CAL ORGANIC', variant: 'Organic Whole (16 oz)', store: stores.wholeFoods,
+                price: 1.79, size: 16, sizeUnit: u.ounce, organic: true,
+                link: 'https://www.amazon.com/dp/B00E3JELZ4',
             }],
         nutrition: {
             [u.cup.name]: { servings: 1, servingSize: 1, calories: 52, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 12, sodium: 88, sugar: 6, protein: 1, fiber: 3 },
+            [u.unit.name]: { servings: 5, servingSize: 1, calories: 32, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 7, sodium: 54, sugar: 4, protein: 1, fiber: 2 },
         },
         conversions: {
             [u.cup.name]: { to: u.pound, factor: 0.24 },
@@ -3191,7 +3497,7 @@ export const i = {
         defaultBrand: '365',
         products: [{
                 brand: '365', variant: 'Organic Frozen Shelled', store: stores.wholeFoods,
-                price: 3.49, size: 10, sizeUnit: u.ounce,
+                price: 3.49, size: 10, sizeUnit: u.ounce, packageUnit: u.bag,
                 link: 'https://www.amazon.com/dp/B074H6S8D8',
             }],
         nutrition: {
@@ -3202,8 +3508,17 @@ export const i = {
         },
     }),
     cabbage: ingredientFactory('Green Cabbage', {
+        defaultBrand: 'Whole Foods Market',
+        products: [{
+                brand: 'Whole Foods Market', variant: 'Organic, Loose (~2.5 lb head)', store: stores.wholeFoods,
+                price: 1.99, size: 1, sizeUnit: u.pound, organic: true, bulk: true,
+                link: 'https://www.amazon.com/dp/B0787TK5FV',
+            }],
         nutrition: {
             [u.cup.name]: { servings: 1, servingSize: 1, calories: 22, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 5, sodium: 16, sugar: 3, protein: 1, fiber: 2 },
+        },
+        conversions: {
+            [u.cup.name]: { to: u.pound, factor: 0.2 }, // 1 cup shredded cabbage ≈ 89g ≈ 0.2 lb
         },
     }),
     coleslawMix: ingredientFactory('Coleslaw Mix', {
@@ -3211,7 +3526,7 @@ export const i = {
         defaultBrand: '365',
         products: [{
                 brand: '365', variant: 'Organic (12 oz)', store: stores.wholeFoods,
-                price: 3.49, size: 12, sizeUnit: u.ounce,
+                price: 3.49, size: 12, sizeUnit: u.ounce, packageUnit: u.bag,
                 link: 'https://www.amazon.com/dp/B07FWN3244',
             }],
         nutrition: {
@@ -3227,7 +3542,7 @@ export const i = {
         defaultBrand: 'Whole Foods Market',
         products: [{
                 brand: 'Whole Foods Market', variant: 'Organic Scallions (1 Bunch)', store: stores.wholeFoods,
-                price: 1.99, size: 1, sizeUnit: u.bunch,
+                price: 1.99, size: 1, sizeUnit: u.bunch, packageUnit: u.bunch,
                 link: 'https://www.amazon.com/dp/B07883LXVL',
             }],
         nutrition: {
@@ -3289,7 +3604,7 @@ export const i = {
         },
         products: [{
                 brand: '365', variant: 'Organic Unsalted (13.4 oz)', store: stores.wholeFoods,
-                price: 1.59, size: 13.4, sizeUnit: u.ounce,
+                price: 1.59, size: 13.4, sizeUnit: u.ounce, packageUnit: u.can,
                 link: 'https://www.amazon.com/dp/B074H5SRPW',
             }],
         nutrition: {
@@ -3303,7 +3618,7 @@ export const i = {
         },
         products: [{
                 brand: '365', variant: 'Organic Unsalted (13.4 oz)', store: stores.wholeFoods,
-                price: 1.59, size: 13.4, sizeUnit: u.ounce,
+                price: 1.59, size: 13.4, sizeUnit: u.ounce, packageUnit: u.can,
                 link: 'https://www.amazon.com/dp/B074H5J2V7',
             }],
         nutrition: {
@@ -3845,12 +4160,13 @@ registerGroup('Dinner', [
         ]));
         s(instruction('Add dressing and toppings from kit, toss to combine', { equipment: [bowl.name] }));
         return steps;
-    })()), { planMinutes: 10, portable: false }),
-    createRecipe('asian-dense-bean-salad-original', 'Asian Dense Bean Salad (Original Blueprint Version)', (() => {
+    })()), { planMinutes: 10, portable: false, hidden: true }),
+    withPlan(createRecipe('asian-dense-bean-salad-original', 'Asian Dense Bean Salad (Original Blueprint Version)', (() => {
         const saladBowl = e.bowl('salad bowl');
         const dressBowl = e.bowl('dressing bowl');
         const ALMONDS = i.almond(1, u.handful);
         const CARROTS = i.carrot(1, u.cup);
+        CARROTS.defaultBrand = 'CAL ORGANIC'; // this recipe shreds whole carrots itself, not pre-shredded
         const CABBAGE = i.cabbage(2, u.cup);
         const CHICKPEAS = i.chickpeas(1, u.cup);
         const CANNELLINI = i.cannelliniBean(1, u.cup);
@@ -3882,11 +4198,12 @@ registerGroup('Dinner', [
         s(instruction('Divide into bowls and top with chopped almonds', { ingredients: [ALMONDS] }));
         s(Timer.set(30, 'm', 'Optional: chill before serving'));
         return steps;
-    })()),
+    })()), { hidden: true }),
     createRecipe('asian-dense-bean-salad', 'Asian Dense Bean Salad', (() => {
         const saladBowl = e.bowl('salad bowl');
         const CARROTS = i.carrot(1, u.cup);
-        const COLESLAW_MIX = i.coleslawMix(2, u.cup);
+        CARROTS.defaultBrand = 'CAL ORGANIC'; // this recipe shreds whole carrots itself, not pre-shredded
+        const CABBAGE = i.cabbage(2, u.cup);
         const CHICKPEAS = i.chickpeas(1, u.cup);
         const CANNELLINI = i.cannelliniBean(1, u.cup);
         const EDAMAME = i.edamame(1, u.cup);
@@ -3894,9 +4211,11 @@ registerGroup('Dinner', [
         const s = (...newSteps) => steps.push(...newSteps);
         const microwave = e.microwave();
         s(Timer.set(80, 's', 'If eating right away and edamame is frozen: microwave edamame', { equipment: [microwave.name], ingredients: [EDAMAME] }));
+        s(prep('Peel and shred carrots', { ingredients: [CARROTS] }));
+        s(prep('Shred cabbage (can be done the day before)', { ingredients: [CABBAGE] }));
         const addProduce = saladBowl.add([
-            [CARROTS, 'pre-shredded'],
-            COLESLAW_MIX,
+            [CARROTS, 'shredded'],
+            [CABBAGE, 'shredded'],
             [i.greenOnion(2, u.unit), 'chopped'],
             CHICKPEAS,
             CANNELLINI,
@@ -3931,6 +4250,49 @@ registerGroup('Dinner', [
         s(pan.cook('Cook second side', time.minutes(8), 350));
         s(Timer.gate('Is the thickest thigh at least 175°F?', 2, 'm', { ingredients: [THIGHS], equipment: [pan.name] }));
         s(Timer.set(5, 'm', `Rest ${THIGHS.name} before eating`, { ingredients: [THIGHS], equipment: [pan.name] }));
+        return steps;
+    })()),
+    createRecipe('fennel-radicchio-citrus-salad', 'Fennel, Radicchio, and Citrus Salad', (() => {
+        const board = e.cuttingBoard();
+        const knife = e.knife();
+        const soakBowl = e.bowl('lemon water bowl');
+        const platter = e.platter();
+        const dressBowl = e.bowl('dressing bowl');
+        const FENNEL = i.fennel(2, u.unit);
+        const RADICCHIO = i.radicchio(1, u.unit);
+        const ARUGULA = i.arugula(140, u.gram);
+        const ORANGE = i.orange(1, u.unit);
+        const GRAPEFRUIT = i.grapefruit(1, u.unit);
+        const FRONDS = i.fennelFronds(1, u.handful);
+        const steps = [];
+        const s = (...newSteps) => steps.push(...newSteps);
+        s(prep('Trim fennel stalks and slice bulbs thinly, reserving the fronds', {
+            equipment: [board.name, knife.name], ingredients: [FENNEL, FRONDS],
+        }));
+        s(soakBowl.add([
+            [i.water(2, u.cup), 'with a squeeze of lemon juice'],
+            FENNEL,
+        ], 'to prevent browning'));
+        s(prep('Remove core from radicchio and slice thinly', {
+            equipment: [board.name, knife.name], ingredients: [RADICCHIO],
+        }));
+        s(prep('Peel and segment orange and grapefruit', {
+            equipment: [board.name, knife.name], ingredients: [ORANGE, GRAPEFRUIT],
+        }));
+        s(platter.add([RADICCHIO, FENNEL, ORANGE, GRAPEFRUIT, ARUGULA], 'arrange on platter'));
+        s(dressBowl.add([
+            i.blueprintOliveOil(2, u.tbsp),
+            i.champagneVinegar(30, u.milliliter),
+            i.lemonJuice(30, u.milliliter),
+            i.honeyDijonMustard(5, u.gram),
+            FRONDS,
+        ]));
+        const dressingReady = dressBowl.mix('fennel vinaigrette');
+        s(dressingReady);
+        s(platter.combine([dressBowl.result], 'drizzle dressing over salad').waitFor(dressingReady));
+        s(instruction('Season with salt and pepper, garnish, and serve', {
+            ingredients: [i.salt(0.25, u.tsp), i.blackPepper(0.25, u.tsp)], equipment: [platter.name],
+        }));
         return steps;
     })()),
 ]);
@@ -3985,6 +4347,7 @@ registerGroup('Lentils', [
         const pot = e.pot();
         const colander = e.colander();
         s(info('130g dry lentils → ~330g cooked. Keeps in the fridge for 3 days.'));
+        s(info('Tip: you can cook 3 days worth in one batch instead.', { linkRecipeId: 'ing-black-lentils-induction-195g' }));
         s(pot.add([LENTILS, WATER]));
         s(instruction('Place lid fully on pot', { equipment: [pot.name] }));
         s(instruction('Set induction stovetop to 215°', { equipment: [pot.name] }));
@@ -3994,7 +4357,7 @@ registerGroup('Lentils', [
         s(instruction('Portion cooked lentils in half (~165g each) into two stainless steel containers', { ingredients: [LENTILS] }));
         s(instruction('Rinse pot and wipe dry with a paper towel (Otherwise Pot Stains)', { equipment: [pot.name] }));
         return steps;
-    })()), { planMinutes: 3, portable: true, prepMinutes: 24, perishableDays: 3, sortOrder: 1 }),
+    })()), { planMinutes: 3, portable: true, prepMinutes: 24, perishableDays: 3, sortOrder: 1, hidden: true }),
     withPlan(createRecipe('ing-black-lentils-induction', 'Black Lentils (65g ×1) (Induction Stovetop)', (() => {
         const steps = [];
         const s = (...newSteps) => steps.push(...newSteps);
@@ -4003,6 +4366,7 @@ registerGroup('Lentils', [
         const pot = e.pot();
         const colander = e.colander();
         s(info('65g dry lentils → 165g cooked. Keeps in the fridge for 3 days.'));
+        s(info('Tip: you can cook 3 days worth in one batch instead.', { linkRecipeId: 'ing-black-lentils-induction-195g' }));
         s(pot.add([LENTILS, WATER]));
         s(instruction('Place lid fully on pot', { equipment: [pot.name] }));
         s(instruction('Set induction stovetop to 215°', { equipment: [pot.name] }));
@@ -4020,6 +4384,7 @@ registerGroup('Lentils', [
         const pot = e.pot();
         const colander = e.colander();
         s(info('65g dry lentils → 165g cooked. Keeps in the fridge for 3 days.'));
+        s(info('Tip: you can cook 3 days worth in one batch instead.', { linkRecipeId: 'ing-black-lentils-induction-195g' }));
         s(pot.add([LENTILS]));
         s(instruction('Add water to pot', { equipment: [pot.name], ingredients: [WATER] }));
         s(Timer.set(21, 'm', 'Cook lentils', { equipment: [pot.name], ingredients: [LENTILS, WATER] }));
@@ -4027,7 +4392,7 @@ registerGroup('Lentils', [
         s(instruction('Portion 65g cooked lentils into stainless steel container', { ingredients: [LENTILS] }));
         s(instruction('Rinse pot and wipe dry with a paper towel (Otherwise Pot Stains)', { equipment: [pot.name] }));
         return steps;
-    })()), { planMinutes: 3, portable: true, prepMinutes: 21, perishableDays: 3, sortOrder: 3 }),
+    })()), { planMinutes: 3, portable: true, prepMinutes: 21, perishableDays: 3, sortOrder: 3, hidden: true }),
 ]);
 registerGroup('Ingredients', [
     withPlan(createRecipe('ing-macadamia-bar', 'Blueprint Macadamia Bar', [
@@ -4044,19 +4409,25 @@ registerGroup('Ingredients', [
 // ============================================================
 // BUNDLES
 // ============================================================
+const DAILY_BLUEPRINT_RECIPE_IDS = [
+    'blueprint-smoothie',
+    'blueprint-longevity-drink',
+    'ing-black-lentils-induction',
+    'ing-macadamia-bar',
+    'ing-macadamia-bar',
+    'ing-psyllium-husk',
+    'protein-nutmix-oliveoil',
+    'asian-dense-bean-salad',
+];
 registerBundle({
     id: 'daily-blueprint',
     name: 'Daily Blueprint',
-    recipeIds: [
-        'blueprint-smoothie',
-        'blueprint-longevity-drink',
-        'ing-black-lentils-induction',
-        'ing-macadamia-bar',
-        'ing-macadamia-bar',
-        'ing-psyllium-husk',
-        'protein-nutmix-oliveoil',
-        'asian-dense-bean-salad',
-    ],
+    recipeIds: DAILY_BLUEPRINT_RECIPE_IDS,
+});
+registerBundle({
+    id: 'weekly-blueprint',
+    name: 'Weekly Blueprint (×5)',
+    recipeIds: Array(5).fill(DAILY_BLUEPRINT_RECIPE_IDS).flat(),
 });
 // ============================================================
 // START APP
