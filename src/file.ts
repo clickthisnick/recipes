@@ -155,11 +155,6 @@ export interface RecipeBundle {
 // GLOBAL STATE
 // ============================================================
 
-// Recipe IDs to pin to the top of the list. Edit at build time.
-const FAVORITE_RECIPE_IDS: string[] = [
-    'blueprint-smoothie',
-];
-
 const SHOW_HIDDEN_RECIPES_KEY = 'recipe-show-hidden';
 
 const state = {
@@ -575,7 +570,7 @@ class Equipment {
 class NuwaveEquipment extends Equipment {
     constructor(label?: string) { super('Nuwave pan', label); }
     preheat(temperature: number): Step {
-        const duration = temperature === 350 ? time.minutes(2) : time.minutes(3);
+        const duration = temperature === 325 ? time.minutes(2) : time.minutes(3);
         return timerStep(`Preheat ${this.name} to ${temperature}°`, duration, { equipment: [this.name] });
     }
 }
@@ -708,9 +703,6 @@ function getFilteredRecipes(): Recipe[] {
         const aAdhoc = a.adhoc ? 0 : 1;
         const bAdhoc = b.adhoc ? 0 : 1;
         if (aAdhoc !== bAdhoc) return aAdhoc - bAdhoc;
-        const aFav = FAVORITE_RECIPE_IDS.includes(a.id) ? 0 : 1;
-        const bFav = FAVORITE_RECIPE_IDS.includes(b.id) ? 0 : 1;
-        if (aFav !== bFav) return aFav - bFav;
         if (a.sortOrder !== undefined && b.sortOrder !== undefined) return a.sortOrder - b.sortOrder;
         return a.name.localeCompare(b.name);
     });
@@ -1270,16 +1262,6 @@ function renderRecipeList(): void {
             const row = document.createElement('div');
             row.className = 'recipe-row';
 
-            if (!recipe.adhoc && FAVORITE_RECIPE_IDS.includes(recipe.id)) {
-                const star = document.createElement('span');
-                star.className   = 'fav-star';
-                star.textContent = '★';
-                row.appendChild(star);
-            } else if (!recipe.adhoc) {
-                const spacer = document.createElement('span');
-                spacer.className = 'fav-star fav-star-spacer';
-                row.appendChild(spacer);
-            }
 
             const btn     = document.createElement('button');
             btn.className = 'recipe-btn';
@@ -3491,9 +3473,6 @@ h2 { margin-top: 0; font-size: 28px; }
 }
 .adhoc-confirm:hover { background: #15803d; }
 
-.fav-star { font-size: 20px; width: 32px; color: #f5c518; user-select: none; flex-shrink: 0; }
-.fav-star-spacer { color: transparent; }
-
 .copy-link-btn { font-size: 18px; padding: 10px 12px; background: none; border: none; color: #666; cursor: pointer; line-height: 1; transition: color 0.3s; }
 .copy-link-btn:hover  { color: #60a5fa; }
 .copy-link-btn:active { color: #2d9e4a; }
@@ -4788,7 +4767,7 @@ registerGroup('Dinner', [
         return steps;
     })()),
 
-    createRecipe('nuwave-chicken-thighs', 'Nuwave Chicken Thighs (350°F)', (() => {
+    createRecipe('nuwave-chicken-thighs', 'Nuwave Chicken Thighs (325°F)', (() => {
         const pan = e.nuwavePan();
         const seasoningBowl = e.bowl('seasoning bowl');
         const THIGHS = i.chickenThigh();
@@ -4803,14 +4782,16 @@ registerGroup('Dinner', [
         ]));
         s(seasoningBowl.mix());
         s(instruction(`Season ${THIGHS.name} on both sides with seasoning mixture`, { ingredients: [THIGHS] }));
-        s(pan.preheat(350));
+        s(pan.preheat(325));
         s(pan.add([
             i.avocadoOil(1, u.spray),
             [THIGHS, 'smooth side down'],
         ]));
-        s(pan.cook('Cook first side — do not move', time.minutes(8), 350));
+        s(instruction('Place lid fully on pan', { equipment: [pan.name] }));
+        s(pan.cook('Cook first side, covered — do not move', time.minutes(8), 325));
         s(pan.flip());
-        s(pan.cook('Cook second side', time.minutes(8), 350));
+        s(pan.cook('Cook second side, covered', time.minutes(8), 325));
+        s(instruction('Remove lid', { equipment: [pan.name] }));
         s(Timer.gate('Is the thickest thigh at least 175°F?', 2, 'm', { ingredients: [THIGHS], equipment: [pan.name] }));
         s(Timer.set(5, 'm', `Rest ${THIGHS.name} before eating`, { ingredients: [THIGHS], equipment: [pan.name] }));
 
