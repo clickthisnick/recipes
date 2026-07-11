@@ -45,7 +45,15 @@
       "Bash(NODE_PATH=/home/mypi/Documents/recipes/node_modules node /tmp/claude-1000/-home-mypi-Documents-recipes/61895248-319e-47dd-b0f7-2d2db1fc4581/scratchpad/probe.js)",
       "Read(//home/mypi/.cache/ms-playwright/**)",
       "Bash(apt list *)",
-      "Bash(grep -n \"\\\\.nutrition-eaten-btn\\\\|const style\\\\|styleSheet\\\\|insertRule\\\\|<style>\\\\|css\\\\`\" /home/mypi/Documents/recipes/src/file.ts)"
+      "Bash(grep -n \"\\\\.nutrition-eaten-btn\\\\|const style\\\\|styleSheet\\\\|insertRule\\\\|<style>\\\\|css\\\\`\" /home/mypi/Documents/recipes/src/file.ts)",
+      "Bash(git status *)",
+      "Skill(code-review)",
+      "Skill(code-review:*)",
+      "Bash(find /home/mypi/Documents/recipes -iname \"CLAUDE.md\" -not -path \"*/node_modules/*\"; echo ---; find /home/mypi -maxdepth 1 -iname \"CLAUDE.md\"; find /home/mypi/.claude -maxdepth 1 -iname \"CLAUDE.md\" 2>/dev/null)",
+      "Read(//home/mypi/**)",
+      "Bash(grep -n \"^registerGroup\\\\|^registerRecipe\\(createRecipe\\(\\\\s*$\\\\|clean-water-bottle\" src/file.ts)",
+      "WebFetch(domain:www.quakeroats.com)",
+      "WebFetch(domain:www.myfooddiary.com)"
     ],
     "additionalDirectories": [
       "/tmp",

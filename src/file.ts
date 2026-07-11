@@ -588,6 +588,7 @@ export const e = {
     cuttingBoard: (label?: string) => new Equipment('cutting board', label),
     colander:     (label?: string) => new Equipment('colander',      label),
     platter:      (label?: string) => new Equipment('platter',       label),
+    kettle:       (label?: string) => new Equipment('tea kettle',    label),
     nuwavePan:    (label?: string) => new NuwaveEquipment(label),
 };
 
@@ -2519,13 +2520,20 @@ function renderStep(step: Step, onDone?: () => void): HTMLElement {
     return panel;
 }
 
-function completeTimer(step: Step, panel: HTMLElement, onDone?: () => void): void {
+// `dueAt` — the timer's original deadline, if this completion followed a countdown (omitted
+// for a gate's immediate "Yes", which never ran one) — lets the card show not just when it
+// was acknowledged but how late that was, mirroring the overdue readout shown while ringing.
+function completeTimer(step: Step, panel: HTMLElement, onDone?: () => void, dueAt?: number): void {
     panel.classList.remove('timer');
     panel.classList.add('completed');
-    const completedAt = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const completedAtMs = Date.now();
+    const completedAt   = formatClockTime(completedAtMs);
     const runCount = state.gateRunCounts.get(step.id) ?? 0;
     const checkedSuffix = runCount > 0 ? ` (checked ${runCount}×)` : '';
-    panel.textContent = `✓ ${step.text} — completed at ${completedAt}${checkedSuffix}`;
+    const overdueSuffix = dueAt !== undefined
+        ? ` (up at ${formatClockTime(dueAt)} — overdue by ${formatOverdueDuration(Math.max(0, Math.round((completedAtMs - dueAt) / 1000)))})`
+        : '';
+    panel.textContent = `✓ ${step.text} — completed at ${completedAt}${overdueSuffix}${checkedSuffix}`;
     onDone?.();
 }
 
@@ -2628,27 +2636,32 @@ document.addEventListener('visibilitychange', () => {
 // that a countdown suspended by the browser (backgrounded tab, locked screen) still fires
 // immediately once the page wakes back up, instead of needing to "catch up" one tick at a
 // time for however many seconds were left when it was suspended.
+function formatClockTime(ms: number): string {
+    return new Date(ms).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
 function runCountdown(
     step: Step,
     panel: HTMLElement,
     durationSeconds: number,
-    formatLabel: (mm: string, ss: string) => string,
-    onComplete: () => void
+    formatLabel: (mm: string, ss: string, dueAtLabel: string) => string,
+    onComplete: (dueAt: number) => void
 ): void {
     const endAt = Date.now() + durationSeconds * 1000;
+    const dueAtLabel = formatClockTime(endAt);
     panel.classList.add('timer');
     acquireWakeLock();
     const intervalId = window.setInterval(() => {
         const remaining = Math.max(0, Math.round((endAt - Date.now()) / 1000));
         const mm = String(Math.floor(remaining / 60)).padStart(2, '0');
         const ss = String(remaining % 60).padStart(2, '0');
-        panel.textContent = formatLabel(mm, ss);
+        panel.textContent = formatLabel(mm, ss, dueAtLabel);
         if (Date.now() >= endAt) {
             window.clearInterval(intervalId);
             state.timers.delete(step.id);
             releaseWakeLockIfIdle();
             panel.classList.remove('timer');
-            onComplete();
+            onComplete(endAt);
         }
     }, 1000);
     state.timers.set(step.id, intervalId);
@@ -2656,15 +2669,19 @@ function runCountdown(
 
 function startTimer(step: Step, panel: HTMLElement, onDone?: () => void): void {
     if (!step.durationSeconds || state.timers.has(step.id)) return;
-    runCountdown(step, panel, step.durationSeconds, (mm, ss) => `${mm}:${ss} ${step.text} — tap 3× to skip`, () => {
-        if (panel.classList.contains('sound-check-btn')) {
-            // Quick sound test button — beep once and reset immediately, no alarm loop.
-            playSound(panel);
-            completeTimer(step, panel, onDone);
-        } else {
-            startAlarm(step, panel, () => completeTimer(step, panel, onDone));
+    runCountdown(
+        step, panel, step.durationSeconds,
+        (mm, ss, dueAtLabel) => `${mm}:${ss} ${step.text} — up at ${dueAtLabel} — tap 3× to skip`,
+        (dueAt) => {
+            if (panel.classList.contains('sound-check-btn')) {
+                // Quick sound test button — beep once and reset immediately, no alarm loop.
+                playSound(panel);
+                completeTimer(step, panel, onDone, dueAt);
+            } else {
+                startAlarm(step, panel, dueAt, () => completeTimer(step, panel, onDone, dueAt));
+            }
         }
-    });
+    );
 }
 
 // ============================================================
@@ -2720,9 +2737,13 @@ function startGateRetryTimer(step: Step, panel: HTMLElement, onDone?: () => void
     if (!step.durationSeconds || state.timers.has(step.id)) return;
     state.gateRunCounts.set(step.id, (state.gateRunCounts.get(step.id) ?? 0) + 1);
     panel.textContent = '';
-    runCountdown(step, panel, step.durationSeconds, (mm, ss) => `${mm}:${ss} cooking more — tap 3× to skip`, () => {
-        startAlarm(step, panel, () => renderGateQuestion(step, panel, onDone));
-    });
+    runCountdown(
+        step, panel, step.durationSeconds,
+        (mm, ss, dueAtLabel) => `${mm}:${ss} cooking more — up at ${dueAtLabel} — tap 3× to skip`,
+        (dueAt) => {
+            startAlarm(step, panel, dueAt, () => renderGateQuestion(step, panel, onDone));
+        }
+    );
 }
 
 function skipGateRetryTimer(step: Step, panel: HTMLElement, onDone?: () => void): void {
@@ -2795,9 +2816,21 @@ const activeAlarms = new Map<number, { panel: HTMLElement; onAcknowledge: () => 
 // truly stops once none of them are ringing anymore.
 const continuousRingSteps = new Set<number>();
 
-function startAlarm(step: Step, panel: HTMLElement, onAcknowledge: () => void): void {
+// mm:ss for durations under an hour; h:mm:ss once overdue runs past 60 minutes.
+function formatOverdueDuration(totalSeconds: number): string {
+    const h  = Math.floor(totalSeconds / 3600);
+    const m  = Math.floor((totalSeconds % 3600) / 60);
+    const s  = totalSeconds % 60;
+    const mm = String(m).padStart(2, '0');
+    const ss = String(s).padStart(2, '0');
+    return h > 0 ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
+}
+
+function startAlarm(step: Step, panel: HTMLElement, dueAt: number, onAcknowledge: () => void): void {
     panel.classList.add('ringing');
     panel.textContent = '';
+
+    const dueAtLabel = formatClockTime(dueAt);
 
     const label = document.createElement('div');
     label.className   = 'ringing-label';
@@ -2821,19 +2854,31 @@ function startAlarm(step: Step, panel: HTMLElement, onAcknowledge: () => void): 
     activeAlarms.set(step.id, { panel, onAcknowledge });
 
     let remaining = ALARM_WARNING_SECONDS;
-    countdown.textContent = `Next alarm in ${remaining}s`;
+    let ringingContinuously = false;
+
+    // Overdue keeps incrementing (based on the original deadline, not this alarm's start)
+    // for as long as the alarm is left ringing, so a user who steps away can see exactly
+    // how late they are when they come back — not just that they're late.
+    const updateDisplay = (): void => {
+        const overdue = Math.max(0, Math.round((Date.now() - dueAt) / 1000));
+        const overdueLabel = `up at ${dueAtLabel} — overdue by ${formatOverdueDuration(overdue)}`;
+        countdown.textContent = ringingContinuously
+            ? overdueLabel
+            : `${overdueLabel} — next alarm in ${remaining}s`;
+    };
+
+    updateDisplay();
     playSound(panel);
 
     const intervalId = window.setInterval(() => {
-        remaining--;
-        if (remaining <= 0) {
-            window.clearInterval(intervalId);
-            state.ringingAlarms.delete(step.id);
-            countdown.textContent = 'Ringing…';
-            startContinuousRing(step.id);
-            return;
+        if (!ringingContinuously) {
+            remaining--;
+            if (remaining <= 0) {
+                ringingContinuously = true;
+                startContinuousRing(step.id);
+            }
         }
-        countdown.textContent = `Next alarm in ${remaining}s`;
+        updateDisplay();
     }, 1000);
     state.ringingAlarms.set(step.id, intervalId);
 }
@@ -3900,6 +3945,21 @@ export const i = {
         fennel: '', radicchio: '', arugula: '', orange: '',
         grapefruit: 'Pink Grapefruit', champagneVinegar: '',
         honeyDijonMustard: '', fennelFronds: '',
+        whiteOnion: '', sourCream: '', mayonnaise: '', dillWeed: '',
+        parsleyFlakes: '', seaSalt: '',
+    }),
+
+    instantOatmeal: ingredientFactory('Instant Oatmeal (Maple & Brown Sugar, Lower Sugar)', {
+        defaultBrand: 'Quaker',
+        products: [{
+            brand: 'Quaker', variant: 'Lower Sugar, Maple & Brown Sugar (1.19 oz, Pack of 44)', store: stores.amazon,
+            price: 13.72, size: 44, sizeUnit: u.unit,
+            discount: { subscribeAndSave: 11.66 },
+            link: 'https://www.amazon.com/dp/B094TG5HDJ',
+        }],
+        nutrition: {
+            [u.unit.name]: { servings: 44, servingSize: 1, calories: 120, fat: 2, saturatedFat: 0.5, transFat: 0, cholesterol: 0, carbs: 24, sodium: 240, sugar: 4, protein: 4, fiber: 3 },
+        },
     }),
 
     blackPepper: ingredientFactory('Black Pepper', {
@@ -4541,6 +4601,23 @@ registerGroup('Breakfast', [
 
         return steps;
     })(), undefined, 8), { planMinutes: 8, portable: false }),
+    withPlan(createRecipe('instant-oatmeal-maple-brown-sugar', 'Instant Oatmeal (Maple & Brown Sugar, Lower Sugar)', (() => {
+        const bowl   = e.bowl();
+        const kettle = e.kettle();
+        const OATMEAL = i.instantOatmeal(2, u.unit);
+        const WATER   = i.water(8, u.fluidOunce);
+        const steps: Step[] = [];
+        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+
+        s(bowl.add([OATMEAL]));
+        s(kettle.add([WATER]));
+        s(kettle.cook('Boil water', time.minutes(3), 475));
+        s(kettle.transfer(bowl, [WATER]));
+        s(bowl.mix());
+        s(Timer.set(60, 's', 'Let sit', { equipment: [bowl.name] }));
+
+        return steps;
+    })()), { planMinutes: 5, portable: false }),
 ]);
 
 // Moved out of the Dinner array — registers itself under its own 'Cleaning' group
@@ -4571,6 +4648,32 @@ registerRecipe(createRecipe(
         instruction('Let the bottle air dry'),
     ],
     'Cleaning',
+));
+
+registerRecipe(createRecipe(
+    'dill-dip',
+    'Dill Dip',
+    (() => {
+        const bowl         = e.bowl();
+        const cuttingBoard = e.cuttingBoard();
+        const ONION = i.whiteOnion(2, u.tbsp);
+        const steps: Step[] = [];
+        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+
+        s(instruction('Mince white onion', { ingredients: [ONION], equipment: [cuttingBoard.name] }));
+        s(bowl.add([
+            i.sourCream(1, u.cup),
+            i.mayonnaise(1, u.cup),
+            i.dillWeed(2, u.tbsp),
+            ONION,
+            i.parsleyFlakes(2, u.tbsp),
+            i.seaSalt(2, u.tsp),
+        ]));
+        s(bowl.mix());
+
+        return steps;
+    })(),
+    'Sides',
 ));
 
 registerGroup('Dinner', [
@@ -4788,9 +4891,9 @@ registerGroup('Dinner', [
             [THIGHS, 'smooth side down'],
         ]));
         s(instruction('Place lid fully on pan', { equipment: [pan.name] }));
-        s(pan.cook('Cook first side, covered — do not move', time.minutes(8), 325));
+        s(pan.cook('Cook first side, covered — do not move', time.minutes(6), 325));
         s(pan.flip());
-        s(pan.cook('Cook second side, covered', time.minutes(8), 325));
+        s(pan.cook('Cook second side, covered', time.minutes(6), 325));
         s(instruction('Remove lid', { equipment: [pan.name] }));
         s(Timer.gate('Is the thickest thigh at least 175°F?', 2, 'm', { ingredients: [THIGHS], equipment: [pan.name] }));
         s(Timer.set(5, 'm', `Rest ${THIGHS.name} before eating`, { ingredients: [THIGHS], equipment: [pan.name] }));
@@ -4972,6 +5075,99 @@ registerGroup('Ingredients', [
         }),
     ]), { planMinutes: 3, portable: false }),
 ]);
+
+// ============================================================
+// TESTING
+// ============================================================
+// Not a real dish — exercises every step type, equipment method, and
+// nutrition/cost edge case in one flow so app changes can be manually smoke
+// tested end to end. Hidden from the default Select list; reachable via
+// search, "Show hidden recipes", or ?recipe=test-recipe-all-features.
+// Timers/gates are kept short (≤10s) — tap 3× rapidly on any of them to skip
+// instantly anyway.
+
+registerRecipe(withPlan(createRecipe(
+    'test-recipe-all-features',
+    'Test Recipe (All Features)',
+    (() => {
+        const bowl         = e.bowl('test bowl');
+        const mixBowl      = e.bowl('mix bowl');
+        const pan          = e.pan('test pan');
+        const pot          = e.pot();
+        const oven         = e.oven();
+        const nuwave       = e.nuwavePan();
+        const cuttingBoard = e.cuttingBoard();
+        const platter      = e.platter();
+
+        // requiresDateLabel: true — exercises the auto-inserted put-away/date-label step
+        const MACADAMIA_MILK = i.macadamiaNutMilk(1, u.cup);
+        // ok nutrition + ok cost, via a chained density conversion (cup → pound → ounce)
+        const CARROT_OK      = i.carrot(1, u.cup);
+        // uncomputable nutrition: has data, but no unit was given on the recipe ingredient
+        const CARROT_NO_UNIT = i.carrot();
+        // uncomputable nutrition + cost: recipe unit ("bag") has no conversion path to the label's keyed unit
+        const CHICKPEAS_BAG  = i.chickpeas(1, u.bag);
+        // missing nutrition + missing cost: no nutrition block, no products at all
+        const OIL_SPRAY       = i.avocadoOil(1, u.spray);
+        // missing nutrition, but ok cost — exercises the split ok/missing state on one ingredient
+        const PEPPER_OZ        = i.blackPepper(1, u.ounce);
+        const MUSHROOM         = i.kingOysterMushroom(1, u.unit);
+
+        const steps: Step[] = [];
+        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+
+        s(info('Test recipe — exercises every step type, equipment method, and nutrition/cost edge case. Tap 3× rapidly on any timer/gate to skip it instantly.'));
+        s(info('Info steps can link to another recipe.', { linkRecipeId: 'blueprint-smoothie' }));
+
+        s(prepOnly('Prep-only step — only visible on the Prep screen'));
+        s(prep('Prep step — visible on both the Prep screen and here'));
+
+        s(bowl.add([MACADAMIA_MILK, CARROT_OK, CARROT_NO_UNIT, CHICKPEAS_BAG, OIL_SPRAY, PEPPER_OZ], 'nutrition/cost edge cases'));
+        // Auto-inserted cleanup-label step for MACADAMIA_MILK lands right here.
+        s(bowl.mix('test mix result'));
+        s(instruction('Use the mix result (composite ingredient — excluded from the nutrition breakdown)', {
+            ingredients: [bowl.result], equipment: [bowl.name],
+        }));
+
+        s(oven.preheat(400));    // fixed 15 min duration — tap 3× to skip
+        s(nuwave.preheat(325));  // NuwaveEquipment override — fixed 2 min duration — tap 3× to skip
+
+        s(pan.add([i.oliveOil(1, u.tbsp)]));
+        s(cuttingBoard.slice(MUSHROOM));
+        s(pan.add([MUSHROOM]));
+        // pot gets contents *before* being nested/broiled so the steps below actually exercise
+        // place()/broil()'s auto-inheritance of a nested vessel's contents, not an empty snapshot.
+        s(pot.add([i.salt(0.25, u.tsp), i.water(8, u.fluidOunce)]));
+        s(oven.place(pan, 'Bake test pan', time.seconds(8), 375));
+        s(oven.place(pot));  // label/duration-less overload — plain instruction step
+        const panTransferred = pan.transfer(mixBowl, [MUSHROOM]);
+        s(panTransferred);
+        s(mixBowl.spray(i.avocadoOil(1, u.spray)));
+        s(mixBowl.flip());
+        s(mixBowl.stir());
+        s(oven.broil('Broil test', time.seconds(8)));  // inherits contents from both nested vessels (pan + pot)
+
+        s(pot.combine([i.blackPepper(0.1, u.tsp)], 'season'));
+        s(platter.combine([pot.result], 'plate it').waitFor(panTransferred));
+
+        s(Timer.gate('Did it finish cooking?', 5, 's'));
+
+        const garnishPrepped = instruction('Garnish prep (no shared resources with the next step)');
+        s(garnishPrepped);
+        s(instruction('Add garnish').waitFor(garnishPrepped));
+
+        s(Timer.set(5, 's', '⏰ Quick alarm test'));
+
+        s(cleanup(pan.name));
+        s(cleanup(mixBowl.name));
+
+        s(instruction('Test recipe complete ✅'));
+
+        return steps;
+    })(),
+    'Testing',
+    2,
+), { planMinutes: 2, portable: false, prepMinutes: 1, perishableDays: 1, hidden: true }));
 
 // ============================================================
 // BUNDLES
