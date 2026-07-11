@@ -184,6 +184,7 @@ const nutritionExclusions = new Map<string, Set<Ingredient>>();
 // Recipes explicitly deselected from nutrition totals. Absence = counted (selected by default).
 const nutritionRecipeExclusions = new Set<string>();
 const nutritionExpanded   = new Set<string>();
+let nutritionAddRecipeQuery = '';
 function getNutritionExcluded(recipeId: string): Set<Ingredient> {
     if (!nutritionExclusions.has(recipeId)) nutritionExclusions.set(recipeId, new Set());
     return nutritionExclusions.get(recipeId)!;
@@ -707,6 +708,20 @@ function getFilteredRecipes(): Recipe[] {
         if (a.sortOrder !== undefined && b.sortOrder !== undefined) return a.sortOrder - b.sortOrder;
         return a.name.localeCompare(b.name);
     });
+}
+
+// Like getFilteredRecipes(), but keyed off its own search string rather than the Select
+// screen's `state.searchQuery` — used by the Nutrition screen's "Add a recipe" search so
+// typing there doesn't clobber (or get clobbered by) whatever's typed on Select. Ad-hoc
+// recipes are excluded: they're synthetic one-offs created by the ingredient picker, not
+// reusable catalog entries to search for.
+function getNutritionAddableRecipes(query: string): Recipe[] {
+    const q   = query.toLowerCase().trim();
+    const all = [...state.recipes.values()].filter((r) => !r.adhoc);
+    const matched = q
+        ? all.filter((r) => r.name.toLowerCase().includes(q))
+        : all.filter((r) => !r.hidden || state.showHidden);
+    return matched.sort((a, b) => a.name.localeCompare(b.name));
 }
 
 // ============================================================
@@ -1334,7 +1349,10 @@ function renderRecipeList(): void {
 function appendAddIngredientButton(root: HTMLElement): void {
     const addRow = document.createElement('div');
     addRow.className = 'add-ingredient-row';
-    const addBtn = createButton('+ Add an ingredient', () => navigateTo('add-ingredient'));
+    const addBtn = createButton('+ Add an ingredient', () => {
+        adhocReturnScreen = state.screen;
+        navigateTo('add-ingredient');
+    });
     addBtn.className = 'add-ingredient-btn';
     addRow.appendChild(addBtn);
     root.appendChild(addRow);
@@ -2023,7 +2041,75 @@ function renderNutritionScreen(): void {
         root.appendChild(suggestPanel);
     }
 
+    // ── Add more, without leaving this screen ──────────────────
+    const addMoreHeading = document.createElement('h3');
+    addMoreHeading.textContent = 'Add more';
+    addMoreHeading.className   = 'group-heading';
+    root.appendChild(addMoreHeading);
+
+    const addRecipeSearch = document.createElement('input');
+    addRecipeSearch.type        = 'text';
+    addRecipeSearch.placeholder = 'Search recipes to add…';
+    addRecipeSearch.value       = nutritionAddRecipeQuery;
+    addRecipeSearch.className   = 'search-input';
+    addRecipeSearch.addEventListener('input', () => {
+        nutritionAddRecipeQuery = addRecipeSearch.value;
+        renderNutritionAddRecipeList();
+    });
+    root.appendChild(addRecipeSearch);
+
+    const addRecipeList = document.createElement('div');
+    addRecipeList.id = 'nutrition-add-recipe-list';
+    root.appendChild(addRecipeList);
+    renderNutritionAddRecipeList();
+
+    appendAddIngredientButton(root);
     root.appendChild(createStartOverButton());
+}
+
+function renderNutritionAddRecipeList(): void {
+    const root = getElement<HTMLDivElement>('nutrition-add-recipe-list');
+    clear(root);
+
+    const matched   = getNutritionAddableRecipes(nutritionAddRecipeQuery);
+    const MAX_SHOWN = 8;
+    const shown     = matched.slice(0, MAX_SHOWN);
+
+    shown.forEach((recipe) => {
+        const row = document.createElement('div');
+        row.className = 'suggestion-row';
+
+        const info = document.createElement('div');
+        info.className = 'suggestion-info';
+        const name = document.createElement('span');
+        name.className   = 'suggestion-name';
+        name.textContent = recipe.name;
+        info.appendChild(name);
+
+        const addBtn = document.createElement('button');
+        addBtn.className   = 'suggestion-add-btn';
+        addBtn.textContent = '+ Add';
+        addBtn.addEventListener('click', () => {
+            state.selectedRecipeIds.push(recipe.id);
+            renderNutritionScreen();
+        });
+
+        row.appendChild(info);
+        row.appendChild(addBtn);
+        root.appendChild(row);
+    });
+
+    if (matched.length > shown.length) {
+        const hint = document.createElement('div');
+        hint.className   = 'suggestion-more-hint';
+        hint.textContent = `+${matched.length - shown.length} more — refine your search`;
+        root.appendChild(hint);
+    } else if (matched.length === 0) {
+        const empty = document.createElement('p');
+        empty.className   = 'empty';
+        empty.textContent = 'No matching recipes.';
+        root.appendChild(empty);
+    }
 }
 
 // ============================================================
@@ -2034,6 +2120,10 @@ let adhocSearchQuery = '';
 let adhocSelectedKey: string | null = null;
 let adhocQuantity   = 1;
 let adhocUnitName   = '';
+// Which screen opened the ingredient picker (Select or Nutrition) — Back/Add to list return
+// here instead of always landing on Select, so adding from Nutrition doesn't strand the user
+// somewhere they didn't ask to go.
+let adhocReturnScreen: Screen = 'select';
 
 function pickDefaultUnit(ing: Ingredient): Unit {
     const productUnits = ing.products?.[0]?.nutrition && Object.keys(ing.products[0].nutrition);
@@ -2094,7 +2184,7 @@ function renderAddIngredientScreen(): void {
         adhocSelectedKey = null;
         adhocQuantity    = 1;
         adhocUnitName    = '';
-        navigateTo('select');
+        navigateTo(adhocReturnScreen);
     });
     backBtn.className = 'start-over-btn';
     root.appendChild(backBtn);
@@ -2184,7 +2274,7 @@ function renderAdhocDetail(): void {
         adhocSelectedKey = null;
         adhocQuantity    = 1;
         adhocUnitName    = '';
-        navigateTo('select');
+        navigateTo(adhocReturnScreen);
     });
     confirmBtn.className = 'adhoc-confirm';
     root.appendChild(confirmBtn);
@@ -3805,6 +3895,7 @@ h2 { margin-top: 0; font-size: 28px; }
 .suggestion-stats { font-size: 13px; color: #6b9c6b; }
 .suggestion-add-btn { font-size: 16px; padding: 8px 18px; border-radius: 10px; border: 1px solid #2d9e4a; background: transparent; color: #2d9e4a; cursor: pointer; white-space: nowrap; }
 .suggestion-add-btn:hover { background: #1a5c2a; color: #f0f0f0; }
+.suggestion-more-hint { font-size: 13px; color: #888; padding: 8px 0; }
 
 @media (max-width: 500px) {
     body { padding: 14px; padding-bottom: max(14px, env(safe-area-inset-bottom)); font-size: 18px; }
@@ -4571,7 +4662,7 @@ export const i = {
 // ============================================================
 
 registerGroup('Breakfast', [
-    withPlan(createRecipe('blueprint-smoothie', 'Blueprint Smoothie', (() => {
+    withPlan(createRecipe('blueprint-smoothie', 'Blueprint Smoothie (Nutribullet)', (() => {
         const mixer = e.bulletMixer();
         const MACADAMIA_MILK = i.macadamiaNutMilk(1, u.cup);
         const steps: Step[] = [];
@@ -4595,6 +4686,36 @@ registerGroup('Breakfast', [
             i.banana(1, u.unit),
             i.kale(0.5, u.cup),
             i.spinach(0.25, u.cup),
+        ]));
+        s(Timer.set(30, 's', 'Let mixer settle', { equipment: [mixer.name] }));
+        s(mixer.mix());
+
+        return steps;
+    })(), undefined, 8), { planMinutes: 8, portable: false }),
+    withPlan(createRecipe('blueprint-smoothie-nuwave', 'Blueprint Smoothie (Nuwave) (x2)', (() => {
+        const mixer = e.bulletMixer();
+        const MACADAMIA_MILK = i.macadamiaNutMilk(2, u.cup);
+        const steps: Step[] = [];
+        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+
+        s(mixer.add([
+            MACADAMIA_MILK,
+            i.lemonJuice(4, u.tbsp),
+            i.macadamiaNut(0.5, u.cup),
+            i.cocoaNibs(2, u.tsp),
+            i.chiaSeed(2, u.tsp),
+            i.hempSeed(2, u.tbsp),
+            i.cherry(6, u.unit),
+            i.antiOxidantBerryBlend(1, u.cup),
+            i.vanillaExtract(0.5, u.tsp),
+        ]));
+        s(mixer.mix());
+
+        s(mixer.add([
+            i.celery(2, u.unit),
+            i.banana(2, u.unit),
+            i.kale(1, u.cup),
+            i.spinach(0.5, u.cup),
         ]));
         s(Timer.set(30, 's', 'Let mixer settle', { equipment: [mixer.name] }));
         s(mixer.mix());
@@ -4996,14 +5117,14 @@ registerGroup('Lentils', [
         const WATER = i.water(24, u.fluidOunce);
         const pot = e.pot();
         const colander = e.colander();
-        s(info('195g dry lentils → ~495g cooked. Keeps in the fridge for 3 days.'));
+        s(info('195g dry lentils → ~418g cooked (~139g per portion, measured). Keeps in the fridge for 3 days.'));
         s(pot.add([LENTILS, WATER]));
         s(instruction('Place lid fully on pot', { equipment: [pot.name] }));
         s(instruction('Set induction stovetop to 215°', { equipment: [pot.name] }));
         s(Timer.set(24, 'm', 'Cook lentils', { equipment: [pot.name], ingredients: [LENTILS, WATER] }));
         s(instruction('Strain lentils through a colander', { equipment: [pot.name, colander.name], ingredients: [LENTILS] }));
         s(Timer.set(10, 'm', 'Let lentils cool', { ingredients: [LENTILS] }));
-        s(instruction('Portion cooked lentils into thirds (~165g each) into three stainless steel containers', { equipment: [pot.name], ingredients: [LENTILS] }));
+        s(instruction('Portion cooked lentils into thirds (~139g each) into three stainless steel containers', { equipment: [pot.name], ingredients: [LENTILS] }));
         s(instruction('Rinse pot and wipe dry with a paper towel (Otherwise Pot Stains)', { equipment: [pot.name] }));
         return steps;
     })()), { planMinutes: 3, portable: true, prepMinutes: 24, perishableDays: 3, sortOrder: 0 }),

@@ -90,6 +90,12 @@ Scoring algorithm (per recipe):
 - Penalty multipliers: `×0.7` if recipe sodium exceeds remaining sodium budget; `×0.8` if recipe sat fat exceeds remaining sat fat cap
 - Top 3 non-zero scores are shown with their name, calories, and protein
 
+#### Add more
+Below the suggestions panel, an **"Add more"** section lets you add to the current selection without leaving the Nutrition screen:
+- A search box (`getNutritionAddableRecipes()`) filters the full recipe catalog by name — independent of the Select screen's own search box, so typing in one doesn't affect the other. Ad-hoc recipes are excluded (they're one-off synthetic entries, not reusable catalog recipes). With no query, non-hidden recipes are listed alphabetically, capped at 8 with a `+N more — refine your search` hint if there are more matches; hidden recipes only surface once searched by name (or once "Show hidden" is toggled), matching Select screen behavior
+- Each matched row has a `+ Add` button that adds one serving and re-renders the screen in place
+- An "+ Add an ingredient" button opens the same ingredient picker as the Select screen (see [Add Ingredient Screen](#add-ingredient-screen)) — see that section for how it returns you back here afterward
+
 #### Cost display
 Cost is shown inline with nutrition wherever data is available, using the format:
 
@@ -129,15 +135,15 @@ Unlike the shopping list (which dedupes by name+unit string), the nutrition brea
 ### Add Ingredient Screen
 A picker that lets the user add a one-off ingredient to the active session without going through a recipe — useful for adding things to the shopping list ("I also need a banana this week") or for tracking nutrition of items eaten on their own.
 
-Opened by the "+ Add an ingredient" button at the bottom of the Select screen.
+Opened by the "+ Add an ingredient" button at the bottom of either the Select screen or the Nutrition screen's ["Add more"](#add-more) section.
 
 Flow:
 1. Search field filters the registered ingredient catalog (every entry in `i`) by name substring
 2. Tap an ingredient to select it; the row turns green
 3. Quantity input (number, defaults to 1, supports decimals) and unit dropdown (all units in `u`) appear below
 4. Default unit is inferred from the selected ingredient's nutrition keys — if it has nutrition data keyed by `'cup'`, the picker preselects `cup`. Falls back to `unit` when there's no hint
-5. "Add to list" creates a synthetic recipe via `createAdhocRecipe()`, registers it, selects one serving, and returns to the Select screen
-6. "← Back" cancels and clears any picker state
+5. "Add to list" creates a synthetic recipe via `createAdhocRecipe()`, registers it, selects one serving, and returns to **whichever screen opened the picker** (Select or Nutrition)
+6. "← Back" cancels, clears any picker state, and returns to the same origin screen
 
 The picker only offers ingredients already declared in `i`. There's no "create new" path — adding a completely unknown ingredient isn't supported (would require ad-hoc name input, no nutrition, etc.).
 

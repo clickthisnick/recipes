@@ -3367,7 +3367,7 @@ h2 { margin-top: 0; font-size: 28px; }
 // Replaced with the real compile timestamp by scripts/validate-recipes.js's postbuild
 // step, right after `tsc` emits dist/file.js. Left as-is (and reported as "dev build")
 // when running straight from source, e.g. under `vite`.
-const BUILD_TIME = '2026-07-11T15:51:23.818Z';
+const BUILD_TIME = '2026-07-11T15:54:35.247Z';
 function formatBuildTime() {
     const date = new Date(BUILD_TIME);
     if (isNaN(date.getTime()))
@@ -4028,7 +4028,7 @@ export const i = {
 // RECIPES
 // ============================================================
 registerGroup('Breakfast', [
-    withPlan(createRecipe('blueprint-smoothie', 'Blueprint Smoothie', (() => {
+    withPlan(createRecipe('blueprint-smoothie', 'Blueprint Smoothie (Nutribullet)', (() => {
         const mixer = e.bulletMixer();
         const MACADAMIA_MILK = i.macadamiaNutMilk(1, u.cup);
         const steps = [];
@@ -4050,6 +4050,33 @@ registerGroup('Breakfast', [
             i.banana(1, u.unit),
             i.kale(0.5, u.cup),
             i.spinach(0.25, u.cup),
+        ]));
+        s(Timer.set(30, 's', 'Let mixer settle', { equipment: [mixer.name] }));
+        s(mixer.mix());
+        return steps;
+    })(), undefined, 8), { planMinutes: 8, portable: false }),
+    withPlan(createRecipe('blueprint-smoothie-nuwave', 'Blueprint Smoothie (Nuwave)', (() => {
+        const mixer = e.bulletMixer();
+        const MACADAMIA_MILK = i.macadamiaNutMilk(2, u.cup);
+        const steps = [];
+        const s = (...newSteps) => steps.push(...newSteps);
+        s(mixer.add([
+            MACADAMIA_MILK,
+            i.lemonJuice(4, u.tbsp),
+            i.macadamiaNut(0.5, u.cup),
+            i.cocoaNibs(2, u.tsp),
+            i.chiaSeed(2, u.tsp),
+            i.hempSeed(2, u.tbsp),
+            i.cherry(6, u.unit),
+            i.antiOxidantBerryBlend(1, u.cup),
+            i.vanillaExtract(0.5, u.tsp),
+        ]));
+        s(mixer.mix());
+        s(mixer.add([
+            i.celery(2, u.unit),
+            i.banana(2, u.unit),
+            i.kale(1, u.cup),
+            i.spinach(0.5, u.cup),
         ]));
         s(Timer.set(30, 's', 'Let mixer settle', { equipment: [mixer.name] }));
         s(mixer.mix());
