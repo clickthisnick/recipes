@@ -7,6 +7,7 @@ const src = readFileSync(resolve(__dirname, '../src/file.ts'), 'utf8');
 const lines = src.split('\n');
 
 const errors = [];
+const warnings = [];
 
 // ── Stamp the real compile time into the freshly-built dist bundle ────────────────────────
 //
@@ -97,18 +98,41 @@ function resolveUnit(expr) {
     return m ? (unitNameMap[m[1]] ?? null) : null;
 }
 
+// ── Check 4 (warning-only): nutrition that's all-zero across every field ─────────────────
+//
+// A `nutrition` entry where every macro is exactly 0 usually means a placeholder was never
+// filled in with real data, rather than a genuinely calorie-free ingredient. Water is a
+// legitimate all-zero case; most things aren't. Ingredients on this list are known,
+// deliberate zero-placeholders (e.g. a spice whose Amazon listing has an image-only label) —
+// add a key here once you've confirmed the zero is intentional, to silence this warning.
+const EXPECTED_ZERO_NUTRITION = [
+    'parsleyFlakes', 'garlicPowder', 'blackPepper', 'bakingSoda', 'paprika', 'thyme', 'rosemary', 'dillWeed',
+    'whiteVinegar', 'champagneVinegar', 'water', 'creatine', 'avocadoOil',
+];
+
+const ZERO_CHECK_FIELDS = ['calories', 'fat', 'saturatedFat', 'transFat', 'cholesterol', 'carbs', 'sodium', 'sugar', 'protein', 'fiber'];
+
+function isAllZeroNutritionValue(val) {
+    return ZERO_CHECK_FIELDS.every((field) => {
+        const m = val.match(new RegExp(`\\b${field}:\\s*(-?\\d+(?:\\.\\d+)?)`));
+        return m && Number(m[1]) === 0;
+    });
+}
+
 // Per-ingredient state
 let tracking       = false;
 let ingredientName = '';
+let ingredientKey  = '';
 let ingredientLine = 0;
 let depth          = 0;   // brace depth relative to start of ingredient's defaults object
 
 let section      = null;  // 'conversions' | 'nutrition' | null
 let sectionDepth = 0;     // depth level that direct children of this section sit at
 
-let conversionPairs = []; // { from, to }
-let nutritionKeys   = []; // string[]
-let nutritionValues = []; // { key, val, lineNum }
+let conversionPairs = []; // { from, to } — ingredient-wide (conversions are shared across all its products)
+let nutritionKeys   = []; // string[] — reset per nutrition BLOCK (see checkNutritionBlock), not per ingredient
+let nutritionValues = []; // { key, val, lineNum } — same per-block scope as nutritionKeys
+let allNutritionEntries = []; // { val, lineNum } — ingredient-wide, for the all-zero check (Check 4) only
 
 function resetIngredient() {
     tracking       = false;
@@ -116,12 +140,16 @@ function resetIngredient() {
     conversionPairs = [];
     nutritionKeys   = [];
     nutritionValues = [];
+    allNutritionEntries = [];
 }
 
-function flushIngredient() {
-    if (!tracking) return;
-
-    // Check: conversion (A→B) exists but both A and B appear in the nutrition label
+// Runs the two redundancy checks scoped to a single `nutrition: { ... }` block, then clears
+// nutritionKeys/nutritionValues for the next block. Scoping matters because a category
+// ingredient's different products each carry their own full nutrition block (see the
+// Product/Listing model) — two products coincidentally using the same unit key, or even
+// identical placeholder values, isn't redundant the way two keys *within the same block*
+// duplicating each other would be.
+function checkNutritionBlock() {
     for (const { from, to } of conversionPairs) {
         if (nutritionKeys.includes(from) && nutritionKeys.includes(to)) {
             errors.push(
@@ -132,14 +160,36 @@ function flushIngredient() {
         }
     }
 
-    // Fallback: two nutrition entries with identical value objects (implicit factor: 1)
+    // Skip all-zero entries here — two placeholder zeros always look "identical" regardless
+    // of unit (0 calories/tsp and 0 calories/oz aren't evidence of a real 1:1 factor between
+    // a teaspoon and an ounce, just an artifact of neither having real data yet).
     for (let a = 0; a < nutritionValues.length; a++) {
+        if (isAllZeroNutritionValue(nutritionValues[a].val)) continue;
         for (let b = a + 1; b < nutritionValues.length; b++) {
             if (nutritionValues[a].val === nutritionValues[b].val) {
                 errors.push(
                     `line ${nutritionValues[b].lineNum}: "${ingredientName}" — nutrition values for` +
                     ` "${nutritionValues[a].key}" and "${nutritionValues[b].key}" are identical;` +
                     ` use a conversion with factor: 1 instead`
+                );
+            }
+        }
+    }
+
+    nutritionKeys   = [];
+    nutritionValues = [];
+}
+
+function flushIngredient() {
+    if (!tracking) return;
+
+    // Check 4: nutrition that's all-zero across every field (see comment above EXPECTED_ZERO_NUTRITION)
+    if (!EXPECTED_ZERO_NUTRITION.includes(ingredientKey)) {
+        for (const entry of allNutritionEntries) {
+            if (isAllZeroNutritionValue(entry.val)) {
+                warnings.push(
+                    `line ${entry.lineNum}: "${ingredientName}" (${ingredientKey}) — nutrition for "${entry.key}" is all zero;` +
+                    ` add real data, or add "${ingredientKey}" to EXPECTED_ZERO_NUTRITION if intentional`
                 );
             }
         }
@@ -153,9 +203,10 @@ for (let i = 0; i < lines.length; i++) {
 
     // Detect a new ingredientFactory (only when not mid-tracking, or on new ones)
     if (!tracking) {
-        const m = line.match(/ingredientFactory\('([^']+)'/);
+        const m = line.match(/(\w+):\s*ingredientFactory\('([^']+)'/);
         if (m) {
-            ingredientName = m[1];
+            ingredientKey  = m[1];
+            ingredientName = m[2];
             ingredientLine = i + 1;
             tracking = true;
             depth = 0;
@@ -184,7 +235,10 @@ for (let i = 0; i < lines.length; i++) {
     depth += delta;
 
     // Close active section when depth drops below where it opened
-    if (section !== null && depth < sectionDepth) section = null;
+    if (section !== null && depth < sectionDepth) {
+        if (section === 'nutrition') checkNutritionBlock();
+        section = null;
+    }
 
     // Extract entries from the active section (direct children sit at sectionDepth)
     if (section === 'conversions' && depth === sectionDepth) {
@@ -207,6 +261,7 @@ for (let i = 0; i < lines.length; i++) {
             if (key) {
                 nutritionKeys.push(key);
                 nutritionValues.push({ key, val, lineNum: i + 1 });
+                allNutritionEntries.push({ key, val, lineNum: i + 1 });
             }
         }
     }
@@ -229,8 +284,6 @@ flushIngredient(); // catch the last ingredient
 // factory). Steps built via Equipment methods (.add(), .mix(), etc.) already populate these
 // arrays automatically and aren't scanned. False positives are expected — this never fails
 // the build.
-
-const warnings = [];
 
 function escapeRegex(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 

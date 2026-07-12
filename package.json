@@ -6,7 +6,8 @@
     "scripts": {
         "build": "tsc",
         "postbuild": "node scripts/validate-recipes.js",
-        "dev": "vite"
+        "dev": "vite",
+        "audit-amazon": "node scripts/audit-amazon-products.js"
     },
     "repository": {
         "type": "git",

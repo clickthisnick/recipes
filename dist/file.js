@@ -2,6 +2,29 @@
 // RECIPE SYSTEM
 // Single-file architecture optimized for readability and AI context
 // ============================================================
+export function subscribeAndSavePercent(discount) {
+    if (!discount)
+        return undefined;
+    if (discount.subscribeAndSave15)
+        return 15;
+    if (discount.subscribeAndSave10)
+        return 10;
+    if (discount.subscribeAndSave5)
+        return 5;
+    return undefined;
+}
+// The listing (of the selected product) actually used for cost/price display — the
+// cheapest one, since that's what a shopper would realistically buy. Listings with no
+// price are ignored, and returns undefined only if none of them have a price at all.
+export function cheapestListing(product) {
+    return (product.listings ?? []).reduce((cheapest, listing) => {
+        if (listing.price === undefined)
+            return cheapest;
+        if (cheapest === undefined || cheapest.price === undefined || listing.price < cheapest.price)
+            return listing;
+        return cheapest;
+    }, undefined);
+}
 const PLAN_CONFIG_KEY = 'recipe-plan-config';
 const DEFAULT_PLAN_CONFIG = {
     blocks: [
@@ -53,6 +76,7 @@ const nutritionExclusions = new Map();
 // Recipes explicitly deselected from nutrition totals. Absence = counted (selected by default).
 const nutritionRecipeExclusions = new Set();
 const nutritionExpanded = new Set();
+let nutritionAddRecipeQuery = '';
 function getNutritionExcluded(recipeId) {
     if (!nutritionExclusions.has(recipeId))
         nutritionExclusions.set(recipeId, new Set());
@@ -517,6 +541,19 @@ function getFilteredRecipes() {
         return a.name.localeCompare(b.name);
     });
 }
+// Like getFilteredRecipes(), but keyed off its own search string rather than the Select
+// screen's `state.searchQuery` — used by the Nutrition screen's "Add a recipe" search so
+// typing there doesn't clobber (or get clobbered by) whatever's typed on Select. Ad-hoc
+// recipes are excluded: they're synthetic one-offs created by the ingredient picker, not
+// reusable catalog entries to search for.
+function getNutritionAddableRecipes(query) {
+    const q = query.toLowerCase().trim();
+    const all = [...state.recipes.values()].filter((r) => !r.adhoc);
+    const matched = q
+        ? all.filter((r) => r.name.toLowerCase().includes(q))
+        : all.filter((r) => !r.hidden || state.showHidden);
+    return matched.sort((a, b) => a.name.localeCompare(b.name));
+}
 // ============================================================
 // COOK TIME
 // ============================================================
@@ -752,7 +789,8 @@ function ingredientCost(ing) {
     const product = selectedProduct(ing);
     if (!product)
         return { status: 'missing' };
-    if (product.price === undefined || product.size === undefined || !product.sizeUnit) {
+    const listing = cheapestListing(product);
+    if (!listing || listing.price === undefined || product.size === undefined || !product.sizeUnit) {
         return { status: 'missing' };
     }
     if (!ing.unit || !ing.unit.name) {
@@ -771,7 +809,7 @@ function ingredientCost(ing) {
     return {
         status: 'ok',
         brand: product.brand,
-        cost: (product.price / product.size) * convertedQty,
+        cost: (listing.price / product.size) * convertedQty,
     };
 }
 // How many recipe-unit quantities (e.g. cups) a single package (e.g. a 13.4oz can)
@@ -968,8 +1006,14 @@ function renderRecipeList() {
             btn.textContent = bundle.name;
             const sub = document.createElement('span');
             sub.className = 'bundle-sub';
-            sub.textContent = bundle.recipeIds
-                .map(id => state.recipes.get(id)?.name ?? id)
+            const counts = new Map();
+            for (const id of bundle.recipeIds)
+                counts.set(id, (counts.get(id) ?? 0) + 1);
+            sub.textContent = [...counts.entries()]
+                .map(([id, count]) => {
+                const name = state.recipes.get(id)?.name ?? id;
+                return count > 1 ? `${name} ×${count}` : name;
+            })
                 .join(' · ');
             btn.appendChild(sub);
             btn.addEventListener('click', () => {
@@ -1066,7 +1110,10 @@ function renderRecipeList() {
 function appendAddIngredientButton(root) {
     const addRow = document.createElement('div');
     addRow.className = 'add-ingredient-row';
-    const addBtn = createButton('+ Add an ingredient', () => navigateTo('add-ingredient'));
+    const addBtn = createButton('+ Add an ingredient', () => {
+        adhocReturnScreen = state.screen;
+        navigateTo('add-ingredient');
+    });
     addBtn.className = 'add-ingredient-btn';
     addRow.appendChild(addBtn);
     root.appendChild(addRow);
@@ -1185,35 +1232,43 @@ function renderShoppingScreen() {
         });
         panel.appendChild(invRow);
         const products = ingredient.products ?? [];
-        if (products.length > 0) {
+        // One row per (product, listing) pair — a single product can have several listings
+        // (e.g. the same item sold on Amazon and on the brand's own site at different prices).
+        const pairs = products.flatMap((product) => (product.listings ?? []).map((listing) => ({ product, listing })));
+        if (pairs.length > 0) {
             const links = document.createElement('div');
             links.className = 'purchase-links';
-            const chosen = selectedProduct(ingredient);
-            const sorted = [...products].sort((a, b) => {
-                const aPpu = a.price !== undefined && a.size !== undefined ? a.price / a.size : Infinity;
-                const bPpu = b.price !== undefined && b.size !== undefined ? b.price / b.size : Infinity;
+            const chosenProduct = selectedProduct(ingredient);
+            const chosenListing = chosenProduct ? cheapestListing(chosenProduct) : undefined;
+            const sorted = [...pairs].sort((a, b) => {
+                const aPpu = a.listing.price !== undefined && a.product.size !== undefined ? a.listing.price / a.product.size : Infinity;
+                const bPpu = b.listing.price !== undefined && b.product.size !== undefined ? b.listing.price / b.product.size : Infinity;
                 return aPpu - bPpu;
             });
-            sorted.forEach((product) => {
+            sorted.forEach(({ product, listing }) => {
                 const a = document.createElement('a');
-                a.href = product.link ?? '#';
+                a.href = listing.link ?? '#';
                 a.target = '_blank';
                 a.className = 'purchase-link';
-                if (product === chosen)
+                const isChosen = product === chosenProduct && listing === chosenListing;
+                if (isChosen)
                     a.classList.add('default-product');
                 const variant = product.variant ? ` ${product.variant}` : '';
-                const where = product.store ? ` · ${product.store}` : '';
-                const pkg = product.price !== undefined && product.size !== undefined
-                    ? ` — $${product.price} / ${product.size} ${product.sizeUnit?.name ?? ''}`.trimEnd()
+                const where = listing.store ? ` · ${listing.store}` : '';
+                const pkg = listing.price !== undefined && product.size !== undefined
+                    ? ` — $${listing.price} / ${product.size} ${product.sizeUnit?.name ?? ''}`.trimEnd()
                     : '';
-                const ppu = product.price !== undefined && product.size !== undefined
-                    ? ` ($${(product.price / product.size).toFixed(2)}/${product.sizeUnit?.name ?? 'unit'})`
+                const ppu = listing.price !== undefined && product.size !== undefined
+                    ? ` ($${(listing.price / product.size).toFixed(2)}/${product.sizeUnit?.name ?? 'unit'})`
                     : '';
-                const sasPpu = product.discount?.subscribeAndSave !== undefined && product.size !== undefined
-                    ? ` ($${(product.discount.subscribeAndSave / product.size).toFixed(2)}/${product.sizeUnit?.name ?? 'unit'})` : '';
-                const sas = product.discount?.subscribeAndSave !== undefined
-                    ? ` · S&S $${product.discount.subscribeAndSave}${sasPpu}` : '';
-                const pick = product === chosen ? ' ✓' : '';
+                const sasPercent = listing.store === stores.amazon ? subscribeAndSavePercent(listing.discount) : undefined;
+                const sasPrice = sasPercent !== undefined && listing.price !== undefined
+                    ? listing.price * (1 - sasPercent / 100) : undefined;
+                const sasPpu = sasPrice !== undefined && product.size !== undefined
+                    ? ` ($${(sasPrice / product.size).toFixed(2)}/${product.sizeUnit?.name ?? 'unit'})` : '';
+                const sas = sasPrice !== undefined
+                    ? ` · S&S ${sasPercent}% $${sasPrice.toFixed(2)}${sasPpu}` : '';
+                const pick = isChosen ? ' ✓' : '';
                 a.textContent = `${product.brand}${variant}${where}${pkg}${ppu}${sas}${pick}`;
                 links.appendChild(a);
             });
@@ -1674,7 +1729,66 @@ function renderNutritionScreen() {
         });
         root.appendChild(suggestPanel);
     }
+    // ── Add more, without leaving this screen ──────────────────
+    const addMoreHeading = document.createElement('h3');
+    addMoreHeading.textContent = 'Add more';
+    addMoreHeading.className = 'group-heading';
+    root.appendChild(addMoreHeading);
+    const addRecipeSearch = document.createElement('input');
+    addRecipeSearch.type = 'text';
+    addRecipeSearch.placeholder = 'Search recipes to add…';
+    addRecipeSearch.value = nutritionAddRecipeQuery;
+    addRecipeSearch.className = 'search-input';
+    addRecipeSearch.addEventListener('input', () => {
+        nutritionAddRecipeQuery = addRecipeSearch.value;
+        renderNutritionAddRecipeList();
+    });
+    root.appendChild(addRecipeSearch);
+    const addRecipeList = document.createElement('div');
+    addRecipeList.id = 'nutrition-add-recipe-list';
+    root.appendChild(addRecipeList);
+    renderNutritionAddRecipeList();
+    appendAddIngredientButton(root);
     root.appendChild(createStartOverButton());
+}
+function renderNutritionAddRecipeList() {
+    const root = getElement('nutrition-add-recipe-list');
+    clear(root);
+    const matched = getNutritionAddableRecipes(nutritionAddRecipeQuery);
+    const MAX_SHOWN = 8;
+    const shown = matched.slice(0, MAX_SHOWN);
+    shown.forEach((recipe) => {
+        const row = document.createElement('div');
+        row.className = 'suggestion-row';
+        const info = document.createElement('div');
+        info.className = 'suggestion-info';
+        const name = document.createElement('span');
+        name.className = 'suggestion-name';
+        name.textContent = recipe.name;
+        info.appendChild(name);
+        const addBtn = document.createElement('button');
+        addBtn.className = 'suggestion-add-btn';
+        addBtn.textContent = '+ Add';
+        addBtn.addEventListener('click', () => {
+            state.selectedRecipeIds.push(recipe.id);
+            renderNutritionScreen();
+        });
+        row.appendChild(info);
+        row.appendChild(addBtn);
+        root.appendChild(row);
+    });
+    if (matched.length > shown.length) {
+        const hint = document.createElement('div');
+        hint.className = 'suggestion-more-hint';
+        hint.textContent = `+${matched.length - shown.length} more — refine your search`;
+        root.appendChild(hint);
+    }
+    else if (matched.length === 0) {
+        const empty = document.createElement('p');
+        empty.className = 'empty';
+        empty.textContent = 'No matching recipes.';
+        root.appendChild(empty);
+    }
 }
 // ============================================================
 // SCREEN: ADD INGREDIENT
@@ -1683,6 +1797,10 @@ let adhocSearchQuery = '';
 let adhocSelectedKey = null;
 let adhocQuantity = 1;
 let adhocUnitName = '';
+// Which screen opened the ingredient picker (Select or Nutrition) — Back/Add to list return
+// here instead of always landing on Select, so adding from Nutrition doesn't strand the user
+// somewhere they didn't ask to go.
+let adhocReturnScreen = 'select';
 function pickDefaultUnit(ing) {
     const productUnits = ing.products?.[0]?.nutrition && Object.keys(ing.products[0].nutrition);
     const ownUnits = ing.nutrition && Object.keys(ing.nutrition);
@@ -1736,7 +1854,7 @@ function renderAddIngredientScreen() {
         adhocSelectedKey = null;
         adhocQuantity = 1;
         adhocUnitName = '';
-        navigateTo('select');
+        navigateTo(adhocReturnScreen);
     });
     backBtn.className = 'start-over-btn';
     root.appendChild(backBtn);
@@ -1819,7 +1937,7 @@ function renderAdhocDetail() {
         adhocSelectedKey = null;
         adhocQuantity = 1;
         adhocUnitName = '';
-        navigateTo('select');
+        navigateTo(adhocReturnScreen);
     });
     confirmBtn.className = 'adhoc-confirm';
     root.appendChild(confirmBtn);
@@ -3331,6 +3449,7 @@ h2 { margin-top: 0; font-size: 28px; }
 .suggestion-stats { font-size: 13px; color: #6b9c6b; }
 .suggestion-add-btn { font-size: 16px; padding: 8px 18px; border-radius: 10px; border: 1px solid #2d9e4a; background: transparent; color: #2d9e4a; cursor: pointer; white-space: nowrap; }
 .suggestion-add-btn:hover { background: #1a5c2a; color: #f0f0f0; }
+.suggestion-more-hint { font-size: 13px; color: #888; padding: 8px 0; }
 
 @media (max-width: 500px) {
     body { padding: 14px; padding-bottom: max(14px, env(safe-area-inset-bottom)); font-size: 18px; }
@@ -3367,7 +3486,7 @@ h2 { margin-top: 0; font-size: 28px; }
 // Replaced with the real compile timestamp by scripts/validate-recipes.js's postbuild
 // step, right after `tsc` emits dist/file.js. Left as-is (and reported as "dev build")
 // when running straight from source, e.g. under `vite`.
-const BUILD_TIME = '2026-07-11T15:54:35.247Z';
+const BUILD_TIME = '2026-07-12T16:05:47.757Z';
 function formatBuildTime() {
     const date = new Date(BUILD_TIME);
     if (isNaN(date.getTime()))
@@ -3411,9 +3530,6 @@ export const stores = {
     amazonFresh: 'Amazon Fresh',
     wholeFoods: 'Whole Foods',
 };
-// ============================================================
-// INGREDIENT FACTORY
-// ============================================================
 function ingredientFactory(name, defaults = {}) {
     return (quantity = 0, unit = u.none) => {
         const ing = { name, quantity, unit, ...defaults };
@@ -3421,77 +3537,388 @@ function ingredientFactory(name, defaults = {}) {
         return ing;
     };
 }
-function keyToName(key) {
-    return key
-        .replace(/([A-Z])/g, ' $1')
-        .replace(/^./, (c) => c.toUpperCase());
-}
-function simpleIngredients(map) {
-    return Object.fromEntries(Object.entries(map).map(([key, name]) => [
-        key,
-        ingredientFactory(name || keyToName(key)),
-    ]));
-}
 // ============================================================
 // ITEMS
 // ============================================================
 export const i = {
-    ...simpleIngredients({
-        apple: '', frozenBerries: '', cocoaFlavanols: '', wheatGrassPowder: '',
-        creatine: '', chlorellaPowder: '', aminoComplex: '', acaiFrozenMix: '',
-        blueprintBlueberryWalnut: '', blueprintCacao: '', frozenStrawberry: '',
-        frozenCauliflower: '', frozenBroccoli: '', frozenBlueberry: '',
-        blueprintNuttyPudding: '', egg: '', milk: '', bread: '',
-        pomegranateSeeds: '', avocadoOil: '',
-        abbotPeaItalianSausage: '', lentilSpaghetti: '', spaghettiSauce: '',
-        pankoBreadCrumbs: '', salt: '', garlicPowder: '', cornstarch: '',
-        paprika: '',
-        cassavaFlour: '', kingOysterMushroom: '',
-        whiteVinegar: '', bakingSoda: '',
-        babyBellaMushroom: '', yellowOnion: '', oliveOil: '',
-        rosemary: '', thyme: '',
-        fennel: '', radicchio: '', arugula: '', orange: '',
-        grapefruit: 'Pink Grapefruit', champagneVinegar: '',
-        honeyDijonMustard: '', fennelFronds: '',
-        whiteOnion: '', sourCream: '', mayonnaise: '', dillWeed: '',
-        parsleyFlakes: '', seaSalt: '',
+    // No nutrition available yet — a real fruit with meaningful calories/carbs, so a zero
+    // placeholder would be actively misleading.
+    // Generic/typical nutrition (not from this listing's own label) — a standard whole
+    // grapefruit, ~236g. Real produce values, just not brand-specific.
+    grapefruit: ingredientFactory('Pink Grapefruit', {
+        defaultBrand: 'Organic',
+        products: [{
+                brand: 'Organic', variant: 'Red Grapefruit', size: 1, sizeUnit: u.unit,
+                listings: [{ price: 1.79, link: 'https://www.amazon.com/Fresh-Produce-Brands-Vary-B000P6G148/dp/B000P6G148' }],
+                nutrition: {
+                    [u.unit.name]: { servings: 1, servingSize: 1, calories: 100, fat: 0.2, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 25, sodium: 0, sugar: 16, protein: 2, fiber: 4 },
+                },
+            }],
+    }),
+    // Nutrition zeroed at the user's request — vinegar is close enough to calorie-free at
+    // typical usage to be a defensible placeholder (same reasoning as whiteVinegar above).
+    champagneVinegar: ingredientFactory('Champagne Vinegar', {
+        defaultBrand: 'O Olive Oil & Vinegar',
+        products: [{
+                brand: 'O Olive Oil & Vinegar', variant: 'California Champagne Vinegar', size: 10.1, sizeUnit: u.fluidOunce,
+                listings: [{ price: 7.96, link: 'https://www.amazon.com/Olive-Oil-California-Champagne-Vinegar/dp/B07CQQ35PK' }],
+                nutrition: {
+                    [u.milliliter.name]: { servings: 1, servingSize: 1, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 },
+                },
+            }],
+    }),
+    // Generic/typical nutrition (not from this listing's own label) — salt is essentially
+    // pure sodium chloride regardless of brand, so ~2300mg sodium/tsp is a standard real value.
+    seaSalt: ingredientFactory('Sea Salt', {
+        defaultBrand: 'Ancient',
+        products: [{
+                brand: 'Ancient', variant: 'Spring Salt, Organic', size: 7, sizeUnit: u.ounce, organic: true,
+                listings: [{ price: 14.5, link: 'https://www.amazon.com/Spring-Salt-Organic-Natural-Microplastic/dp/B091V3KBC2' }],
+                nutrition: {
+                    [u.tsp.name]: { servings: 1, servingSize: 1, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 2300, sugar: 0, protein: 0, fiber: 0 },
+                },
+            }],
+    }),
+    // Nutrition zeroed at the user's request — the label is image-only on Amazon (typical
+    // for dried herbs), so this is a placeholder, not a real (scraped or measured) value.
+    rosemary: ingredientFactory('Rosemary', {
+        defaultBrand: '365',
+        products: [{
+                brand: '365', variant: 'Organic', organic: true,
+                listings: [{ store: stores.wholeFoods, price: 3.99, link: 'https://www.amazon.com/365-Everyday-Value-Organic-Rosemary/dp/B074H6M37H' }],
+                nutrition: {
+                    [u.tsp.name]: { servings: 1, servingSize: 1, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 },
+                },
+            }],
+    }),
+    // Generic/typical nutrition (not from this listing's own label) — standard mushroom
+    // values, per roughly one whole king trumpet mushroom (~100g).
+    kingOysterMushroom: ingredientFactory('King Trumpet Mushroom', {
+        defaultBrand: 'Mushroom King Farm',
+        products: [{
+                brand: 'Mushroom King Farm', variant: 'Organic Sliced', size: 4, sizeUnit: u.ounce, organic: true,
+                listings: [{ price: 6.29, link: 'https://www.amazon.com/MUSHROOM-Organic-King-Trumpet-Mushrooms/dp/B0F9LQG2V8' }],
+                nutrition: {
+                    [u.unit.name]: { servings: 1, servingSize: 1, calories: 22, fat: 0.3, saturatedFat: 0.1, transFat: 0, cholesterol: 0, carbs: 3, sodium: 5, sugar: 2, protein: 3, fiber: 1 },
+                },
+            }],
+    }),
+    cassavaFlour: ingredientFactory('Cassava Flour', {
+        defaultBrand: "Otto's Naturals",
+        products: [{
+                brand: "Otto's Naturals", variant: 'Organic', size: 1.5, sizeUnit: u.pound, organic: true,
+                listings: [{ price: 19.99, link: 'https://www.amazon.com/Ottos-Naturals-Organic-Grain-Free-Gluten-Free/dp/B08QZVC7WH' }],
+                nutrition: {
+                    [u.cup.name]: { servings: 1, servingSize: 0.25, calories: 110, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 28, sodium: 0, sugar: 0, protein: 1, fiber: 3 },
+                },
+            }],
+    }),
+    cornstarch: ingredientFactory('Corn Starch', {
+        defaultBrand: '365',
+        products: [{
+                brand: '365', size: 16, sizeUnit: u.ounce,
+                listings: [{ store: stores.wholeFoods, price: 2.18, link: 'https://www.amazon.com/365-Everyday-Value-Corn-Starch/dp/B074H67H5C' }],
+                nutrition: {
+                    [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 30, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 7, sodium: 0, sugar: 0, protein: 0, fiber: 0 },
+                },
+            }],
+    }),
+    // Generic/typical nutrition (not from this listing's own label) — standard fennel bulb
+    // values, per one medium bulb (~234g).
+    fennel: ingredientFactory('Fennel', {
+        defaultBrand: 'Organic',
+        products: [{
+                brand: 'Organic', size: 1, sizeUnit: u.unit,
+                listings: [{ price: 2.21, link: 'https://www.amazon.com/Fresh-Produce-Brands-May-Vary/dp/B00E3J6RC4' }],
+                nutrition: {
+                    [u.unit.name]: { servings: 1, servingSize: 1, calories: 73, fat: 0.5, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 17, sodium: 122, sugar: 9, protein: 3, fiber: 7 },
+                },
+            }],
+    }),
+    // Generic/typical nutrition (not from this listing's own label) — standard radicchio
+    // values, per one head (~350g).
+    radicchio: ingredientFactory('Radicchio', {
+        defaultBrand: 'Organic',
+        products: [{
+                brand: 'Organic', size: 1, sizeUnit: u.unit,
+                listings: [{ price: 4.61, link: 'https://www.amazon.com/produce-aisle-101767-Organic-Radicchio/dp/B00E3KS6LS' }],
+                nutrition: {
+                    [u.unit.name]: { servings: 1, servingSize: 1, calories: 81, fat: 0.9, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 16, sodium: 77, sugar: 2, protein: 5, fiber: 3 },
+                },
+            }],
+    }),
+    // Nutrition zeroed at the user's request — the label is image-only on Amazon (typical
+    // for dried herbs), so this is a placeholder, not a real (scraped or measured) value.
+    dillWeed: ingredientFactory('Dill Weed', {
+        defaultBrand: '365',
+        products: [{
+                brand: '365', variant: 'Organic', size: 0.46, sizeUnit: u.ounce, organic: true,
+                listings: [{ store: stores.wholeFoods, price: 3.99, link: 'https://www.amazon.com/365-Everyday-Value-Organic-Dill/dp/B074H773GP' }],
+                nutrition: {
+                    [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 },
+                },
+            }],
+    }),
+    // Nutrition zeroed at the user's request — the label is image-only on Amazon; distilled
+    // white vinegar is also close enough to calorie-free at typical usage to be a defensible
+    // placeholder even so, but flagging same as the others since it's not from a real label.
+    whiteVinegar: ingredientFactory('White Vinegar', {
+        defaultBrand: '365',
+        products: [{
+                brand: '365', variant: 'Organic Distilled', size: 32, sizeUnit: u.fluidOunce, organic: true,
+                listings: [{ store: stores.wholeFoods, price: 2.99, link: 'https://www.amazon.com/365-Everyday-Value-Organic-Distilled/dp/B074J6FD4L' }],
+                nutrition: {
+                    [u.tsp.name]: { servings: 1, servingSize: 1, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 },
+                },
+            }],
+    }),
+    thyme: ingredientFactory('Thyme', {
+        defaultBrand: '365',
+        products: [{
+                brand: '365', variant: 'Organic', size: 0.67, sizeUnit: u.ounce, organic: true,
+                listings: [{ store: stores.wholeFoods, price: 3.99, link: 'https://www.amazon.com/365-Everyday-Value-Organic-Thyme/dp/B074HBKSCL' }],
+                nutrition: {
+                    [u.tsp.name]: { servings: 1, servingSize: 1, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 },
+                },
+            }],
+    }),
+    // Generic/typical nutrition — recipes use this by the spray (a mister/pump dose, ~0.2g),
+    // which is genuinely small enough that standard cooking-oil-spray labels round it to
+    // 0 cal/0g fat per spray (the same convention as e.g. PAM) — not a placeholder zero.
+    avocadoOil: ingredientFactory('Avocado Oil', {
+        defaultBrand: 'Chosen Foods',
+        products: [{
+                brand: 'Chosen Foods', variant: 'Organic 100% Avocado Oil', size: 16.9, sizeUnit: u.fluidOunce, organic: true,
+                listings: [{ price: 14.99, link: 'https://www.amazon.com/CHOSEN-FOODS-Organic-100-Avocado/dp/B0CTCXXG2J' }],
+                nutrition: {
+                    [u.spray.name]: { servings: 1, servingSize: 1, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 },
+                },
+            }],
+    }),
+    // Generic/typical nutrition (not from this listing's own label) — standard honey-mustard
+    // dressing values, per 1 tbsp (15g).
+    honeyDijonMustard: ingredientFactory('Honey Dijon Mustard', {
+        defaultBrand: 'SideDish',
+        products: [{
+                brand: 'SideDish', variant: 'Honey Dijon Dressing', size: 8, sizeUnit: u.fluidOunce,
+                listings: [{ price: 9.99, link: 'https://www.amazon.com/SideDish-Honey-Dijon-Dressing-OZ/dp/B0CSTW8YFP' }],
+                nutrition: {
+                    [u.gram.name]: { servings: 1, servingSize: 15, calories: 50, fat: 4.5, saturatedFat: 0.5, transFat: 0, cholesterol: 0, carbs: 3, sodium: 90, sugar: 3, protein: 0, fiber: 0 },
+                },
+            }],
+    }),
+    // Generic/typical nutrition (not from this listing's own label) — a standard medium
+    // orange, ~131g.
+    orange: ingredientFactory('Orange', {
+        defaultBrand: 'Organic',
+        products: [{
+                brand: 'Organic', variant: 'Valencia', size: 1, sizeUnit: u.unit,
+                listings: [{ price: 1.32, link: 'https://www.amazon.com/365-by-Whole-Foods-Market/dp/B003TQ3554' }],
+                nutrition: {
+                    [u.unit.name]: { servings: 1, servingSize: 1, calories: 62, fat: 0.2, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 15, sodium: 0, sugar: 12, protein: 1, fiber: 3 },
+                },
+            }],
+    }),
+    // Generic/typical nutrition (not from this listing's own label) — standard arugula
+    // values, per 100g.
+    arugula: ingredientFactory('Arugula', {
+        defaultBrand: '365',
+        products: [{
+                brand: '365', variant: 'Organic Baby Arugula Salad', size: 5, sizeUnit: u.ounce, organic: true,
+                listings: [{ store: stores.wholeFoods, price: 3.99, link: 'https://www.amazon.com/365-Whole-Foods-Market-Organic/dp/B09ZHX8Y9V' }],
+                nutrition: {
+                    [u.gram.name]: { servings: 1, servingSize: 100, calories: 25, fat: 0.7, saturatedFat: 0.1, transFat: 0, cholesterol: 0, carbs: 4, sodium: 27, sugar: 2, protein: 3, fiber: 2 },
+                },
+            }],
+    }),
+    // Cholesterol left at 0 — the scraped nutrition table for this listing didn't include a
+    // cholesterol line at all (dairy sour cream normally has some), so that field specifically
+    // is unconfirmed rather than a verified zero. Everything else here is real scraped data.
+    sourCream: ingredientFactory('Sour Cream', {
+        defaultBrand: '365',
+        products: [{
+                brand: '365', variant: 'Organic', size: 16, sizeUnit: u.ounce, organic: true,
+                listings: [{ store: stores.wholeFoods, price: 3.39, link: 'https://www.amazon.com/365-Whole-Foods-Market-Organic/dp/B07BS4YGL5' }],
+                nutrition: {
+                    [u.tbsp.name]: { servings: 8, servingSize: 2, calories: 60, fat: 5, saturatedFat: 3, transFat: 0, cholesterol: 0, carbs: 2, sodium: 20, sugar: 2, protein: 1, fiber: 0 },
+                },
+            }],
+    }),
+    paprika: ingredientFactory('Paprika', {
+        defaultBrand: '365',
+        products: [{
+                brand: '365', variant: 'Organic', size: 1.69, sizeUnit: u.ounce, organic: true,
+                listings: [{ store: stores.wholeFoods, price: 3.99, link: 'https://www.amazon.com/365-Everyday-Value-Organic-Paprika/dp/B074H81LWT' }],
+                nutrition: {
+                    [u.tsp.name]: { servings: 1, servingSize: 1, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 },
+                },
+            }],
+    }),
+    // Nutrition zeroed at the user's request — Amazon's label for this listing is
+    // image-only, so this is a placeholder, not a real (scraped or measured) value.
+    garlicPowder: ingredientFactory('Garlic Powder', {
+        defaultBrand: '365',
+        products: [{
+                brand: '365', variant: 'Organic', size: 2.33, sizeUnit: u.ounce, organic: true,
+                listings: [{ store: stores.wholeFoods, price: 3.99, link: 'https://www.amazon.com/365-Everyday-Value-Organic-Garlic/dp/B00JJZ57FK' }],
+                nutrition: {
+                    [u.tsp.name]: { servings: 1, servingSize: 1, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 },
+                },
+            }],
+    }),
+    // Generic/typical nutrition (not from this listing's own label) — standard mayonnaise
+    // values, scaled up from a typical ~94 cal/tbsp to a full cup (16 tbsp), matching how
+    // this ingredient is actually consumed in the one recipe that uses it.
+    mayonnaise: ingredientFactory('Mayonnaise', {
+        defaultBrand: '365',
+        products: [{
+                brand: '365', variant: 'Organic Squeezable', size: 11.2, sizeUnit: u.fluidOunce, organic: true,
+                listings: [{ store: stores.wholeFoods, price: 3.79, link: 'https://www.amazon.com/365-Everyday-Value-Mayonnaise-Squeezable/dp/B074H64C5R' }],
+                nutrition: {
+                    [u.cup.name]: { servings: 1, servingSize: 1, calories: 1500, fat: 165, saturatedFat: 25, transFat: 0, cholesterol: 100, carbs: 0, sodium: 1400, sugar: 0, protein: 0, fiber: 0 },
+                },
+            }],
+    }),
+    babyBellaMushroom: ingredientFactory('Baby Bella Mushroom', {
+        defaultBrand: '365',
+        products: [{
+                brand: '365', variant: 'Organic Whole', size: 8, sizeUnit: u.ounce, organic: true,
+                listings: [{ store: stores.wholeFoods, price: 3.79, link: 'https://www.amazon.com/365-Everyday-Value-Organic-Mushrooms/dp/B07NQDLF47' }],
+                nutrition: {
+                    [u.gram.name]: { servings: 2, servingSize: 84, calories: 18, fat: 0.29, saturatedFat: 0.05, transFat: 0, cholesterol: 0, carbs: 3.3, sodium: 8, sugar: 2.1, protein: 1.772, fiber: 1.1 },
+                },
+            }],
+    }),
+    // Generic/typical nutrition (not from this listing's own label) — standard plant-based
+    // Italian sausage values, scaled to the whole 10oz (283g) package (recipe consumes it as
+    // "1 bag").
+    abbotPeaItalianSausage: ingredientFactory('Abbot\'s Plant-Based Italian Sausage', {
+        defaultBrand: "Abbot's",
+        products: [{
+                brand: "Abbot's", size: 10, sizeUnit: u.ounce,
+                listings: [{ price: 9.49, link: 'https://www.amazon.com/Abbots-Plant-Based-Italian-Gluten-Free-High-Protein/dp/B0FB447RLJ' }],
+                nutrition: {
+                    [u.bag.name]: { servings: 1, servingSize: 1, calories: 570, fat: 34, saturatedFat: 6, transFat: 0, cholesterol: 0, carbs: 23, sodium: 1700, sugar: 3, protein: 45, fiber: 8 },
+                },
+            }],
+    }),
+    egg: ingredientFactory('Egg', {
+        defaultBrand: '365',
+        products: [{
+                brand: '365', variant: 'Organic Large Brown Grade A (12 Count)', size: 12, sizeUnit: u.unit, organic: true,
+                listings: [{ store: stores.wholeFoods, price: 5.99, link: 'https://www.amazon.com/365-Everyday-Value-Brown-Organic/dp/B07PDH5138' }],
+                nutrition: {
+                    [u.unit.name]: { servings: 12, servingSize: 1, calories: 80, fat: 5, saturatedFat: 2, transFat: 0, cholesterol: 210, carbs: 0, sodium: 80, sugar: 0, protein: 7, fiber: 0 },
+                },
+            }],
+    }),
+    spaghettiSauce: ingredientFactory('Spaghetti Sauce', {
+        defaultBrand: '365',
+        products: [{
+                brand: '365', variant: 'Organic 4 Cheese Pasta Sauce', size: 25, sizeUnit: u.ounce, organic: true,
+                listings: [{ store: stores.wholeFoods, price: 3.49, link: 'https://www.amazon.com/365-Everyday-Value-Organic-Cheese/dp/B074H66176' }],
+                nutrition: {
+                    // Recipe consumes this as "1 bag" (the whole 25oz jar) — label is 1/2 cup
+                    // (118g), 6 servings/container, so these are the per-jar totals (per-serving × 6).
+                    [u.bag.name]: { servings: 1, servingSize: 1, calories: 420, fat: 21, saturatedFat: 6, transFat: 0, cholesterol: 30, carbs: 48, sodium: 2460, sugar: 24, protein: 18, fiber: 12 },
+                },
+            }],
+    }),
+    // No nutrition available yet — Amazon didn't expose a text nutrition table for this
+    // listing (baking soda is chemically invariant across brands, but serving-size
+    // conventions differ enough between labels that a real one is still needed here).
+    // Nutrition zeroed at the user's request — no text nutrition table was available for
+    // this listing, so this is a placeholder, not a real (scraped or measured) value.
+    bakingSoda: ingredientFactory('Baking Soda', {
+        defaultBrand: 'Arm & Hammer',
+        products: [{
+                brand: 'Arm & Hammer', size: 16, sizeUnit: u.ounce,
+                listings: [{ price: 4.50, link: 'https://www.amazon.com/Arm-Hammer-Pure-Baking-Soda/dp/B00K1JFAVE' }],
+                nutrition: {
+                    [u.tsp.name]: { servings: 1, servingSize: 1, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 },
+                },
+            }],
+    }),
+    pankoBreadCrumbs: ingredientFactory('Panko Bread Crumbs', {
+        defaultBrand: '365',
+        products: [{
+                brand: '365', size: 8, sizeUnit: u.ounce,
+                listings: [{ store: stores.wholeFoods, price: 1.99, link: 'https://www.amazon.com/365-Everyday-Value-Panko-Crumbs/dp/B074H5LYGT' }],
+                nutrition: {
+                    [u.cup.name]: { servings: 8, servingSize: 0.333, calories: 110, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 23, sodium: 100, sugar: 1, protein: 4, fiber: 1 },
+                },
+            }],
+    }),
+    // Nutrition zeroed at the user's request — the label is image-only on Amazon (typical
+    // for dried herbs), so this is a placeholder, not a real (scraped or measured) value.
+    parsleyFlakes: ingredientFactory('Parsley Flakes', {
+        defaultBrand: '365',
+        products: [{
+                brand: '365', variant: 'Organic Parsley', size: 0.24, sizeUnit: u.ounce, organic: true,
+                listings: [{ store: stores.wholeFoods, price: 3.99, link: 'https://www.amazon.com/365-Everyday-Value-Organic-Parsley/dp/B074H81M9K' }],
+                nutrition: {
+                    [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 },
+                },
+            }],
+    }),
+    lentilSpaghetti: ingredientFactory('Lentil Spaghetti', {
+        defaultBrand: 'Whole Foods Market',
+        products: [{
+                brand: 'Whole Foods Market', variant: 'Organic Red Lentil Gluten Free', size: 8, sizeUnit: u.ounce, organic: true,
+                listings: [{ store: stores.wholeFoods, price: 3.29, link: 'https://www.amazon.com/Whole-Foods-Market-Organic-Spaghetti/dp/B07FX14M71' }],
+                nutrition: {
+                    // 2 oz (56g / 1/4 package) dry, 4 servings per container
+                    [u.ounce.name]: { servings: 4, servingSize: 2, calories: 210, fat: 1, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 36, sodium: 0, sugar: 0.99, protein: 15, fiber: 6 },
+                },
+            }],
     }),
     instantOatmeal: ingredientFactory('Instant Oatmeal (Maple & Brown Sugar, Lower Sugar)', {
         defaultBrand: 'Quaker',
         products: [{
-                brand: 'Quaker', variant: 'Lower Sugar, Maple & Brown Sugar (1.19 oz, Pack of 44)', store: stores.amazon,
-                price: 13.72, size: 44, sizeUnit: u.unit,
-                discount: { subscribeAndSave: 11.66 },
-                link: 'https://www.amazon.com/dp/B094TG5HDJ',
+                brand: 'Quaker', variant: 'Lower Sugar, Maple & Brown Sugar (1.19 oz, Pack of 44)', listings: [{ store: stores.amazon, price: 13.72, discount: { subscribeAndSave15: true }, link: 'https://www.amazon.com/dp/B094TG5HDJ' }], size: 44, sizeUnit: u.unit,
             }],
         nutrition: {
             [u.unit.name]: { servings: 44, servingSize: 1, calories: 120, fat: 2, saturatedFat: 0.5, transFat: 0, cholesterol: 0, carbs: 24, sodium: 240, sugar: 4, protein: 4, fiber: 3 },
         },
     }),
+    // Generic/typical nutrition (not from this listing's own label) — standard onion values,
+    // per 1 tbsp minced (~10g), matching how this ingredient is actually used in recipes.
+    whiteOnion: ingredientFactory('White Onion', {
+        defaultBrand: 'Organic',
+        products: [{
+                brand: 'Organic', size: 1, sizeUnit: u.unit,
+                listings: [{ price: 1.49, link: 'https://www.amazon.com/Organic-White-Onion-1-Each/dp/B0787Z3T3B' }],
+                nutrition: {
+                    [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 4, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 1, sodium: 0, sugar: 0.4, protein: 0, fiber: 0 },
+                },
+            }],
+    }),
+    // Nutrition zeroed at the user's request — Amazon's label for these listings is
+    // image-only, so this is a placeholder, not a real (scraped or measured) value.
     blackPepper: ingredientFactory('Black Pepper', {
         defaultBrand: '365',
         products: [{
-                brand: '365', variant: 'Organic Ground (1.8 oz)', store: stores.wholeFoods,
-                price: 4.29, size: 1.8, sizeUnit: u.ounce, organic: true,
-                link: 'https://www.amazon.com/dp/B074H6GRM7',
+                brand: '365', variant: 'Organic Ground (1.8 oz)', size: 1.8, sizeUnit: u.ounce, organic: true,
+                listings: [
+                    { store: stores.wholeFoods, price: 4.29, link: 'https://www.amazon.com/dp/B074H6GRM7' },
+                    { store: stores.amazon, price: 4.69, discount: { subscribeAndSave5: true }, link: 'https://www.amazon.com/dp/B075M4KPWW' },
+                ],
+                nutrition: {
+                    [u.tsp.name]: { servings: 1, servingSize: 1, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 },
+                    [u.ounce.name]: { servings: 1, servingSize: 1, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 },
+                },
             }, {
-                brand: '365', variant: 'Organic Ground (1.8 oz)', store: stores.amazon,
-                price: 4.69, size: 1.8, sizeUnit: u.ounce, organic: true,
-                discount: { subscribeAndSave: 4.46 },
-                link: 'https://www.amazon.com/dp/B075M4KPWW',
-            }, {
-                brand: 'Watkins', variant: 'Organic Ground (4 oz Tin)', store: stores.amazon,
-                price: 6.99, size: 4, sizeUnit: u.ounce, organic: true,
-                discount: { subscribeAndSave: 6.64 },
-                link: 'https://www.amazon.com/dp/B0B5YCWGST',
+                brand: 'Watkins', variant: 'Organic Ground (4 oz Tin)', listings: [{ store: stores.amazon, price: 6.99, discount: { subscribeAndSave5: true }, link: 'https://www.amazon.com/dp/B0B5YCWGST' }], size: 4, sizeUnit: u.ounce, organic: true,
+                nutrition: {
+                    [u.tsp.name]: { servings: 1, servingSize: 1, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 },
+                    [u.ounce.name]: { servings: 1, servingSize: 1, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 },
+                },
             }],
     }),
     asianSaladKit: ingredientFactory('Asian Inspired Salad Kit', {
         defaultBrand: '365',
         products: [{
-                brand: '365', variant: 'Organic Asian Inspired (12 oz)', store: stores.wholeFoods,
-                price: 5.99, size: 1, sizeUnit: u.unit,
-                link: 'https://www.amazon.com/dp/B07B67Y9MH',
+                brand: '365', variant: 'Organic Asian Inspired (12 oz)', listings: [{ store: stores.wholeFoods, price: 5.99, link: 'https://www.amazon.com/dp/B07B67Y9MH' }], size: 1, sizeUnit: u.unit,
             }],
         nutrition: {
             // per whole bag (2 × 1-cup servings): 170 cal × 2, estimated fat/carbs from ingredients
@@ -3501,13 +3928,9 @@ export const i = {
     carrot: ingredientFactory('Carrots', {
         defaultBrand: '365',
         products: [{
-                brand: '365', variant: 'Organic Shredded (10 oz)', store: stores.wholeFoods,
-                price: 2.99, size: 10, sizeUnit: u.ounce,
-                link: 'https://www.amazon.com/dp/B078J1FS9V',
+                brand: '365', variant: 'Organic Shredded (10 oz)', listings: [{ store: stores.wholeFoods, price: 2.99, link: 'https://www.amazon.com/dp/B078J1FS9V' }], size: 10, sizeUnit: u.ounce,
             }, {
-                brand: 'CAL ORGANIC', variant: 'Organic Whole (16 oz)', store: stores.wholeFoods,
-                price: 1.79, size: 16, sizeUnit: u.ounce, organic: true,
-                link: 'https://www.amazon.com/dp/B00E3JELZ4',
+                brand: 'CAL ORGANIC', variant: 'Organic Whole (16 oz)', listings: [{ store: stores.wholeFoods, price: 1.79, link: 'https://www.amazon.com/dp/B00E3JELZ4' }], size: 16, sizeUnit: u.ounce, organic: true,
             }],
         nutrition: {
             [u.cup.name]: { servings: 1, servingSize: 1, calories: 52, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 12, sodium: 88, sugar: 6, protein: 1, fiber: 3 },
@@ -3520,9 +3943,7 @@ export const i = {
     edamame: ingredientFactory('Shelled Edamame', {
         defaultBrand: '365',
         products: [{
-                brand: '365', variant: 'Organic Frozen Shelled', store: stores.wholeFoods,
-                price: 3.49, size: 10, sizeUnit: u.ounce, packageUnit: u.bag,
-                link: 'https://www.amazon.com/dp/B074H6S8D8',
+                brand: '365', variant: 'Organic Frozen Shelled', listings: [{ store: stores.wholeFoods, price: 3.49, link: 'https://www.amazon.com/dp/B074H6S8D8' }], size: 10, sizeUnit: u.ounce, packageUnit: u.bag,
             }],
         nutrition: {
             [u.cup.name]: { servings: 1, servingSize: 1, calories: 190, fat: 8, saturatedFat: 1, transFat: 0, cholesterol: 0, carbs: 14, sodium: 9, sugar: 3, protein: 17, fiber: 8 },
@@ -3531,12 +3952,23 @@ export const i = {
             [u.cup.name]: { to: u.ounce, factor: 5.3 }, // 1 cup shelled ≈ 5.3 oz
         },
     }),
+    yellowOnion: ingredientFactory('Yellow Onion', {
+        defaultBrand: 'Whole Foods Market',
+        products: [{
+                brand: 'Whole Foods Market', variant: 'Organic, Loose', listings: [{ store: stores.wholeFoods, price: 2.99, link: 'https://www.amazon.com/dp/B07QV6B5WV' }], size: 1, sizeUnit: u.pound, organic: true, bulk: true,
+            }],
+        nutrition: {
+            [u.cup.name]: { servings: 3, servingSize: 0.5, calories: 32, fat: 0.08, saturatedFat: 0.03, transFat: 0, cholesterol: 0, carbs: 7, sodium: 3.2, sugar: 3.392, protein: 0.88, fiber: 1.4 },
+        },
+        conversions: {
+            [u.cup.name]: { to: u.pound, factor: 0.35 }, // 1 cup chopped onion ≈ 160g ≈ 0.35 lb
+            [u.unit.name]: { to: u.cup, factor: 1 }, // 1 medium onion ≈ 1 cup chopped
+        },
+    }),
     cabbage: ingredientFactory('Green Cabbage', {
         defaultBrand: 'Whole Foods Market',
         products: [{
-                brand: 'Whole Foods Market', variant: 'Organic, Loose (~2.5 lb head)', store: stores.wholeFoods,
-                price: 1.99, size: 1, sizeUnit: u.pound, organic: true, bulk: true,
-                link: 'https://www.amazon.com/dp/B0787TK5FV',
+                brand: 'Whole Foods Market', variant: 'Organic, Loose (~2.5 lb head)', listings: [{ store: stores.wholeFoods, price: 1.99, link: 'https://www.amazon.com/dp/B0787TK5FV' }], size: 1, sizeUnit: u.pound, organic: true, bulk: true,
             }],
         nutrition: {
             [u.cup.name]: { servings: 1, servingSize: 1, calories: 22, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 5, sodium: 16, sugar: 3, protein: 1, fiber: 2 },
@@ -3549,9 +3981,7 @@ export const i = {
         // Green cabbage, red cabbage, and carrots
         defaultBrand: '365',
         products: [{
-                brand: '365', variant: 'Organic (12 oz)', store: stores.wholeFoods,
-                price: 3.49, size: 12, sizeUnit: u.ounce, packageUnit: u.bag,
-                link: 'https://www.amazon.com/dp/B07FWN3244',
+                brand: '365', variant: 'Organic (12 oz)', listings: [{ store: stores.wholeFoods, price: 3.49, link: 'https://www.amazon.com/dp/B07FWN3244' }], size: 12, sizeUnit: u.ounce, packageUnit: u.bag,
             }],
         nutrition: {
             // Label: ~4 servings per bag, serving size 1 cup (85g)
@@ -3565,9 +3995,7 @@ export const i = {
     greenOnion: ingredientFactory('Green Onion', {
         defaultBrand: 'Whole Foods Market',
         products: [{
-                brand: 'Whole Foods Market', variant: 'Organic Scallions (1 Bunch)', store: stores.wholeFoods,
-                price: 1.99, size: 1, sizeUnit: u.bunch, packageUnit: u.bunch,
-                link: 'https://www.amazon.com/dp/B07883LXVL',
+                brand: 'Whole Foods Market', variant: 'Organic Scallions (1 Bunch)', listings: [{ store: stores.wholeFoods, price: 1.99, link: 'https://www.amazon.com/dp/B07883LXVL' }], size: 1, sizeUnit: u.bunch, packageUnit: u.bunch,
             }],
         nutrition: {
             [u.unit.name]: { servings: 1, servingSize: 1, calories: 5, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 1, sodium: 5, sugar: 0, protein: 0, fiber: 0 },
@@ -3612,9 +4040,7 @@ export const i = {
     creamySesameDressing: ingredientFactory('Creamy Sesame Salad Dressing', {
         defaultBrand: 'SideDish',
         products: [{
-                brand: 'SideDish', variant: 'Creamy Sesame (8 fl oz)', store: stores.wholeFoods,
-                price: 6.53, size: 8, sizeUnit: u.fluidOunce,
-                link: 'https://www.amazon.com/dp/B0CR56SHBK',
+                brand: 'SideDish', variant: 'Creamy Sesame (8 fl oz)', listings: [{ store: stores.wholeFoods, price: 6.53, link: 'https://www.amazon.com/dp/B0CR56SHBK' }], size: 8, sizeUnit: u.fluidOunce,
             }],
         nutrition: {
             // Label: ~7 servings per container, serving size 2 tbsp (30g)
@@ -3627,9 +4053,7 @@ export const i = {
             [u.cup.name]: { to: u.ounce, factor: 13.4 / 1.5 }, // 13.4 oz per ~1.5 cups (3 × ½ cup servings)
         },
         products: [{
-                brand: '365', variant: 'Organic Unsalted (13.4 oz)', store: stores.wholeFoods,
-                price: 1.59, size: 13.4, sizeUnit: u.ounce, packageUnit: u.can,
-                link: 'https://www.amazon.com/dp/B074H5SRPW',
+                brand: '365', variant: 'Organic Unsalted (13.4 oz)', listings: [{ store: stores.wholeFoods, price: 1.59, link: 'https://www.amazon.com/dp/B074H5SRPW' }], size: 13.4, sizeUnit: u.ounce, packageUnit: u.can,
             }],
         nutrition: {
             [u.cup.name]: { servings: 1, servingSize: 1, calories: 220, fat: 4, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 36, sodium: 20, sugar: 2, protein: 12, fiber: 10 },
@@ -3641,9 +4065,7 @@ export const i = {
             [u.cup.name]: { to: u.ounce, factor: 13.4 / 1.5 }, // 13.4 oz per 1.5 cups (3 × ½ cup servings)
         },
         products: [{
-                brand: '365', variant: 'Organic Unsalted (13.4 oz)', store: stores.wholeFoods,
-                price: 1.59, size: 13.4, sizeUnit: u.ounce, packageUnit: u.can,
-                link: 'https://www.amazon.com/dp/B074H5J2V7',
+                brand: '365', variant: 'Organic Unsalted (13.4 oz)', listings: [{ store: stores.wholeFoods, price: 1.59, link: 'https://www.amazon.com/dp/B074H5J2V7' }], size: 13.4, sizeUnit: u.ounce, packageUnit: u.can,
             }],
         nutrition: {
             [u.cup.name]: { servings: 1, servingSize: 1, calories: 180, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 32, sodium: 10, sugar: 2, protein: 12, fiber: 12 },
@@ -3653,9 +4075,7 @@ export const i = {
         requiresDateLabel: true,
         defaultBrand: 'Milkadamia',
         products: [{
-                brand: 'Milkadamia', variant: 'Unsweetened', store: stores.wholeFoods,
-                link: 'https://www.amazon.com/dp/B01JH2O854',
-                price: 6.19, size: 32, sizeUnit: u.fluidOunce,
+                brand: 'Milkadamia', variant: 'Unsweetened', listings: [{ store: stores.wholeFoods, link: 'https://www.amazon.com/dp/B01JH2O854', price: 6.19 }], size: 32, sizeUnit: u.fluidOunce,
                 nutrition: {
                     [u.cup.name]: { servings: 4, servingSize: 1, calories: 50, fat: 5, saturatedFat: 0.5, transFat: 0, cholesterol: 0, carbs: 1, sodium: 75, sugar: 0, protein: 1, fiber: 0 },
                 },
@@ -3668,17 +4088,13 @@ export const i = {
         },
         products: [
             {
-                brand: '365', variant: 'Organic Raw', store: stores.wholeFoods,
-                link: 'https://www.wholefoodsmarket.com/product/365-by-whole-foods-market-organic-macadamia-nuts-8-oz-b086hk83yf',
-                price: 10.79, size: 8, sizeUnit: u.ounce, organic: true,
+                brand: '365', variant: 'Organic Raw', listings: [{ store: stores.wholeFoods, link: 'https://www.wholefoodsmarket.com/product/365-by-whole-foods-market-organic-macadamia-nuts-8-oz-b086hk83yf', price: 10.79 }], size: 8, sizeUnit: u.ounce, organic: true,
                 nutrition: {
                     [u.cup.name]: { servings: 1, servingSize: 1, calories: 960, fat: 95, saturatedFat: 15, transFat: 0, cholesterol: 0, carbs: 18, sodium: 7, sugar: 6, protein: 11, fiber: 9 },
                 },
             },
             {
-                brand: 'Blueprint', variant: 'Raw', store: stores.amazon,
-                link: 'https://www.amazon.com/Blueprint-Bryan-Johnson-Macadamia-Nuts/dp/B0DNGJFBS1',
-                price: 12, size: 4, sizeUnit: u.ounce, organic: false,
+                brand: 'Blueprint', variant: 'Raw', listings: [{ store: stores.amazon, link: 'https://www.amazon.com/Blueprint-Bryan-Johnson-Macadamia-Nuts/dp/B0DNGJFBS1', price: 12 }], size: 4, sizeUnit: u.ounce, organic: false,
                 nutrition: {
                     // Label: 1 oz (28g) serving = 210 cal etc; scaled ×4 to a per-cup value (1 cup ≈ 4 oz, per the ingredient's conversion factor above)
                     [u.cup.name]: { servings: 1, servingSize: 1, calories: 840, fat: 88, saturatedFat: 16, transFat: 0, cholesterol: 0, carbs: 16, sodium: 8, sugar: 4, protein: 8, fiber: 12 },
@@ -3698,7 +4114,7 @@ export const i = {
     chiaSeed: ingredientFactory('Chia Seed', {
         defaultBrand: '365',
         products: [{
-                brand: '365', variant: 'Organic Black', store: stores.wholeFoods,
+                brand: '365', variant: 'Organic Black', listings: [{ store: stores.wholeFoods }],
                 nutrition: {
                     [u.tsp.name]: { servings: 1, servingSize: 1, calories: 19, fat: 1, saturatedFat: 0.1, transFat: 0, cholesterol: 0, carbs: 1.5, sodium: 0, sugar: 0, protein: 1, fiber: 2 },
                 },
@@ -3707,7 +4123,7 @@ export const i = {
     hempSeed: ingredientFactory('Hemp Seed', {
         defaultBrand: 'Manitoba Harvest',
         products: [{
-                brand: 'Manitoba Harvest', variant: 'Hemp Hearts', store: stores.wholeFoods,
+                brand: 'Manitoba Harvest', variant: 'Hemp Hearts', listings: [{ store: stores.wholeFoods }],
                 nutrition: {
                     [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 55, fat: 4, saturatedFat: 0.5, transFat: 0, cholesterol: 0, carbs: 1, sodium: 0, sugar: 0.5, protein: 3.3, fiber: 0 },
                 },
@@ -3716,7 +4132,7 @@ export const i = {
     antiOxidantBerryBlend: ingredientFactory('Antioxidant Berry Blend', {
         defaultBrand: '365',
         products: [{
-                brand: '365', variant: 'Organic Antioxidant Fruit Blend (frozen)', store: stores.wholeFoods,
+                brand: '365', variant: 'Organic Antioxidant Fruit Blend (frozen)', listings: [{ store: stores.wholeFoods }],
                 size: 16, sizeUnit: u.ounce, organic: true,
                 nutrition: {
                     [u.cup.name]: { servings: 4, servingSize: 1, calories: 70, fat: 0.5, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 17, sodium: 0, sugar: 13, protein: 1, fiber: 4 },
@@ -3726,19 +4142,15 @@ export const i = {
     vanillaExtract: ingredientFactory('Vanilla Extract', {
         defaultBrand: '365',
         products: [{
-                brand: '365', variant: 'Organic Vanilla Extract', store: stores.wholeFoods,
-                nutrition: { [u.fluidOunce.name]: { servings: 2, servingSize: 2, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 } },
-                price: 8.79, size: 2, sizeUnit: u.fluidOunce, organic: true,
-                link: 'https://www.amazon.com/365-Everyday-Value-Organic-Vanilla/dp/B074VBL8R9',
+                brand: '365', variant: 'Organic Vanilla Extract', listings: [{ store: stores.wholeFoods, price: 8.79, link: 'https://www.amazon.com/365-Everyday-Value-Organic-Vanilla/dp/B074VBL8R9' }],
+                nutrition: { [u.fluidOunce.name]: { servings: 2, servingSize: 2, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 } }, size: 2, sizeUnit: u.fluidOunce, organic: true,
             }],
     }),
     lemonJuice: ingredientFactory('Lemon Juice', {
         defaultBrand: '365',
         products: [{
-                brand: '365', variant: 'Organic Lemon Juice', store: stores.wholeFoods,
-                nutrition: { [u.tsp.name]: { servings: 59, servingSize: 1, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 } },
-                price: 3.49, size: 10, sizeUnit: u.fluidOunce, organic: true,
-                link: 'https://www.amazon.com/365-Everyday-Value-Organic-Concentrate/dp/B074J5WZS8?th=1',
+                brand: '365', variant: 'Organic Lemon Juice', listings: [{ store: stores.wholeFoods, price: 3.49, link: 'https://www.amazon.com/365-Everyday-Value-Organic-Concentrate/dp/B074J5WZS8?th=1' }],
+                nutrition: { [u.tsp.name]: { servings: 59, servingSize: 1, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 } }, size: 10, sizeUnit: u.fluidOunce, organic: true,
             }],
     }),
     cherry: ingredientFactory('Cherry', {
@@ -3748,9 +4160,7 @@ export const i = {
             [u.cup.name]: { to: u.ounce, factor: 5 }, // 1 cup dark cherries ≈ 5 oz
         },
         products: [{
-                brand: '365', variant: 'Organic Sweet Dark Cherries (frozen)', store: stores.wholeFoods,
-                link: 'https://www.amazon.com/dp/B074H57SNZ',
-                price: 4.29, size: 10, sizeUnit: u.ounce,
+                brand: '365', variant: 'Organic Sweet Dark Cherries (frozen)', listings: [{ store: stores.wholeFoods, link: 'https://www.amazon.com/dp/B074H57SNZ', price: 4.29 }], size: 10, sizeUnit: u.ounce,
                 organic: true,
                 nutrition: {
                     [u.cup.name]: { servings: 2, servingSize: 1, calories: 90, fat: 0.3, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 23, sodium: 0, sugar: 18, protein: 1, fiber: 3 },
@@ -3763,9 +4173,7 @@ export const i = {
     spinach: ingredientFactory('Spinach', {
         defaultBrand: '365',
         products: [{
-                brand: '365', variant: 'Organic Whole Leaf (Frozen, 16 oz)', store: stores.wholeFoods,
-                price: 3.59, size: 16, sizeUnit: u.ounce,
-                link: 'https://www.amazon.com/dp/B074H5Y441',
+                brand: '365', variant: 'Organic Whole Leaf (Frozen, 16 oz)', listings: [{ store: stores.wholeFoods, price: 3.59, link: 'https://www.amazon.com/dp/B074H5Y441' }], size: 16, sizeUnit: u.ounce,
             }],
         nutrition: { [u.ounce.name]: { servings: 1, servingSize: 1, calories: 7, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 1, sodium: 24, sugar: 0.1, protein: 0.9, fiber: 1 } },
         conversions: {
@@ -3776,9 +4184,7 @@ export const i = {
     kale: ingredientFactory('Kale', {
         defaultBrand: '365',
         products: [{
-                brand: '365', variant: 'Organic Chopped (Frozen, 16 oz)', store: stores.wholeFoods,
-                price: 3.59, size: 16, sizeUnit: u.ounce,
-                link: 'https://www.amazon.com/dp/B074H5Y3WB',
+                brand: '365', variant: 'Organic Chopped (Frozen, 16 oz)', listings: [{ store: stores.wholeFoods, price: 3.59, link: 'https://www.amazon.com/dp/B074H5Y3WB' }], size: 16, sizeUnit: u.ounce,
             }],
         nutrition: { [u.ounce.name]: { servings: 1, servingSize: 1, calories: 8, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 1.5, sodium: 11, sugar: 0.2, protein: 0.7, fiber: 1 } },
         conversions: {
@@ -3792,30 +4198,30 @@ export const i = {
     peanutButter: ingredientFactory('Peanut Butter', {
         defaultBrand: '365',
         products: [
-            { brand: '365', variant: 'Organic Unsweetened', store: stores.wholeFoods,
-                price: 4.19, size: 16, sizeUnit: u.ounce, organic: true,
-                link: 'https://www.amazon.com/365-Everyday-Value-Organic-Unsweetened/dp/B074H61LYV/ref=sr_1_9_0o_wf' },
-            { brand: '365', variant: 'Creamy', store: stores.wholeFoods,
-                price: 2.49, size: 16, sizeUnit: u.ounce,
-                link: 'https://www.amazon.com/365-Everyday-Value-Peanut-Butter/dp/B074H57SPT/ref=sr_1_7_0o_wf' },
-            { brand: '365', variant: 'Crunchy', store: stores.wholeFoods,
-                price: 4.99, size: 36, sizeUnit: u.ounce,
-                link: 'https://www.amazon.com/Everyday-Value-Peanut-Butter-Crunchy/dp/B074Y2V88X/ref=sr_1_16_0o_wf' },
-            { brand: 'Amazon Brand', variant: 'Creamy', store: stores.amazon,
-                price: 4.69, size: 40, sizeUnit: u.ounce,
-                link: 'https://www.amazon.com/dp/B07KWGSCW2/ref=sns_myd_detail_page',
-                discount: { subscribe5Products: 5 } },
-        ],
-    }),
-    pittedDates: ingredientFactory('Pitted Dates', {
-        defaultBrand: '365',
-        products: [
-            { brand: '365', store: stores.wholeFoods, price: 3.99, size: 8, sizeUnit: u.ounce,
-                link: 'https://www.amazon.com/365-Everyday-Value-Dates-Pitted/dp/B074VDMNH7/ref=sr_1_5_0o_wf' },
-            { brand: 'Food to Live', variant: 'Organic Deglet Nour', store: stores.amazon,
-                price: 16.59, size: 2.5, sizeUnit: u.pound, organic: true,
-                link: 'https://www.amazon.com/ORGANIC-Pitted-Dates-Deglet-Nour/dp/B0872L82ZK/ref=sr_1_10',
-                discount: { subscribe5Products: 5 } },
+            {
+                brand: '365', variant: 'Organic Unsweetened', listings: [{ store: stores.wholeFoods, price: 4.19, link: 'https://www.amazon.com/365-Everyday-Value-Organic-Unsweetened/dp/B074H61LYV/ref=sr_1_9_0o_wf' }], size: 16, sizeUnit: u.ounce, organic: true,
+                nutrition: {
+                    [u.tbsp.name]: { servings: 14, servingSize: 2, calories: 190, fat: 17, saturatedFat: 3.5, transFat: 0, cholesterol: 0, carbs: 6, sodium: 100, sugar: 1, protein: 7, fiber: 2 },
+                },
+            },
+            {
+                brand: '365', variant: 'Creamy', listings: [{ store: stores.wholeFoods, price: 2.49, link: 'https://www.amazon.com/365-Everyday-Value-Peanut-Butter/dp/B074H57SPT/ref=sr_1_7_0o_wf' }], size: 16, sizeUnit: u.ounce,
+                nutrition: {
+                    [u.tbsp.name]: { servings: 14, servingSize: 2, calories: 190, fat: 16, saturatedFat: 2.5, transFat: 0, cholesterol: 0, carbs: 7, sodium: 120, sugar: 2, protein: 8, fiber: 3 },
+                },
+            },
+            {
+                brand: '365', variant: 'Crunchy', listings: [{ store: stores.wholeFoods, price: 4.99, link: 'https://www.amazon.com/Everyday-Value-Peanut-Butter-Crunchy/dp/B074Y2V88X/ref=sr_1_16_0o_wf' }], size: 36, sizeUnit: u.ounce,
+                nutrition: {
+                    [u.tbsp.name]: { servings: 32, servingSize: 2, calories: 190, fat: 16, saturatedFat: 2.5, transFat: 0, cholesterol: 0, carbs: 7, sodium: 100, sugar: 2, protein: 8, fiber: 3 },
+                },
+            },
+            {
+                brand: 'Amazon Brand', variant: 'Creamy', listings: [{ store: stores.amazon, price: 3.97, link: 'https://www.amazon.com/dp/B07KWGSCW2/ref=sns_myd_detail_page', discount: { subscribe5Products: 5 } }], size: 40, sizeUnit: u.ounce,
+                nutrition: {
+                    [u.tbsp.name]: { servings: 35, servingSize: 2, calories: 180, fat: 15, saturatedFat: 2.5, transFat: 0, cholesterol: 0, carbs: 7, sodium: 130, sugar: 3, protein: 7, fiber: 2 },
+                },
+            },
         ],
     }),
     orangeJuice: ingredientFactory('Orange Juice', {
@@ -3830,24 +4236,7 @@ export const i = {
         nutrition: {
             [u.fluidOunce.name]: { servings: 1, servingSize: 1, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 },
         },
-        products: [{ brand: 'Tap', price: 0, size: 1, sizeUnit: u.fluidOunce }],
-    }),
-    strawberry: ingredientFactory('Strawberry', {
-        defaultBrand: '365',
-        products: [{
-                brand: '365', variant: 'Organic Whole Strawberries (frozen)', store: stores.wholeFoods,
-                price: 6.69, size: 32, sizeUnit: u.ounce, organic: true,
-                link: 'https://www.wholefoodsmarket.com/product/365-by-whole-foods-market-365-whole-foods-market-organic-whole-strawberries-b09gcp3jng',
-            }],
-    }),
-    collagenPowder: ingredientFactory('Collagen Powder', {
-        defaultBrand: 'Sports Research',
-        products: [{
-                brand: 'Sports Research', store: stores.amazon,
-                price: 17.99, size: 1, sizeUnit: u.pound,
-                link: 'https://www.amazon.com/gp/product/B071S8D69C/ref=ppx_yo_dt_b_asin_title_o00_s00',
-                discount: { subscribe5Products: 5 },
-            }],
+        products: [{ brand: 'Tap', listings: [{ price: 0 }], size: 1, sizeUnit: u.fluidOunce }],
     }),
     psyllium: ingredientFactory('Psyllium Husk', {
         defaultBrand: '365',
@@ -3855,28 +4244,22 @@ export const i = {
             [u.tbsp.name]: { to: u.ounce, factor: 0.214 }, // 12 oz / 56 tbsp servings
         },
         products: [{
-                brand: '365', variant: 'Organic Whole Flakes', store: stores.wholeFoods,
-                link: 'https://www.amazon.com/dp/B0CDQJRFGX',
-                price: 17.49, size: 12, sizeUnit: u.ounce,
+                brand: '365', variant: 'Organic Whole Flakes', size: 12, sizeUnit: u.ounce,
                 organic: true,
+                listings: [
+                    { store: stores.wholeFoods, link: 'https://www.amazon.com/dp/B0CDQJRFGX', price: 17.49 },
+                    { store: stores.amazon, link: 'https://www.amazon.com/dp/B0CDQJJ5TF', price: 18.48 },
+                ],
                 nutrition: {
                     [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 15, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 5, sodium: 5, sugar: 0, protein: 0, fiber: 5 },
                 },
-            }, {
-                brand: '365', variant: 'Organic Whole Flakes', store: stores.amazon,
-                link: 'https://www.amazon.com/dp/B0CDQJJ5TF',
-                price: 18.48, size: 12, sizeUnit: u.ounce,
-                organic: true,
             }],
     }),
-    blueprintMacadamiaBar: ingredientFactory('Blueprint Macadamia Bar', {
+    macadamiaBar: ingredientFactory('Macadamia Bar', {
         defaultBrand: 'Blueprint',
         products: [
             {
-                brand: 'Blueprint', variant: 'Raspberry', store: stores.amazon,
-                link: 'https://www.amazon.com/dp/B0DQLSW6FB',
-                price: 29.00, size: 12, sizeUnit: u.unit,
-                discount: { subscribeAndSave: 26.10 },
+                brand: 'Blueprint', variant: 'Raspberry', listings: [{ store: stores.amazon, link: 'https://www.amazon.com/dp/B0DQLSW6FB', price: 29.00, discount: { subscribeAndSave10: true } }], size: 12, sizeUnit: u.unit,
                 nutrition: {
                     [u.unit.name]: { servings: 12, servingSize: 1, calories: 160, fat: 12, saturatedFat: 2, transFat: 0, cholesterol: 0, carbs: 5, sodium: 80, sugar: 1, protein: 9, fiber: 2 },
                 },
@@ -3889,24 +4272,20 @@ export const i = {
             [u.gram.name]: { to: u.cup, factor: 1 / 180 }, // 45g = ¼ cup dry, per nutrition label
         },
         products: [{
-                brand: '365', variant: 'Organic, Black, dry', store: stores.wholeFoods,
-                price: 3.29, size: 16, sizeUnit: u.ounce, organic: true,
-                link: 'https://www.amazon.com/dp/B084NHD2R9',
+                brand: '365', variant: 'Organic, Black, dry', listings: [{ store: stores.wholeFoods, price: 3.29, link: 'https://www.amazon.com/dp/B084NHD2R9' }], size: 16, sizeUnit: u.ounce, organic: true,
                 nutrition: {
                     [u.cup.name]: { servings: 11, servingSize: 1, calories: 600, fat: 2, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 106, sodium: 0, sugar: 4, protein: 44, fiber: 20 },
                 },
             }],
     }),
-    blueprintOliveOil: ingredientFactory('Extra Virgin Olive Oil', {
+    oliveOil: ingredientFactory('Extra Virgin Olive Oil', {
         defaultBrand: 'Blueprint',
         conversions: {
             [u.shot.name]: { to: u.fluidOunce, factor: 1 }, // 1 shot = 1 fl oz
         },
         products: [{
-                brand: 'Blueprint', variant: 'Snake Oil (High Polyphenol EVOO)', store: stores.amazon,
+                brand: 'Blueprint', variant: 'Snake Oil (High Polyphenol EVOO)', listings: [{ store: stores.amazon, price: 35, link: 'https://www.amazon.com/Blueprint-Bryan-Johnson-Olive-Oil/dp/B0F1P5SR2M' }],
                 size: 25, sizeUnit: u.fluidOunce,
-                price: 35,
-                link: 'https://www.amazon.com/Blueprint-Bryan-Johnson-Olive-Oil/dp/B0F1P5SR2M',
                 nutrition: {
                     [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 120, fat: 14, saturatedFat: 2, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 },
                 },
@@ -3915,10 +4294,8 @@ export const i = {
     longevityProtein: ingredientFactory('Longevity Protein', {
         defaultBrand: 'Blueprint',
         products: [{
-                brand: 'Blueprint', variant: 'Chocolate (30 servings)', store: stores.amazon,
-                price: 94,
-                size: 30, sizeUnit: u.unit, // 30 scoops per container
-                link: 'https://www.amazon.com/Blueprint-Bryan-Johnson-Longevity-Protein/dp/B0DNGJRLQF',
+                brand: 'Blueprint', variant: 'Chocolate (30 servings)', listings: [{ store: stores.amazon, price: 94, link: 'https://www.amazon.com/Blueprint-Bryan-Johnson-Longevity-Protein/dp/B0DNGJRLQF' }],
+                size: 30, sizeUnit: u.unit,
                 nutrition: {
                     [u.unit.name]: { servings: 1, servingSize: 1, calories: 200, fat: 5, saturatedFat: 0.5, transFat: 0, cholesterol: 0, carbs: 13, sodium: 200, sugar: 0, protein: 26, fiber: 1 },
                 },
@@ -3927,10 +4304,7 @@ export const i = {
     blueberryNutMix: ingredientFactory('Blueberry Nut Mix', {
         defaultBrand: 'Blueprint',
         products: [{
-                brand: 'Blueprint', variant: 'Macadamia + Walnut + Blueberry', store: stores.amazon,
-                price: 37, size: 30, sizeUnit: u.unit,
-                discount: { subscribeAndSave: 33.30 },
-                link: 'https://www.amazon.com/Blueprint-Bryan-Johnson-Blueberry-Nut/dp/B0D3FZ29RJ',
+                brand: 'Blueprint', variant: 'Macadamia + Walnut + Blueberry', listings: [{ store: stores.amazon, price: 37, discount: { subscribeAndSave10: true }, link: 'https://www.amazon.com/Blueprint-Bryan-Johnson-Blueberry-Nut/dp/B0D3FZ29RJ' }], size: 30, sizeUnit: u.unit,
                 nutrition: {
                     // Per 1 scoop (15g), 30 servings per container
                     [u.unit.name]: { servings: 30, servingSize: 1, calories: 70, fat: 4.5, saturatedFat: 0.5, transFat: 0, cholesterol: 0, carbs: 8, sodium: 0, sugar: 5, protein: 1, fiber: 2 },
@@ -3940,87 +4314,78 @@ export const i = {
     longevityMix: ingredientFactory('Longevity Mix', {
         defaultBrand: 'Blueprint',
         products: [{
-                brand: 'Blueprint', variant: 'Blood Orange (30 servings)', store: stores.amazon,
-                price: 49, size: 30, sizeUnit: u.unit,
-                link: 'https://www.amazon.com/dp/B0D3GBRNSX',
-                discount: { subscribeAndSave: 44.10 },
+                brand: 'Blueprint', variant: 'Blood Orange (30 servings)', listings: [{ store: stores.amazon, price: 49, link: 'https://www.amazon.com/dp/B0D3GBRNSX', discount: { subscribeAndSave10: true } }], size: 30, sizeUnit: u.unit,
             }],
         nutrition: {
             [u.unit.name]: { servings: 30, servingSize: 1, calories: 10, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 3, sodium: 0, sugar: 0, protein: 0, fiber: 0 },
         },
     }),
-    blueprintCollagen: ingredientFactory('Collagen Peptides', {
+    collagenPowder: ingredientFactory('Collagen Peptides', {
         defaultBrand: 'Blueprint',
         products: [{
-                brand: 'Blueprint', variant: 'Hydrolyzed Type I, II & III (30 servings)', store: stores.amazon,
-                price: 45, size: 30, sizeUnit: u.unit,
-                link: 'https://www.amazon.com/dp/B0DV1PQDWH',
-                discount: { subscribeAndSave: 40.50 },
+                brand: 'Blueprint', variant: 'Hydrolyzed Type I, II & III (30 servings)', listings: [{ store: stores.amazon, price: 45, link: 'https://www.amazon.com/dp/B0DV1PQDWH', discount: { subscribeAndSave10: true } }], size: 30, sizeUnit: u.unit,
             }],
         nutrition: {
             [u.unit.name]: { servings: 30, servingSize: 1, calories: 80, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 20, fiber: 0 },
         },
     }),
-    blueprintCreatine: ingredientFactory('Creatine Monohydrate', {
+    creatine: ingredientFactory('Creatine Monohydrate', {
         defaultBrand: 'Blueprint',
         products: [{
-                brand: 'Blueprint', variant: 'Unflavored (100 servings)', store: stores.amazon,
-                price: 40, size: 100, sizeUnit: u.unit,
-                link: 'https://www.amazon.com/dp/B0DQLW13S2',
-                discount: { subscribeAndSave: 36.00 },
+                brand: 'Blueprint', variant: 'Unflavored (100 servings)', listings: [{ store: stores.amazon, price: 40, link: 'https://www.amazon.com/dp/B0DQLW13S2', discount: { subscribeAndSave10: true } }], size: 100, sizeUnit: u.unit,
             }],
         nutrition: {
             [u.unit.name]: { servings: 100, servingSize: 1, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 },
         },
     }),
+    // Generic/typical nutrition (not from this listing's own label) — standard honey values,
+    // per 1 tsp (~7g). Link is also currently dead ("Page Not Found") — needs a fresh one.
     manukaHoney: ingredientFactory('Manuka Honey', {
         defaultBrand: 'Blueprint',
         products: [{
-                brand: 'Blueprint', variant: 'Manuka Honey', store: stores.amazon,
-                link: 'https://www.amazon.com/dp/B0DQLSXYZ',
+                brand: 'Blueprint', variant: 'Manuka Honey', listings: [{ store: stores.amazon, link: 'https://www.amazon.com/dp/B0DQLSXYZ' }],
+                nutrition: {
+                    [u.tsp.name]: { servings: 1, servingSize: 1, calories: 21, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 6, sodium: 0, sugar: 6, protein: 0, fiber: 0 },
+                },
             }],
     }),
     nutThins: ingredientFactory('Nut Thins', {
         defaultBrand: 'Blue Diamond',
         products: [
             {
-                brand: 'Blue Diamond', variant: 'Hint Of Sea Salt', store: stores.amazon,
-                link: 'https://www.amazon.com/dp/B00FBO8FF2',
-                price: 3.97, size: 4.25, sizeUnit: u.ounce,
-                discount: { subscribeAndSave: 3.37 },
+                brand: 'Blue Diamond', variant: 'Hint Of Sea Salt', size: 4.25, sizeUnit: u.ounce,
+                listings: [
+                    { store: stores.amazon, link: 'https://www.amazon.com/dp/B00FBO8FF2', price: 3.97, discount: { subscribeAndSave15: true } },
+                    { store: stores.wholeFoods, price: 4.39 },
+                ],
                 nutrition: {
                     // 19 crackers per serving, 4 servings per container
                     [u.unit.name]: { servings: 4, servingSize: 19, calories: 130, fat: 4, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 22, sodium: 80, sugar: 0, protein: 3, fiber: 1 },
                 },
             },
             {
-                brand: 'Blue Diamond', variant: 'Hint Of Sea Salt', store: stores.wholeFoods,
-                price: 4.39, size: 4.25, sizeUnit: u.ounce,
-            },
-            {
-                brand: 'Blue Diamond', variant: 'Hint Of Sea Salt (Family Size)', store: stores.amazon,
-                link: 'https://www.amazon.com/dp/B07XHRRB1T',
-                price: 6.57, size: 7.7, sizeUnit: u.ounce,
-                discount: { subscribeAndSave: 5.58 },
+                brand: 'Blue Diamond', variant: 'Hint Of Sea Salt (Family Size)', size: 7.7, sizeUnit: u.ounce,
+                listings: [
+                    { store: stores.amazon, link: 'https://www.amazon.com/dp/B07XHRRB1T', price: 6.57, discount: { subscribeAndSave15: true } },
+                    { store: stores.wholeFoods, link: 'https://www.amazon.com/dp/B07XHRRB1T', price: 7.99 },
+                ],
                 nutrition: {
                     // 19 crackers per serving, 7 servings per container
                     [u.unit.name]: { servings: 7, servingSize: 19, calories: 130, fat: 4, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 22, sodium: 55, sugar: 0, protein: 3, fiber: 1 },
                 },
             },
-            {
-                brand: 'Blue Diamond', variant: 'Hint Of Sea Salt (Family Size)', store: stores.wholeFoods,
-                link: 'https://www.amazon.com/dp/B07XHRRB1T',
-                price: 7.99, size: 7.7, sizeUnit: u.ounce,
-            },
         ],
     }),
+    // Generic/typical nutrition (not from this listing's own label) — standard raw boneless
+    // skinless chicken thigh values, per 1 lb (453.6g).
     chickenThigh: ingredientFactory('Chicken Thighs (Boneless Skinless)', {
         isMeatProduct: true,
         defaultBrand: '365',
         products: [{
-                brand: '365', variant: 'Organic Boneless Skinless (1.5 lb)', store: stores.wholeFoods,
-                price: 9.99, size: 1.5, sizeUnit: u.pound,
-                link: 'https://www.amazon.com/dp/B07813VZHR',
+                brand: '365', variant: 'Organic Boneless Skinless (1.5 lb)', listings: [{ store: stores.wholeFoods, price: 9.99, link: 'https://www.amazon.com/dp/B07813VZHR' }], size: 1.5, sizeUnit: u.pound,
+                nutrition: {
+                    [u.pound.name]: { servings: 1, servingSize: 1, calories: 708, fat: 37, saturatedFat: 10, transFat: 0, cholesterol: 372, carbs: 0, sodium: 345, sugar: 0, protein: 90, fiber: 0 },
+                },
             }],
     }),
 };
@@ -4055,7 +4420,7 @@ registerGroup('Breakfast', [
         s(mixer.mix());
         return steps;
     })(), undefined, 8), { planMinutes: 8, portable: false }),
-    withPlan(createRecipe('blueprint-smoothie-nuwave', 'Blueprint Smoothie (Nuwave)', (() => {
+    withPlan(createRecipe('blueprint-smoothie-nuwave', 'Blueprint Smoothie (Nuwave) (x2)', (() => {
         const mixer = e.bulletMixer();
         const MACADAMIA_MILK = i.macadamiaNutMilk(2, u.cup);
         const steps = [];
@@ -4158,7 +4523,7 @@ registerGroup('Dinner', [
         s(transferToBowl);
         s(batter.add([
             i.water(7, u.ounce),
-            i.salt(0.5, u.tsp),
+            i.seaSalt(0.5, u.tsp),
             i.garlicPowder(0.5, u.tsp),
             i.cornstarch(2, u.tbsp),
             i.cassavaFlour(0.5, u.cup),
@@ -4193,7 +4558,7 @@ registerGroup('Dinner', [
             [MUSHROOMS, 'halved'],
             [ONION, 'cut into 8 wedges'],
             i.oliveOil(1, u.tbsp),
-            i.salt(1, u.tsp),
+            i.seaSalt(1, u.tsp),
             i.rosemary(2, u.tsp),
             i.thyme(2, u.tsp),
         ]));
@@ -4273,7 +4638,7 @@ registerGroup('Dinner', [
             i.riceVinegar(2, u.tbsp),
             i.sesameSeed(2, u.tbsp),
             i.limeJuice(1, u.tbsp),
-            i.blueprintOliveOil(1, u.tsp),
+            i.oliveOil(1, u.tsp),
             i.manukaHoney(1, u.tsp),
         ]));
         const dressingReady = dressBowl.mix('miso sesame dressing');
@@ -4317,7 +4682,7 @@ registerGroup('Dinner', [
         const steps = [];
         const s = (...newSteps) => steps.push(...newSteps);
         s(seasoningBowl.add([
-            i.salt(0.5, u.tsp),
+            i.seaSalt(0.5, u.tsp),
             i.blackPepper(0.5, u.tsp),
             i.paprika(0.5, u.tsp),
             i.garlicPowder(0.5, u.tsp),
@@ -4349,11 +4714,10 @@ registerGroup('Dinner', [
         const ARUGULA = i.arugula(140, u.gram);
         const ORANGE = i.orange(1, u.unit);
         const GRAPEFRUIT = i.grapefruit(1, u.unit);
-        const FRONDS = i.fennelFronds(1, u.handful);
         const steps = [];
         const s = (...newSteps) => steps.push(...newSteps);
         s(prep('Trim fennel stalks and slice bulbs thinly, reserving the fronds', {
-            equipment: [board.name, knife.name], ingredients: [FENNEL, FRONDS],
+            equipment: [board.name, knife.name], ingredients: [FENNEL],
         }));
         s(soakBowl.add([
             [i.water(2, u.cup), 'with a squeeze of lemon juice'],
@@ -4367,17 +4731,17 @@ registerGroup('Dinner', [
         }));
         s(platter.add([RADICCHIO, FENNEL, ORANGE, GRAPEFRUIT, ARUGULA], 'arrange on platter'));
         s(dressBowl.add([
-            i.blueprintOliveOil(2, u.tbsp),
+            i.oliveOil(2, u.tbsp),
             i.champagneVinegar(30, u.milliliter),
             i.lemonJuice(30, u.milliliter),
             i.honeyDijonMustard(5, u.gram),
-            FRONDS,
+            FENNEL,
         ]));
         const dressingReady = dressBowl.mix('fennel vinaigrette');
         s(dressingReady);
         s(platter.combine([dressBowl.result], 'drizzle dressing over salad').waitFor(dressingReady));
         s(instruction('Season with salt and pepper, garnish, and serve', {
-            ingredients: [i.salt(0.25, u.tsp), i.blackPepper(0.25, u.tsp)], equipment: [platter.name],
+            ingredients: [i.seaSalt(0.25, u.tsp), i.blackPepper(0.25, u.tsp)], equipment: [platter.name],
         }));
         return steps;
     })()),
@@ -4391,7 +4755,7 @@ registerGroup('Blueprint', [
             ingredients: [i.blueberryNutMix(1, u.unit)],
         }),
         instruction('Take 2 shots of Blueprint olive oil', {
-            ingredients: [i.blueprintOliveOil(2, u.shot)],
+            ingredients: [i.oliveOil(2, u.shot)],
         }),
     ]), { planMinutes: 5, portable: false }),
     withPlan(createRecipe('blueprint-longevity-drink', 'Blueprint Longevity Drink (Longevity Mix, Collagen, Creatine)', [
@@ -4399,10 +4763,10 @@ registerGroup('Blueprint', [
             ingredients: [i.longevityMix(1, u.unit)],
         }),
         instruction('Add 1 scoop Blueprint Collagen Peptides', {
-            ingredients: [i.blueprintCollagen(1, u.unit)],
+            ingredients: [i.collagenPowder(1, u.unit)],
         }),
         instruction('Add 1 scoop (5g) Blueprint Creatine Monohydrate and stir until dissolved', {
-            ingredients: [i.blueprintCreatine(1, u.unit)],
+            ingredients: [i.creatine(1, u.unit)],
         }),
     ]), { planMinutes: 3, portable: false }),
 ]);
@@ -4414,14 +4778,14 @@ registerGroup('Lentils', [
         const WATER = i.water(24, u.fluidOunce);
         const pot = e.pot();
         const colander = e.colander();
-        s(info('195g dry lentils → ~495g cooked. Keeps in the fridge for 3 days.'));
+        s(info('195g dry lentils → ~418g cooked (~139g per portion, measured). Keeps in the fridge for 3 days.'));
         s(pot.add([LENTILS, WATER]));
         s(instruction('Place lid fully on pot', { equipment: [pot.name] }));
         s(instruction('Set induction stovetop to 215°', { equipment: [pot.name] }));
         s(Timer.set(24, 'm', 'Cook lentils', { equipment: [pot.name], ingredients: [LENTILS, WATER] }));
         s(instruction('Strain lentils through a colander', { equipment: [pot.name, colander.name], ingredients: [LENTILS] }));
         s(Timer.set(10, 'm', 'Let lentils cool', { ingredients: [LENTILS] }));
-        s(instruction('Portion cooked lentils into thirds (~165g each) into three stainless steel containers', { equipment: [pot.name], ingredients: [LENTILS] }));
+        s(instruction('Portion cooked lentils into thirds (~139g each) into three stainless steel containers', { equipment: [pot.name], ingredients: [LENTILS] }));
         s(instruction('Rinse pot and wipe dry with a paper towel (Otherwise Pot Stains)', { equipment: [pot.name] }));
         return steps;
     })()), { planMinutes: 3, portable: true, prepMinutes: 24, perishableDays: 3, sortOrder: 0 }),
@@ -4483,7 +4847,7 @@ registerGroup('Lentils', [
 registerGroup('Ingredients', [
     withPlan(createRecipe('ing-macadamia-bar', 'Blueprint Macadamia Bar', [
         instruction('Have 1 Blueprint Macadamia Bar on hand', {
-            ingredients: [i.blueprintMacadamiaBar(1, u.unit)],
+            ingredients: [i.macadamiaBar(1, u.unit)],
         }),
     ]), { planMinutes: 2, portable: true }),
     withPlan(createRecipe('ing-psyllium-husk', 'Psyllium Husk (1 tbsp)', [
@@ -4542,7 +4906,7 @@ registerRecipe(withPlan(createRecipe('test-recipe-all-features', 'Test Recipe (A
     s(pan.add([MUSHROOM]));
     // pot gets contents *before* being nested/broiled so the steps below actually exercise
     // place()/broil()'s auto-inheritance of a nested vessel's contents, not an empty snapshot.
-    s(pot.add([i.salt(0.25, u.tsp), i.water(8, u.fluidOunce)]));
+    s(pot.add([i.seaSalt(0.25, u.tsp), i.water(8, u.fluidOunce)]));
     s(oven.place(pan, 'Bake test pan', time.seconds(8), 375));
     s(oven.place(pot)); // label/duration-less overload — plain instruction step
     const panTransferred = pan.transfer(mixBowl, [MUSHROOM]);

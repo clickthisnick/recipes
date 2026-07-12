@@ -514,27 +514,45 @@ Ingredient factory functions `(quantity, unit) => Ingredient`. Each call produce
 The display name (`name`) is generic — "Macadamia Nut Milk", not "Milkadamia" — so the steps and shopping list stay brand-neutral. Brand identity, purchase info, and nutrition labels all live on `Product` entries attached to the ingredient.
 
 Optional metadata:
-- `products` — an array of `Product` entries; each is a specific SKU with brand, optional store/link/price/size, and an optional `nutrition` label
+- `products` — an array of `Product` entries; each is a specific SKU (brand + variant), with its own size/nutrition and one or more `listings` (where it can be bought)
 - `defaultBrand` — the brand string of the selected product. Its label drives nutrition; it's marked as the pick (`✓`) on the shopping list. If unset, the first product is used
 - `nutrition` — an ingredient-level label, used for brand-independent items like produce (celery, banana). Ignored when a selected product carries its own `nutrition`
 - `perishableDays`, `isMeatProduct`
 - `requiresDateLabel` — if `true`, automatically adds an instruction child step to any `.add()` call using this ingredient, asking the user to write today's date on the bottle with a Sharpie (useful for tracking expiration)
 
-### `Product`
+### `Product` and `Listing`
 ```ts
 { brand: string;       // e.g. 'Milkadamia', '365'
   variant?: string;    // 'Unsweetened', 'Organic Raw'
-  store?: string;
-  link?: string;
-  price?: number;
   size?: number;       // package size
   sizeUnit?: Unit;     // package unit
   organic?: boolean;
-  discount?: Record<string, number>;
-  nutrition?: NutritionLabel; }   // keyed by unit name
+  nutrition?: NutritionLabel;   // keyed by unit name
+  listings?: Listing[]; }
+
+// Where/how a Product can be bought — retailer-specific and non-exclusive.
+{ store?: string;
+  link?: string;
+  price?: number;
+  discount?: Discount; }
 ```
 
-This single type replaces the older split between `purchaseLinks` and ingredient-level `nutrition`. Brand identity lives in one place; the Shopping screen reads from `products[]` and the Nutrition screen reads from the selected product's label.
+`Product` describes what the item physically *is* (brand, variant, size, nutrition); `Listing` describes where/how to buy it (store, link, price, discount). The split exists because the same physical product is often sold in more than one place at different prices — e.g. a Blueprint bar sold both on Amazon and on Blueprint's own site — and those listings share one nutrition label, not two duplicated ones. A genuine multi-SKU category (peanut butter: Organic Unsweetened vs. Creamy vs. Crunchy) is modeled as separate `Product` entries instead, each with its own real nutrition, since those genuinely differ.
+
+For display/cost purposes, the shopping screen renders one row per `(product, listing)` pair, sorted ascending by price-per-unit; `cheapestListing(product)` picks which listing drives cost calculations and the `✓` default marker.
+
+### `Discount` and Subscribe & Save
+```ts
+{ subscribeAndSave5?: boolean;
+  subscribeAndSave10?: boolean;
+  subscribeAndSave15?: boolean;
+  subscribe5Products?: number; }  // Amazon's separate "5+ subscriptions" bonus, unrelated to the tiers above
+```
+
+Subscribe & Save eligibility is recorded as a boolean per tier (5/10/15%) rather than a hardcoded dollar price — `subscribeAndSavePercent()` picks the highest eligible tier, and the S&S price is always computed live as `listing.price × (1 − percent/100)`, so it can never go stale independently of the base price. The Shopping screen only shows an S&S price when `listing.store === stores.amazon` — Whole Foods and other retailers don't offer Subscribe & Save even for an identical item.
+
+### Nutrition is required
+Every ingredient must resolve to real nutrition data — there's no "missing" path. `ingredientFactory`'s TypeScript signature enforces this via two overloads: either the ingredient itself carries a `nutrition` label (for a true single product, regardless of how many retailers/listings sell it), or every entry in its `products` array does (for genuine multi-SKU categories, where one generic number would misrepresent whichever variant isn't picked). Passing neither is a compile error. `simpleIngredients()`'s bulk-declare helper is subject to the same rule — each entry must supply its own `nutrition`.
 
 ### Brand selection model
 - The default brand is set on the ingredient factory (`defaultBrand: 'Milkadamia'`), so every call to `i.macadamiaNutMilk()` is pre-pointed at that brand
