@@ -3486,7 +3486,7 @@ h2 { margin-top: 0; font-size: 28px; }
 // Replaced with the real compile timestamp by scripts/validate-recipes.js's postbuild
 // step, right after `tsc` emits dist/file.js. Left as-is (and reported as "dev build")
 // when running straight from source, e.g. under `vite`.
-const BUILD_TIME = '2026-07-12T16:05:47.757Z';
+const BUILD_TIME = '__BUILD_TIME__';
 function formatBuildTime() {
     const date = new Date(BUILD_TIME);
     if (isNaN(date.getTime()))
@@ -4435,15 +4435,12 @@ registerGroup('Breakfast', [
             i.cherry(6, u.unit),
             i.antiOxidantBerryBlend(1, u.cup),
             i.vanillaExtract(0.5, u.tsp),
-        ]));
-        s(mixer.mix());
-        s(mixer.add([
             i.celery(2, u.unit),
             i.banana(2, u.unit),
             i.kale(1, u.cup),
             i.spinach(0.5, u.cup),
         ]));
-        s(Timer.set(30, 's', 'Let mixer settle', { equipment: [mixer.name] }));
+        s(Timer.set(90, 's', 'Use Nut Milk setting', { equipment: [mixer.name] }));
         s(mixer.mix());
         return steps;
     })(), undefined, 8), { planMinutes: 8, portable: false }),
@@ -4653,8 +4650,12 @@ registerGroup('Dinner', [
         const CARROTS = i.carrot(1, u.cup);
         CARROTS.defaultBrand = 'CAL ORGANIC'; // this recipe shreds whole carrots itself, not pre-shredded
         const CABBAGE = i.cabbage(2, u.cup);
-        const CHICKPEAS = i.chickpeas(1, u.cup);
-        const CANNELLINI = i.cannelliniBean(1, u.cup);
+        // Real-world prep buys 3 packages of each (1.5 cups/package) and splits them across 4
+        // single-recipe batches, so this recipe's true share is 3/4 package = 1.125 cups — used
+        // here for accurate nutrition/shopping totals even though the step below still says the
+        // whole-can "1.5 cups" that's actually measured out per batch.
+        const CHICKPEAS = i.chickpeas(1.125, u.cup);
+        const CANNELLINI = i.cannelliniBean(1.125, u.cup);
         const EDAMAME = i.edamame(1, u.cup);
         const steps = [];
         const s = (...newSteps) => steps.push(...newSteps);
@@ -4666,13 +4667,43 @@ registerGroup('Dinner', [
             [CARROTS, 'shredded'],
             [CABBAGE, 'shredded'],
             [i.greenOnion(2, u.unit), 'chopped'],
+            EDAMAME,
+        ]);
+        addProduce.prep = true;
+        s(addProduce);
+        s(instruction('Add 1.5 cups chickpeas to salad bowl', { ingredients: [CHICKPEAS], equipment: [saladBowl.name] }));
+        s(instruction('Add 1.5 cups cannellini beans to salad bowl', { ingredients: [CANNELLINI], equipment: [saladBowl.name] }));
+        s(saladBowl.add([i.creamySesameDressing(2, u.tbsp)], 'pour dressing over salad, toss gently to coat'));
+        return steps;
+    })()),
+    createRecipe('asian-dense-bean-salad-4x', 'Asian Dense Bean Salad (4x)', (() => {
+        const saladBowl = e.bowl('salad bowl');
+        const CARROTS = i.carrot(4, u.cup);
+        CARROTS.defaultBrand = 'CAL ORGANIC'; // this recipe shreds whole carrots itself, not pre-shredded
+        const CABBAGE = i.cabbage(8, u.cup);
+        const CHICKPEAS = i.chickpeas(4, u.cup);
+        const CANNELLINI = i.cannelliniBean(4, u.cup);
+        const EDAMAME = i.edamame(4, u.cup);
+        const steps = [];
+        const s = (...newSteps) => steps.push(...newSteps);
+        const microwave = e.microwave();
+        s(Timer.set(80, 's', 'If eating right away and edamame is frozen: microwave edamame', { equipment: [microwave.name], ingredients: [EDAMAME] }));
+        s(prep('Peel and shred carrots', { ingredients: [CARROTS] }));
+        s(prep('Shred cabbage (can be done the day before)', { ingredients: [CABBAGE] }));
+        s(prep('Get out 3 packages of chickpeas and 3 packages of cannellini beans, open the tops', { ingredients: [CHICKPEAS, CANNELLINI] }));
+        s(prep('Strain chickpeas, then measure ~1.5 cups into each of the 4 salad bowl tops', { ingredients: [CHICKPEAS] }));
+        s(prep('Strain cannellini beans, then measure ~1.5 cups into each of the 4 salad bowl tops', { ingredients: [CANNELLINI] }));
+        const addProduce = saladBowl.add([
+            [CARROTS, 'shredded'],
+            [CABBAGE, 'shredded'],
+            [i.greenOnion(8, u.unit), 'chopped'],
             CHICKPEAS,
             CANNELLINI,
             EDAMAME,
         ]);
         addProduce.prep = true;
         s(addProduce);
-        s(saladBowl.add([i.creamySesameDressing(2, u.tbsp)], 'pour dressing over salad, toss gently to coat'));
+        s(saladBowl.add([i.creamySesameDressing(8, u.tbsp)], 'pour dressing over salad, toss gently to coat'));
         return steps;
     })()),
     createRecipe('nuwave-chicken-thighs', 'Nuwave Chicken Thighs (325°F)', (() => {

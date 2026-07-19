@@ -7,7 +7,7 @@
         "build": "tsc",
         "postbuild": "node scripts/validate-recipes.js",
         "dev": "vite",
-        "audit-amazon": "node scripts/audit-amazon-products.js"
+        "audit-amazon": "node scripts/audit-products.js"
     },
     "repository": {
         "type": "git",

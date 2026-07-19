@@ -1,23 +1,24 @@
 'use strict';
 
-// ── Audit every Amazon-linked product in src/file.ts against the live page ────
+// ── Audit every product in src/file.ts against its live page ──────────────────
 //
-// For each product object in src/file.ts whose `link` points at amazon.com,
-// this attaches to an already-running Chrome and checks:
+// For each product object in src/file.ts (currently only listings whose `link`
+// points at amazon.com are supported), this attaches to an already-running
+// Chrome and checks:
 //
 //   - base price:        file's `price` vs. what the page shows now
 //   - subscribeAndSave:  recalculates the S&S price from the *current* scraped
 //                        price at whichever tier (5/10/15%) is recorded in the
 //                        file, and flags a recorded tier on a non-Amazon `store`
 //                        (S&S only applies buying directly from Amazon)
-//   - nutrition:         best-effort only — most Amazon grocery listings show
-//                        the nutrition label as a photo, not text, so this can
+//   - nutrition:         best-effort only — most grocery listings show the
+//                        nutrition label as a photo, not text, so this can
 //                        only catch the listings that happen to expose it as a
 //                        real HTML table/bullets. A "not found" here does NOT
 //                        mean the file's nutrition data is wrong, just that it
 //                        couldn't be checked automatically.
 //
-// A delay between requests (DELAY_MS) keeps this from hammering Amazon and
+// A delay between requests (DELAY_MS) keeps this from hammering the site and
 // tripping a bot/robot-check page.
 //
 // Results are written to scripts/audit-report.md AS THEY'RE FOUND (rewritten
@@ -25,12 +26,12 @@
 // instead of waiting on the terminal — nothing is held back until the end.
 //
 // Usage:
-//   node scripts/audit-amazon-products.js
-//   DELAY_MS=8000 LIMIT=5 FILTER=blueprint node scripts/audit-amazon-products.js
+//   node scripts/audit-products.js
+//   DELAY_MS=8000 LIMIT=5 FILTER=blueprint node scripts/audit-products.js
 //
 // Passing one or more raw URLs instead skips the file.ts diffing entirely and just prints
 // what's on each page — for pulling in a brand-new ingredient's price/nutrition by hand:
-//   node scripts/audit-amazon-products.js <url> [<url> ...]
+//   node scripts/audit-products.js <url> [<url> ...]
 //
 // Chrome needs to already be running with its CDP debugging port open:
 //
@@ -61,7 +62,7 @@ function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// ── Extract every Amazon-linked product object from src/file.ts ───────────────
+// ── Extract every supported product listing from src/file.ts (currently Amazon links only) ──
 
 function getStringLiteral(node) {
     return node && ts.isStringLiteral(node) ? node.text : undefined;
@@ -383,7 +384,7 @@ function buildReportMarkdown(state) {
     const flagged = results.filter((r) => r.status === 'flagged');
     const lines = [];
 
-    lines.push('# Amazon Product Audit');
+    lines.push('# Product Audit');
     lines.push('');
     lines.push(`Started: ${startedAt}`);
     lines.push(
