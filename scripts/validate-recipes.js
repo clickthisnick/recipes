@@ -107,7 +107,7 @@ function resolveUnit(expr) {
 // add a key here once you've confirmed the zero is intentional, to silence this warning.
 const EXPECTED_ZERO_NUTRITION = [
     'parsleyFlakes', 'garlicPowder', 'blackPepper', 'bakingSoda', 'paprika', 'thyme', 'rosemary', 'dillWeed',
-    'whiteVinegar', 'champagneVinegar', 'water', 'creatine', 'avocadoOil',
+    'whiteVinegar', 'champagneVinegar', 'water', 'creatine', 'avocadoOil', 'iceCube',
 ];
 
 const ZERO_CHECK_FIELDS = ['calories', 'fat', 'saturatedFat', 'transFat', 'cholesterol', 'carbs', 'sodium', 'sugar', 'protein', 'fiber'];

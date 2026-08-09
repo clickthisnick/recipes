@@ -433,6 +433,7 @@ export const e = {
     platter: (label) => new Equipment('platter', label),
     kettle: (label) => new Equipment('tea kettle', label),
     nuwavePan: (label) => new NuwaveEquipment(label),
+    glass: (label) => new Equipment('glass', label),
 };
 // ============================================================
 // RECIPE REGISTRATION
@@ -3486,7 +3487,7 @@ h2 { margin-top: 0; font-size: 28px; }
 // Replaced with the real compile timestamp by scripts/validate-recipes.js's postbuild
 // step, right after `tsc` emits dist/file.js. Left as-is (and reported as "dev build")
 // when running straight from source, e.g. under `vite`.
-const BUILD_TIME = '__BUILD_TIME__';
+const BUILD_TIME = '2026-08-09T16:00:58.686Z';
 function formatBuildTime() {
     const date = new Date(BUILD_TIME);
     if (isNaN(date.getTime()))
@@ -4238,6 +4239,27 @@ export const i = {
         },
         products: [{ brand: 'Tap', listings: [{ price: 0 }], size: 1, sizeUnit: u.fluidOunce }],
     }),
+    // Frozen water — nutritionally identical to water, kept as its own ingredient so
+    // recipe steps and the shopping list read as "ice cubes" rather than liquid water.
+    iceCube: ingredientFactory('Ice Cube', {
+        nutrition: {
+            [u.unit.name]: { servings: 1, servingSize: 1, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 },
+        },
+    }),
+    // Generic/typical nutrition (not from a specific brand's label) — standard black brewed
+    // coffee per USDA data, brand-agnostic since cold brew is commonly home-brewed.
+    coldBrewCoffee: ingredientFactory('Cold Brew Coffee', {
+        nutrition: {
+            [u.fluidOunce.name]: { servings: 1, servingSize: 8, calories: 5, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 5, sugar: 0, protein: 1, fiber: 0 },
+        },
+    }),
+    // Generic/typical nutrition (not from a specific brand's label) — standard flavored
+    // liquid coffee creamer (e.g. French Vanilla style) per tablespoon serving.
+    coffeeCreamer: ingredientFactory('Coffee Creamer', {
+        nutrition: {
+            [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 35, fat: 1.5, saturatedFat: 1, transFat: 0, cholesterol: 0, carbs: 5, sodium: 5, sugar: 5, protein: 0, fiber: 0 },
+        },
+    }),
     psyllium: ingredientFactory('Psyllium Husk', {
         defaultBrand: '365',
         conversions: {
@@ -4459,6 +4481,48 @@ registerGroup('Breakfast', [
         s(Timer.set(60, 's', 'Let sit', { equipment: [bowl.name] }));
         return steps;
     })()), { planMinutes: 5, portable: false }),
+    withPlan(createRecipe('scrambled-eggs', 'Scrambled Eggs (NuWave, Stainless Steel)', (() => {
+        const bowl = e.bowl();
+        const pan = e.nuwavePan();
+        const steps = [];
+        const s = (...newSteps) => steps.push(...newSteps);
+        s(pan.preheat(300));
+        s(instruction('Test with a drop of water — it should bead and skitter rather than vanish instantly. If it violently sprays everywhere, the pan is too hot — lower the temperature briefly', { equipment: [pan.name] }));
+        s(pan.add([i.oliveOil(1.5, u.tsp)]));
+        s(Timer.set(25, 's', 'Swirl oil across the whole cooking surface and let it warm', { equipment: [pan.name] }));
+        s(bowl.add([
+            i.egg(3, u.unit),
+            i.seaSalt(0.125, u.tsp),
+            i.blackPepper(0.125, u.tsp),
+        ]));
+        s(bowl.mix('whisked eggs'));
+        const WHISKED = bowl.result;
+        s(instruction('Turn the NuWave down to 250°F', { equipment: [pan.name] }));
+        s(bowl.transfer(pan, [WHISKED]));
+        s(Timer.set(18, 's', "Don't touch — let the bottom begin to set", { equipment: [pan.name], ingredients: [WHISKED] }));
+        s(instruction('Gently push the cooked egg toward the center with a silicone spatula, tilting the pan so uncooked egg runs into the empty areas', { equipment: [pan.name], ingredients: [WHISKED] }));
+        s(Timer.set(12, 's', 'Let sit before the next fold', { equipment: [pan.name], ingredients: [WHISKED] }));
+        s(instruction('Fold again, gently — avoid aggressively stirring against the stainless steel', { equipment: [pan.name], ingredients: [WHISKED] }));
+        s(Timer.set(90, 's', 'Finish cooking, folding every 10-15s, until the eggs still look slightly wet — then turn off the NuWave', { equipment: [pan.name], ingredients: [WHISKED] }));
+        s(instruction('Turn off the NuWave', { equipment: [pan.name] }));
+        s(Timer.set(25, 's', 'Let residual heat finish the eggs', { equipment: [pan.name], ingredients: [WHISKED] }));
+        return steps;
+    })()), { planMinutes: 6, portable: false }),
+    withPlan(createRecipe('iced-coffee', 'Iced Coffee', (() => {
+        const glass = e.glass();
+        const steps = [];
+        const s = (...newSteps) => steps.push(...newSteps);
+        s(glass.add([i.iceCube(3, u.unit)]));
+        s(instruction('Pour coffee creamer into the glass until it reaches about ¾ of the way up to the bottom ice cube', {
+            equipment: [glass.name],
+            ingredients: [i.coffeeCreamer(3, u.tbsp)],
+        }));
+        s(instruction('Pour cold brew coffee into the glass until full', {
+            equipment: [glass.name],
+            ingredients: [i.coldBrewCoffee(8, u.fluidOunce)],
+        }));
+        return steps;
+    })(), undefined, 2), { planMinutes: 2, portable: true }),
 ]);
 // Moved out of the Dinner array — registers itself under its own 'Cleaning' group
 registerRecipe(createRecipe('clean-water-bottle', 'Clean Water Bottle', [
