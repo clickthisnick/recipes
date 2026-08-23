@@ -3488,7 +3488,7 @@ h2 { margin-top: 0; font-size: 28px; }
 // Replaced with the real compile timestamp by scripts/validate-recipes.js's postbuild
 // step, right after `tsc` emits dist/file.js. Left as-is (and reported as "dev build")
 // when running straight from source, e.g. under `vite`.
-const BUILD_TIME = '2026-08-23T13:07:42.865Z';
+const BUILD_TIME = '2026-08-23T15:13:50.811Z';
 function formatBuildTime() {
     const date = new Date(BUILD_TIME);
     if (isNaN(date.getTime()))
@@ -4605,27 +4605,27 @@ registerRecipe(createRecipe('clean-water-bottle', 'Clean Water Bottle', (() => {
     // Tap water — free and nutritionally zero either way, so an approximate fill
     // amount here doesn't affect any cost/nutrition totals; it just lets each
     // "dump out" step reference the same water that was added.
-    const RINSE_1 = i.water(8, u.fluidOunce);
-    const RINSE_2 = i.water(8, u.fluidOunce);
-    const RINSE_3 = i.water(8, u.fluidOunce);
+    const RINSE_1 = i.water(15, u.fluidOunce);
+    const RINSE_2 = i.water(15, u.fluidOunce);
+    const RINSE_3 = i.water(15, u.fluidOunce);
     const QUARTER_FILL = i.water(2, u.fluidOunce);
     return [
         instruction('Make sure the straw is seated in the bottle'),
         instruction('Power wash the top to remove dust'),
-        instruction('Add about 10 seconds of water to the bottle', { ingredients: [RINSE_1] }),
+        instruction('Add about 15 ounces of water to the bottle', { ingredients: [RINSE_1] }),
         instruction('Add vinegar', {
             ingredients: [i.whiteVinegar(1, u.tsp)],
         }),
         Timer.set(45, 's', 'Shake'),
         instruction('Dump out the water', { ingredients: [RINSE_1] }),
         instruction('Clean the straw with a straw pipe cleaner'),
-        instruction('Add about 10 seconds of water to the bottle', { ingredients: [RINSE_2] }),
+        instruction('Add about 15 ounces of water to the bottle', { ingredients: [RINSE_2] }),
         instruction('Add baking soda', {
             ingredients: [i.bakingSoda(0.5, u.tsp)],
         }),
         Timer.set(45, 's', 'Shake'),
         instruction('Dump out the water', { ingredients: [RINSE_2] }),
-        instruction('Add about 10 seconds of water to the bottle', { ingredients: [RINSE_3] }),
+        instruction('Add about 15 ounces of water to the bottle', { ingredients: [RINSE_3] }),
         Timer.set(20, 's', 'Shake'),
         instruction('Dump out the water', { ingredients: [RINSE_3] }),
         instruction('Fill the bottle about ¼ full with water', { ingredients: [QUARTER_FILL] }),
