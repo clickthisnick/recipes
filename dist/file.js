@@ -434,6 +434,7 @@ export const e = {
     kettle: (label) => new Equipment('tea kettle', label),
     nuwavePan: (label) => new NuwaveEquipment(label),
     glass: (label) => new Equipment('glass', label),
+    siliconeBag: (label) => new Equipment('silicone bag', label),
 };
 // ============================================================
 // RECIPE REGISTRATION
@@ -3487,7 +3488,7 @@ h2 { margin-top: 0; font-size: 28px; }
 // Replaced with the real compile timestamp by scripts/validate-recipes.js's postbuild
 // step, right after `tsc` emits dist/file.js. Left as-is (and reported as "dev build")
 // when running straight from source, e.g. under `vite`.
-const BUILD_TIME = '2026-08-09T16:00:58.686Z';
+const BUILD_TIME = '2026-08-23T13:03:12.577Z';
 function formatBuildTime() {
     const date = new Date(BUILD_TIME);
     if (isNaN(date.getTime()))
@@ -4170,6 +4171,10 @@ export const i = {
     }),
     celery: ingredientFactory('Celery', {
         nutrition: { [u.unit.name]: { servings: 1, servingSize: 1, calories: 6, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 1.5, sodium: 32, sugar: 1, protein: 0.3, fiber: 1 } },
+        conversions: {
+            // 1 medium stalk chopped ≈ ½ cup (8 tbsp) — lets tbsp-measured amounts resolve nutrition.
+            [u.tbsp.name]: { to: u.unit, factor: 0.125 },
+        },
     }),
     spinach: ingredientFactory('Spinach', {
         defaultBrand: '365',
@@ -4410,6 +4415,52 @@ export const i = {
                 },
             }],
     }),
+    // Generic/typical nutrition (not from a specific brand's label) — dried chile de árbol
+    // pods are essentially never sold with a per-pod nutrition label, so this estimates a
+    // single ~1g dried pod from generic dried-chile USDA values.
+    chileDeArbol: ingredientFactory('Chile de Árbol (Dried)', {
+        nutrition: {
+            [u.unit.name]: { servings: 1, servingSize: 1, calories: 3, fat: 0.1, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0.5, sodium: 1, sugar: 0.1, protein: 0.1, fiber: 0.2 },
+        },
+    }),
+    // Generic/typical nutrition — chile pequín and chiltepín are used interchangeably here;
+    // pods are tiny (~0.3g dried), so values are near-negligible per pod.
+    chilePequin: ingredientFactory('Chile Pequín / Chiltepín (Dried)', {
+        nutrition: {
+            [u.unit.name]: { servings: 1, servingSize: 1, calories: 1, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0.2, sodium: 0, sugar: 0, protein: 0, fiber: 0.1 },
+        },
+    }),
+    // Generic/typical nutrition (not from a specific brand's label) — standard USDA values
+    // for one medium red bell pepper (~119g).
+    redBellPepper: ingredientFactory('Red Bell Pepper', {
+        nutrition: {
+            [u.unit.name]: { servings: 1, servingSize: 1, calories: 31, fat: 0.3, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 7.3, sodium: 3, sugar: 5, protein: 1.2, fiber: 2.5 },
+        },
+    }),
+    // Generic/typical nutrition — standard USDA values for one raw garlic clove (~3g).
+    garlicClove: ingredientFactory('Garlic Clove', {
+        nutrition: {
+            [u.unit.name]: { servings: 1, servingSize: 1, calories: 4, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 1, sodium: 0.5, sugar: 0, protein: 0.2, fiber: 0.1 },
+        },
+    }),
+    // Generic/typical nutrition — standard USDA values for fresh cilantro, per 1 tbsp chopped (~1g).
+    cilantro: ingredientFactory('Fresh Cilantro', {
+        nutrition: {
+            [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 1, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0.1, sodium: 0, sugar: 0, protein: 0, fiber: 0.1 },
+        },
+    }),
+    // Generic/typical nutrition — standard USDA values for ground cumin, per 1 tsp (~2.1g).
+    cumin: ingredientFactory('Ground Cumin', {
+        nutrition: {
+            [u.tsp.name]: { servings: 1, servingSize: 1, calories: 8, fat: 0.5, saturatedFat: 0.1, transFat: 0, cholesterol: 0, carbs: 0.9, sodium: 4, sugar: 0.1, protein: 0.4, fiber: 0.2 },
+        },
+    }),
+    // Generic/typical nutrition — standard USDA values for chili powder, per 1 tsp (~2.7g).
+    chiliPowder: ingredientFactory('Chili Powder', {
+        nutrition: {
+            [u.tsp.name]: { servings: 1, servingSize: 1, calories: 8, fat: 0.4, saturatedFat: 0.1, transFat: 0, cholesterol: 0, carbs: 1.4, sodium: 26, sugar: 0.2, protein: 0.4, fiber: 0.9 },
+        },
+    }),
 };
 // ============================================================
 // RECIPES
@@ -4417,52 +4468,76 @@ export const i = {
 registerGroup('Breakfast', [
     withPlan(createRecipe('blueprint-smoothie', 'Blueprint Smoothie (Nutribullet)', (() => {
         const mixer = e.bulletMixer();
+        const bag = e.siliconeBag('OXO silicone bag');
         const MACADAMIA_MILK = i.macadamiaNutMilk(1, u.cup);
+        const MACADAMIA_NUT = i.macadamiaNut(0.25, u.cup);
+        const CHERRY = i.cherry(3, u.unit);
+        const BERRY_BLEND = i.antiOxidantBerryBlend(0.5, u.cup);
+        const KALE = i.kale(0.5, u.cup);
+        const SPINACH = i.spinach(0.25, u.cup);
+        const CELERY = i.celery(1, u.unit);
+        const BANANA = i.banana(1, u.unit);
         const steps = [];
         const s = (...newSteps) => steps.push(...newSteps);
+        const bagPrep = bag.add([
+            MACADAMIA_NUT,
+            CHERRY,
+            BERRY_BLEND,
+            KALE,
+            SPINACH,
+            CELERY,
+            BANANA,
+        ]);
+        bagPrep.prep = true;
+        s(bagPrep);
         s(mixer.add([
             MACADAMIA_MILK,
             i.lemonJuice(2, u.tbsp),
-            i.macadamiaNut(0.25, u.cup),
             i.cocoaNibs(1, u.tsp),
             i.chiaSeed(1, u.tsp),
             i.hempSeed(1, u.tbsp),
-            i.cherry(3, u.unit),
-            i.antiOxidantBerryBlend(0.5, u.cup),
             i.vanillaExtract(0.25, u.tsp),
         ]));
         s(mixer.mix());
-        s(mixer.add([
-            i.celery(1, u.unit),
-            i.banana(1, u.unit),
-            i.kale(0.5, u.cup),
-            i.spinach(0.25, u.cup),
-        ]));
+        s(bag.transfer(mixer, [MACADAMIA_NUT, CHERRY, BERRY_BLEND, KALE, SPINACH, CELERY, BANANA]));
         s(Timer.set(30, 's', 'Let mixer settle', { equipment: [mixer.name] }));
         s(mixer.mix());
         return steps;
     })(), undefined, 8), { planMinutes: 8, portable: false }),
     withPlan(createRecipe('blueprint-smoothie-nuwave', 'Blueprint Smoothie (Nuwave) (x2)', (() => {
         const mixer = e.bulletMixer();
+        const bag = e.siliconeBag('OXO silicone bag');
         const MACADAMIA_MILK = i.macadamiaNutMilk(2, u.cup);
+        const MACADAMIA_NUT = i.macadamiaNut(0.5, u.cup);
+        const CHERRY = i.cherry(6, u.unit);
+        const BERRY_BLEND = i.antiOxidantBerryBlend(1, u.cup);
+        const KALE = i.kale(1, u.cup);
+        const SPINACH = i.spinach(0.5, u.cup);
+        const CELERY = i.celery(2, u.unit);
+        const BANANA = i.banana(2, u.unit);
         const steps = [];
         const s = (...newSteps) => steps.push(...newSteps);
+        const bagPrep = bag.add([
+            MACADAMIA_NUT,
+            CHERRY,
+            BERRY_BLEND,
+            KALE,
+            SPINACH,
+            CELERY,
+            BANANA,
+        ]);
+        bagPrep.prep = true;
+        s(bagPrep);
         s(mixer.add([
             MACADAMIA_MILK,
             i.lemonJuice(4, u.tbsp),
-            i.macadamiaNut(0.5, u.cup),
             i.cocoaNibs(2, u.tsp),
             i.chiaSeed(2, u.tsp),
             i.hempSeed(2, u.tbsp),
-            i.cherry(6, u.unit),
-            i.antiOxidantBerryBlend(1, u.cup),
             i.vanillaExtract(0.5, u.tsp),
-            i.celery(2, u.unit),
-            i.banana(2, u.unit),
-            i.kale(1, u.cup),
-            i.spinach(0.5, u.cup),
         ]));
-        s(Timer.set(90, 's', 'Use Nut Milk setting', { equipment: [mixer.name] }));
+        s(bag.transfer(mixer, [MACADAMIA_NUT, CHERRY, BERRY_BLEND, KALE, SPINACH, CELERY, BANANA]));
+        s(Timer.set(90, 's', 'Use Nut Milk setting', { equipment: [mixer.name], ingredients: [MACADAMIA_MILK] }));
         s(mixer.mix());
         return steps;
     })(), undefined, 8), { planMinutes: 8, portable: false }),
@@ -4487,7 +4562,7 @@ registerGroup('Breakfast', [
         const steps = [];
         const s = (...newSteps) => steps.push(...newSteps);
         s(pan.preheat(300));
-        s(instruction('Test with a drop of water — it should bead and skitter rather than vanish instantly. If it violently sprays everywhere, the pan is too hot — lower the temperature briefly', { equipment: [pan.name] }));
+        s(instruction('Flick a wet finger at the pan to test — the droplet should bead and skitter rather than vanish instantly. If it violently sprays everywhere, the pan is too hot — lower the temperature briefly', { equipment: [pan.name] }));
         s(pan.add([i.oliveOil(1.5, u.tsp)]));
         s(Timer.set(25, 's', 'Swirl oil across the whole cooking surface and let it warm', { equipment: [pan.name] }));
         s(bowl.add([
@@ -4512,10 +4587,11 @@ registerGroup('Breakfast', [
         const glass = e.glass();
         const steps = [];
         const s = (...newSteps) => steps.push(...newSteps);
-        s(glass.add([i.iceCube(3, u.unit)]));
+        const ICE = i.iceCube(3, u.unit);
+        s(glass.add([ICE]));
         s(instruction('Pour coffee creamer into the glass until it reaches about ¾ of the way up to the bottom ice cube', {
             equipment: [glass.name],
-            ingredients: [i.coffeeCreamer(3, u.tbsp)],
+            ingredients: [ICE, i.coffeeCreamer(3, u.tbsp)],
         }));
         s(instruction('Pour cold brew coffee into the glass until full', {
             equipment: [glass.name],
@@ -4525,29 +4601,38 @@ registerGroup('Breakfast', [
     })(), undefined, 2), { planMinutes: 2, portable: true }),
 ]);
 // Moved out of the Dinner array — registers itself under its own 'Cleaning' group
-registerRecipe(createRecipe('clean-water-bottle', 'Clean Water Bottle', [
-    instruction('Make sure the straw is in the water bottle'),
-    instruction('Power wash the top to remove dust'),
-    instruction('Add about 10 seconds of water to the bottle'),
-    instruction('Add vinegar', {
-        ingredients: [i.whiteVinegar(1, u.tsp)],
-    }),
-    Timer.set(45, 's', 'Shake'),
-    instruction('Dump out the water'),
-    instruction('Clean the straw with a straw pipe cleaner'),
-    instruction('Add about 10 seconds of water to the bottle'),
-    instruction('Add baking soda', {
-        ingredients: [i.bakingSoda(0.5, u.tsp)],
-    }),
-    Timer.set(45, 's', 'Shake'),
-    instruction('Dump out the water'),
-    instruction('Add about 10 seconds of water to the bottle'),
-    Timer.set(20, 's', 'Shake'),
-    instruction('Dump out the water'),
-    instruction('Fill the bottle about ¼ full with water'),
-    instruction('Dump out the water'),
-    instruction('Let the bottle air dry'),
-], 'Cleaning'));
+registerRecipe(createRecipe('clean-water-bottle', 'Clean Water Bottle', (() => {
+    // Tap water — free and nutritionally zero either way, so an approximate fill
+    // amount here doesn't affect any cost/nutrition totals; it just lets each
+    // "dump out" step reference the same water that was added.
+    const RINSE_1 = i.water(8, u.fluidOunce);
+    const RINSE_2 = i.water(8, u.fluidOunce);
+    const RINSE_3 = i.water(8, u.fluidOunce);
+    const QUARTER_FILL = i.water(2, u.fluidOunce);
+    return [
+        instruction('Make sure the straw is seated in the bottle'),
+        instruction('Power wash the top to remove dust'),
+        instruction('Add about 10 seconds of water to the bottle', { ingredients: [RINSE_1] }),
+        instruction('Add vinegar', {
+            ingredients: [i.whiteVinegar(1, u.tsp)],
+        }),
+        Timer.set(45, 's', 'Shake'),
+        instruction('Dump out the water', { ingredients: [RINSE_1] }),
+        instruction('Clean the straw with a straw pipe cleaner'),
+        instruction('Add about 10 seconds of water to the bottle', { ingredients: [RINSE_2] }),
+        instruction('Add baking soda', {
+            ingredients: [i.bakingSoda(0.5, u.tsp)],
+        }),
+        Timer.set(45, 's', 'Shake'),
+        instruction('Dump out the water', { ingredients: [RINSE_2] }),
+        instruction('Add about 10 seconds of water to the bottle', { ingredients: [RINSE_3] }),
+        Timer.set(20, 's', 'Shake'),
+        instruction('Dump out the water', { ingredients: [RINSE_3] }),
+        instruction('Fill the bottle about ¼ full with water', { ingredients: [QUARTER_FILL] }),
+        instruction('Dump out the water', { ingredients: [QUARTER_FILL] }),
+        instruction('Let the bottle air dry'),
+    ];
+})(), 'Cleaning'));
 registerRecipe(createRecipe('dill-dip', 'Dill Dip', (() => {
     const bowl = e.bowl();
     const cuttingBoard = e.cuttingBoard();
@@ -4566,6 +4651,56 @@ registerRecipe(createRecipe('dill-dip', 'Dill Dip', (() => {
     s(bowl.mix());
     return steps;
 })(), 'Sides'));
+registerRecipe(withPlan(createRecipe('taco-ames-hot-sauce', 'Taco Ames Hot Sauce', (() => {
+    const cuttingBoard = e.cuttingBoard();
+    const pot = e.pot();
+    const mixer = e.bulletMixer();
+    const colander = e.colander();
+    const jar = e.bowl('jar');
+    const steps = [];
+    const s = (...newSteps) => steps.push(...newSteps);
+    const CHILE_ARBOL = i.chileDeArbol(6, u.unit);
+    const CHILE_PEQUIN = i.chilePequin(3, u.unit);
+    const WATER = i.water(1, u.cup);
+    const BELL_PEPPER = i.redBellPepper(0.5, u.unit);
+    const GARLIC = i.garlicClove(1, u.unit);
+    const ONION = i.whiteOnion(0.25, u.cup);
+    const CELERY = i.celery(2, u.tbsp);
+    const CARROT = i.carrot(2, u.tbsp);
+    s(instruction('Remove stems from the chile de árbol and chile pequín/chiltepín (keep the veins in for more heat, scrape them out for less)', {
+        equipment: [cuttingBoard.name],
+        ingredients: [CHILE_ARBOL, CHILE_PEQUIN],
+    }));
+    s(pot.add([CHILE_ARBOL, CHILE_PEQUIN, WATER]));
+    s(Timer.set(6, 'm', 'Bring to a simmer and cook until the chiles have softened and turned a deep red-brown', { equipment: [pot.name] }));
+    s(instruction('Roughly chop the bell pepper, garlic, onion, celery, and carrot', {
+        equipment: [cuttingBoard.name],
+        ingredients: [BELL_PEPPER, GARLIC, ONION, CELERY, CARROT],
+    }));
+    s(pot.transfer(mixer, [CHILE_ARBOL, CHILE_PEQUIN, WATER]));
+    s(mixer.add([
+        BELL_PEPPER,
+        GARLIC,
+        ONION,
+        CELERY,
+        CARROT,
+        i.cilantro(1, u.tbsp),
+        i.cumin(0.5, u.tsp),
+        i.chiliPowder(0.5, u.tsp),
+        i.seaSalt(0.5, u.tsp),
+        i.blackPepper(0.125, u.tsp),
+        i.whiteVinegar(0.333, u.cup),
+    ]));
+    s(mixer.mix('blended hot sauce'));
+    const BLENDED = mixer.result;
+    s(mixer.transfer(colander, [BLENDED]));
+    s(instruction('Strain into the jar, pressing with a spoon to push liquid through and leave the pulp and skins behind', {
+        equipment: [colander.name, jar.name],
+        ingredients: [BLENDED],
+    }));
+    s(instruction('Taste and adjust seasoning if needed, then cap and refrigerate'));
+    return steps;
+})(), 'Sauces'), { planMinutes: 1, portable: true, prepMinutes: 20, perishableDays: 14 }));
 registerGroup('Dinner', [
     createRecipe('breaded-mushrooms', 'Breaded Mushrooms', (() => {
         const pankoPan = e.pan('panko pan');
@@ -4608,16 +4743,16 @@ registerGroup('Dinner', [
         const oven = e.oven();
         const bowl = e.bowl();
         const CARROTS = i.carrot(1, u.pound);
-        const MUSHROOMS = i.babyBellaMushroom(8, u.ounce);
-        const ONION = i.yellowOnion(1, u.unit);
+        const BELLA_MUSHROOMS = i.babyBellaMushroom(8, u.ounce);
+        const YELLOW_ONION = i.yellowOnion(1, u.unit);
         const steps = [];
         const s = (...newSteps) => steps.push(...newSteps);
         s(oven.preheat(450));
         s(instruction('Place sheet pan in oven while it preheats', { equipment: ['oven', 'sheet pan'] }));
         s(bowl.add([
             [CARROTS, 'peeled, cut lengthwise or into thick diagonals'],
-            [MUSHROOMS, 'halved'],
-            [ONION, 'cut into 8 wedges'],
+            [BELLA_MUSHROOMS, 'halved'],
+            [YELLOW_ONION, 'cut into 8 wedges'],
             i.oliveOil(1, u.tbsp),
             i.seaSalt(1, u.tsp),
             i.rosemary(2, u.tsp),
@@ -4626,11 +4761,11 @@ registerGroup('Dinner', [
         s(bowl.mix());
         s(instruction('Carefully spread vegetables onto the hot sheet pan in a single layer, leaving space between pieces', {
             equipment: ['sheet pan'],
-            ingredients: [CARROTS, MUSHROOMS, ONION],
+            ingredients: [CARROTS, BELLA_MUSHROOMS, YELLOW_ONION],
         }));
         s(Timer.set(20, 'm', 'Roast — do not move'));
-        s(instruction('Flip everything on the sheet pan', { equipment: ['sheet pan'], ingredients: [CARROTS, MUSHROOMS, ONION] }));
-        s(Timer.set(17, 'm', 'Roast until carrots are caramelized, mushrooms deeply browned, onions soft with crispy tips', { equipment: ['sheet pan'], ingredients: [CARROTS, MUSHROOMS, ONION] }));
+        s(instruction('Flip everything on the sheet pan', { equipment: ['sheet pan'], ingredients: [CARROTS, BELLA_MUSHROOMS, YELLOW_ONION] }));
+        s(Timer.set(17, 'm', 'Roast until carrots are caramelized, mushrooms deeply browned, onions soft with crispy tips', { equipment: ['sheet pan'], ingredients: [CARROTS, BELLA_MUSHROOMS, YELLOW_ONION] }));
         s(Timer.set(5, 'm', 'Rest vegetables before serving'));
         return steps;
     })(), undefined, 45),
@@ -4668,7 +4803,7 @@ registerGroup('Dinner', [
             i.chickpeas(1, u.cup),
             i.cannelliniBean(1, u.cup),
         ]));
-        s(instruction('Add dressing and toppings from kit, toss to combine', { equipment: [bowl.name] }));
+        s(instruction('Add the included flavor packet and toppings from the kit, toss to combine', { equipment: [bowl.name] }));
         return steps;
     })()), { planMinutes: 10, portable: false, hidden: true }),
     withPlan(createRecipe('asian-dense-bean-salad-original', 'Asian Dense Bean Salad (Original Blueprint Version)', (() => {
@@ -4755,8 +4890,8 @@ registerGroup('Dinner', [
         s(prep('Peel and shred carrots', { ingredients: [CARROTS] }));
         s(prep('Shred cabbage (can be done the day before)', { ingredients: [CABBAGE] }));
         s(prep('Get out 3 packages of chickpeas and 3 packages of cannellini beans, open the tops', { ingredients: [CHICKPEAS, CANNELLINI] }));
-        s(prep('Strain chickpeas, then measure ~1.5 cups into each of the 4 salad bowl tops', { ingredients: [CHICKPEAS] }));
-        s(prep('Strain cannellini beans, then measure ~1.5 cups into each of the 4 salad bowl tops', { ingredients: [CANNELLINI] }));
+        s(prep('Strain chickpeas, then measure ~1.5 cups into each of the 4 salad bowl tops', { ingredients: [CHICKPEAS], equipment: [saladBowl.name] }));
+        s(prep('Strain cannellini beans, then measure ~1.5 cups into each of the 4 salad bowl tops', { ingredients: [CANNELLINI], equipment: [saladBowl.name] }));
         const addProduce = saladBowl.add([
             [CARROTS, 'shredded'],
             [CABBAGE, 'shredded'],
@@ -4855,7 +4990,8 @@ registerGroup('Blueprint', [
     ]), { planMinutes: 5, portable: false }),
     withPlan(createRecipe('blueprint-longevity-drink', 'Blueprint Longevity Drink (Longevity Mix, Collagen, Creatine)', [
         instruction('Add 1 scoop Blueprint Longevity Mix (Blood Orange) to a glass of water', {
-            ingredients: [i.longevityMix(1, u.unit)],
+            equipment: ['glass'],
+            ingredients: [i.longevityMix(1, u.unit), i.water(8, u.fluidOunce)],
         }),
         instruction('Add 1 scoop Blueprint Collagen Peptides', {
             ingredients: [i.collagenPowder(1, u.unit)],

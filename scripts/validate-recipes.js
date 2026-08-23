@@ -471,7 +471,9 @@ while ((sm = STEP_FACTORY_RE.exec(src)) !== null) {
     for (const phrase of matchPhrases(text, equipmentPhrases)) {
         const coveredLiteral = equipArr.includes(`'${phrase}'`);
         const coveredVar = Object.entries(equipmentVarType).some(
-            ([varName, type]) => type === phrase && new RegExp(`\\b${varName}\\.name\\b`).test(equipArr)
+            // equipArr is lowercased above, so this must match case-insensitively —
+            // otherwise a camelCase var like `saladBowl` never matches its own `.name`.
+            ([varName, type]) => type === phrase && new RegExp(`\\b${varName}\\.name\\b`, 'i').test(equipArr)
         );
         if (!coveredLiteral && !coveredVar) {
             warnings.push(`line ${lineNum}: text mentions "${phrase}" but step doesn't declare it in \`equipment\``);
