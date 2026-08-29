@@ -3488,7 +3488,7 @@ h2 { margin-top: 0; font-size: 28px; }
 // Replaced with the real compile timestamp by scripts/validate-recipes.js's postbuild
 // step, right after `tsc` emits dist/file.js. Left as-is (and reported as "dev build")
 // when running straight from source, e.g. under `vite`.
-const BUILD_TIME = '2026-08-29T14:55:41.228Z';
+const BUILD_TIME = '2026-08-29T15:04:08.190Z';
 function formatBuildTime() {
     const date = new Date(BUILD_TIME);
     if (isNaN(date.getTime()))
@@ -4575,9 +4575,9 @@ registerGroup('Breakfast', [
         s(instruction('Turn the NuWave down to 250°F', { equipment: [pan.name] }));
         s(bowl.transfer(pan, [WHISKED]));
         s(Timer.set(18, 's', "Don't touch — let the bottom begin to set", { equipment: [pan.name], ingredients: [WHISKED] }));
-        s(instruction('Gently push the cooked egg toward the center with a silicone spatula, tilting the pan so uncooked egg runs into the empty areas', { equipment: [pan.name], ingredients: [WHISKED] }));
+        s(instruction(`Gently push the cooked ${formatIngredient(WHISKED)} toward the center with a silicone spatula, tilting the pan so uncooked egg runs into the empty areas`, { equipment: [pan.name], ingredients: [WHISKED] }));
         s(Timer.set(12, 's', 'Let sit before the next fold', { equipment: [pan.name], ingredients: [WHISKED] }));
-        s(instruction('Fold again, gently — avoid aggressively stirring against the stainless steel', { equipment: [pan.name], ingredients: [WHISKED] }));
+        s(instruction(`Fold ${formatIngredient(WHISKED)} again, gently — avoid aggressively stirring against the stainless steel`, { equipment: [pan.name], ingredients: [WHISKED] }));
         s(Timer.set(90, 's', 'Finish cooking, folding every 10-15s, until the eggs still look slightly wet — then turn off the NuWave', { equipment: [pan.name], ingredients: [WHISKED] }));
         s(instruction('Turn off the NuWave', { equipment: [pan.name] }));
         s(Timer.set(25, 's', 'Let residual heat finish the eggs', { equipment: [pan.name], ingredients: [WHISKED] }));
@@ -4588,14 +4588,16 @@ registerGroup('Breakfast', [
         const steps = [];
         const s = (...newSteps) => steps.push(...newSteps);
         const ICE = i.iceCube(3, u.unit);
+        const CREAMER = i.coffeeCreamer(3, u.tbsp);
+        const COLD_BREW = i.coldBrewCoffee(8, u.fluidOunce);
         s(glass.add([ICE]));
-        s(instruction('Pour coffee creamer into the glass until it reaches about ¾ of the way up to the bottom ice cube', {
+        s(instruction(`Pour ${formatIngredient(CREAMER)} into the glass until it reaches about ¾ of the way up to the bottom ice cube`, {
             equipment: [glass.name],
-            ingredients: [ICE, i.coffeeCreamer(3, u.tbsp)],
+            ingredients: [ICE, CREAMER],
         }));
-        s(instruction('Pour cold brew coffee into the glass until full', {
+        s(instruction(`Pour ${formatIngredient(COLD_BREW)} into the glass until full`, {
             equipment: [glass.name],
-            ingredients: [i.coldBrewCoffee(8, u.fluidOunce)],
+            ingredients: [COLD_BREW],
         }));
         return steps;
     })(), undefined, 2), { planMinutes: 2, portable: true }),
@@ -4609,27 +4611,29 @@ registerRecipe(createRecipe('clean-water-bottle', 'Clean Water Bottle', (() => {
     const RINSE_2 = i.water(15, u.fluidOunce);
     const RINSE_3 = i.water(15, u.fluidOunce);
     const QUARTER_FILL = i.water(2, u.fluidOunce);
+    const VINEGAR = i.whiteVinegar(1, u.tsp);
+    const BAKING_SODA = i.bakingSoda(0.5, u.tsp);
     return [
         instruction('Make sure the straw is seated in the bottle'),
         instruction('Power wash the top to remove dust'),
         instruction('Add about 15 ounces of water to the bottle', { ingredients: [RINSE_1] }),
-        instruction('Add vinegar', {
-            ingredients: [i.whiteVinegar(1, u.tsp)],
+        instruction(`Add ${formatIngredient(VINEGAR)}`, {
+            ingredients: [VINEGAR],
         }),
         Timer.set(45, 's', 'Shake'),
-        instruction('Dump out the water', { ingredients: [RINSE_1] }),
+        instruction(`Dump out ${formatIngredient(RINSE_1)}`, { ingredients: [RINSE_1] }),
         instruction('Clean the straw with a straw pipe cleaner'),
         instruction('Add about 15 ounces of water to the bottle', { ingredients: [RINSE_2] }),
-        instruction('Add baking soda', {
-            ingredients: [i.bakingSoda(0.5, u.tsp)],
+        instruction(`Add ${formatIngredient(BAKING_SODA)}`, {
+            ingredients: [BAKING_SODA],
         }),
         Timer.set(45, 's', 'Shake'),
-        instruction('Dump out the water', { ingredients: [RINSE_2] }),
+        instruction(`Dump out ${formatIngredient(RINSE_2)}`, { ingredients: [RINSE_2] }),
         instruction('Add about 15 ounces of water to the bottle', { ingredients: [RINSE_3] }),
         Timer.set(20, 's', 'Shake'),
-        instruction('Dump out the water', { ingredients: [RINSE_3] }),
+        instruction(`Dump out ${formatIngredient(RINSE_3)}`, { ingredients: [RINSE_3] }),
         instruction('Fill the bottle about ¼ full with water', { ingredients: [QUARTER_FILL] }),
-        instruction('Dump out the water', { ingredients: [QUARTER_FILL] }),
+        instruction(`Dump out ${formatIngredient(QUARTER_FILL)}`, { ingredients: [QUARTER_FILL] }),
         instruction('Let the bottle air dry'),
     ];
 })(), 'Cleaning'));
@@ -4639,7 +4643,7 @@ registerRecipe(createRecipe('dill-dip', 'Dill Dip', (() => {
     const ONION = i.whiteOnion(2, u.tbsp);
     const steps = [];
     const s = (...newSteps) => steps.push(...newSteps);
-    s(instruction('Mince white onion', { ingredients: [ONION], equipment: [cuttingBoard.name] }));
+    s(instruction(`Mince ${formatIngredient(ONION)}`, { ingredients: [ONION], equipment: [cuttingBoard.name] }));
     s(bowl.add([
         i.sourCream(1, u.cup),
         i.mayonnaise(1, u.cup),
@@ -4667,13 +4671,13 @@ registerRecipe(withPlan(createRecipe('taco-ames-hot-sauce', 'Taco Ames Hot Sauce
     const ONION = i.whiteOnion(0.25, u.cup);
     const CELERY = i.celery(2, u.tbsp);
     const CARROT = i.carrot(2, u.tbsp);
-    s(instruction('Remove stems from the chile de árbol and chile pequín/chiltepín (keep the veins in for more heat, scrape them out for less)', {
+    s(instruction(`Remove stems from ${formatIngredient(CHILE_ARBOL)} and ${formatIngredient(CHILE_PEQUIN)} (keep the veins in for more heat, scrape them out for less)`, {
         equipment: [cuttingBoard.name],
         ingredients: [CHILE_ARBOL, CHILE_PEQUIN],
     }));
     s(pot.add([CHILE_ARBOL, CHILE_PEQUIN, WATER]));
     s(Timer.set(6, 'm', 'Bring to a simmer and cook until the chiles have softened and turned a deep red-brown', { equipment: [pot.name] }));
-    s(instruction('Roughly chop the bell pepper, garlic, onion, celery, and carrot', {
+    s(instruction(`Roughly chop ${formatIngredient(BELL_PEPPER)}, ${formatIngredient(GARLIC)}, ${formatIngredient(ONION)}, ${formatIngredient(CELERY)}, and ${formatIngredient(CARROT)}`, {
         equipment: [cuttingBoard.name],
         ingredients: [BELL_PEPPER, GARLIC, ONION, CELERY, CARROT],
     }));
@@ -4694,7 +4698,7 @@ registerRecipe(withPlan(createRecipe('taco-ames-hot-sauce', 'Taco Ames Hot Sauce
     s(mixer.mix('blended hot sauce'));
     const BLENDED = mixer.result;
     s(mixer.transfer(colander, [BLENDED]));
-    s(instruction('Strain into the jar, pressing with a spoon to push liquid through and leave the pulp and skins behind', {
+    s(instruction(`Strain ${formatIngredient(BLENDED)} into the jar, pressing with a spoon to push liquid through and leave the pulp and skins behind`, {
         equipment: [colander.name, jar.name],
         ingredients: [BLENDED],
     }));
@@ -4759,12 +4763,12 @@ registerGroup('Dinner', [
             i.thyme(2, u.tsp),
         ]));
         s(bowl.mix());
-        s(instruction('Carefully spread vegetables onto the hot sheet pan in a single layer, leaving space between pieces', {
+        s(instruction(`Carefully spread ${formatIngredient(CARROTS)}, ${formatIngredient(BELLA_MUSHROOMS)}, and ${formatIngredient(YELLOW_ONION)} onto the hot sheet pan in a single layer, leaving space between pieces`, {
             equipment: ['sheet pan'],
             ingredients: [CARROTS, BELLA_MUSHROOMS, YELLOW_ONION],
         }));
         s(Timer.set(20, 'm', 'Roast — do not move'));
-        s(instruction('Flip everything on the sheet pan', { equipment: ['sheet pan'], ingredients: [CARROTS, BELLA_MUSHROOMS, YELLOW_ONION] }));
+        s(instruction(`Flip ${formatIngredient(CARROTS)}, ${formatIngredient(BELLA_MUSHROOMS)}, and ${formatIngredient(YELLOW_ONION)} on the sheet pan`, { equipment: ['sheet pan'], ingredients: [CARROTS, BELLA_MUSHROOMS, YELLOW_ONION] }));
         s(Timer.set(17, 'm', 'Roast until carrots are caramelized, mushrooms deeply browned, onions soft with crispy tips', { equipment: ['sheet pan'], ingredients: [CARROTS, BELLA_MUSHROOMS, YELLOW_ONION] }));
         s(Timer.set(5, 'm', 'Rest vegetables before serving'));
         return steps;
@@ -4798,7 +4802,7 @@ registerGroup('Dinner', [
         const EDAMAME = i.edamame(1, u.cup);
         s(bowl.add([i.asianSaladKit(1, u.unit)]));
         s(Timer.set(80, 's', 'Microwave edamame until just thawed', { equipment: [microwave.name], ingredients: [EDAMAME] }));
-        s(instruction('Pat edamame dry, then add to bowl', { ingredients: [EDAMAME], equipment: [bowl.name] }));
+        s(instruction(`Pat ${formatIngredient(EDAMAME)} dry, then add to bowl`, { ingredients: [EDAMAME], equipment: [bowl.name] }));
         s(bowl.add([
             i.chickpeas(1, u.cup),
             i.cannelliniBean(1, u.cup),
@@ -4840,7 +4844,7 @@ registerGroup('Dinner', [
         const dressingReady = dressBowl.mix('miso sesame dressing');
         s(dressingReady);
         s(saladBowl.combine([dressBowl.result], 'pour dressing over salad, toss gently to coat').waitFor(dressingReady));
-        s(instruction('Divide into bowls and top with chopped almonds', { ingredients: [ALMONDS] }));
+        s(instruction(`Divide into bowls and top with ${formatIngredient(ALMONDS)}`, { ingredients: [ALMONDS] }));
         s(Timer.set(30, 'm', 'Optional: chill before serving'));
         return steps;
     })()), { hidden: true }),
@@ -4918,7 +4922,7 @@ registerGroup('Dinner', [
             i.garlicPowder(0.5, u.tsp),
         ]));
         s(seasoningBowl.mix());
-        s(instruction(`Season ${THIGHS.name} on both sides with seasoning mixture`, { ingredients: [THIGHS] }));
+        s(instruction(`Season ${formatIngredient(THIGHS)} on both sides with seasoning mixture`, { ingredients: [THIGHS] }));
         s(pan.preheat(325));
         s(pan.add([
             i.avocadoOil(1, u.spray),
@@ -4970,7 +4974,7 @@ registerGroup('Dinner', [
         const dressingReady = dressBowl.mix('fennel vinaigrette');
         s(dressingReady);
         s(platter.combine([dressBowl.result], 'drizzle dressing over salad').waitFor(dressingReady));
-        s(instruction('Season with salt and pepper, garnish, and serve', {
+        s(instruction('Season with ¼ teaspoon Sea Salt and ¼ teaspoon Black Pepper, garnish, and serve', {
             ingredients: [i.seaSalt(0.25, u.tsp), i.blackPepper(0.25, u.tsp)], equipment: [platter.name],
         }));
         return steps;
@@ -5014,7 +5018,7 @@ registerGroup('Lentils', [
         s(instruction('Place lid fully on pot', { equipment: [pot.name] }));
         s(instruction('Set induction stovetop to 215°', { equipment: [pot.name] }));
         s(Timer.set(24, 'm', 'Cook lentils', { equipment: [pot.name], ingredients: [LENTILS, WATER] }));
-        s(instruction('Strain lentils through a colander', { equipment: [pot.name, colander.name], ingredients: [LENTILS] }));
+        s(instruction(`Strain ${formatIngredient(LENTILS)} through a colander`, { equipment: [pot.name, colander.name], ingredients: [LENTILS] }));
         s(Timer.set(10, 'm', 'Let lentils cool', { ingredients: [LENTILS] }));
         s(instruction('Portion cooked lentils into thirds (~139g each) into three stainless steel containers', { equipment: [pot.name], ingredients: [LENTILS] }));
         s(instruction('Rinse pot and wipe dry with a paper towel (Otherwise Pot Stains)', { equipment: [pot.name] }));
@@ -5033,7 +5037,7 @@ registerGroup('Lentils', [
         s(instruction('Place lid fully on pot', { equipment: [pot.name] }));
         s(instruction('Set induction stovetop to 215°', { equipment: [pot.name] }));
         s(Timer.set(24, 'm', 'Cook lentils', { equipment: [pot.name], ingredients: [LENTILS, WATER] }));
-        s(instruction('Strain lentils through a colander', { equipment: [pot.name, colander.name], ingredients: [LENTILS] }));
+        s(instruction(`Strain ${formatIngredient(LENTILS)} through a colander`, { equipment: [pot.name, colander.name], ingredients: [LENTILS] }));
         s(Timer.set(10, 'm', 'Let lentils cool', { ingredients: [LENTILS] }));
         s(instruction('Portion cooked lentils in half (~165g each) into two stainless steel containers', { ingredients: [LENTILS] }));
         s(instruction('Rinse pot and wipe dry with a paper towel (Otherwise Pot Stains)', { equipment: [pot.name] }));
@@ -5052,7 +5056,7 @@ registerGroup('Lentils', [
         s(instruction('Place lid fully on pot', { equipment: [pot.name] }));
         s(instruction('Set induction stovetop to 215°', { equipment: [pot.name] }));
         s(Timer.set(21, 'm', 'Cook lentils', { equipment: [pot.name], ingredients: [LENTILS, WATER] }));
-        s(instruction('Strain lentils through a colander', { equipment: [pot.name, colander.name], ingredients: [LENTILS] }));
+        s(instruction(`Strain ${formatIngredient(LENTILS)} through a colander`, { equipment: [pot.name, colander.name], ingredients: [LENTILS] }));
         s(instruction('Portion 65g cooked lentils into stainless steel container', { ingredients: [LENTILS] }));
         s(instruction('Rinse pot and wipe dry with a paper towel (Otherwise Pot Stains)', { equipment: [pot.name] }));
         return steps;
@@ -5067,9 +5071,9 @@ registerGroup('Lentils', [
         s(info('65g dry lentils → 165g cooked. Keeps in the fridge for 3 days.'));
         s(info('Tip: you can cook 3 days worth in one batch instead.', { linkRecipeId: 'ing-black-lentils-induction-195g' }));
         s(pot.add([LENTILS]));
-        s(instruction('Add water to pot', { equipment: [pot.name], ingredients: [WATER] }));
+        s(instruction(`Add ${formatIngredient(WATER)} to pot`, { equipment: [pot.name], ingredients: [WATER] }));
         s(Timer.set(21, 'm', 'Cook lentils', { equipment: [pot.name], ingredients: [LENTILS, WATER] }));
-        s(instruction('Strain lentils through a colander', { equipment: [pot.name, colander.name], ingredients: [LENTILS] }));
+        s(instruction(`Strain ${formatIngredient(LENTILS)} through a colander`, { equipment: [pot.name, colander.name], ingredients: [LENTILS] }));
         s(instruction('Portion 65g cooked lentils into stainless steel container', { ingredients: [LENTILS] }));
         s(instruction('Rinse pot and wipe dry with a paper towel (Otherwise Pot Stains)', { equipment: [pot.name] }));
         return steps;
@@ -5127,7 +5131,7 @@ registerRecipe(withPlan(createRecipe('test-recipe-all-features', 'Test Recipe (A
     s(bowl.add([MACADAMIA_MILK, CARROT_OK, CARROT_NO_UNIT, CHICKPEAS_BAG, OIL_SPRAY, PEPPER_OZ], 'nutrition/cost edge cases'));
     // Auto-inserted cleanup-label step for MACADAMIA_MILK lands right here.
     s(bowl.mix('test mix result'));
-    s(instruction('Use the mix result (composite ingredient — excluded from the nutrition breakdown)', {
+    s(instruction(`Use ${formatIngredient(bowl.result)} (composite ingredient — excluded from the nutrition breakdown)`, {
         ingredients: [bowl.result], equipment: [bowl.name],
     }));
     s(oven.preheat(400)); // fixed 15 min duration — tap 3× to skip

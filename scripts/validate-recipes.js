@@ -468,6 +468,23 @@ while ((sm = STEP_FACTORY_RE.exec(src)) !== null) {
     const equipArr = extractArray(rest, 'equipment').toLowerCase();
     const ingArr   = extractArray(rest, 'ingredients');
 
+    // An explicit instruction that declares ingredients must state an amount.
+    // Prefer interpolating formatIngredient() so the text and the declared
+    // ingredient can never drift apart; a literal amount is also allowed for
+    // broader instructions (for example, "Add 1 scoop ... to a glass of water").
+    // Equipment.add() is excluded because it generates amount-bearing child steps
+    // itself.
+    if (sm[1] === 'instruction' && ingArr.trim()) {
+        const usesFormattedIngredient = /\$\{\s*formatIngredient\s*\(/.test(rawTextArg);
+        const statesLiteralAmount = /\d|[⅛⅓¼½¾]/.test(text);
+        if (!usesFormattedIngredient && !statesLiteralAmount) {
+            errors.push(
+                `line ${lineNum}: instruction declares ingredients but does not state an amount; ` +
+                'use formatIngredient(...) in the instruction text or include the amount explicitly'
+            );
+        }
+    }
+
     for (const phrase of matchPhrases(text, equipmentPhrases)) {
         const coveredLiteral = equipArr.includes(`'${phrase}'`);
         const coveredVar = Object.entries(equipmentVarType).some(
