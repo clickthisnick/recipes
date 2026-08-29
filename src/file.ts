@@ -106,8 +106,11 @@ export type IngredientConversions = Record<string, { to: Unit; factor: number }>
 export interface Ingredient {
     readonly [__ingredient]: true;
     name: string;
-    quantity?: number;
-    unit?: Unit;
+    // Recipe ingredients must always be measured.  Keeping these required makes an
+    // unmeasured i.ingredient() call a TypeScript/build error instead of silently
+    // rendering as an ingredient with no amount.
+    quantity: number;
+    unit: Unit;
     perishableDays?: number;
     nutrition?: NutritionLabel;
     products?: Product[];
@@ -4060,13 +4063,13 @@ type IngredientDefaults = Partial<Omit<Ingredient, typeof __ingredient>>;
 function ingredientFactory(
     name: string,
     defaults: IngredientDefaults & { nutrition: NutritionLabel }
-): (quantity?: number, unit?: Unit) => Ingredient;
+): (quantity: number, unit: Unit) => Ingredient;
 function ingredientFactory(
     name: string,
     defaults: IngredientDefaults & { products: (Product & { nutrition: NutritionLabel })[] }
-): (quantity?: number, unit?: Unit) => Ingredient;
+): (quantity: number, unit: Unit) => Ingredient;
 function ingredientFactory(name: string, defaults: IngredientDefaults = {}) {
-    return (quantity = 0, unit: Unit = u.none): Ingredient => {
+    return (quantity: number, unit: Unit): Ingredient => {
         const ing: any = { name, quantity, unit, ...defaults };
         ing.rename = (newName: string) => { ing.name = newName; };
         return ing as unknown as Ingredient;
@@ -5599,7 +5602,7 @@ registerGroup('Dinner', [
     createRecipe('nuwave-chicken-thighs', 'Nuwave Chicken Thighs (325°F)', (() => {
         const pan = e.nuwavePan();
         const seasoningBowl = e.bowl('seasoning bowl');
-        const THIGHS = i.chickenThigh();
+        const THIGHS = i.chickenThigh(2, u.unit);
         const steps: Step[] = [];
         const s = (...newSteps: Step[]) => steps.push(...newSteps);
 
@@ -5829,8 +5832,8 @@ registerRecipe(withPlan(createRecipe(
         const MACADAMIA_MILK = i.macadamiaNutMilk(1, u.cup);
         // ok nutrition + ok cost, via a chained density conversion (cup → pound → ounce)
         const CARROT_OK      = i.carrot(1, u.cup);
-        // uncomputable nutrition: has data, but no unit was given on the recipe ingredient
-        const CARROT_NO_UNIT = i.carrot();
+        // uncomputable nutrition: its recipe unit has no conversion to the label's keyed unit
+        const CARROT_NO_UNIT = i.carrot(1, u.unit);
         // uncomputable nutrition + cost: recipe unit ("bag") has no conversion path to the label's keyed unit
         const CHICKPEAS_BAG  = i.chickpeas(1, u.bag);
         // missing nutrition + missing cost: no nutrition block, no products at all
