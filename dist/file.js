@@ -13,7 +13,7 @@ export function subscribeAndSavePercent(discount) {
         return 5;
     return undefined;
 }
-// The listing (of the selected product) actually used for cost/price display — the
+// The listing (of the selected product) actually used for cost/price display - the
 // cheapest one, since that's what a shopper would realistically buy. Listings with no
 // price are ignored, and returns undefined only if none of them have a price at all.
 export function cheapestListing(product) {
@@ -184,7 +184,7 @@ function formatIngredient(ingredient) {
         : unit.plural || pluralize(unit.name, quantity ?? 0);
     return `${formatQuantity(quantity ?? 0)} ${unitText} ${name}`;
 }
-// Same as formatIngredient but without the item name — used to describe an
+// Same as formatIngredient but without the item name - used to describe an
 // arbitrary quantity (e.g. "how much is still needed") in an ingredient's unit.
 function formatQuantityUnit(quantity, unit) {
     if (!unit || !unit.name)
@@ -202,6 +202,12 @@ function createStep(input) {
     step.waitFor = function (...steps) {
         for (const dep of steps) {
             step.waitForIds = [...(step.waitForIds ?? []), dep.id];
+        }
+        return step;
+    };
+    step.startWhen = function (...steps) {
+        for (const dep of steps) {
+            step.startWhenIds = [...(step.startWhenIds ?? []), dep.id];
         }
         return step;
     };
@@ -297,7 +303,7 @@ class Equipment {
             return createStep({
                 type: 'instruction',
                 text: itemNote
-                    ? `${formatIngredient(ing)} — ${itemNote}`
+                    ? `${formatIngredient(ing)} - ${itemNote}`
                     : formatIngredient(ing),
                 ingredients: [ing],
                 equipment: [this.name],
@@ -305,7 +311,7 @@ class Equipment {
         });
         return createStep({
             type: 'instruction',
-            text: `Add to ${this.name}${note ? ` — ${note}` : ''}`,
+            text: `Add to ${this.name}${note ? ` - ${note}` : ''}`,
             equipment: [this.name],
             ingredients: allIngredients,
             children,
@@ -333,7 +339,7 @@ class Equipment {
     broil(label, durationSeconds) {
         const allEquipment = this.getAllEquipment();
         const allIngredients = this.getContents();
-        return timerStep(`Broil — ${label}`, durationSeconds, {
+        return timerStep(`Broil - ${label}`, durationSeconds, {
             equipment: allEquipment,
             ingredients: allIngredients,
         });
@@ -405,7 +411,7 @@ class Equipment {
         this._result = produced;
         return createStep({
             type: 'instruction',
-            text: `Combine ${ingredients.map(i => i.name).join(', ')} in ${this.name}${note ? ` — ${note}` : ''}`,
+            text: `Combine ${ingredients.map(i => i.name).join(', ')} in ${this.name}${note ? ` - ${note}` : ''}`,
             equipment: [this.name],
             ingredients: allConstituents,
         });
@@ -414,7 +420,7 @@ class Equipment {
 class NuwaveEquipment extends Equipment {
     constructor(label) { super('Nuwave pan', label); }
     preheat(temperature) {
-        const duration = temperature === 325 ? time.minutes(2) : time.minutes(3);
+        const duration = temperature <= 350 ? time.seconds(45) : time.minutes(2);
         return timerStep(`Preheat ${this.name} to ${temperature}°`, duration, { equipment: [this.name] });
     }
 }
@@ -544,7 +550,7 @@ function getFilteredRecipes() {
     });
 }
 // Like getFilteredRecipes(), but keyed off its own search string rather than the Select
-// screen's `state.searchQuery` — used by the Nutrition screen's "Add a recipe" search so
+// screen's `state.searchQuery` - used by the Nutrition screen's "Add a recipe" search so
 // typing there doesn't clobber (or get clobbered by) whatever's typed on Select. Ad-hoc
 // recipes are excluded: they're synthetic one-offs created by the ingredient picker, not
 // reusable catalog entries to search for.
@@ -596,10 +602,14 @@ function formatCookTime(seconds) {
 function buildCookingPlan(recipes) {
     const steps = recipes.flatMap(r => r.steps.filter(s => !s.prepOnly));
     const manualWaits = new Map();
+    const manualStartWhens = new Map();
     steps.forEach(s => {
         if (s.waitForIds && s.waitForIds.length > 0)
             manualWaits.set(s.id, [...s.waitForIds]);
         s.waitForIds = undefined;
+        if (s.startWhenIds && s.startWhenIds.length > 0)
+            manualStartWhens.set(s.id, [...s.startWhenIds]);
+        s.startWhenIds = undefined;
     });
     const equipClaims = new Map();
     const ingClaims = new Map();
@@ -624,6 +634,11 @@ function buildCookingPlan(recipes) {
             ingClaims.set(ing, step.id);
     }
     for (const step of steps) {
+        const startWhen = new Set();
+        for (const id of (manualStartWhens.get(step.id) ?? []))
+            startWhen.add(id);
+        if (startWhen.size > 0)
+            step.startWhenIds = [...startWhen];
         const waitFor = new Set();
         for (const id of (manualWaits.get(step.id) ?? []))
             waitFor.add(id);
@@ -815,7 +830,7 @@ function ingredientCost(ing) {
     };
 }
 // How many recipe-unit quantities (e.g. cups) a single package (e.g. a 13.4oz can)
-// contains — the inverse of the recipeUnit → packageUnit conversion used above, derived
+// contains - the inverse of the recipeUnit → packageUnit conversion used above, derived
 // from the same physical/density conversion data rather than a separately entered figure.
 function unitsPerPackage(ing, product) {
     const recipeUnit = ing.unit?.name;
@@ -932,11 +947,11 @@ function unlockAudioContext() {
         return;
     state.audioUnlocked = true;
     // Prime the *actual* alarm element with a direct, gesture-triggered play(), not a
-    // separate throwaway one — some browsers (notably Safari) grant "allowed to autoplay"
+    // separate throwaway one - some browsers (notably Safari) grant "allowed to autoplay"
     // per media element based on it having been played directly during a user gesture at
     // least once, rather than unlocking playback page-wide. Without this, the alarm's
-    // audio.play() call — which always fires later from a setInterval callback, not a
-    // gesture — gets rejected with NotAllowedError the first time a real (non-test) timer
+    // audio.play() call - which always fires later from a setInterval callback, not a
+    // gesture - gets rejected with NotAllowedError the first time a real (non-test) timer
     // tries to ring.
     const wasMuted = audio.muted;
     audio.muted = true;
@@ -1167,7 +1182,7 @@ function renderShoppingScreen() {
         panel.appendChild(label);
         const required = ingredient.quantity ?? 0;
         const product = selectedProduct(ingredient);
-        // Track "have" in whole packages by default — size/sizeUnit already describe
+        // Track "have" in whole packages by default - size/sizeUnit already describe
         // one real container for almost every product. Bulk items (cabbage sold loose
         // per lb) opt out via `bulk`, falling back to entering the recipe unit directly
         // rather than guessing a fake "package".
@@ -1234,7 +1249,7 @@ function renderShoppingScreen() {
         });
         panel.appendChild(invRow);
         const products = ingredient.products ?? [];
-        // One row per (product, listing) pair — a single product can have several listings
+        // One row per (product, listing) pair - a single product can have several listings
         // (e.g. the same item sold on Amazon and on the brand's own site at different prices).
         const pairs = products.flatMap((product) => (product.listings ?? []).map((listing) => ({ product, listing })));
         if (pairs.length > 0) {
@@ -1258,7 +1273,7 @@ function renderShoppingScreen() {
                 const variant = product.variant ? ` ${product.variant}` : '';
                 const where = listing.store ? ` · ${listing.store}` : '';
                 const pkg = listing.price !== undefined && product.size !== undefined
-                    ? ` — $${listing.price} / ${product.size} ${product.sizeUnit?.name ?? ''}`.trimEnd()
+                    ? ` - $${listing.price} / ${product.size} ${product.sizeUnit?.name ?? ''}`.trimEnd()
                     : '';
                 const ppu = listing.price !== undefined && product.size !== undefined
                     ? ` ($${(listing.price / product.size).toFixed(2)}/${product.sizeUnit?.name ?? 'unit'})`
@@ -1340,7 +1355,7 @@ function renderMacroTargetsPanel(grand) {
         row.appendChild(inputWrap);
         const actualEl = document.createElement('span');
         actualEl.className = 'macro-actual';
-        actualEl.textContent = actual !== null ? `${actual} ${unit}${calPct ?? ''}${macroPct ?? ''}` : '—';
+        actualEl.textContent = actual !== null ? `${actual} ${unit}${calPct ?? ''}${macroPct ?? ''}` : '-';
         row.appendChild(actualEl);
         const initRemaining = actual !== null ? macroTargets[key] - actual : null;
         const remainClass = (rem) => {
@@ -1352,7 +1367,7 @@ function renderMacroTargetsPanel(grand) {
         };
         const remainText = (rem) => {
             if (rem === null)
-                return '—';
+                return '-';
             if (cap)
                 return rem < 0 ? `${Math.round(-rem)} ${unit} over` : rem === 0 ? '✓ at limit' : `${Math.round(rem)} ${unit} left`;
             return rem > 0 ? `${Math.round(rem)} ${unit}` : '✓ met';
@@ -1377,7 +1392,7 @@ function renderMacroTargetsPanel(grand) {
 function buildRecipeSuggestions(grand) {
     const remCals = macroTargets.calories - grand.calories;
     if (remCals < 50)
-        return []; // nearly full — no suggestions needed
+        return []; // nearly full - no suggestions needed
     const remaining = {
         calories: Math.max(0, remCals),
         protein: Math.max(0, macroTargets.protein - grand.protein),
@@ -1483,7 +1498,7 @@ function renderNutritionScreen() {
         totalValue.textContent = `$${grandCost.toFixed(2)}`;
     }
     else {
-        totalValue.textContent = '— no computable data';
+        totalValue.textContent = '- no computable data';
     }
     totalCard.appendChild(totalValue);
     // 30-day cost projection
@@ -1497,7 +1512,7 @@ function renderNutritionScreen() {
     if (gCostMissing > 0 && hasCostData) {
         const costNote = document.createElement('div');
         costNote.className = 'nutrition-cost-note';
-        costNote.textContent = `⚠ cost is partial — ${gCostMissing} ingredient${gCostMissing === 1 ? '' : 's'} missing price data`;
+        costNote.textContent = `⚠ cost is partial - ${gCostMissing} ingredient${gCostMissing === 1 ? '' : 's'} missing price data`;
         totalCard.appendChild(costNote);
     }
     const totalCoverage = document.createElement('div');
@@ -1551,7 +1566,7 @@ function renderNutritionScreen() {
             sub.textContent = `$${sectionCost.toFixed(2)}`;
         }
         else {
-            sub.textContent = '— no computable data';
+            sub.textContent = '- no computable data';
         }
         const servingControls = document.createElement('div');
         servingControls.className = 'nutrition-serving-controls';
@@ -1636,7 +1651,7 @@ function renderNutritionScreen() {
             const detail = document.createElement('span');
             if (isExcluded) {
                 detail.className = 'nutrition-ingredient-value';
-                detail.textContent = '— excluded';
+                detail.textContent = '- excluded';
             }
             else if (result.status === 'ok') {
                 detail.className = 'nutrition-ingredient-value';
@@ -1668,7 +1683,7 @@ function renderNutritionScreen() {
                 costFlag.className = 'nutrition-cost-flag';
                 costFlag.textContent = costResult.status === 'missing'
                     ? '⚠ no price data'
-                    : `⚠ cost can't compute — ${costResult.reason}`;
+                    : `⚠ cost can't compute - ${costResult.reason}`;
                 row.appendChild(costFlag);
             }
             if (!isExcluded && result.status === 'ok' && result.brand) {
@@ -1782,7 +1797,7 @@ function renderNutritionAddRecipeList() {
     if (matched.length > shown.length) {
         const hint = document.createElement('div');
         hint.className = 'suggestion-more-hint';
-        hint.textContent = `+${matched.length - shown.length} more — refine your search`;
+        hint.textContent = `+${matched.length - shown.length} more - refine your search`;
         root.appendChild(hint);
     }
     else if (matched.length === 0) {
@@ -1799,7 +1814,7 @@ let adhocSearchQuery = '';
 let adhocSelectedKey = null;
 let adhocQuantity = 1;
 let adhocUnitName = '';
-// Which screen opened the ingredient picker (Select or Nutrition) — Back/Add to list return
+// Which screen opened the ingredient picker (Select or Nutrition) - Back/Add to list return
 // here instead of always landing on Select, so adding from Nutrition doesn't strand the user
 // somewhere they didn't ask to go.
 let adhocReturnScreen = 'select';
@@ -1970,7 +1985,7 @@ function renderCookingScreen() {
         root.appendChild(banner);
     }
     let lastRecipeId;
-    // Every step renders in its natural recipe order, whether locked or not — a locked
+    // Every step renders in its natural recipe order, whether locked or not - a locked
     // step just looks/behaves locked in place (see applyLock). Nothing ever moves once
     // it's on screen, so unlocking never shifts the layout around it.
     for (let idx = 0; idx < state.cookingPlanSteps.length; idx++) {
@@ -2072,15 +2087,26 @@ function renderInfoGroup(steps) {
 // ============================================================
 function applyLock(panel, step) {
     const waitForIds = step.waitForIds;
-    if (!waitForIds || waitForIds.length === 0)
+    const startWhenIds = step.startWhenIds;
+    if ((!waitForIds || waitForIds.length === 0) && (!startWhenIds || startWhenIds.length === 0))
         return;
     const appEl = document.getElementById('app');
     if (!appEl)
         return;
-    const isUnlocked = () => waitForIds.every(id => {
+    const isStarted = (id) => {
+        const el = document.getElementById(`step-${id}`);
+        if (!el)
+            return true;
+        return el.classList.contains('timer') || el.classList.contains('ringing') ||
+            el.classList.contains('completed') || el.classList.contains('skipped') ||
+            el.classList.contains('done-child');
+    };
+    const isFinished = (id) => {
         const el = document.getElementById(`step-${id}`);
         return !el || el.classList.contains('completed') || el.classList.contains('skipped') || el.classList.contains('ringing');
-    });
+    };
+    const isUnlocked = () => (!waitForIds || waitForIds.length === 0 || waitForIds.every(isFinished)) &&
+        (!startWhenIds || startWhenIds.length === 0 || startWhenIds.every(isStarted));
     panel.classList.add('step-locked');
     const pill = document.createElement('div');
     pill.className = 'waiting-pill';
@@ -2124,6 +2150,8 @@ function renderStep(step, onDone) {
         step.children.forEach((child) => {
             if (step.waitForIds && !child.waitForIds)
                 child.waitForIds = step.waitForIds;
+            if (step.startWhenIds && !child.startWhenIds)
+                child.startWhenIds = step.startWhenIds;
             childWrap.appendChild(renderStep(child, checkDone));
         });
         applyLock(panel, step);
@@ -2156,7 +2184,7 @@ function renderStep(step, onDone) {
             if (panel.classList.contains('completed') || panel.classList.contains('skipped'))
                 return;
             // While ringing, the document-wide click listener (see startAlarm) handles
-            // dismissal — just make sure this handler doesn't restart the timer.
+            // dismissal - just make sure this handler doesn't restart the timer.
             if (panel.classList.contains('ringing'))
                 return;
             if (!state.timers.has(step.id)) {
@@ -2244,8 +2272,8 @@ function renderStep(step, onDone) {
     applyLock(panel, step);
     return panel;
 }
-// `dueAt` — the timer's original deadline, if this completion followed a countdown (omitted
-// for a gate's immediate "Yes", which never ran one) — lets the card show not just when it
+// `dueAt` - the timer's original deadline, if this completion followed a countdown (omitted
+// for a gate's immediate "Yes", which never ran one) - lets the card show not just when it
 // was acknowledged but how late that was, mirroring the overdue readout shown while ringing.
 function completeTimer(step, panel, onDone, dueAt) {
     panel.classList.remove('timer');
@@ -2255,9 +2283,9 @@ function completeTimer(step, panel, onDone, dueAt) {
     const runCount = state.gateRunCounts.get(step.id) ?? 0;
     const checkedSuffix = runCount > 0 ? ` (checked ${runCount}×)` : '';
     const overdueSuffix = dueAt !== undefined
-        ? ` (up at ${formatClockTime(dueAt)} — overdue by ${formatOverdueDuration(Math.max(0, Math.round((completedAtMs - dueAt) / 1000)))})`
+        ? ` (up at ${formatClockTime(dueAt)} - overdue by ${formatOverdueDuration(Math.max(0, Math.round((completedAtMs - dueAt) / 1000)))})`
         : '';
-    panel.textContent = `✓ ${step.text} — completed at ${completedAt}${overdueSuffix}${checkedSuffix}`;
+    panel.textContent = `✓ ${step.text} - completed at ${completedAt}${overdueSuffix}${checkedSuffix}`;
     onDone?.();
 }
 function skipTimer(step, panel, onDone) {
@@ -2270,7 +2298,7 @@ function skipTimer(step, panel, onDone) {
     panel.classList.remove('timer');
     panel.classList.add('skipped');
     const skippedAt = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    panel.textContent = `⏭ ${step.text} — skipped at ${skippedAt}`;
+    panel.textContent = `⏭ ${step.text} - skipped at ${skippedAt}`;
     onDone?.();
 }
 // ============================================================
@@ -2343,7 +2371,7 @@ function releaseWakeLockIfIdle() {
     wakeLockSentinel = null;
 }
 // The wake lock is auto-released by the browser whenever the document is hidden (e.g. the
-// user switches apps) — if a timer is still running when the page becomes visible again,
+// user switches apps) - if a timer is still running when the page becomes visible again,
 // re-acquire it rather than leaving the screen free to sleep for the rest of the cook.
 document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible' && state.timers.size > 0)
@@ -2382,9 +2410,9 @@ function runCountdown(step, panel, durationSeconds, formatLabel, onComplete) {
 function startTimer(step, panel, onDone) {
     if (!step.durationSeconds || state.timers.has(step.id))
         return;
-    runCountdown(step, panel, step.durationSeconds, (mm, ss, dueAtLabel) => `${mm}:${ss} ${step.text} — up at ${dueAtLabel} — tap 3× to skip`, (dueAt) => {
+    runCountdown(step, panel, step.durationSeconds, (mm, ss, dueAtLabel) => `${mm}:${ss} ${step.text} - up at ${dueAtLabel} - tap 3× to skip`, (dueAt) => {
         if (panel.classList.contains('sound-check-btn')) {
-            // Quick sound test button — beep once and reset immediately, no alarm loop.
+            // Quick sound test button - beep once and reset immediately, no alarm loop.
             playSound(panel);
             completeTimer(step, panel, onDone, dueAt);
         }
@@ -2441,7 +2469,7 @@ function startGateRetryTimer(step, panel, onDone) {
         return;
     state.gateRunCounts.set(step.id, (state.gateRunCounts.get(step.id) ?? 0) + 1);
     panel.textContent = '';
-    runCountdown(step, panel, step.durationSeconds, (mm, ss, dueAtLabel) => `${mm}:${ss} cooking more — up at ${dueAtLabel} — tap 3× to skip`, (dueAt) => {
+    runCountdown(step, panel, step.durationSeconds, (mm, ss, dueAtLabel) => `${mm}:${ss} cooking more - up at ${dueAtLabel} - tap 3× to skip`, (dueAt) => {
         startAlarm(step, panel, dueAt, () => renderGateQuestion(step, panel, onDone));
     });
 }
@@ -2460,7 +2488,7 @@ function skipGateRetryTimer(step, panel, onDone) {
 // ============================================================
 const audio = new Audio('../src/sounds/pager-beep.mp3');
 // audio.play() can silently reject (e.g. autoplay blocked after the page has sat idle/
-// backgrounded for a while) — surface that visibly instead of only logging it, since a
+// backgrounded for a while) - surface that visibly instead of only logging it, since a
 // failed alarm sound is otherwise indistinguishable from a timer that's still running.
 let soundBlockedBanner = null;
 function showSoundBlockedBanner() {
@@ -2468,7 +2496,7 @@ function showSoundBlockedBanner() {
         return;
     const banner = document.createElement('div');
     banner.className = 'sound-blocked-banner';
-    banner.textContent = '🔇 Alarm sound was blocked by the browser — tap anywhere to enable it';
+    banner.textContent = '🔇 Alarm sound was blocked by the browser - tap anywhere to enable it';
     document.body.appendChild(banner);
     soundBlockedBanner = banner;
 }
@@ -2509,7 +2537,7 @@ const ALARM_WARNING_SECONDS = 30;
 // Steps whose alarm is currently ringing (countdown or continuous phase),
 // keyed by step id, so a click anywhere on the page can dismiss them.
 const activeAlarms = new Map();
-// Steps currently in the continuous-loop phase — the shared `audio` element only
+// Steps currently in the continuous-loop phase - the shared `audio` element only
 // truly stops once none of them are ringing anymore.
 const continuousRingSteps = new Set();
 // mm:ss for durations under an hour; h:mm:ss once overdue runs past 60 minutes.
@@ -2527,7 +2555,7 @@ function startAlarm(step, panel, dueAt, onAcknowledge) {
     const dueAtLabel = formatClockTime(dueAt);
     const label = document.createElement('div');
     label.className = 'ringing-label';
-    label.textContent = `⏰ ${step.text} — time's up!`;
+    label.textContent = `⏰ ${step.text} - time's up!`;
     panel.appendChild(label);
     const countdown = document.createElement('div');
     countdown.className = 'ringing-countdown';
@@ -2546,13 +2574,13 @@ function startAlarm(step, panel, dueAt, onAcknowledge) {
     let ringingContinuously = false;
     // Overdue keeps incrementing (based on the original deadline, not this alarm's start)
     // for as long as the alarm is left ringing, so a user who steps away can see exactly
-    // how late they are when they come back — not just that they're late.
+    // how late they are when they come back - not just that they're late.
     const updateDisplay = () => {
         const overdue = Math.max(0, Math.round((Date.now() - dueAt) / 1000));
-        const overdueLabel = `up at ${dueAtLabel} — overdue by ${formatOverdueDuration(overdue)}`;
+        const overdueLabel = `up at ${dueAtLabel} - overdue by ${formatOverdueDuration(overdue)}`;
         countdown.textContent = ringingContinuously
             ? overdueLabel
-            : `${overdueLabel} — next alarm in ${remaining}s`;
+            : `${overdueLabel} - next alarm in ${remaining}s`;
     };
     updateDisplay();
     playSound(panel);
@@ -2589,7 +2617,7 @@ function stopAlarm(stepId) {
     }
     stopContinuousRing(stepId);
     activeAlarms.delete(stepId);
-    // Dismissing an alarm means the user has already dealt with it — don't leave the
+    // Dismissing an alarm means the user has already dealt with it - don't leave the
     // "retry on next click" banner armed to unexpectedly blast sound on some later,
     // unrelated click (e.g. navigating away) that has nothing to do with this alarm.
     hideSoundBlockedBanner();
@@ -2602,12 +2630,12 @@ function acknowledgeAlarm(stepId) {
     alarm.panel.classList.remove('ringing');
     alarm.onAcknowledge();
 }
-// Any interaction anywhere on the page — any button, any click — dismisses
+// Any interaction anywhere on the page - any button, any click - dismisses
 // whatever alarm(s) are currently ringing.
 document.addEventListener('click', () => {
     // Capture before dismissing: retry blocked playback only when this click is actually
     // dismissing a still-active (blocked) alarm, so the user hears at least one beep for
-    // it — not for every future unrelated click for the rest of the session.
+    // it - not for every future unrelated click for the rest of the session.
     const retryBlockedSound = activeAlarms.size > 0 && soundBlockedBanner !== null;
     for (const stepId of [...activeAlarms.keys()])
         acknowledgeAlarm(stepId);
@@ -2951,7 +2979,7 @@ function renderPlanScreen() {
                 row.className = 'plan-batch-row';
                 const mins = recipe.prepMinutes;
                 const days = recipe.perishableDays;
-                row.textContent = `${recipe.name} — ${mins} min cook time` + (days ? ` · keeps ${days} day${days > 1 ? 's' : ''} in fridge` : '');
+                row.textContent = `${recipe.name} - ${mins} min cook time` + (days ? ` · keeps ${days} day${days > 1 ? 's' : ''} in fridge` : '');
                 scheduleOut.appendChild(row);
             });
         }
@@ -2973,7 +3001,7 @@ button, a, input, select { touch-action: manipulation; }
 
 /* Block pinch-zoom gestures page-wide (belt-and-suspenders alongside the viewport meta
    tag's maximum-scale/user-scalable, which some iOS versions/accessibility settings can
-   partially override) — still allow normal scrolling in both directions. */
+   partially override) - still allow normal scrolling in both directions. */
 html, body { touch-action: pan-x pan-y; }
 
 body {
@@ -3338,7 +3366,7 @@ h2 { margin-top: 0; font-size: 28px; }
 /* 30-day cost projection */
 .nutrition-monthly-cost { font-size: 15px; color: #6b9fcf; margin-top: 6px; }
 
-/* Partial-cost note — shown when some but not all ingredients have price data */
+/* Partial-cost note - shown when some but not all ingredients have price data */
 .nutrition-cost-note { font-size: 13px; color: #f59e0b; margin-top: 4px; font-style: italic; }
 
 .panel.nutrition-recipe { cursor: default; padding: 0; }
@@ -3383,7 +3411,7 @@ h2 { margin-top: 0; font-size: 28px; }
 
 .nutrition-flag-reason { flex-basis: 100%; font-size: 13px; color: #d97706; font-style: italic; margin-top: 2px; }
 
-/* Cost flag — shown on a row where nutrition is ok but price is missing/uncomputable */
+/* Cost flag - shown on a row where nutrition is ok but price is missing/uncomputable */
 .nutrition-cost-flag { flex-basis: 100%; font-size: 12px; color: #f59e0b; font-style: italic; margin-top: 1px; opacity: 0.8; }
 
 .nutrition-provenance { flex-basis: 100%; font-size: 12px; color: #666; font-style: italic; margin-top: 2px; }
@@ -3488,7 +3516,7 @@ h2 { margin-top: 0; font-size: 28px; }
 // Replaced with the real compile timestamp by scripts/validate-recipes.js's postbuild
 // step, right after `tsc` emits dist/file.js. Left as-is (and reported as "dev build")
 // when running straight from source, e.g. under `vite`.
-const BUILD_TIME = '2026-08-29T15:04:08.190Z';
+const BUILD_TIME = '2026-09-01T23:24:49.459Z';
 function formatBuildTime() {
     const date = new Date(BUILD_TIME);
     if (isNaN(date.getTime()))
@@ -3509,7 +3537,7 @@ function bootstrap() {
     document.body.innerHTML = `<div id="app"></div>`;
     document.addEventListener('click', () => unlockAudioContext(), { once: true });
     // iOS Safari fires its own non-standard gesture events for pinch-zoom that aren't
-    // fully covered by touch-action — block those directly. Feature-detected since only
+    // fully covered by touch-action - block those directly. Feature-detected since only
     // WebKit dispatches them.
     if ('ongesturestart' in document) {
         document.addEventListener('gesturestart', (e) => e.preventDefault());
@@ -3543,9 +3571,9 @@ function ingredientFactory(name, defaults = {}) {
 // ITEMS
 // ============================================================
 export const i = {
-    // No nutrition available yet — a real fruit with meaningful calories/carbs, so a zero
+    // No nutrition available yet - a real fruit with meaningful calories/carbs, so a zero
     // placeholder would be actively misleading.
-    // Generic/typical nutrition (not from this listing's own label) — a standard whole
+    // Generic/typical nutrition (not from this listing's own label) - a standard whole
     // grapefruit, ~236g. Real produce values, just not brand-specific.
     grapefruit: ingredientFactory('Pink Grapefruit', {
         defaultBrand: 'Organic',
@@ -3557,7 +3585,7 @@ export const i = {
                 },
             }],
     }),
-    // Nutrition zeroed at the user's request — vinegar is close enough to calorie-free at
+    // Nutrition zeroed at the user's request - vinegar is close enough to calorie-free at
     // typical usage to be a defensible placeholder (same reasoning as whiteVinegar above).
     champagneVinegar: ingredientFactory('Champagne Vinegar', {
         defaultBrand: 'O Olive Oil & Vinegar',
@@ -3569,7 +3597,7 @@ export const i = {
                 },
             }],
     }),
-    // Generic/typical nutrition (not from this listing's own label) — salt is essentially
+    // Generic/typical nutrition (not from this listing's own label) - salt is essentially
     // pure sodium chloride regardless of brand, so ~2300mg sodium/tsp is a standard real value.
     seaSalt: ingredientFactory('Sea Salt', {
         defaultBrand: 'Ancient',
@@ -3581,7 +3609,7 @@ export const i = {
                 },
             }],
     }),
-    // Nutrition zeroed at the user's request — the label is image-only on Amazon (typical
+    // Nutrition zeroed at the user's request - the label is image-only on Amazon (typical
     // for dried herbs), so this is a placeholder, not a real (scraped or measured) value.
     rosemary: ingredientFactory('Rosemary', {
         defaultBrand: '365',
@@ -3593,7 +3621,7 @@ export const i = {
                 },
             }],
     }),
-    // Generic/typical nutrition (not from this listing's own label) — standard mushroom
+    // Generic/typical nutrition (not from this listing's own label) - standard mushroom
     // values, per roughly one whole king trumpet mushroom (~100g).
     kingOysterMushroom: ingredientFactory('King Trumpet Mushroom', {
         defaultBrand: 'Mushroom King Farm',
@@ -3625,7 +3653,7 @@ export const i = {
                 },
             }],
     }),
-    // Generic/typical nutrition (not from this listing's own label) — standard fennel bulb
+    // Generic/typical nutrition (not from this listing's own label) - standard fennel bulb
     // values, per one medium bulb (~234g).
     fennel: ingredientFactory('Fennel', {
         defaultBrand: 'Organic',
@@ -3637,7 +3665,7 @@ export const i = {
                 },
             }],
     }),
-    // Generic/typical nutrition (not from this listing's own label) — standard radicchio
+    // Generic/typical nutrition (not from this listing's own label) - standard radicchio
     // values, per one head (~350g).
     radicchio: ingredientFactory('Radicchio', {
         defaultBrand: 'Organic',
@@ -3649,7 +3677,7 @@ export const i = {
                 },
             }],
     }),
-    // Nutrition zeroed at the user's request — the label is image-only on Amazon (typical
+    // Nutrition zeroed at the user's request - the label is image-only on Amazon (typical
     // for dried herbs), so this is a placeholder, not a real (scraped or measured) value.
     dillWeed: ingredientFactory('Dill Weed', {
         defaultBrand: '365',
@@ -3661,7 +3689,7 @@ export const i = {
                 },
             }],
     }),
-    // Nutrition zeroed at the user's request — the label is image-only on Amazon; distilled
+    // Nutrition zeroed at the user's request - the label is image-only on Amazon; distilled
     // white vinegar is also close enough to calorie-free at typical usage to be a defensible
     // placeholder even so, but flagging same as the others since it's not from a real label.
     whiteVinegar: ingredientFactory('White Vinegar', {
@@ -3684,9 +3712,9 @@ export const i = {
                 },
             }],
     }),
-    // Generic/typical nutrition — recipes use this by the spray (a mister/pump dose, ~0.2g),
+    // Generic/typical nutrition - recipes use this by the spray (a mister/pump dose, ~0.2g),
     // which is genuinely small enough that standard cooking-oil-spray labels round it to
-    // 0 cal/0g fat per spray (the same convention as e.g. PAM) — not a placeholder zero.
+    // 0 cal/0g fat per spray (the same convention as e.g. PAM) - not a placeholder zero.
     avocadoOil: ingredientFactory('Avocado Oil', {
         defaultBrand: 'Chosen Foods',
         products: [{
@@ -3697,7 +3725,7 @@ export const i = {
                 },
             }],
     }),
-    // Generic/typical nutrition (not from this listing's own label) — standard honey-mustard
+    // Generic/typical nutrition (not from this listing's own label) - standard honey-mustard
     // dressing values, per 1 tbsp (15g).
     honeyDijonMustard: ingredientFactory('Honey Dijon Mustard', {
         defaultBrand: 'SideDish',
@@ -3709,7 +3737,7 @@ export const i = {
                 },
             }],
     }),
-    // Generic/typical nutrition (not from this listing's own label) — a standard medium
+    // Generic/typical nutrition (not from this listing's own label) - a standard medium
     // orange, ~131g.
     orange: ingredientFactory('Orange', {
         defaultBrand: 'Organic',
@@ -3721,7 +3749,7 @@ export const i = {
                 },
             }],
     }),
-    // Generic/typical nutrition (not from this listing's own label) — standard arugula
+    // Generic/typical nutrition (not from this listing's own label) - standard arugula
     // values, per 100g.
     arugula: ingredientFactory('Arugula', {
         defaultBrand: '365',
@@ -3733,7 +3761,7 @@ export const i = {
                 },
             }],
     }),
-    // Cholesterol left at 0 — the scraped nutrition table for this listing didn't include a
+    // Cholesterol left at 0 - the scraped nutrition table for this listing didn't include a
     // cholesterol line at all (dairy sour cream normally has some), so that field specifically
     // is unconfirmed rather than a verified zero. Everything else here is real scraped data.
     sourCream: ingredientFactory('Sour Cream', {
@@ -3756,7 +3784,7 @@ export const i = {
                 },
             }],
     }),
-    // Nutrition zeroed at the user's request — Amazon's label for this listing is
+    // Nutrition zeroed at the user's request - Amazon's label for this listing is
     // image-only, so this is a placeholder, not a real (scraped or measured) value.
     garlicPowder: ingredientFactory('Garlic Powder', {
         defaultBrand: '365',
@@ -3768,7 +3796,7 @@ export const i = {
                 },
             }],
     }),
-    // Generic/typical nutrition (not from this listing's own label) — standard mayonnaise
+    // Generic/typical nutrition (not from this listing's own label) - standard mayonnaise
     // values, scaled up from a typical ~94 cal/tbsp to a full cup (16 tbsp), matching how
     // this ingredient is actually consumed in the one recipe that uses it.
     mayonnaise: ingredientFactory('Mayonnaise', {
@@ -3791,7 +3819,7 @@ export const i = {
                 },
             }],
     }),
-    // Generic/typical nutrition (not from this listing's own label) — standard plant-based
+    // Generic/typical nutrition (not from this listing's own label) - standard plant-based
     // Italian sausage values, scaled to the whole 10oz (283g) package (recipe consumes it as
     // "1 bag").
     abbotPeaItalianSausage: ingredientFactory('Abbot\'s Plant-Based Italian Sausage', {
@@ -3820,16 +3848,16 @@ export const i = {
                 brand: '365', variant: 'Organic 4 Cheese Pasta Sauce', size: 25, sizeUnit: u.ounce, organic: true,
                 listings: [{ store: stores.wholeFoods, price: 3.49, link: 'https://www.amazon.com/365-Everyday-Value-Organic-Cheese/dp/B074H66176' }],
                 nutrition: {
-                    // Recipe consumes this as "1 bag" (the whole 25oz jar) — label is 1/2 cup
+                    // Recipe consumes this as "1 bag" (the whole 25oz jar) - label is 1/2 cup
                     // (118g), 6 servings/container, so these are the per-jar totals (per-serving × 6).
                     [u.bag.name]: { servings: 1, servingSize: 1, calories: 420, fat: 21, saturatedFat: 6, transFat: 0, cholesterol: 30, carbs: 48, sodium: 2460, sugar: 24, protein: 18, fiber: 12 },
                 },
             }],
     }),
-    // No nutrition available yet — Amazon didn't expose a text nutrition table for this
+    // No nutrition available yet - Amazon didn't expose a text nutrition table for this
     // listing (baking soda is chemically invariant across brands, but serving-size
     // conventions differ enough between labels that a real one is still needed here).
-    // Nutrition zeroed at the user's request — no text nutrition table was available for
+    // Nutrition zeroed at the user's request - no text nutrition table was available for
     // this listing, so this is a placeholder, not a real (scraped or measured) value.
     bakingSoda: ingredientFactory('Baking Soda', {
         defaultBrand: 'Arm & Hammer',
@@ -3851,7 +3879,7 @@ export const i = {
                 },
             }],
     }),
-    // Nutrition zeroed at the user's request — the label is image-only on Amazon (typical
+    // Nutrition zeroed at the user's request - the label is image-only on Amazon (typical
     // for dried herbs), so this is a placeholder, not a real (scraped or measured) value.
     parsleyFlakes: ingredientFactory('Parsley Flakes', {
         defaultBrand: '365',
@@ -3883,7 +3911,7 @@ export const i = {
             [u.unit.name]: { servings: 44, servingSize: 1, calories: 120, fat: 2, saturatedFat: 0.5, transFat: 0, cholesterol: 0, carbs: 24, sodium: 240, sugar: 4, protein: 4, fiber: 3 },
         },
     }),
-    // Generic/typical nutrition (not from this listing's own label) — standard onion values,
+    // Generic/typical nutrition (not from this listing's own label) - standard onion values,
     // per 1 tbsp minced (~10g), matching how this ingredient is actually used in recipes.
     whiteOnion: ingredientFactory('White Onion', {
         defaultBrand: 'Organic',
@@ -3895,7 +3923,7 @@ export const i = {
                 },
             }],
     }),
-    // Nutrition zeroed at the user's request — Amazon's label for these listings is
+    // Nutrition zeroed at the user's request - Amazon's label for these listings is
     // image-only, so this is a placeholder, not a real (scraped or measured) value.
     blackPepper: ingredientFactory('Black Pepper', {
         defaultBrand: '365',
@@ -4172,7 +4200,7 @@ export const i = {
     celery: ingredientFactory('Celery', {
         nutrition: { [u.unit.name]: { servings: 1, servingSize: 1, calories: 6, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 1.5, sodium: 32, sugar: 1, protein: 0.3, fiber: 1 } },
         conversions: {
-            // 1 medium stalk chopped ≈ ½ cup (8 tbsp) — lets tbsp-measured amounts resolve nutrition.
+            // 1 medium stalk chopped ≈ ½ cup (8 tbsp) - lets tbsp-measured amounts resolve nutrition.
             [u.tbsp.name]: { to: u.unit, factor: 0.125 },
         },
     }),
@@ -4244,21 +4272,21 @@ export const i = {
         },
         products: [{ brand: 'Tap', listings: [{ price: 0 }], size: 1, sizeUnit: u.fluidOunce }],
     }),
-    // Frozen water — nutritionally identical to water, kept as its own ingredient so
+    // Frozen water - nutritionally identical to water, kept as its own ingredient so
     // recipe steps and the shopping list read as "ice cubes" rather than liquid water.
     iceCube: ingredientFactory('Ice Cube', {
         nutrition: {
             [u.unit.name]: { servings: 1, servingSize: 1, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 },
         },
     }),
-    // Generic/typical nutrition (not from a specific brand's label) — standard black brewed
+    // Generic/typical nutrition (not from a specific brand's label) - standard black brewed
     // coffee per USDA data, brand-agnostic since cold brew is commonly home-brewed.
     coldBrewCoffee: ingredientFactory('Cold Brew Coffee', {
         nutrition: {
             [u.fluidOunce.name]: { servings: 1, servingSize: 8, calories: 5, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 5, sugar: 0, protein: 1, fiber: 0 },
         },
     }),
-    // Generic/typical nutrition (not from a specific brand's label) — standard flavored
+    // Generic/typical nutrition (not from a specific brand's label) - standard flavored
     // liquid coffee creamer (e.g. French Vanilla style) per tablespoon serving.
     coffeeCreamer: ingredientFactory('Coffee Creamer', {
         nutrition: {
@@ -4365,8 +4393,8 @@ export const i = {
             [u.unit.name]: { servings: 100, servingSize: 1, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 },
         },
     }),
-    // Generic/typical nutrition (not from this listing's own label) — standard honey values,
-    // per 1 tsp (~7g). Link is also currently dead ("Page Not Found") — needs a fresh one.
+    // Generic/typical nutrition (not from this listing's own label) - standard honey values,
+    // per 1 tsp (~7g). Link is also currently dead ("Page Not Found") - needs a fresh one.
     manukaHoney: ingredientFactory('Manuka Honey', {
         defaultBrand: 'Blueprint',
         products: [{
@@ -4403,7 +4431,7 @@ export const i = {
             },
         ],
     }),
-    // Generic/typical nutrition (not from this listing's own label) — standard raw boneless
+    // Generic/typical nutrition (not from this listing's own label) - standard raw boneless
     // skinless chicken thigh values, per 1 lb (453.6g).
     chickenThigh: ingredientFactory('Chicken Thighs (Boneless Skinless)', {
         isMeatProduct: true,
@@ -4415,7 +4443,7 @@ export const i = {
                 },
             }],
     }),
-    // Generic/typical nutrition (not from a specific brand's label) — dried chile de árbol
+    // Generic/typical nutrition (not from a specific brand's label) - dried chile de árbol
     // pods are essentially never sold with a per-pod nutrition label, so this estimates a
     // single ~1g dried pod from generic dried-chile USDA values.
     chileDeArbol: ingredientFactory('Chile de Árbol (Dried)', {
@@ -4423,42 +4451,75 @@ export const i = {
             [u.unit.name]: { servings: 1, servingSize: 1, calories: 3, fat: 0.1, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0.5, sodium: 1, sugar: 0.1, protein: 0.1, fiber: 0.2 },
         },
     }),
-    // Generic/typical nutrition — chile pequín and chiltepín are used interchangeably here;
+    // Generic/typical nutrition - chile pequín and chiltepín are used interchangeably here;
     // pods are tiny (~0.3g dried), so values are near-negligible per pod.
     chilePequin: ingredientFactory('Chile Pequín / Chiltepín (Dried)', {
         nutrition: {
             [u.unit.name]: { servings: 1, servingSize: 1, calories: 1, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0.2, sodium: 0, sugar: 0, protein: 0, fiber: 0.1 },
         },
     }),
-    // Generic/typical nutrition (not from a specific brand's label) — standard USDA values
+    // Generic/typical nutrition (not from a specific brand's label) - standard USDA values
     // for one medium red bell pepper (~119g).
     redBellPepper: ingredientFactory('Red Bell Pepper', {
         nutrition: {
             [u.unit.name]: { servings: 1, servingSize: 1, calories: 31, fat: 0.3, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 7.3, sodium: 3, sugar: 5, protein: 1.2, fiber: 2.5 },
         },
     }),
-    // Generic/typical nutrition — standard USDA values for one raw garlic clove (~3g).
+    // Generic/typical nutrition - standard USDA values for one raw garlic clove (~3g).
     garlicClove: ingredientFactory('Garlic Clove', {
         nutrition: {
             [u.unit.name]: { servings: 1, servingSize: 1, calories: 4, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 1, sodium: 0.5, sugar: 0, protein: 0.2, fiber: 0.1 },
         },
     }),
-    // Generic/typical nutrition — standard USDA values for fresh cilantro, per 1 tbsp chopped (~1g).
+    // Generic/typical nutrition - standard USDA values for fresh cilantro, per 1 tbsp chopped (~1g).
     cilantro: ingredientFactory('Fresh Cilantro', {
         nutrition: {
             [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 1, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0.1, sodium: 0, sugar: 0, protein: 0, fiber: 0.1 },
         },
     }),
-    // Generic/typical nutrition — standard USDA values for ground cumin, per 1 tsp (~2.1g).
+    // Generic/typical nutrition - standard USDA values for ground cumin, per 1 tsp (~2.1g).
     cumin: ingredientFactory('Ground Cumin', {
         nutrition: {
             [u.tsp.name]: { servings: 1, servingSize: 1, calories: 8, fat: 0.5, saturatedFat: 0.1, transFat: 0, cholesterol: 0, carbs: 0.9, sodium: 4, sugar: 0.1, protein: 0.4, fiber: 0.2 },
         },
     }),
-    // Generic/typical nutrition — standard USDA values for chili powder, per 1 tsp (~2.7g).
+    // Generic/typical nutrition - standard USDA values for chili powder, per 1 tsp (~2.7g).
     chiliPowder: ingredientFactory('Chili Powder', {
         nutrition: {
             [u.tsp.name]: { servings: 1, servingSize: 1, calories: 8, fat: 0.4, saturatedFat: 0.1, transFat: 0, cholesterol: 0, carbs: 1.4, sodium: 26, sugar: 0.2, protein: 0.4, fiber: 0.9 },
+        },
+    }),
+    // From the product label: per 1 burger (71g); 4 burgers per 10 oz box. Sold as a
+    // countable frozen patty, so the recipe measures it by the unit and the box counts as 4.
+    drPraegersCrunchyCauliflowerBurger: ingredientFactory("Dr. Praeger's Crunchy Cauliflower Burger", {
+        defaultBrand: "Dr. Praeger's",
+        products: [{
+                brand: "Dr. Praeger's", variant: 'Crunchy Cauliflower Veggie Burgers (4 Count, 10 oz)',
+                size: 4, sizeUnit: u.unit,
+                // Price from the user; no stable direct product link on hand, so left blank
+                // (the shopping list will simply show the price without a deep link).
+                listings: [{ price: 4.37 }],
+                nutrition: {
+                    [u.unit.name]: { servings: 4, servingSize: 1, calories: 150, fat: 7, saturatedFat: 0.5, transFat: 0, cholesterol: 0, carbs: 20, sodium: 420, sugar: 1, protein: 3, fiber: 3 },
+                },
+            }],
+    }),
+    // Generic/typical nutrition - standard USDA values for yellow mustard, per 1 tsp (~5g).
+    mustard: ingredientFactory('Yellow Mustard', {
+        nutrition: {
+            [u.tsp.name]: { servings: 1, servingSize: 1, calories: 3, fat: 0.2, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0.4, sodium: 55, sugar: 0.1, protein: 0.2, fiber: 0.1 },
+        },
+    }),
+    // Generic/typical nutrition - a standard white hamburger bun (~50g).
+    hamburgerBun: ingredientFactory('Hamburger Bun', {
+        nutrition: {
+            [u.unit.name]: { servings: 1, servingSize: 1, calories: 120, fat: 2, saturatedFat: 0.5, transFat: 0, cholesterol: 0, carbs: 21, sodium: 206, sugar: 3, protein: 4, fiber: 1 },
+        },
+    }),
+    // Generic/typical nutrition - standard USDA values for dill pickles, per 1 medium spear (~35g).
+    pickle: ingredientFactory('Dill Pickle', {
+        nutrition: {
+            [u.unit.name]: { servings: 1, servingSize: 1, calories: 5, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 1.5, sodium: 340, sugar: 0.5, protein: 0, fiber: 0.5 },
         },
     }),
 };
@@ -4562,7 +4623,7 @@ registerGroup('Breakfast', [
         const steps = [];
         const s = (...newSteps) => steps.push(...newSteps);
         s(pan.preheat(300));
-        s(instruction('Flick a wet finger at the pan to test — the droplet should bead and skitter rather than vanish instantly. If it violently sprays everywhere, the pan is too hot — lower the temperature briefly', { equipment: [pan.name] }));
+        s(instruction('Flick a wet finger at the pan to test - the droplet should bead and skitter rather than vanish instantly. If it violently sprays everywhere, the pan is too hot - lower the temperature briefly', { equipment: [pan.name] }));
         s(pan.add([i.oliveOil(1.5, u.tsp)]));
         s(Timer.set(25, 's', 'Swirl oil across the whole cooking surface and let it warm', { equipment: [pan.name] }));
         s(bowl.add([
@@ -4574,11 +4635,11 @@ registerGroup('Breakfast', [
         const WHISKED = bowl.result;
         s(instruction('Turn the NuWave down to 250°F', { equipment: [pan.name] }));
         s(bowl.transfer(pan, [WHISKED]));
-        s(Timer.set(18, 's', "Don't touch — let the bottom begin to set", { equipment: [pan.name], ingredients: [WHISKED] }));
+        s(Timer.set(18, 's', "Don't touch - let the bottom begin to set", { equipment: [pan.name], ingredients: [WHISKED] }));
         s(instruction(`Gently push the cooked ${formatIngredient(WHISKED)} toward the center with a silicone spatula, tilting the pan so uncooked egg runs into the empty areas`, { equipment: [pan.name], ingredients: [WHISKED] }));
         s(Timer.set(12, 's', 'Let sit before the next fold', { equipment: [pan.name], ingredients: [WHISKED] }));
-        s(instruction(`Fold ${formatIngredient(WHISKED)} again, gently — avoid aggressively stirring against the stainless steel`, { equipment: [pan.name], ingredients: [WHISKED] }));
-        s(Timer.set(90, 's', 'Finish cooking, folding every 10-15s, until the eggs still look slightly wet — then turn off the NuWave', { equipment: [pan.name], ingredients: [WHISKED] }));
+        s(instruction(`Fold ${formatIngredient(WHISKED)} again, gently - avoid aggressively stirring against the stainless steel`, { equipment: [pan.name], ingredients: [WHISKED] }));
+        s(Timer.set(90, 's', 'Finish cooking, folding every 10-15s, until the eggs still look slightly wet - then turn off the NuWave', { equipment: [pan.name], ingredients: [WHISKED] }));
         s(instruction('Turn off the NuWave', { equipment: [pan.name] }));
         s(Timer.set(25, 's', 'Let residual heat finish the eggs', { equipment: [pan.name], ingredients: [WHISKED] }));
         return steps;
@@ -4602,9 +4663,9 @@ registerGroup('Breakfast', [
         return steps;
     })(), undefined, 2), { planMinutes: 2, portable: true }),
 ]);
-// Moved out of the Dinner array — registers itself under its own 'Cleaning' group
+// Moved out of the Dinner array - registers itself under its own 'Cleaning' group
 registerRecipe(createRecipe('clean-water-bottle', 'Clean Water Bottle', (() => {
-    // Tap water — free and nutritionally zero either way, so an approximate fill
+    // Tap water - free and nutritionally zero either way, so an approximate fill
     // amount here doesn't affect any cost/nutrition totals; it just lets each
     // "dump out" step reference the same water that was added.
     const RINSE_1 = i.water(15, u.fluidOunce);
@@ -4767,7 +4828,7 @@ registerGroup('Dinner', [
             equipment: ['sheet pan'],
             ingredients: [CARROTS, BELLA_MUSHROOMS, YELLOW_ONION],
         }));
-        s(Timer.set(20, 'm', 'Roast — do not move'));
+        s(Timer.set(20, 'm', 'Roast - do not move'));
         s(instruction(`Flip ${formatIngredient(CARROTS)}, ${formatIngredient(BELLA_MUSHROOMS)}, and ${formatIngredient(YELLOW_ONION)} on the sheet pan`, { equipment: ['sheet pan'], ingredients: [CARROTS, BELLA_MUSHROOMS, YELLOW_ONION] }));
         s(Timer.set(17, 'm', 'Roast until carrots are caramelized, mushrooms deeply browned, onions soft with crispy tips', { equipment: ['sheet pan'], ingredients: [CARROTS, BELLA_MUSHROOMS, YELLOW_ONION] }));
         s(Timer.set(5, 'm', 'Rest vegetables before serving'));
@@ -4854,7 +4915,7 @@ registerGroup('Dinner', [
         CARROTS.defaultBrand = 'CAL ORGANIC'; // this recipe shreds whole carrots itself, not pre-shredded
         const CABBAGE = i.cabbage(2, u.cup);
         // Real-world prep buys 3 packages of each (1.5 cups/package) and splits them across 4
-        // single-recipe batches, so this recipe's true share is 3/4 package = 1.125 cups — used
+        // single-recipe batches, so this recipe's true share is 3/4 package = 1.125 cups - used
         // here for accurate nutrition/shopping totals even though the step below still says the
         // whole-can "1.5 cups" that's actually measured out per batch.
         const CHICKPEAS = i.chickpeas(1.125, u.cup);
@@ -4929,7 +4990,7 @@ registerGroup('Dinner', [
             [THIGHS, 'smooth side down'],
         ]));
         s(instruction('Place lid fully on pan', { equipment: [pan.name] }));
-        s(pan.cook('Cook first side, covered — do not move', time.minutes(6), 325));
+        s(pan.cook('Cook first side, covered - do not move', time.minutes(6), 325));
         s(pan.flip());
         s(pan.cook('Cook second side, covered', time.minutes(6), 325));
         s(instruction('Remove lid', { equipment: [pan.name] }));
@@ -4979,6 +5040,49 @@ registerGroup('Dinner', [
         }));
         return steps;
     })()),
+    createRecipe('dr-praegers-cauliflower-burger-nuwave', "Dr. Praeger's Crunchy Cauliflower Burger - NuWave", (() => {
+        const pan = e.nuwavePan();
+        const board = e.cuttingBoard();
+        const knife = e.knife();
+        const BURGER = i.drPraegersCrunchyCauliflowerBurger(2, u.unit);
+        const OIL = i.oliveOil(1, u.spray);
+        const ONION = i.whiteOnion(1, u.unit);
+        const BUN = i.hamburgerBun(2, u.unit);
+        const MUSTARD = i.mustard(1, u.tbsp);
+        const PICKLE = i.pickle(2, u.unit);
+        const steps = [];
+        const s = (...newSteps) => steps.push(...newSteps);
+        s(pan.preheat(320));
+        s(pan.spray(OIL));
+        s(pan.add([[BURGER, 'both frozen, straight from the freezer']]));
+        const firstCook = pan.cook('Cook first side - both burgers at once', time.minutes(5), 320);
+        s(firstCook);
+        s(pan.flip());
+        const secondCook = pan.cook('Cook second side - both burgers at once', time.minutes(5), 320);
+        s(secondCook);
+        // Unlock the onion slicing the moment the second side's cook timer starts, but
+        // don't wait for it to finish - the cutter can prep while the burgers cook.
+        const sliceOnion = prep(`While the second side cooks, slice ${formatIngredient(ONION)}`, {
+            equipment: [board.name, knife.name], ingredients: [ONION],
+        });
+        s(sliceOnion.startWhen(secondCook));
+        s(instruction(`Optional: set ${pan.name} to 320° and cook ${formatIngredient(BURGER)} 2 more minutes for extra crunch`, {
+            equipment: [pan.name], ingredients: [BURGER],
+        }));
+        // Lets the user decide - "No" cooks 2 more minutes and re-asks; "Yes" finishes the burger.
+        s(Timer.gate(`Happy with the crunch on ${formatIngredient(BURGER)}?`, 2, 'm', {
+            equipment: [pan.name], ingredients: [BURGER],
+        }));
+        // Burgers are done - toast the buns (cut side down) on the still-hot pan.
+        s(instruction(`Place ${formatIngredient(BUN)} cut-side down on the pan`, {
+            equipment: [pan.name], ingredients: [BUN],
+        }));
+        s(pan.cook('Toast buns cut-side down until golden and crisp', time.minutes(1), 320));
+        s(instruction(`Assemble burger on ${formatIngredient(BUN)} with ${formatIngredient(MUSTARD)}, ${formatIngredient(ONION)}, ${formatIngredient(PICKLE)}, and ${formatIngredient(BURGER)}`, {
+            ingredients: [BUN, MUSTARD, ONION, PICKLE, BURGER],
+        }));
+        return steps;
+    })(), 'Dinner', 18),
 ]);
 registerGroup('Blueprint', [
     withPlan(createRecipe('protein-nutmix-oliveoil', 'Blueprint (Nutty Pudding) - Protein, Nut Mix & Olive Oil', [
@@ -5094,11 +5198,11 @@ registerGroup('Ingredients', [
 // ============================================================
 // TESTING
 // ============================================================
-// Not a real dish — exercises every step type, equipment method, and
+// Not a real dish - exercises every step type, equipment method, and
 // nutrition/cost edge case in one flow so app changes can be manually smoke
 // tested end to end. Hidden from the default Select list; reachable via
 // search, "Show hidden recipes", or ?recipe=test-recipe-all-features.
-// Timers/gates are kept short (≤10s) — tap 3× rapidly on any of them to skip
+// Timers/gates are kept short (≤10s) - tap 3× rapidly on any of them to skip
 // instantly anyway.
 registerRecipe(withPlan(createRecipe('test-recipe-all-features', 'Test Recipe (All Features)', (() => {
     const bowl = e.bowl('test bowl');
@@ -5109,7 +5213,7 @@ registerRecipe(withPlan(createRecipe('test-recipe-all-features', 'Test Recipe (A
     const nuwave = e.nuwavePan();
     const cuttingBoard = e.cuttingBoard();
     const platter = e.platter();
-    // requiresDateLabel: true — exercises the auto-inserted put-away/date-label step
+    // requiresDateLabel: true - exercises the auto-inserted put-away/date-label step
     const MACADAMIA_MILK = i.macadamiaNutMilk(1, u.cup);
     // ok nutrition + ok cost, via a chained density conversion (cup → pound → ounce)
     const CARROT_OK = i.carrot(1, u.cup);
@@ -5119,23 +5223,23 @@ registerRecipe(withPlan(createRecipe('test-recipe-all-features', 'Test Recipe (A
     const CHICKPEAS_BAG = i.chickpeas(1, u.bag);
     // missing nutrition + missing cost: no nutrition block, no products at all
     const OIL_SPRAY = i.avocadoOil(1, u.spray);
-    // missing nutrition, but ok cost — exercises the split ok/missing state on one ingredient
+    // missing nutrition, but ok cost - exercises the split ok/missing state on one ingredient
     const PEPPER_OZ = i.blackPepper(1, u.ounce);
     const MUSHROOM = i.kingOysterMushroom(1, u.unit);
     const steps = [];
     const s = (...newSteps) => steps.push(...newSteps);
-    s(info('Test recipe — exercises every step type, equipment method, and nutrition/cost edge case. Tap 3× rapidly on any timer/gate to skip it instantly.'));
+    s(info('Test recipe - exercises every step type, equipment method, and nutrition/cost edge case. Tap 3× rapidly on any timer/gate to skip it instantly.'));
     s(info('Info steps can link to another recipe.', { linkRecipeId: 'blueprint-smoothie' }));
-    s(prepOnly('Prep-only step — only visible on the Prep screen'));
-    s(prep('Prep step — visible on both the Prep screen and here'));
+    s(prepOnly('Prep-only step - only visible on the Prep screen'));
+    s(prep('Prep step - visible on both the Prep screen and here'));
     s(bowl.add([MACADAMIA_MILK, CARROT_OK, CARROT_NO_UNIT, CHICKPEAS_BAG, OIL_SPRAY, PEPPER_OZ], 'nutrition/cost edge cases'));
     // Auto-inserted cleanup-label step for MACADAMIA_MILK lands right here.
     s(bowl.mix('test mix result'));
-    s(instruction(`Use ${formatIngredient(bowl.result)} (composite ingredient — excluded from the nutrition breakdown)`, {
+    s(instruction(`Use ${formatIngredient(bowl.result)} (composite ingredient - excluded from the nutrition breakdown)`, {
         ingredients: [bowl.result], equipment: [bowl.name],
     }));
-    s(oven.preheat(400)); // fixed 15 min duration — tap 3× to skip
-    s(nuwave.preheat(325)); // NuwaveEquipment override — fixed 2 min duration — tap 3× to skip
+    s(oven.preheat(400)); // fixed 15 min duration - tap 3× to skip
+    s(nuwave.preheat(325)); // NuwaveEquipment override - fixed 45 s duration - tap 3× to skip
     s(pan.add([i.oliveOil(1, u.tbsp)]));
     s(cuttingBoard.slice(MUSHROOM));
     s(pan.add([MUSHROOM]));
@@ -5143,7 +5247,7 @@ registerRecipe(withPlan(createRecipe('test-recipe-all-features', 'Test Recipe (A
     // place()/broil()'s auto-inheritance of a nested vessel's contents, not an empty snapshot.
     s(pot.add([i.seaSalt(0.25, u.tsp), i.water(8, u.fluidOunce)]));
     s(oven.place(pan, 'Bake test pan', time.seconds(8), 375));
-    s(oven.place(pot)); // label/duration-less overload — plain instruction step
+    s(oven.place(pot)); // label/duration-less overload - plain instruction step
     const panTransferred = pan.transfer(mixBowl, [MUSHROOM]);
     s(panTransferred);
     s(mixBowl.spray(i.avocadoOil(1, u.spray)));

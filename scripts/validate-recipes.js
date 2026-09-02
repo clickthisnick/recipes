@@ -509,6 +509,68 @@ while ((sm = STEP_FACTORY_RE.exec(src)) !== null) {
     }
 }
 
+// ── Check 5 (error): cooking oil above its smoke point, pan/direct-heat only ──
+//
+// Each oil has a smoke point in °F — the temperature where it starts to burn and
+// turn bitter/acrid in a pan. If a recipe heats that oil above its smoke point, it
+// burns, and the fix is a higher-smoke-point oil (e.g. avocado) or a lower heat.
+//
+// Scoped per createRecipe() block, and only for *direct-heat* cooking on a pan or
+// NuWave pan. Oven roasting is excluded: the oil is absorbed onto wet food that
+// steams near 212°F while water's present, so it never crosses its smoke point even
+// in a 450°F oven. A dressing that merely lists an oil without heating it is also
+// never flagged. Error (not a warning): oil past its smoke point on a hot pan will
+// burn. The all-features test recipe deliberately exercises every code path, so
+// it's exempted - real recipes must comply.
+const OIL_SMOKE_POINTS = {
+    // Extra Virgin Olive Oil
+    oliveOil: 320,
+    // Avocado oil - far higher smoke point, the usual direct swap for olive oil
+    avocadoOil: 500,
+};
+
+{
+    const createRe = /\bcreateRecipe\(\s*'([^']+)'/g;
+    let cm;
+    while ((cm = createRe.exec(src)) !== null) {
+        const openIdx  = cm.index + 'createRecipe'.length; // index of '('
+        const closeIdx = readBalanced(src, openIdx);
+        if (closeIdx === -1) continue;
+        const block  = src.slice(cm.index, closeIdx + 1);
+        const lineNo = src.slice(0, cm.index).split('\n').length;
+
+        if (cm[1] === 'test-recipe-all-features') continue;
+
+        // Only flag oils used on a direct-heat pan surface — var must be *assigned*
+        // here (`const v = e.pan(...)`), not merely mentioned in step text.
+        if (!/const\s+\w+\s*=\s*e\.(?:pan|nuwavePan)\(/.test(block)) continue;
+
+        const usedOils = Object.keys(OIL_SMOKE_POINTS).filter(
+            (key) => new RegExp(`\\bi\\.${key}\\(`).test(block)
+        );
+        if (usedOils.length === 0) continue;
+
+        // Temperature signals that matter for burning: explicit preheat() calls and
+        // "to 350°" phrasing. Cook-step seconds are deliberately excluded - the step
+        // that can actually burn the oil is the preheat.
+        const temps = [];
+        for (const t of block.matchAll(/\.preheat\([^)]*?(\d{3,})\s*\)/g)) temps.push(Number(t[1]));
+        for (const t of block.matchAll(/\bto\s+(\d{3,})\s*°/g)) temps.push(Number(t[1]));
+        const maxTemp = temps.length ? Math.max(...temps) : 0;
+        if (maxTemp === 0) continue;
+
+        for (const key of usedOils) {
+            const smoke = OIL_SMOKE_POINTS[key];
+            if (maxTemp <= smoke) continue;
+            errors.push(
+                `line ${lineNo}: recipe "${cm[1]}" renders ${key} above its smoke point ` +
+                `(${smoke}°F) - preheat is ${maxTemp}°F; swap in a higher-smoke-point oil ` +
+                `(e.g. avocado) or lower the temperature`
+            );
+        }
+    }
+}
+
 // ── Report ────────────────────────────────────────────────────────────────────
 
 if (warnings.length > 0) {
