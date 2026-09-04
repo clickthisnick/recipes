@@ -5765,6 +5765,9 @@ registerGroup('Dinner', [
 
         s(pan.preheat(320));
         s(pan.spray(OIL));
+        s(instruction(`Let ${formatIngredient(OIL)} heat in ${pan.name} until it shimmers, about 30 seconds`, {
+            equipment: [pan.name], ingredients: [OIL],
+        }));
         s(pan.add([[BURGER, 'both frozen, straight from the freezer']]));
         const firstCook  = pan.cook('Cook first side - both burgers at once', time.minutes(5), 320);
         s(firstCook);

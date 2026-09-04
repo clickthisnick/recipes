@@ -3516,7 +3516,7 @@ h2 { margin-top: 0; font-size: 28px; }
 // Replaced with the real compile timestamp by scripts/validate-recipes.js's postbuild
 // step, right after `tsc` emits dist/file.js. Left as-is (and reported as "dev build")
 // when running straight from source, e.g. under `vite`.
-const BUILD_TIME = '2026-09-01T23:24:49.459Z';
+const BUILD_TIME = '2026-09-04T11:51:26.218Z';
 function formatBuildTime() {
     const date = new Date(BUILD_TIME);
     if (isNaN(date.getTime()))
@@ -5054,6 +5054,9 @@ registerGroup('Dinner', [
         const s = (...newSteps) => steps.push(...newSteps);
         s(pan.preheat(320));
         s(pan.spray(OIL));
+        s(instruction(`Let ${formatIngredient(OIL)} heat in ${pan.name} until it shimmers, about 30 seconds`, {
+            equipment: [pan.name], ingredients: [OIL],
+        }));
         s(pan.add([[BURGER, 'both frozen, straight from the freezer']]));
         const firstCook = pan.cook('Cook first side - both burgers at once', time.minutes(5), 320);
         s(firstCook);
