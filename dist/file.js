@@ -281,9 +281,30 @@ class Equipment {
             ...this.nestedVessels.flatMap(v => [v.name, ...v.nestedVessels.map(n => n.name)]),
         ];
     }
+    get targetTemp() { return this._targetTemp; }
     preheat(temperature) {
+        this._targetTemp = temperature;
         return timerStep(`Preheat ${this.name} to ${temperature}°`, time.minutes(15), {
             equipment: [this.name],
+        });
+    }
+    // Adds oil to this vessel.  Mirror of add() - keeps the oil in `contents` so later
+    // steps can reference it,but gives oils a dedicated verb on Equipment: e.g.
+    // `pan.addOil(oil)`` then `pan.heatUp()` reads the pan's temp to time the wait..
+    addOil(oil, note) {
+        this.contents.push(oil);
+        const single = createStep({
+            type: 'instruction',
+            text: formatIngredient(oil),
+            ingredients: [oil],
+            equipment: [this.name],
+        });
+        return createStep({
+            type: 'instruction',
+            text: `Add ${formatIngredient(oil)} to ${this.name}${note ? ` - ${note}` : ''}`,
+            equipment: [this.name],
+            ingredients: [oil],
+            children: [single],
         });
     }
     cook(label, durationSeconds, temperature, extraEquipment = []) {
@@ -352,13 +373,33 @@ class Equipment {
             ingredients: [ingredient],
         });
     }
-    spray(ingredient) {
-        return createStep({
+    spray(ingredient, opts = {}) {
+        const sprayStep = createStep({
             type: 'instruction',
             text: `Spray ${ingredient.name} on ${this.name}`,
             equipment: [this.name],
             ingredients: [ingredient],
         });
+        if (!opts.heatUp)
+            return [sprayStep];
+        // Two independent top-level steps (spray, then heat-up timer) rather than a
+        // container: keeps the heat-up timer on screen after it completes and avoids
+        // duplicating the "spray" text in a container header + child.
+        return [sprayStep, this.heatUp(ingredient)];
+    }
+    // Heats oil on this pan up to its shimmer point before food goes in.  A real countdown
+    // timer, not a passive instruction -the point is the delay.  How long depends on how hot
+    // the pan already is (its preheat target)and on the oil:a hotter pan shimmers faster,
+    // and an oil with a lower shimmerAt reaches shimmer sooner than a high-temp one..
+    heatUp(oil, overrideSeconds) {
+        const target = this.targetTemp ?? 325;
+        const shimmerAt = oil ? (oil.shimmerAt ?? 300) : 300;
+        const delta = Math.max(Math.min(target - shimmerAt, 150), 20);
+        const seconds = overrideSeconds ?? Math.round((delta / 65 + 0.6) * 30);
+        const what = oil ? formatIngredient(oil) : 'Oil';
+        return timerStep(overrideSeconds !== undefined
+            ? `Let ${what} heat up in ${this.name} until it shimmers`
+            : `Heat ${what} to shimmer (${target}° pan)`, seconds, { equipment: [this.name], ...(oil ? { ingredients: [oil] } : {}) });
     }
     flip() {
         return createStep({
@@ -420,6 +461,7 @@ class Equipment {
 class NuwaveEquipment extends Equipment {
     constructor(label) { super('Nuwave pan', label); }
     preheat(temperature) {
+        this._targetTemp = temperature;
         const duration = temperature <= 350 ? time.seconds(45) : time.minutes(2);
         return timerStep(`Preheat ${this.name} to ${temperature}°`, duration, { equipment: [this.name] });
     }
@@ -2141,7 +2183,10 @@ function renderStep(step, onDone) {
         childWrap.className = 'container-children';
         panel.appendChild(childWrap);
         const checkDone = () => {
-            const remaining = childWrap.querySelectorAll('.panel:not(.done-child)').length;
+            // A child is "done" when it's been tapped (done-child) or, for a timer/gate
+            // child, when its countdown finished (completed/skipped/ringing) - those
+            // panels stay in the DOM but must still release the container.
+            const remaining = childWrap.querySelectorAll('.panel:not(.done-child):not(.completed):not(.skipped):not(.ringing)').length;
             if (remaining === 0) {
                 panel.remove();
                 onDone?.();
@@ -3516,7 +3561,7 @@ h2 { margin-top: 0; font-size: 28px; }
 // Replaced with the real compile timestamp by scripts/validate-recipes.js's postbuild
 // step, right after `tsc` emits dist/file.js. Left as-is (and reported as "dev build")
 // when running straight from source, e.g. under `vite`.
-const BUILD_TIME = '2026-09-04T11:51:26.218Z';
+const BUILD_TIME = '2026-09-06T20:48:43.052Z';
 function formatBuildTime() {
     const date = new Date(BUILD_TIME);
     if (isNaN(date.getTime()))
@@ -3717,6 +3762,7 @@ export const i = {
     // 0 cal/0g fat per spray (the same convention as e.g. PAM) - not a placeholder zero.
     avocadoOil: ingredientFactory('Avocado Oil', {
         defaultBrand: 'Chosen Foods',
+        shimmerAt: 330,
         products: [{
                 brand: 'Chosen Foods', variant: 'Organic 100% Avocado Oil', size: 16.9, sizeUnit: u.fluidOunce, organic: true,
                 listings: [{ price: 14.99, link: 'https://www.amazon.com/CHOSEN-FOODS-Organic-100-Avocado/dp/B0CTCXXG2J' }],
@@ -4335,6 +4381,7 @@ export const i = {
     }),
     oliveOil: ingredientFactory('Extra Virgin Olive Oil', {
         defaultBrand: 'Blueprint',
+        shimmerAt: 300,
         conversions: {
             [u.shot.name]: { to: u.fluidOunce, factor: 1 }, // 1 shot = 1 fl oz
         },
@@ -4624,8 +4671,9 @@ registerGroup('Breakfast', [
         const s = (...newSteps) => steps.push(...newSteps);
         s(pan.preheat(300));
         s(instruction('Flick a wet finger at the pan to test - the droplet should bead and skitter rather than vanish instantly. If it violently sprays everywhere, the pan is too hot - lower the temperature briefly', { equipment: [pan.name] }));
-        s(pan.add([i.oliveOil(1.5, u.tsp)]));
-        s(Timer.set(25, 's', 'Swirl oil across the whole cooking surface and let it warm', { equipment: [pan.name] }));
+        const OIL = i.oliveOil(1.5, u.tsp);
+        s(pan.addOil(OIL));
+        s(pan.heatUp(OIL));
         s(bowl.add([
             i.egg(3, u.unit),
             i.seaSalt(0.125, u.tsp),
@@ -4792,11 +4840,11 @@ registerGroup('Dinner', [
         s(batter.mix('batter'));
         s(cuttingBoard.slice(MUSHROOMS));
         s(batter.combine([MUSHROOMS], 'dip, let drain').waitFor(transferToBowl));
-        s(pankoPan.spray(i.avocadoOil(1, u.spray)));
+        s(...pankoPan.spray(i.avocadoOil(1, u.spray)));
         s(pankoBowl.combine([batter.result], 'coat with panko'));
         pankoBowl.result.rename('Breaded King Oyster Mushroom');
         s(pankoBowl.transfer(pankoPan, [pankoBowl.result]));
-        s(pankoPan.spray(i.avocadoOil(1, u.spray)));
+        s(...pankoPan.spray(i.avocadoOil(1, u.spray)));
         s(oven.place(pankoPan));
         s(oven.cook('Bake mushrooms (first half)', time.minutes(12), 450));
         s(pankoPan.flip());
@@ -4985,10 +5033,9 @@ registerGroup('Dinner', [
         s(seasoningBowl.mix());
         s(instruction(`Season ${formatIngredient(THIGHS)} on both sides with seasoning mixture`, { ingredients: [THIGHS] }));
         s(pan.preheat(325));
-        s(pan.add([
-            i.avocadoOil(1, u.spray),
-            [THIGHS, 'smooth side down'],
-        ]));
+        const OIL = i.avocadoOil(1, u.spray);
+        s(...pan.spray(OIL, { heatUp: true }));
+        s(pan.add([[THIGHS, 'smooth side down']]));
         s(instruction('Place lid fully on pan', { equipment: [pan.name] }));
         s(pan.cook('Cook first side, covered - do not move', time.minutes(6), 325));
         s(pan.flip());
@@ -5053,10 +5100,7 @@ registerGroup('Dinner', [
         const steps = [];
         const s = (...newSteps) => steps.push(...newSteps);
         s(pan.preheat(320));
-        s(pan.spray(OIL));
-        s(instruction(`Let ${formatIngredient(OIL)} heat in ${pan.name} until it shimmers, about 30 seconds`, {
-            equipment: [pan.name], ingredients: [OIL],
-        }));
+        s(...pan.spray(OIL, { heatUp: true }));
         s(pan.add([[BURGER, 'both frozen, straight from the freezer']]));
         const firstCook = pan.cook('Cook first side - both burgers at once', time.minutes(5), 320);
         s(firstCook);
@@ -5069,13 +5113,6 @@ registerGroup('Dinner', [
             equipment: [board.name, knife.name], ingredients: [ONION],
         });
         s(sliceOnion.startWhen(secondCook));
-        s(instruction(`Optional: set ${pan.name} to 320° and cook ${formatIngredient(BURGER)} 2 more minutes for extra crunch`, {
-            equipment: [pan.name], ingredients: [BURGER],
-        }));
-        // Lets the user decide - "No" cooks 2 more minutes and re-asks; "Yes" finishes the burger.
-        s(Timer.gate(`Happy with the crunch on ${formatIngredient(BURGER)}?`, 2, 'm', {
-            equipment: [pan.name], ingredients: [BURGER],
-        }));
         // Burgers are done - toast the buns (cut side down) on the still-hot pan.
         s(instruction(`Place ${formatIngredient(BUN)} cut-side down on the pan`, {
             equipment: [pan.name], ingredients: [BUN],
@@ -5253,7 +5290,7 @@ registerRecipe(withPlan(createRecipe('test-recipe-all-features', 'Test Recipe (A
     s(oven.place(pot)); // label/duration-less overload - plain instruction step
     const panTransferred = pan.transfer(mixBowl, [MUSHROOM]);
     s(panTransferred);
-    s(mixBowl.spray(i.avocadoOil(1, u.spray)));
+    s(...mixBowl.spray(i.avocadoOil(1, u.spray)));
     s(mixBowl.flip());
     s(mixBowl.stir());
     s(oven.broil('Broil test', time.seconds(8))); // inherits contents from both nested vessels (pan + pot)
