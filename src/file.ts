@@ -5980,6 +5980,29 @@ registerGroup('Ingredients', [
     ]), { planMinutes: 3, portable: false }),
 ]);
 
+registerRecipe(createRecipe(
+    'freeze-bananas',
+    'Freeze Bananas',
+    (() => {
+        const steps: Step[] = [];
+        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        const BANANA = i.banana(4, u.unit);
+        const bag    = e.siliconeBag();
+
+        s(instruction(`Peel ${formatIngredient(BANANA)}`, { ingredients: [BANANA] }));
+        s(instruction('Cut off both ends of each one'));
+        s(instruction('Cut each one in half crosswise'));
+        s(bag.add([BANANA]));
+        s(Timer.set(60, 'm', 'Freeze'));
+        s(instruction('Shuffle the pieces around in the bag so they do not stick together', { equipment: [bag.name] }));
+        s(instruction('Return the bag to the freezer', { equipment: [bag.name] }));
+
+        return steps;
+    })(),
+    'Ingredients',
+    70,
+));
+
 // ============================================================
 // TESTING
 // ============================================================

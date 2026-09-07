@@ -3561,7 +3561,7 @@ h2 { margin-top: 0; font-size: 28px; }
 // Replaced with the real compile timestamp by scripts/validate-recipes.js's postbuild
 // step, right after `tsc` emits dist/file.js. Left as-is (and reported as "dev build")
 // when running straight from source, e.g. under `vite`.
-const BUILD_TIME = '2026-09-06T20:48:43.052Z';
+const BUILD_TIME = '2026-09-07T16:27:43.287Z';
 function formatBuildTime() {
     const date = new Date(BUILD_TIME);
     if (isNaN(date.getTime()))
@@ -5235,6 +5235,20 @@ registerGroup('Ingredients', [
         }),
     ]), { planMinutes: 3, portable: false }),
 ]);
+registerRecipe(createRecipe('freeze-bananas', 'Freeze Bananas', (() => {
+    const steps = [];
+    const s = (...newSteps) => steps.push(...newSteps);
+    const BANANA = i.banana(4, u.unit);
+    const bag = e.siliconeBag();
+    s(instruction(`Peel ${formatIngredient(BANANA)}`, { ingredients: [BANANA] }));
+    s(instruction('Cut off both ends of each one'));
+    s(instruction('Cut each one in half crosswise'));
+    s(bag.add([BANANA]));
+    s(Timer.set(60, 'm', 'Freeze'));
+    s(instruction('Shuffle the pieces around in the bag so they do not stick together', { equipment: [bag.name] }));
+    s(instruction('Return the bag to the freezer', { equipment: [bag.name] }));
+    return steps;
+})(), 'Ingredients', 70));
 // ============================================================
 // TESTING
 // ============================================================
