@@ -5907,7 +5907,7 @@ registerGroup('Lentils', [
         s(Timer.set(24, 'm', 'Cook lentils', { equipment: [pot.name], ingredients: [LENTILS, WATER] }));
         s(instruction(`Strain ${formatIngredient(LENTILS)} through a colander`, { equipment: [pot.name, colander.name], ingredients: [LENTILS] }));
         s(Timer.set(10, 'm', 'Let lentils cool', { ingredients: [LENTILS] }));
-        s(instruction('Portion cooked lentils into thirds (~139g each) into three stainless steel containers', { equipment: [pot.name], ingredients: [LENTILS] }));
+        s(Timer.set(10, 'm', 'Portion cooked lentils into thirds (~139g each) into three stainless steel containers', { equipment: [pot.name], ingredients: [LENTILS] }));
         s(instruction('Rinse pot and wipe dry with a paper towel (Otherwise Pot Stains)', { equipment: [pot.name] }));
         return steps;
     })()), { planMinutes: 3, portable: true, prepMinutes: 24, perishableDays: 3, sortOrder: 0 }),
