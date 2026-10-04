@@ -3561,7 +3561,7 @@ h2 { margin-top: 0; font-size: 28px; }
 // Replaced with the real compile timestamp by scripts/validate-recipes.js's postbuild
 // step, right after `tsc` emits dist/file.js. Left as-is (and reported as "dev build")
 // when running straight from source, e.g. under `vite`.
-const BUILD_TIME = '2026-09-27T00:58:07.717Z';
+const BUILD_TIME = '2026-10-04T22:13:15.391Z';
 function formatBuildTime() {
     const date = new Date(BUILD_TIME);
     if (isNaN(date.getTime()))
@@ -4123,6 +4123,20 @@ export const i = {
             [u.tbsp.name]: { servings: 7, servingSize: 2, calories: 100, fat: 7, saturatedFat: 1, transFat: 0, cholesterol: 0, carbs: 9, sodium: 330, sugar: 6, protein: 2, fiber: 1 },
         },
     }),
+    // Generic/typical nutrition - standard USDA values for cooked quinoa, per 1 cup (~185g).
+    quinoa: ingredientFactory('Cooked Quinoa', {
+        nutrition: {
+            [u.cup.name]: { servings: 1, servingSize: 1, calories: 222, fat: 3.6, saturatedFat: 0.4, transFat: 0, cholesterol: 0, carbs: 39, sodium: 13, sugar: 1.6, protein: 8.1, fiber: 5.2 },
+        },
+    }),
+    // Generic/typical nutrition - standard USDA values for canned black beans, drained,
+    // per 1 cup. One 15 oz (425 g) can yields ~1.5 cups drained, which is how the recipe
+    // measures it.
+    blackBean: ingredientFactory('Black Beans', {
+        nutrition: {
+            [u.cup.name]: { servings: 1, servingSize: 1, calories: 218, fat: 0.9, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 40, sodium: 460, sugar: 1, protein: 14.5, fiber: 16.6 },
+        },
+    }),
     chickpeas: ingredientFactory('Chickpeas (Garbanzo Beans)', {
         defaultBrand: '365',
         conversions: {
@@ -4528,6 +4542,12 @@ export const i = {
     cumin: ingredientFactory('Ground Cumin', {
         nutrition: {
             [u.tsp.name]: { servings: 1, servingSize: 1, calories: 8, fat: 0.5, saturatedFat: 0.1, transFat: 0, cholesterol: 0, carbs: 0.9, sodium: 4, sugar: 0.1, protein: 0.4, fiber: 0.2 },
+        },
+    }),
+    // Generic/typical nutrition - standard USDA values for ground coriander, per 1 tsp (~1.8g).
+    coriander: ingredientFactory('Ground Coriander', {
+        nutrition: {
+            [u.tsp.name]: { servings: 1, servingSize: 1, calories: 5, fat: 0.3, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 1, sodium: 1, sugar: 0.1, protein: 0.2, fiber: 0.5 },
         },
     }),
     // Generic/typical nutrition - standard USDA values for chili powder, per 1 tsp (~2.7g).
@@ -5123,6 +5143,54 @@ registerGroup('Dinner', [
         }));
         return steps;
     })(), 'Dinner', 18),
+    withPlan(createRecipe('quinoa-falafel', 'Quinoa Falafel', (() => {
+        const steps = [];
+        const s = (...newSteps) => steps.push(...newSteps);
+        const bowl = e.bowl('mixing bowl');
+        const pasteBowl = e.bowl('small bowl');
+        const colander = e.colander();
+        const pot = e.pot();
+        const oven = e.oven();
+        const QUINOA = i.quinoa(1, u.cup);
+        const BEANS = i.blackBean(1.5, u.cup);
+        const GARLIC = i.garlicClove(3, u.unit);
+        s(info('Makes 24 patties. Keeps 3-4 days in the fridge, or 1 month in the freezer'));
+        s(prep('Rinse 1 cup dry quinoa in a fine-mesh strainer under cold water', { equipment: [pot.name] }));
+        s(prep('Add the rinsed quinoa and 2 cups water to a small pot, cover, and set over high heat', { equipment: [pot.name] }));
+        s(timerStep('Bring quinoa and water to a boil on the induction stovetop (set to 475°)', time.minutes(3), { prep: true, equipment: [pot.name] }));
+        s(timerStep('Simmer quinoa, covered, on the induction stovetop (set to 215°)', time.minutes(15), { prep: true, equipment: [pot.name] }));
+        s(timerStep('Fluff the quinoa and let it cool completely before using', time.minutes(15), { prep: true, equipment: [pot.name] }));
+        s(colander.add([BEANS]));
+        s(instruction(`Strain ${formatIngredient(BEANS)} and mash them`, { ingredients: [BEANS], equipment: [colander.name] }));
+        s(pasteBowl.add([
+            [i.water(4.5, u.tsp), ''],
+            [i.psyllium(1.5, u.tsp), ''],
+        ], 'stir into a smooth paste'));
+        s(bowl.add([
+            [QUINOA, 'cooked and cooled'],
+            [BEANS, 'mashed'],
+            [GARLIC, 'minced'],
+            [i.seaSalt(0.5, u.tsp), ''],
+            [i.cumin(1, u.tsp), ''],
+            [i.coriander(0.5, u.tsp), ''],
+        ], 'stir into a textured dough'));
+        s(instruction(`Fold the ${formatIngredient(i.psyllium(1.5, u.tsp))} paste into the dough until evenly combined`, {
+            equipment: [bowl.name, pasteBowl.name],
+            ingredients: [i.psyllium(1.5, u.tsp)],
+        }));
+        s(instruction('Scoop 1.5 tbsp portions and press into discs about 1.5 in across and ½ in thick', {
+            equipment: [bowl.name],
+        }));
+        s(instruction(`Line a sheet pan with parchment, place the discs, and spray lightly with ${formatIngredient(i.oliveOil(1, u.spray))}`, {
+            equipment: [oven.name],
+            ingredients: [i.oliveOil(1, u.spray)],
+        }));
+        s(oven.cook('Bake at 375°', time.minutes(15), 375));
+        s(instruction('Flip the patties', { equipment: [oven.name] }));
+        s(oven.cook('Bake until edges are golden', time.minutes(10), 375));
+        s(Timer.gate('Are the edges golden?', 2, 'm', { equipment: [oven.name] }));
+        return steps;
+    })()), { planMinutes: 20, portable: false, prepMinutes: 25, perishableDays: 4 }),
 ]);
 registerGroup('Blueprint', [
     withPlan(createRecipe('protein-nutmix-oliveoil', 'Blueprint (Nutty Pudding) - Protein, Nut Mix & Olive Oil', [
