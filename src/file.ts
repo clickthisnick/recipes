@@ -5898,7 +5898,8 @@ registerGroup('Dinner', [
         s(prep('Add the rinsed quinoa and 2 cups water to a small pot, cover, and set over high heat', { equipment: [pot.name] }));
         s(timerStep('Bring quinoa and water to a boil on the induction stovetop (set to 475°)', time.minutes(3), { prep: true, equipment: [pot.name] }));
         s(timerStep('Simmer quinoa, covered, on the induction stovetop (set to 215°)', time.minutes(15), { prep: true, equipment: [pot.name] }));
-        s(timerStep('Fluff the quinoa and let it cool completely before using', time.minutes(15), { prep: true, equipment: [pot.name] }));
+        const quinoaCooled = timerStep('Fluff the quinoa and let it cool completely before using', time.minutes(15), { prep: true, equipment: [pot.name] });
+        s(quinoaCooled);
         s(colander.add([BEANS]));
         s(instruction(`Strain ${formatIngredient(BEANS)} and mash them`, { ingredients: [BEANS], equipment: [colander.name] }));
 
@@ -5913,7 +5914,7 @@ registerGroup('Dinner', [
             [i.seaSalt(0.5, u.tsp), ''],
             [i.cumin(1, u.tsp), ''],
             [i.coriander(0.5, u.tsp), ''],
-        ], 'stir into a textured dough'));
+        ], 'stir into a textured dough').waitFor(quinoaCooled));
         s(instruction(`Fold the ${formatIngredient(i.psyllium(1.5, u.tsp))} paste into the dough until evenly combined`, {
             equipment: [bowl.name, pasteBowl.name],
             ingredients: [i.psyllium(1.5, u.tsp)],

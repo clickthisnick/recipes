@@ -3561,7 +3561,7 @@ h2 { margin-top: 0; font-size: 28px; }
 // Replaced with the real compile timestamp by scripts/validate-recipes.js's postbuild
 // step, right after `tsc` emits dist/file.js. Left as-is (and reported as "dev build")
 // when running straight from source, e.g. under `vite`.
-const BUILD_TIME = '2026-10-04T22:13:15.391Z';
+const BUILD_TIME = '2026-10-05T01:06:34.099Z';
 function formatBuildTime() {
     const date = new Date(BUILD_TIME);
     if (isNaN(date.getTime()))
@@ -5159,7 +5159,8 @@ registerGroup('Dinner', [
         s(prep('Add the rinsed quinoa and 2 cups water to a small pot, cover, and set over high heat', { equipment: [pot.name] }));
         s(timerStep('Bring quinoa and water to a boil on the induction stovetop (set to 475°)', time.minutes(3), { prep: true, equipment: [pot.name] }));
         s(timerStep('Simmer quinoa, covered, on the induction stovetop (set to 215°)', time.minutes(15), { prep: true, equipment: [pot.name] }));
-        s(timerStep('Fluff the quinoa and let it cool completely before using', time.minutes(15), { prep: true, equipment: [pot.name] }));
+        const quinoaCooled = timerStep('Fluff the quinoa and let it cool completely before using', time.minutes(15), { prep: true, equipment: [pot.name] });
+        s(quinoaCooled);
         s(colander.add([BEANS]));
         s(instruction(`Strain ${formatIngredient(BEANS)} and mash them`, { ingredients: [BEANS], equipment: [colander.name] }));
         s(pasteBowl.add([
@@ -5173,7 +5174,7 @@ registerGroup('Dinner', [
             [i.seaSalt(0.5, u.tsp), ''],
             [i.cumin(1, u.tsp), ''],
             [i.coriander(0.5, u.tsp), ''],
-        ], 'stir into a textured dough'));
+        ], 'stir into a textured dough').waitFor(quinoaCooled));
         s(instruction(`Fold the ${formatIngredient(i.psyllium(1.5, u.tsp))} paste into the dough until evenly combined`, {
             equipment: [bowl.name, pasteBowl.name],
             ingredients: [i.psyllium(1.5, u.tsp)],
