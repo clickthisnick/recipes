@@ -4589,6 +4589,18 @@ export const i = {
         },
     }),
 
+    blueZonesBasilPestoVeggieBowl: ingredientFactory('Blue Zones Kitchen Basil Pesto Veggie Bowl', {
+        defaultBrand: 'Blue Zones Kitchen',
+        products: [{
+            brand: 'Blue Zones Kitchen', variant: 'Basil Pesto Veggie Bowl', size: 8.5, sizeUnit: u.ounce, packageUnit: u.unit,
+            listings: [{ store: stores.wholeFoods, price: 7.99, link: 'https://www.wholefoodsmarket.com/grocery/product/blue-zones-blue-zones-kitchen-basil-pesto-veggie-bowl-8-5-ounce-b0f24t4vqj' }],
+        }],
+        nutrition: {
+            // 1 bowl (8.5 oz) = 1 serving, per the product label
+            [u.unit.name]: { servings: 1, servingSize: 1, calories: 320, fat: 21, saturatedFat: 2.5, transFat: 0, cholesterol: 0, carbs: 27, sodium: 550, sugar: 3, protein: 9, fiber: 7 },
+        },
+    }),
+
     carrot: ingredientFactory('Carrots', {
         defaultBrand: '365',
         products: [{
@@ -5915,7 +5927,7 @@ registerGroup('Dinner', [
             [i.cumin(1, u.tsp), ''],
             [i.coriander(0.5, u.tsp), ''],
         ], 'stir into a textured dough').waitFor(quinoaCooled));
-        s(instruction(`Fold the ${formatIngredient(i.psyllium(1.5, u.tsp))} paste into the dough until evenly combined`, {
+            s(instruction(`Fold the ${formatIngredient(i.psyllium(1.5, u.tsp))} paste into the dough until evenly combined`, {
             equipment: [bowl.name, pasteBowl.name],
             ingredients: [i.psyllium(1.5, u.tsp)],
         }));
@@ -5936,6 +5948,28 @@ registerGroup('Dinner', [
 
         return steps;
     })()), { planMinutes: 20, portable: false, prepMinutes: 25, perishableDays: 4 }),
+
+    withPlan(createRecipe(
+        'blue-zones-basil-pesto-veggie-bowl',
+        'Blue Zones Kitchen Basil Pesto Veggie Bowl',
+        (() => {
+            const microwave = e.microwave();
+            const BOWL = i.blueZonesBasilPestoVeggieBowl(1, u.unit);
+            const steps: Step[] = [];
+            const s = (...newSteps: Step[]) => steps.push(...newSteps);
+
+            s(instruction(`Peel back the film and microwave ${formatIngredient(BOWL)} without it`, {
+                equipment: [microwave.name],
+                ingredients: [BOWL],
+            }));
+            s(Timer.set(3, 'm', 'Microwave on high', { equipment: [microwave.name], ingredients: [BOWL] }));
+            s(instruction(`Stir ${formatIngredient(BOWL)} so it heats evenly`, { equipment: [microwave.name], ingredients: [BOWL] }));
+            s(Timer.set(90, 's', 'Microwave until steaming hot all the way through', { equipment: [microwave.name], ingredients: [BOWL] }));
+            s(Timer.set(60, 's', 'Let rest, then enjoy straight from the bowl', { ingredients: [BOWL] }));
+
+            return steps;
+        })(),
+    ), { planMinutes: 7, portable: false }),
 ]);
 
 registerGroup('Blueprint', [

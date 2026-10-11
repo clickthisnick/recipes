@@ -3561,7 +3561,7 @@ h2 { margin-top: 0; font-size: 28px; }
 // Replaced with the real compile timestamp by scripts/validate-recipes.js's postbuild
 // step, right after `tsc` emits dist/file.js. Left as-is (and reported as "dev build")
 // when running straight from source, e.g. under `vite`.
-const BUILD_TIME = '2026-10-05T01:06:34.099Z';
+const BUILD_TIME = '2026-10-11T17:56:18.156Z';
 function formatBuildTime() {
     const date = new Date(BUILD_TIME);
     if (isNaN(date.getTime()))
@@ -3999,6 +3999,17 @@ export const i = {
         nutrition: {
             // per whole bag (2 × 1-cup servings): 170 cal × 2, estimated fat/carbs from ingredients
             [u.unit.name]: { servings: 1, servingSize: 1, calories: 340, fat: 18, saturatedFat: 2, transFat: 0, cholesterol: 0, carbs: 28, sodium: 780, sugar: 12, protein: 6, fiber: 6 },
+        },
+    }),
+    blueZonesBasilPestoVeggieBowl: ingredientFactory('Blue Zones Kitchen Basil Pesto Veggie Bowl', {
+        defaultBrand: 'Blue Zones Kitchen',
+        products: [{
+                brand: 'Blue Zones Kitchen', variant: 'Basil Pesto Veggie Bowl', size: 8.5, sizeUnit: u.ounce, packageUnit: u.unit,
+                listings: [{ store: stores.wholeFoods, price: 7.99, link: 'https://www.wholefoodsmarket.com/grocery/product/blue-zones-blue-zones-kitchen-basil-pesto-veggie-bowl-8-5-ounce-b0f24t4vqj' }],
+            }],
+        nutrition: {
+            // 1 bowl (8.5 oz) = 1 serving, per the product label
+            [u.unit.name]: { servings: 1, servingSize: 1, calories: 320, fat: 21, saturatedFat: 2.5, transFat: 0, cholesterol: 0, carbs: 27, sodium: 550, sugar: 3, protein: 9, fiber: 7 },
         },
     }),
     carrot: ingredientFactory('Carrots', {
@@ -5192,6 +5203,21 @@ registerGroup('Dinner', [
         s(Timer.gate('Are the edges golden?', 2, 'm', { equipment: [oven.name] }));
         return steps;
     })()), { planMinutes: 20, portable: false, prepMinutes: 25, perishableDays: 4 }),
+    withPlan(createRecipe('blue-zones-basil-pesto-veggie-bowl', 'Blue Zones Kitchen Basil Pesto Veggie Bowl', (() => {
+        const microwave = e.microwave();
+        const BOWL = i.blueZonesBasilPestoVeggieBowl(1, u.unit);
+        const steps = [];
+        const s = (...newSteps) => steps.push(...newSteps);
+        s(instruction(`Peel back the film and microwave ${formatIngredient(BOWL)} without it`, {
+            equipment: [microwave.name],
+            ingredients: [BOWL],
+        }));
+        s(Timer.set(3, 'm', 'Microwave on high', { equipment: [microwave.name], ingredients: [BOWL] }));
+        s(instruction(`Stir ${formatIngredient(BOWL)} so it heats evenly`, { equipment: [microwave.name], ingredients: [BOWL] }));
+        s(Timer.set(90, 's', 'Microwave until steaming hot all the way through', { equipment: [microwave.name], ingredients: [BOWL] }));
+        s(Timer.set(60, 's', 'Let rest, then enjoy straight from the bowl', { ingredients: [BOWL] }));
+        return steps;
+    })()), { planMinutes: 7, portable: false }),
 ]);
 registerGroup('Blueprint', [
     withPlan(createRecipe('protein-nutmix-oliveoil', 'Blueprint (Nutty Pudding) - Protein, Nut Mix & Olive Oil', [
