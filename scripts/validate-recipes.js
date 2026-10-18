@@ -108,6 +108,7 @@ function resolveUnit(expr) {
 const EXPECTED_ZERO_NUTRITION = [
     'parsleyFlakes', 'garlicPowder', 'blackPepper', 'bakingSoda', 'paprika', 'thyme', 'rosemary', 'dillWeed',
     'whiteVinegar', 'champagneVinegar', 'water', 'creatine', 'avocadoOil', 'iceCube',
+    'allulose', 'mapleExtract', 'vanillaPowder',
 ];
 
 const ZERO_CHECK_FIELDS = ['calories', 'fat', 'saturatedFat', 'transFat', 'cholesterol', 'carbs', 'sodium', 'sugar', 'protein', 'fiber'];

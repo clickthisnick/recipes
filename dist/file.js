@@ -3561,7 +3561,7 @@ h2 { margin-top: 0; font-size: 28px; }
 // Replaced with the real compile timestamp by scripts/validate-recipes.js's postbuild
 // step, right after `tsc` emits dist/file.js. Left as-is (and reported as "dev build")
 // when running straight from source, e.g. under `vite`.
-const BUILD_TIME = '2026-10-11T17:56:18.156Z';
+const BUILD_TIME = '2026-10-18T19:43:32.533Z';
 function formatBuildTime() {
     const date = new Date(BUILD_TIME);
     if (isNaN(date.getTime()))
@@ -4186,6 +4186,7 @@ export const i = {
         defaultBrand: 'Blueprint',
         conversions: {
             [u.cup.name]: { to: u.ounce, factor: 4 }, // 1 cup ≈ 4 oz by weight
+            [u.gram.name]: { to: u.cup, factor: 1 / 113.4 }, // 1 cup ≈ 113g by weight
         },
         products: [
             {
@@ -4600,6 +4601,79 @@ export const i = {
             [u.unit.name]: { servings: 1, servingSize: 1, calories: 5, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 1.5, sodium: 340, sugar: 0.5, protein: 0, fiber: 0.5 },
         },
     }),
+    // Generic/typical nutrition - standard USDA values for rolled oats, per 1 cup (~80g).
+    rolledOats: ingredientFactory('Rolled Oats', {
+        defaultBrand: '365',
+        products: [{
+                brand: '365', variant: 'Old Fashioned Rolled Oats', listings: [{ store: stores.wholeFoods }],
+                nutrition: {
+                    [u.cup.name]: { servings: 1, servingSize: 1, calories: 300, fat: 6, saturatedFat: 1, transFat: 0, cholesterol: 0, carbs: 54, sodium: 0, sugar: 1, protein: 10, fiber: 8 },
+                },
+            }],
+    }),
+    // Generic/typical nutrition - standard USDA values for pitted Medjool dates, per 1 date (~24g).
+    medjoolDate: ingredientFactory('Medjool Dates (Pitted)', {
+        defaultBrand: '365',
+        conversions: {
+            [u.gram.name]: { to: u.unit, factor: 1 / 24 }, // ~24g per pitted Medjool date
+        },
+        products: [{
+                brand: '365', variant: 'Pitted Medjool Dates', listings: [{ store: stores.wholeFoods, price: 6.99, link: 'https://www.amazon.com/365-Everyday-Value-Medjool-Pitted/dp/B074H7XH3H' }],
+                nutrition: {
+                    [u.unit.name]: { servings: 1, servingSize: 1, calories: 66, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 18, sodium: 0, sugar: 16, protein: 0.4, fiber: 1.6 },
+                },
+            }],
+    }),
+    // Generic/typical nutrition - allulose is a noncaloric sweetener, so zeroed.
+    allulose: ingredientFactory('Allulose', {
+        defaultBrand: 'Wholesome Yum',
+        products: [{
+                brand: 'Wholesome Yum', variant: 'Powdered Allulose', listings: [{ store: stores.amazon, price: 16.99, link: 'https://www.amazon.com/dp/B07RLP444V' }],
+                nutrition: {
+                    [u.gram.name]: { servings: 1, servingSize: 15, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 },
+                },
+            }],
+    }),
+    // Generic/typical nutrition - standard USDA values for maple extract, negligible per tsp.
+    mapleExtract: ingredientFactory('Maple Extract', {
+        defaultBrand: 'McCormick',
+        products: [{
+                brand: 'McCormick', variant: 'Pure Maple Extract', listings: [{ store: stores.amazon, price: 5.49, link: 'https://www.amazon.com/McCormick-Pure-Maple-Flavor/dp/B00032GJCO' }],
+                nutrition: {
+                    [u.tsp.name]: { servings: 1, servingSize: 1, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 },
+                },
+            }],
+    }),
+    // Generic/typical nutrition - standard USDA values for ground flaxseed, per 1 tbsp (~7g).
+    groundFlaxseed: ingredientFactory('Ground Flaxseed', {
+        defaultBrand: '365',
+        products: [{
+                brand: '365', variant: 'Organic Ground Flaxseed', listings: [{ store: stores.wholeFoods }],
+                nutrition: {
+                    [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 30, fat: 2, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 2, sodium: 2, sugar: 0, protein: 1, fiber: 2 },
+                },
+            }],
+    }),
+    // Generic/typical nutrition - standard USDA values for vanilla powder, negligible per ¼ tsp.
+    vanillaPowder: ingredientFactory('Vanilla Powder', {
+        defaultBrand: 'Native Vanilla',
+        products: [{
+                brand: 'Native Vanilla', variant: 'Bean Powder', listings: [{ store: stores.amazon, price: 15.99, link: 'https://www.amazon.com/Native-Vanilla-Organic-Powder-ounce/dp/B07Z7J3KBK' }],
+                nutrition: {
+                    [u.tsp.name]: { servings: 1, servingSize: 1, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 },
+                },
+            }],
+    }),
+    // Generic/typical nutrition - standard values for mini dark chocolate chips, per 1 tbsp (~11g).
+    miniDarkChocolateChip: ingredientFactory('Mini Dark Chocolate Chips', {
+        defaultBrand: '365',
+        products: [{
+                brand: '365', variant: 'Mini Chocolate Chips (Dark)', listings: [{ store: stores.wholeFoods }],
+                nutrition: {
+                    [u.cup.name]: { servings: 1, servingSize: 0.25, calories: 200, fat: 16, saturatedFat: 10, transFat: 0, cholesterol: 0, carbs: 24, sodium: 0, sugar: 20, protein: 2, fiber: 2 },
+                },
+            }],
+    }),
 };
 // ============================================================
 // RECIPES
@@ -4712,13 +4786,14 @@ registerGroup('Breakfast', [
         ]));
         s(bowl.mix('whisked eggs'));
         const WHISKED = bowl.result;
+        const EGG = i.egg(3, u.unit);
         s(instruction('Turn the NuWave down to 250°F', { equipment: [pan.name] }));
         s(bowl.transfer(pan, [WHISKED]));
         s(Timer.set(18, 's', "Don't touch - let the bottom begin to set", { equipment: [pan.name], ingredients: [WHISKED] }));
-        s(instruction(`Gently push the cooked ${formatIngredient(WHISKED)} toward the center with a silicone spatula, tilting the pan so uncooked egg runs into the empty areas`, { equipment: [pan.name], ingredients: [WHISKED] }));
+        s(instruction(`Gently push the cooked ${formatIngredient(WHISKED)} toward the center with a silicone spatula, tilting the pan so uncooked egg runs into the empty areas`, { equipment: [pan.name], ingredients: [WHISKED, EGG] }));
         s(Timer.set(12, 's', 'Let sit before the next fold', { equipment: [pan.name], ingredients: [WHISKED] }));
         s(instruction(`Fold ${formatIngredient(WHISKED)} again, gently - avoid aggressively stirring against the stainless steel`, { equipment: [pan.name], ingredients: [WHISKED] }));
-        s(Timer.set(90, 's', 'Finish cooking, folding every 10-15s, until the eggs still look slightly wet - then turn off the NuWave', { equipment: [pan.name], ingredients: [WHISKED] }));
+        s(Timer.set(90, 's', 'Finish cooking, folding every 10-15s, until the eggs still look slightly wet - then turn off the NuWave', { equipment: [pan.name], ingredients: [WHISKED, EGG] }));
         s(instruction('Turn off the NuWave', { equipment: [pan.name] }));
         s(Timer.set(25, 's', 'Let residual heat finish the eggs', { equipment: [pan.name], ingredients: [WHISKED] }));
         return steps;
@@ -4741,6 +4816,69 @@ registerGroup('Breakfast', [
         }));
         return steps;
     })(), undefined, 2), { planMinutes: 2, portable: true }),
+    withPlan(createRecipe('shelf-stable-vanilla-chip-chewy-granola-bars', 'Shelf-Stable Vanilla-Chip Chewy Granola Bars (Makes 10)', (() => {
+        const bowl = e.bowl();
+        const foodProcessor = e.bulletMixer();
+        const pan = e.pan('8×8-inch pan');
+        const steps = [];
+        const s = (...newSteps) => steps.push(...newSteps);
+        const OATS = i.rolledOats(180, u.gram);
+        const PEANUT_BUTTER = i.peanutButter(128, u.gram);
+        const DATES = i.medjoolDate(90, u.gram);
+        const ALLULOSE = i.allulose(15, u.gram);
+        const WATER = i.water(2, u.tbsp);
+        const MAPLE = i.mapleExtract(0.5, u.tsp);
+        const FLAX = i.groundFlaxseed(2, u.tbsp);
+        const HEMP = i.hempSeed(2, u.tbsp);
+        const VANILLA = i.vanillaExtract(1, u.tsp);
+        const SALT = i.seaSalt(0.5, u.tsp);
+        const VANILLA_POWDER = i.vanillaPowder(0.25, u.tsp);
+        const CHOCOLATE = i.miniDarkChocolateChip(0.25, u.cup);
+        s(instruction(`Soak ${formatIngredient(DATES)} in water for 5–10 minutes, then drain`, {
+            ingredients: [DATES, WATER],
+        }));
+        s(foodProcessor.add([
+            DATES,
+            PEANUT_BUTTER,
+            ALLULOSE,
+            WATER,
+            MAPLE,
+            VANILLA,
+            SALT,
+        ]));
+        s(foodProcessor.mix('sticky date-nut butter paste'));
+        const DATE_PASTE = foodProcessor.result;
+        s(instruction(`Process ${formatIngredient(DATE_PASTE)} until you have a smooth, sticky paste`, {
+            equipment: [foodProcessor.name],
+            ingredients: [DATE_PASTE],
+        }));
+        s(bowl.add([
+            OATS,
+            FLAX,
+            HEMP,
+        ]));
+        s(bowl.mix());
+        s(instruction(`Pour ${formatIngredient(DATE_PASTE)} over the oats and mix extremely well`, {
+            equipment: [bowl.name],
+            ingredients: [DATE_PASTE, OATS, FLAX, HEMP],
+        }));
+        s(instruction(`Fold in ${formatIngredient(CHOCOLATE)}`, {
+            ingredients: [CHOCOLATE],
+        }));
+        if (VANILLA_POWDER) {
+            s(instruction(`Fold in ${formatIngredient(VANILLA_POWDER)} (optional)`, {
+                ingredients: [VANILLA_POWDER],
+            }));
+        }
+        s(instruction('Line an 8×8-inch pan with parchment paper', { equipment: [pan.name] }));
+        s(instruction(`Press the mixture down very firmly in the pan so the bars don't crumble`, {
+            equipment: [pan.name],
+        }));
+        s(Timer.set(2, 'h', 'Refrigerate for at least 2 hours', { equipment: [pan.name] }));
+        s(instruction('Cut into 10 equal bars'));
+        s(info('No baking needed. Since the bars use water, not milk, they stay shelf-stable. If they are soft, chill them longer before cutting.'));
+        return steps;
+    })(), undefined, 15), { planMinutes: 2, portable: true, prepMinutes: 15, perishableDays: 14 }),
 ]);
 // Moved out of the Dinner array - registers itself under its own 'Cleaning' group
 registerRecipe(createRecipe('clean-water-bottle', 'Clean Water Bottle', (() => {
@@ -4942,7 +5080,7 @@ registerGroup('Dinner', [
         const EDAMAME = i.edamame(1, u.cup);
         s(bowl.add([i.asianSaladKit(1, u.unit)]));
         s(Timer.set(80, 's', 'Microwave edamame until just thawed', { equipment: [microwave.name], ingredients: [EDAMAME] }));
-        s(instruction(`Pat ${formatIngredient(EDAMAME)} dry, then add to bowl`, { ingredients: [EDAMAME], equipment: [bowl.name] }));
+        s(instruction(`Pat ${formatIngredient(EDAMAME)} dry, then add to bowl`, { ingredients: [EDAMAME, i.blueZonesBasilPestoVeggieBowl(0, u.unit)], equipment: [bowl.name] }));
         s(bowl.add([
             i.chickpeas(1, u.cup),
             i.cannelliniBean(1, u.cup),
@@ -5014,8 +5152,8 @@ registerGroup('Dinner', [
         ]);
         addProduce.prep = true;
         s(addProduce);
-        s(instruction('Add 1.5 cups chickpeas to salad bowl', { ingredients: [CHICKPEAS], equipment: [saladBowl.name] }));
-        s(instruction('Add 1.5 cups cannellini beans to salad bowl', { ingredients: [CANNELLINI], equipment: [saladBowl.name] }));
+        s(instruction('Add 1.5 cups chickpeas to salad bowl', { ingredients: [CHICKPEAS, i.blueZonesBasilPestoVeggieBowl(0, u.unit)], equipment: [saladBowl.name] }));
+        s(instruction('Add 1.5 cups cannellini beans to salad bowl', { ingredients: [CANNELLINI, i.blueZonesBasilPestoVeggieBowl(0, u.unit)], equipment: [saladBowl.name] }));
         s(saladBowl.add([i.creamySesameDressing(2, u.tbsp)], 'pour dressing over salad, toss gently to coat'));
         return steps;
     })()),
@@ -5034,8 +5172,8 @@ registerGroup('Dinner', [
         s(prep('Peel and shred carrots', { ingredients: [CARROTS] }));
         s(prep('Shred cabbage (can be done the day before)', { ingredients: [CABBAGE] }));
         s(prep('Get out 3 packages of chickpeas and 3 packages of cannellini beans, open the tops', { ingredients: [CHICKPEAS, CANNELLINI] }));
-        s(prep('Strain chickpeas, then measure ~1.5 cups into each of the 4 salad bowl tops', { ingredients: [CHICKPEAS], equipment: [saladBowl.name] }));
-        s(prep('Strain cannellini beans, then measure ~1.5 cups into each of the 4 salad bowl tops', { ingredients: [CANNELLINI], equipment: [saladBowl.name] }));
+        s(prep('Strain chickpeas, then measure ~1.5 cups into each of the 4 salad bowl tops', { ingredients: [CHICKPEAS, i.blueZonesBasilPestoVeggieBowl(0, u.unit)], equipment: [saladBowl.name] }));
+        s(prep('Strain cannellini beans, then measure ~1.5 cups into each of the 4 salad bowl tops', { ingredients: [CANNELLINI, i.blueZonesBasilPestoVeggieBowl(0, u.unit)], equipment: [saladBowl.name] }));
         const addProduce = saladBowl.add([
             [CARROTS, 'shredded'],
             [CABBAGE, 'shredded'],
@@ -5166,11 +5304,11 @@ registerGroup('Dinner', [
         const BEANS = i.blackBean(1.5, u.cup);
         const GARLIC = i.garlicClove(3, u.unit);
         s(info('Makes 24 patties. Keeps 3-4 days in the fridge, or 1 month in the freezer'));
-        s(prep('Rinse 1 cup dry quinoa in a fine-mesh strainer under cold water', { equipment: [pot.name] }));
-        s(prep('Add the rinsed quinoa and 2 cups water to a small pot, cover, and set over high heat', { equipment: [pot.name] }));
-        s(timerStep('Bring quinoa and water to a boil on the induction stovetop (set to 475°)', time.minutes(3), { prep: true, equipment: [pot.name] }));
-        s(timerStep('Simmer quinoa, covered, on the induction stovetop (set to 215°)', time.minutes(15), { prep: true, equipment: [pot.name] }));
-        const quinoaCooled = timerStep('Fluff the quinoa and let it cool completely before using', time.minutes(15), { prep: true, equipment: [pot.name] });
+        s(prep('Rinse 1 cup dry quinoa in a fine-mesh strainer under cold water', { equipment: [pot.name], ingredients: [QUINOA, i.water(1, u.cup)] }));
+        s(prep('Add the rinsed quinoa and 2 cups water to a small pot, cover, and set over high heat', { equipment: [pot.name], ingredients: [QUINOA, i.water(2, u.cup)] }));
+        s(timerStep('Bring quinoa and water to a boil on the induction stovetop (set to 475°)', time.minutes(3), { prep: true, equipment: [pot.name], ingredients: [QUINOA, i.water(2, u.cup)] }));
+        s(timerStep('Simmer quinoa, covered, on the induction stovetop (set to 215°)', time.minutes(15), { prep: true, equipment: [pot.name], ingredients: [QUINOA, i.water(2, u.cup)] }));
+        const quinoaCooled = timerStep('Fluff the quinoa and let it cool completely before using', time.minutes(15), { prep: true, equipment: [pot.name], ingredients: [QUINOA] });
         s(quinoaCooled);
         s(colander.add([BEANS]));
         s(instruction(`Strain ${formatIngredient(BEANS)} and mash them`, { ingredients: [BEANS], equipment: [colander.name] }));
@@ -5194,7 +5332,7 @@ registerGroup('Dinner', [
             equipment: [bowl.name],
         }));
         s(instruction(`Line a sheet pan with parchment, place the discs, and spray lightly with ${formatIngredient(i.oliveOil(1, u.spray))}`, {
-            equipment: [oven.name],
+            equipment: [oven.name, 'sheet pan'],
             ingredients: [i.oliveOil(1, u.spray)],
         }));
         s(oven.cook('Bake at 375°', time.minutes(15), 375));
@@ -5209,13 +5347,13 @@ registerGroup('Dinner', [
         const steps = [];
         const s = (...newSteps) => steps.push(...newSteps);
         s(instruction(`Peel back the film and microwave ${formatIngredient(BOWL)} without it`, {
-            equipment: [microwave.name],
+            equipment: [microwave.name, 'bowl'],
             ingredients: [BOWL],
         }));
         s(Timer.set(3, 'm', 'Microwave on high', { equipment: [microwave.name], ingredients: [BOWL] }));
-        s(instruction(`Stir ${formatIngredient(BOWL)} so it heats evenly`, { equipment: [microwave.name], ingredients: [BOWL] }));
+        s(instruction(`Stir ${formatIngredient(BOWL)} so it heats evenly`, { equipment: [microwave.name, 'bowl'], ingredients: [BOWL] }));
         s(Timer.set(90, 's', 'Microwave until steaming hot all the way through', { equipment: [microwave.name], ingredients: [BOWL] }));
-        s(Timer.set(60, 's', 'Let rest, then enjoy straight from the bowl', { ingredients: [BOWL] }));
+        s(Timer.set(60, 's', 'Let rest, then enjoy straight from the bowl', { equipment: ['bowl'], ingredients: [BOWL] }));
         return steps;
     })()), { planMinutes: 7, portable: false }),
 ]);
@@ -5234,7 +5372,7 @@ registerGroup('Blueprint', [
     withPlan(createRecipe('blueprint-longevity-drink', 'Blueprint Longevity Drink (Longevity Mix, Collagen, Creatine)', [
         instruction('Add 1 scoop Blueprint Longevity Mix (Blood Orange) to a glass of water', {
             equipment: ['glass'],
-            ingredients: [i.longevityMix(1, u.unit), i.water(8, u.fluidOunce)],
+            ingredients: [i.longevityMix(1, u.unit), i.water(8, u.fluidOunce), i.orange(1, u.unit)],
         }),
         instruction('Add 1 scoop Blueprint Collagen Peptides', {
             ingredients: [i.collagenPowder(1, u.unit)],
@@ -5385,7 +5523,7 @@ registerRecipe(withPlan(createRecipe('test-recipe-all-features', 'Test Recipe (A
     // Auto-inserted cleanup-label step for MACADAMIA_MILK lands right here.
     s(bowl.mix('test mix result'));
     s(instruction(`Use ${formatIngredient(bowl.result)} (composite ingredient - excluded from the nutrition breakdown)`, {
-        ingredients: [bowl.result], equipment: [bowl.name],
+        ingredients: [bowl.result, i.blueZonesBasilPestoVeggieBowl(0, u.unit)], equipment: [bowl.name],
     }));
     s(oven.preheat(400)); // fixed 15 min duration - tap 3× to skip
     s(nuwave.preheat(325)); // NuwaveEquipment override - fixed 45 s duration - tap 3× to skip
