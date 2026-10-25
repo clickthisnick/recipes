@@ -5513,7 +5513,7 @@ withPlan(createRecipe(
         const VANILLA_POWDER = i.vanillaPowder(0.25, u.tsp);
         const CHOCOLATE  = i.miniDarkChocolateChip(0.25, u.cup);
 
-        s(instruction(`Soak ${formatIngredient(DATES)} in water for 5–10 minutes, then drain`, {
+        s(Timer.set(5, 'm', `Soak ${formatIngredient(DATES)} in water for 5–10 minutes, then drain`, {
             ingredients: [DATES, WATER],
         }));
         s(foodProcessor.add([

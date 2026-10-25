@@ -3561,7 +3561,7 @@ h2 { margin-top: 0; font-size: 28px; }
 // Replaced with the real compile timestamp by scripts/validate-recipes.js's postbuild
 // step, right after `tsc` emits dist/file.js. Left as-is (and reported as "dev build")
 // when running straight from source, e.g. under `vite`.
-const BUILD_TIME = '2026-10-18T19:43:32.533Z';
+const BUILD_TIME = '2026-10-25T19:34:52.158Z';
 function formatBuildTime() {
     const date = new Date(BUILD_TIME);
     if (isNaN(date.getTime()))
@@ -4834,7 +4834,7 @@ registerGroup('Breakfast', [
         const SALT = i.seaSalt(0.5, u.tsp);
         const VANILLA_POWDER = i.vanillaPowder(0.25, u.tsp);
         const CHOCOLATE = i.miniDarkChocolateChip(0.25, u.cup);
-        s(instruction(`Soak ${formatIngredient(DATES)} in water for 5–10 minutes, then drain`, {
+        s(Timer.set(5, 'm', `Soak ${formatIngredient(DATES)} in water for 5–10 minutes, then drain`, {
             ingredients: [DATES, WATER],
         }));
         s(foodProcessor.add([
