@@ -489,6 +489,15 @@ class Equipment {
         });
     }
 
+    setTemp(temperature: number): Step {
+        this._targetTemp = temperature;
+        return createStep({
+            type: 'instruction',
+            text: `Set ${this.name} to ${temperature}°`,
+            equipment: [this.name],
+        });
+    }
+
     // Adds oil to this vessel.  Mirror of add() - keeps the oil in `contents` so later
     // steps can reference it,but gives oils a dedicated verb on Equipment: e.g.
     // `pan.addOil(oil)`` then `pan.heatUp()` reads the pan's temp to time the wait..
@@ -5471,7 +5480,7 @@ registerGroup('Breakfast', [
         const WHISKED = bowl.result;
         const EGG     = i.egg(3, u.unit);
 
-        s(instruction('Turn the NuWave down to 250°F', { equipment: [pan.name] }));
+        s(pan.setTemp(250));
         s(bowl.transfer(pan, [WHISKED]));
         s(Timer.set(18, 's', "Don't touch - let the bottom begin to set", { equipment: [pan.name], ingredients: [WHISKED] }));
         s(instruction(`Gently push the cooked ${formatIngredient(WHISKED)} toward the center with a silicone spatula, tilting the pan so uncooked egg runs into the empty areas`, { equipment: [pan.name], ingredients: [WHISKED, EGG] }));
@@ -5781,16 +5790,16 @@ registerGroup('Dinner', [
         const steps: Step[] = [];
         const s = (...newSteps: Step[]) => steps.push(...newSteps);
 
-        s(instruction(`Heat the pan over medium-high (about 400°F) until a flicked ${formatIngredient(i.water(1, u.spray))} droplet beads and skitters before evaporating`, { equipment: [pan.name], ingredients: [i.water(1, u.spray)] }));
+        s(pan.preheat(350));
         s(pan.add([
             i.avocadoOil(1, u.spray),
-            [SAUSAGES, 'prick each link once or twice with a fork, then add in a single layer'],
+            [SAUSAGES, 'add in a single layer'],
         ]));
-        s(pan.cook('Sear first side, uncovered - golden crust, no lid', time.minutes(3), 400));
-        s(instruction('Flip the sausages, then turn the heat down to medium-low (about 350°F)', { equipment: [pan.name], ingredients: [SAUSAGES] }));
-        s(pan.cook('Sear second side, uncovered - golden crust, no lid', time.minutes(3), 400));
-        s(instruction('Cover the pan with the lid and keep the heat at medium-low (about 350°F)', { equipment: [pan.name], ingredients: [SAUSAGES] }));
-        s(pan.cook('Cook with the lid on until the sausages reach 165°F in the center', time.minutes(8), 350));
+        s(pan.cook('Sear first side, uncovered - golden crust, no lid', time.minutes(4), 350));
+        s(pan.flip());
+        s(pan.cook('Sear second side, uncovered - golden crust, no lid', time.minutes(4), 350));
+        s(instruction(`Cover the pan with the lid over ${formatIngredient(SAUSAGES)}`, { equipment: [pan.name], ingredients: [SAUSAGES] }));
+        s(pan.cook('Cook with the lid on until the sausages reach 165°F in the center', time.minutes(3), 350));
         s(Timer.gate('Are the sausages at least 165°F in the center?', 2, 'm', { ingredients: [SAUSAGES], equipment: [pan.name] }));
         s(instruction('Remove the lid and rest the sausages 5 minutes before serving', { equipment: [pan.name], ingredients: [SAUSAGES] }));
         s(Timer.set(5, 'm', 'Rest before serving', { equipment: [pan.name], ingredients: [SAUSAGES] }));
@@ -6129,7 +6138,7 @@ registerGroup('Dinner', [
             ingredients: [i.oliveOil(1, u.spray)],
         }));
 
-        s(oven.cook('Bake at 375°', time.minutes(15), 375));
+        s(oven.cook('Bake until golden and set', time.minutes(15), 375));
         s(instruction('Flip the patties', { equipment: [oven.name] }));
         s(oven.cook('Bake until edges are golden', time.minutes(10), 375));
         s(Timer.gate('Are the edges golden?', 2, 'm', { equipment: [oven.name] }));

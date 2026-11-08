@@ -444,6 +444,40 @@ const TEXT_ARG_INDEX = {
 
 const STEP_FACTORY_RE = /\b(instruction|prep|prepOnly|Timer\.set|Timer\.gate|timerStep)\(/g;
 
+// ── Check 6 (error): temperature already carried by an equipment action ───────
+//
+// .cook(), .place(), .preheat(), and .setTemp() all render the temperature
+// themselves (e.g. cook('Sear', 60, 350) displays "(350°)"). The step text must
+// not repeat the degrees - it drifts when the action's temperature changes, and
+// the rendered step shows the same number twice. Only action steps are flagged;
+// standalone text like "Set induction stovetop to 215°" carries no temperature
+// argument, so it's the single source of truth there and stays allowed.
+{
+    const ACTION_TEMP_METHODS = /\b(cook|place|preheat|setTemp)\(/;
+    const DEGREE_IN_TEXT = /\d+\s*[°]F?\b/;
+
+    const methodCalls = [];
+    for (let i = 0; i < lines.length; i++) {
+        if (!ACTION_TEMP_METHODS.test(lines[i])) continue;
+        const m = lines[i].match(new RegExp(`\\b(?:cook|place|preheat|setTemp)\\([^)]*?\\b(\\d{3})\\s*\\)`));
+        if (m) methodCalls.push({ lineNum: i + 1, temp: m[1] });
+    }
+
+    for (const call of methodCalls) {
+        const lineText = lines[call.lineNum - 1];
+        const textParts = lineText.match(/(['"`])((?:[^\\]|\\.)*?)\1/g) || [];
+        for (const part of textParts) {
+            const text = part.replace(/^['"`]|['"`]$/g, '');
+            if (DEGREE_IN_TEXT.test(text)) {
+                errors.push(
+                    `line ${call.lineNum}: step text contains "${text}" but the temperature ` +
+                    `(${call.temp}°) is already rendered by the action; remove the degrees from the text`
+                );
+            }
+        }
+    }
+}
+
 let sm;
 while ((sm = STEP_FACTORY_RE.exec(src)) !== null) {
     const callStart  = sm.index;
