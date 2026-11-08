@@ -5329,6 +5329,20 @@ export const i = {
         }],
     }),
 
+    // From the product label: per 1 link (85g), 5 links per 12 oz package. The recipe tracks
+    // the package by count (5 links) and remembers that chicken sausage needs to finish at 165°F.
+    chickenSausage: ingredientFactory('Chicken Sausage', {
+        defaultBrand: '365',
+        isMeatProduct: true,
+        products: [{
+            brand: '365', variant: 'Italian-Style Chicken Sausage (5 Count, 12 oz)', size: 5, sizeUnit: u.unit, organic: true,
+            listings: [{ store: stores.wholeFoods, price: 7.99, link: 'https://www.wholefoodsmarket.com/product/365-by-whole-foods-market-organic-italian-style-chicken-sausage-12-oz-b00jgzgq00' }],
+            nutrition: {
+                [u.unit.name]: { servings: 5, servingSize: 1, calories: 190, fat: 13, saturatedFat: 3.5, transFat: 0.5, cholesterol: 80, carbs: 1, sodium: 420, sugar: 0, protein: 17, fiber: 0 },
+            },
+        }],
+    }),
+
 };
 
 // ============================================================
@@ -5761,6 +5775,29 @@ registerGroup('Dinner', [
         return steps;
     })(), undefined, 45),
 
+    createRecipe('pan-seared-chicken-sausage', 'Pan-Seared Chicken Sausage (Sear + Cover to Finish)', (() => {
+        const pan = e.pan();
+        const SAUSAGES = i.chickenSausage(5, u.unit);
+        const steps: Step[] = [];
+        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+
+        s(instruction(`Heat the pan over medium-high (about 400°F) until a flicked ${formatIngredient(i.water(1, u.spray))} droplet beads and skitters before evaporating`, { equipment: [pan.name], ingredients: [i.water(1, u.spray)] }));
+        s(pan.add([
+            i.avocadoOil(1, u.spray),
+            [SAUSAGES, 'prick each link once or twice with a fork, then add in a single layer'],
+        ]));
+        s(pan.cook('Sear first side, uncovered - golden crust, no lid', time.minutes(3), 400));
+        s(instruction('Flip the sausages, then turn the heat down to medium-low (about 350°F)', { equipment: [pan.name], ingredients: [SAUSAGES] }));
+        s(pan.cook('Sear second side, uncovered - golden crust, no lid', time.minutes(3), 400));
+        s(instruction('Cover the pan with the lid and keep the heat at medium-low (about 350°F)', { equipment: [pan.name], ingredients: [SAUSAGES] }));
+        s(pan.cook('Cook with the lid on until the sausages reach 165°F in the center', time.minutes(8), 350));
+        s(Timer.gate('Are the sausages at least 165°F in the center?', 2, 'm', { ingredients: [SAUSAGES], equipment: [pan.name] }));
+        s(instruction('Remove the lid and rest the sausages 5 minutes before serving', { equipment: [pan.name], ingredients: [SAUSAGES] }));
+        s(Timer.set(5, 'm', 'Rest before serving', { equipment: [pan.name], ingredients: [SAUSAGES] }));
+
+        return steps;
+    })()),
+
     createRecipe('abbot-pea-protein-spaghetti', 'Abbot Pea Protein Spaghetti', (() => {
         const pot = e.pot();
         const pan = e.pan();
@@ -5780,7 +5817,7 @@ registerGroup('Dinner', [
         s(pot.stir());
         s(pot.cook('Cook spaghetti (second half)', time.minutes(7), 7));
         s(pan.add([i.spaghettiSauce(1, u.bag)]));
-        s(pan.cook('Simmer sauce with sausage', time.minutes(5), 7));
+        s(pan.cook('Simmer sauce with sausage', time.minutes(5) * 60, 7));
 
         return steps;
     })()),
