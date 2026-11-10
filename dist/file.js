@@ -3569,7 +3569,7 @@ h2 { margin-top: 0; font-size: 28px; }
 // Replaced with the real compile timestamp by scripts/validate-recipes.js's postbuild
 // step, right after `tsc` emits dist/file.js. Left as-is (and reported as "dev build")
 // when running straight from source, e.g. under `vite`.
-const BUILD_TIME = '2026-11-08T01:47:21.608Z';
+const BUILD_TIME = '2026-11-10T01:13:10.144Z';
 function formatBuildTime() {
     const date = new Date(BUILD_TIME);
     if (isNaN(date.getTime()))
@@ -4695,6 +4695,22 @@ export const i = {
                 },
             }],
     }),
+    // From the product label: per 1 pack (100g), 4 servings per 12 oz package. The recipe
+    // cooks one 4-serving pack for 4 minutes, which is also the package's cook time.
+    tinglyChiliMomofukuNoodles: ingredientFactory('Tingly Chili Momofuku Noodles', {
+        defaultBrand: 'Momofuku',
+        products: [{
+                brand: 'Momofuku', variant: 'Tingly Chili (12 oz, 4 packs)', size: 4, sizeUnit: u.unit, packageUnit: u.package,
+                listings: [{
+                        store: stores.wholeFoods,
+                        price: 11.99,
+                        link: 'https://www.wholefoodsmarket.com/product/momofuku-tingly-chili-noodle-kit',
+                    }],
+                nutrition: {
+                    [u.unit.name]: { servings: 4, servingSize: 1, calories: 320, fat: 9, saturatedFat: 3.5, transFat: 0, cholesterol: 0, carbs: 51, sodium: 760, sugar: 4, protein: 9, fiber: 3 },
+                },
+            }],
+    }),
 };
 // ============================================================
 // RECIPES
@@ -5005,6 +5021,25 @@ registerRecipe(withPlan(createRecipe('taco-ames-hot-sauce', 'Taco Ames Hot Sauce
     return steps;
 })(), 'Sauces'), { planMinutes: 1, portable: true, prepMinutes: 20, perishableDays: 14 }));
 registerGroup('Dinner', [
+    withPlan(createRecipe('tingly-chili-momofuku-noodles', 'Tingly Chili Momofuku Noodles', (() => {
+        const pot = e.pot();
+        const colander = e.colander();
+        const steps = [];
+        const s = (...newSteps) => steps.push(...newSteps);
+        const WATER = i.water(26, u.ounce);
+        const NOODLES = i.tinglyChiliMomofukuNoodles(1, u.unit);
+        s(pot.add([WATER]));
+        s(pot.setTemp(525));
+        s(Timer.set(10, 'm', 'Bring water to a boil - start the 4 minute timer once it is boiling, not before', { equipment: [pot.name], ingredients: [WATER] }));
+        s(Timer.gate('Is the water boiling?', 1, 'm', { equipment: [pot.name], ingredients: [WATER] }));
+        s(pot.add([NOODLES], 'gently separate with tongs'));
+        s(pot.cook(`Cook ${formatIngredient(NOODLES)}`, time.minutes(4), 525));
+        s(instruction(`Drain ${formatIngredient(NOODLES)}`, {
+            equipment: [pot.name, colander.name],
+            ingredients: [NOODLES],
+        }));
+        return steps;
+    })()), { planMinutes: 10, portable: false }),
     createRecipe('breaded-mushrooms', 'Breaded Mushrooms', (() => {
         const pankoPan = e.pan('panko pan');
         const pankoBowl = e.bowl('panko bowl');
