@@ -3569,7 +3569,7 @@ h2 { margin-top: 0; font-size: 28px; }
 // Replaced with the real compile timestamp by scripts/validate-recipes.js's postbuild
 // step, right after `tsc` emits dist/file.js. Left as-is (and reported as "dev build")
 // when running straight from source, e.g. under `vite`.
-const BUILD_TIME = '2026-11-10T01:13:10.144Z';
+const BUILD_TIME = '2026-11-10T01:45:50.315Z';
 function formatBuildTime() {
     const date = new Date(BUILD_TIME);
     if (isNaN(date.getTime()))
@@ -5428,8 +5428,8 @@ registerGroup('Dinner', [
         }));
         s(Timer.set(3, 'm', 'Microwave on high', { equipment: [microwave.name], ingredients: [BOWL] }));
         s(instruction(`Stir ${formatIngredient(BOWL)} so it heats evenly`, { equipment: [microwave.name, 'bowl'], ingredients: [BOWL] }));
-        s(Timer.set(90, 's', 'Microwave until steaming hot all the way through', { equipment: [microwave.name], ingredients: [BOWL] }));
-        s(Timer.set(60, 's', 'Let rest, then enjoy straight from the bowl', { equipment: ['bowl'], ingredients: [BOWL] }));
+        s(Timer.set(30, 's', 'Microwave until steaming hot all the way through', { equipment: [microwave.name], ingredients: [BOWL] }));
+        s(Timer.set(120, 's', 'Let rest, then enjoy straight from the bowl', { equipment: ['bowl'], ingredients: [BOWL] }));
         return steps;
     })()), { planMinutes: 7, portable: false }),
 ]);

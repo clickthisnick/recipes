@@ -6200,8 +6200,8 @@ registerGroup('Dinner', [
             }));
             s(Timer.set(3, 'm', 'Microwave on high', { equipment: [microwave.name], ingredients: [BOWL] }));
             s(instruction(`Stir ${formatIngredient(BOWL)} so it heats evenly`, { equipment: [microwave.name, 'bowl'], ingredients: [BOWL] }));
-            s(Timer.set(90, 's', 'Microwave until steaming hot all the way through', { equipment: [microwave.name], ingredients: [BOWL] }));
-            s(Timer.set(60, 's', 'Let rest, then enjoy straight from the bowl', { equipment: ['bowl'], ingredients: [BOWL] }));
+            s(Timer.set(30, 's', 'Microwave until steaming hot all the way through', { equipment: [microwave.name], ingredients: [BOWL] }));
+            s(Timer.set(120, 's', 'Let rest, then enjoy straight from the bowl', { equipment: ['bowl'], ingredients: [BOWL] }));
 
             return steps;
         })(),
