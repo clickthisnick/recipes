@@ -894,6 +894,7 @@ function buildCookingPlan(recipes: Recipe[]): Step[] {
     });
     const equipClaims: Map<string, number>     = new Map();
     const ingClaims:   Map<Ingredient, number> = new Map();
+    const claimableIng = (ing: Ingredient): boolean => ing.name !== 'Water';
     function getBlockingIds(step: Step): number[] {
         const blocking = new Set<number>();
         for (const eq of (step.equipment ?? [])) {
@@ -901,6 +902,7 @@ function buildCookingPlan(recipes: Recipe[]): Step[] {
             if (id !== undefined) blocking.add(id);
         }
         for (const ing of (step.ingredients ?? [])) {
+            if (!claimableIng(ing)) continue;
             const id = ingClaims.get(ing);
             if (id !== undefined) blocking.add(id);
         }
@@ -908,7 +910,10 @@ function buildCookingPlan(recipes: Recipe[]): Step[] {
     }
     function setClaims(step: Step): void {
         for (const eq of (step.equipment ?? [])) equipClaims.set(`${step.recipeId}::eq::${eq}`, step.id);
-        for (const ing of (step.ingredients ?? [])) ingClaims.set(ing, step.id);
+        for (const ing of (step.ingredients ?? [])) {
+            if (!claimableIng(ing)) continue;
+            ingClaims.set(ing, step.id);
+        }
     }
     for (const step of steps) {
         const startWhen = new Set<number>();
@@ -4426,6 +4431,19 @@ export const i = {
         }],
     }),
 
+    // Nutrition zeroed at the user's request - Amazon's label for this listing is
+    // image-only, so this is a placeholder, not a real (scraped or measured) value.
+    onionPowder: ingredientFactory('Onion Powder', {
+        defaultBrand: '365',
+        products: [{
+            brand: '365', variant: 'Organic', size: 2.33, sizeUnit: u.ounce, organic: true,
+            listings: [{ store: stores.wholeFoods, price: 3.99, link: 'https://www.amazon.com/365-Everyday-Value-Organic-Onion/dp/B00DQMKSY4' }],
+            nutrition: {
+                [u.tsp.name]: { servings: 1, servingSize: 1, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 },
+            },
+        }],
+    }),
+
     // Generic/typical nutrition (not from this listing's own label) - standard mayonnaise
     // values, scaled up from a typical ~94 cal/tbsp to a full cup (16 tbsp), matching how
     // this ingredient is actually consumed in the one recipe that uses it.
@@ -5352,6 +5370,21 @@ export const i = {
         }],
     }),
 
+    // Generic/typical nutrition (not from a specific brand's label) - standard USDA values
+    // for a raw boneless pork shoulder/butt roast (per pound). The user usually buys a
+    // pre-salted roast, so the cooking steps skip additional salt.
+    porkShoulder: ingredientFactory('Pork Shoulder', {
+        isMeatProduct: true,
+        requiresDateLabel: true,
+        products: [{
+            brand: 'Generic', size: 2, sizeUnit: u.pound,
+            listings: [{ store: stores.wholeFoods, price: 9.98, link: 'https://www.wholefoodsmarket.com/product/whole-foods-market-pork-butt-roast-boneless' }],
+            nutrition: {
+                [u.pound.name]: { servings: 1, servingSize: 1, calories: 810, fat: 54, saturatedFat: 19, transFat: 0, cholesterol: 240, carbs: 0, sodium: 160, sugar: 0, protein: 76, fiber: 0 },
+            },
+        }],
+    }),
+
     // From the product label: per 1 pack (100g), 4 servings per 12 oz package. The recipe
     // cooks one 4-serving pack for 4 minutes, which is also the package's cook time.
     tinglyChiliMomofukuNoodles: ingredientFactory('Tingly Chili Momofuku Noodles', {
@@ -5553,11 +5586,12 @@ withPlan(createRecipe(
         const VANILLA_POWDER = i.vanillaPowder(0.25, u.tsp);
         const CHOCOLATE  = i.miniDarkChocolateChip(0.25, u.cup);
 
-        s(Timer.set(5, 'm', `Soak ${formatIngredient(DATES)} in water for 5–10 minutes, then drain`, {
+        const soakStep = Timer.set(7, 'm', `Soak ${formatIngredient(DATES)} in water for 5–10 minutes, then drain`, {
             ingredients: [DATES, WATER],
-        }));
+        });
+        s(soakStep);
+
         s(foodProcessor.add([
-            DATES,
             PEANUT_BUTTER,
             ALLULOSE,
             WATER,
@@ -5565,6 +5599,8 @@ withPlan(createRecipe(
             VANILLA,
             SALT,
         ]));
+        const addSoakedDates = foodProcessor.add([DATES]).waitFor(soakStep);
+        s(addSoakedDates);
         s(foodProcessor.mix('sticky date-nut butter paste'));
         const DATE_PASTE = foodProcessor.result;
         s(instruction(`Process ${formatIngredient(DATE_PASTE)} until you have a smooth, sticky paste`, {
@@ -6206,6 +6242,46 @@ registerGroup('Dinner', [
             return steps;
         })(),
     ), { planMinutes: 7, portable: false }),
+
+    createRecipe('nuwave-pork-shoulder', 'Pork Shoulder (NuWave, 2 lb)', (() => {
+        const pan = e.nuwavePan();
+        const PORK = i.porkShoulder(2, u.pound);
+        const steps: Step[] = [];
+        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+
+        s(info('For a 2 lb pork shoulder. Set the NuWave to 375°F, brown the pork uncovered, then cook it covered at 225°F for 2–3 hours until it hits 195–205°F inside.'));
+
+        s(pan.setTemp(375));
+        s(pan.addOil(i.avocadoOil(1, u.spray), 'a little oil for browning'));
+        s(pan.add([[PORK, 'brown uncovered, 3–5 minutes per side']]));
+        s(pan.cook('Brown first side, uncovered', time.minutes(5), 375));
+        s(pan.flip());
+        s(pan.cook('Brown second side, uncovered', time.minutes(5), 375));
+
+        s(pan.add([
+            [i.water(1.5, u.cup), 'or broth, a third to halfway up the meat'],
+            [i.blackPepper(1, u.tsp), 'only if using water'],
+            [i.garlicPowder(1, u.tsp), 'only if using water'],
+            [i.onionPowder(1, u.tsp), 'only if using water'],
+            [i.paprika(1, u.tsp), 'optional'],
+        ], 'season the liquid - no extra salt, the pork is already salted'));
+
+        s(instruction('Bring to a gentle simmer, put the lid on', { equipment: [pan.name] }));
+        s(pan.setTemp(225));
+        s(instruction('If you need to keep a few slow bubbles going, go up toward 275°F', { equipment: [pan.name] }));
+        s(pan.cook('Cook covered', time.minutes(90), 225));
+        s(Timer.gate('Has it cooked at least 1.5 hours?', 30, 'm', { equipment: [pan.name], ingredients: [PORK] }));
+        s(instruction(`Turn ${formatIngredient(PORK)} and add water if it gets low`, { equipment: [pan.name], ingredients: [PORK, i.water(1, u.cup)] }));
+        s(pan.cook('Cook covered, second half', time.minutes(60), 225));
+        s(Timer.gate('Can a fork twist easily in the meat?', 15, 'm', { equipment: [pan.name], ingredients: [PORK] }));
+        s(instruction(`Check the center temperature - it should read 195–205°F. Add water if it gets low`, {
+            equipment: [pan.name], ingredients: [PORK, i.water(1, u.cup)],
+        }));
+        s(Timer.gate('Is the pork at 195–205°F in the center?', 15, 'm', { equipment: [pan.name], ingredients: [PORK] }));
+        s(Timer.set(10, 'm', 'Rest before serving', { equipment: [pan.name], ingredients: [PORK] }));
+
+        return steps;
+    })()),
 ]);
 
 registerGroup('Blueprint', [

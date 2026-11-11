@@ -106,7 +106,7 @@ function resolveUnit(expr) {
 // deliberate zero-placeholders (e.g. a spice whose Amazon listing has an image-only label) —
 // add a key here once you've confirmed the zero is intentional, to silence this warning.
 const EXPECTED_ZERO_NUTRITION = [
-    'parsleyFlakes', 'garlicPowder', 'blackPepper', 'bakingSoda', 'paprika', 'thyme', 'rosemary', 'dillWeed',
+    'parsleyFlakes', 'garlicPowder', 'onionPowder', 'blackPepper', 'bakingSoda', 'paprika', 'thyme', 'rosemary', 'dillWeed',
     'whiteVinegar', 'champagneVinegar', 'water', 'creatine', 'avocadoOil', 'iceCube',
     'allulose', 'mapleExtract', 'vanillaPowder',
 ];
