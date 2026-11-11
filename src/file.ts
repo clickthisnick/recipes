@@ -5568,6 +5568,7 @@ withPlan(createRecipe(
     'Shelf-Stable Vanilla-Chip Chewy Granola Bars (Makes 10)',
     (() => {
         const bowl         = e.bowl();
+        const binderBowl   = e.bowl('binder bowl');
         const foodProcessor = e.bulletMixer();
         const pan          = e.pan('8×8-inch pan');
         const steps: Step[] = [];
@@ -5575,11 +5576,12 @@ withPlan(createRecipe(
 
         const OATS       = i.rolledOats(180, u.gram);
         const PEANUT_BUTTER = i.peanutButter(128, u.gram);
-        const DATES      = i.medjoolDate(90, u.gram);
+        const DATES      = i.medjoolDate(120, u.gram);
         const ALLULOSE   = i.allulose(15, u.gram);
         const WATER      = i.water(2, u.tbsp);
         const MAPLE      = i.mapleExtract(0.5, u.tsp);
-        const FLAX       = i.groundFlaxseed(2, u.tbsp);
+        const PSYLLIUM   = i.psyllium(1, u.tbsp);
+        const PSYLLIUM_WATER = i.water(4, u.tbsp);
         const HEMP       = i.hempSeed(2, u.tbsp);
         const VANILLA    = i.vanillaExtract(1, u.tsp);
         const SALT       = i.seaSalt(0.5, u.tsp);
@@ -5591,16 +5593,19 @@ withPlan(createRecipe(
         });
         s(soakStep);
 
+        s(binderBowl.combine([PSYLLIUM, PSYLLIUM_WATER], 'let thicken into a binder gel'));
+        const BINDER_GEL = binderBowl.result;
+        BINDER_GEL.rename('Binder Gel');
+
         s(foodProcessor.add([
             PEANUT_BUTTER,
             ALLULOSE,
-            WATER,
             MAPLE,
             VANILLA,
             SALT,
         ]));
-        const addSoakedDates = foodProcessor.add([DATES]).waitFor(soakStep);
-        s(addSoakedDates);
+        const addStickyBase = foodProcessor.add([DATES, BINDER_GEL]).waitFor(soakStep);
+        s(addStickyBase);
         s(foodProcessor.mix('sticky date-nut butter paste'));
         const DATE_PASTE = foodProcessor.result;
         s(instruction(`Process ${formatIngredient(DATE_PASTE)} until you have a smooth, sticky paste`, {
@@ -5609,13 +5614,12 @@ withPlan(createRecipe(
         }));
         s(bowl.add([
             OATS,
-            FLAX,
             HEMP,
         ]));
         s(bowl.mix());
         s(instruction(`Pour ${formatIngredient(DATE_PASTE)} over the oats and mix extremely well`, {
             equipment: [bowl.name],
-            ingredients: [DATE_PASTE, OATS, FLAX, HEMP],
+            ingredients: [DATE_PASTE, OATS, PSYLLIUM, HEMP],
         }));
         s(instruction(`Fold in ${formatIngredient(CHOCOLATE)}`, {
             ingredients: [CHOCOLATE],
