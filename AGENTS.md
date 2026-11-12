@@ -10,6 +10,12 @@ This is a personal recipes project. Keep all recipe and product data, plus code,
 - `src/requirements.md` is reference/spec documentation, not source of truth.
 - `node_modules/` and `dist/` are never inspected.
 
+## Modern Web Guidance
+
+- Before writing or editing web UI, CSS, or client-side JS (including HTML pages, dialogs, forms, animations, accessibility, and performance), consult `modern-web-guidance` first: `npx -y modern-web-guidance@latest search "<focused query>"`, then `retrieve "<id>"` for relevant guides.
+- Follow the skill instructions in `.agents/skills/modern-web-guidance/SKILL.md`, including retrieving broader discipline guides (e.g., `html`, `css`, `forms`, `accessibility`, `performance`, `security`) when they apply.
+- Keep browser-support fallbacks as the guides require unless the user specifies a custom support policy.
+
 ## Working with src/file.ts (cost-sensitive)
 
 `src/file.ts` is very large, so do not read or print the whole file. Prefer targeted commands:
