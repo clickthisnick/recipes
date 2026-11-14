@@ -683,6 +683,8 @@ function recipeCookSeconds(recipe) {
     }
     let totalTime = 0;
     for (const step of recipe.steps) {
+        if (step.prepOnly)
+            continue;
         if (step.type !== 'timer' && step.type !== 'gate')
             continue;
         const keys = claimKeysForStep(step);
@@ -3840,7 +3842,7 @@ h1, h2 { margin-top: 0; font-size: 28px; }
 // Replaced with the real compile timestamp by scripts/validate-recipes.js's postbuild
 // step, right after `tsc` emits dist/file.js. Left as-is (and reported as "dev build")
 // when running straight from source, e.g. under `vite`.
-const BUILD_TIME = '2026-11-14T13:26:37.941Z';
+const BUILD_TIME = '2026-11-14T17:14:04.396Z';
 function formatBuildTime() {
     const date = new Date(BUILD_TIME);
     if (isNaN(date.getTime()))
@@ -5041,10 +5043,12 @@ export const i = {
 // RECIPES
 // ============================================================
 registerGroup('Breakfast', [
-    withPlan(createRecipe('blueprint-smoothie', 'Blueprint Smoothie (Nutribullet)', (() => {
+    withPlan(createRecipe('blueprint-smoothie', 'Blueprint Smoothie (Nutribullet, 1 serving)', (() => {
         const mixer = e.bulletMixer();
         const bag = e.siliconeBag('OXO silicone bag');
-        const MACADAMIA_MILK = i.macadamiaNutMilk(1, u.cup);
+        const knife = e.knife();
+        const board = e.cuttingBoard();
+        const MACADAMIA_MILK = i.macadamiaNutMilk(1.25, u.cup);
         const MACADAMIA_NUT = i.macadamiaNut(0.25, u.cup);
         const CHERRY = i.cherry(3, u.unit);
         const BERRY_BLEND = i.antiOxidantBerryBlend(0.5, u.cup);
@@ -5052,70 +5056,121 @@ registerGroup('Breakfast', [
         const SPINACH = i.spinach(0.25, u.cup);
         const CELERY = i.celery(1, u.unit);
         const BANANA = i.banana(1, u.unit);
+        const LEMON = i.lemonJuice(2, u.tbsp);
+        const NIBS = i.cocoaNibs(1, u.tsp);
+        const CHIA = i.chiaSeed(1, u.tsp);
+        const HEMP = i.hempSeed(1, u.tbsp);
+        const VANILLA = i.vanillaExtract(0.25, u.tsp);
+        const FROZEN_PACK = [BANANA, CHERRY, BERRY_BLEND, KALE, SPINACH, CELERY];
         const steps = [];
         const s = (...newSteps) => steps.push(...newSteps);
-        const bagPrep = bag.add([
-            MACADAMIA_NUT,
-            CHERRY,
-            BERRY_BLEND,
-            KALE,
-            SPINACH,
-            CELERY,
-            BANANA,
-        ]);
+        s(info(`One ${bag.name} is one serving of produce only. For the week, repeat the tray-freeze and flat-bag steps once per smoothie. Keep ${formatIngredient(MACADAMIA_NUT)}, ${formatIngredient(NIBS)}, ${formatIngredient(CHIA)}, and ${formatIngredient(HEMP)} out of the freezer, pre-portioned into a small pantry jar, one serving per jar.`));
+        s(prepOnly(`Slice ${formatIngredient(BANANA)}`, {
+            ingredients: [BANANA], equipment: [knife.name, board.name],
+        }));
+        s(prepOnly(`Pat ${formatIngredient(KALE)}, ${formatIngredient(SPINACH)}, and ${formatIngredient(CELERY)} dry`, {
+            ingredients: [KALE, SPINACH, CELERY],
+        }));
+        s(prepOnly(`Chop ${formatIngredient(CELERY)} into about ½-inch pieces`, {
+            ingredients: [CELERY], equipment: [knife.name, board.name],
+        }));
+        s(prepOnly(`Line a sheet pan with parchment and spread ${formatIngredient(BANANA)}, ${formatIngredient(CHERRY)}, and ${formatIngredient(BERRY_BLEND)} in a single layer so the pieces do not touch`, {
+            ingredients: [BANANA, CHERRY, BERRY_BLEND], equipment: ['sheet pan'],
+        }));
+        const freezeTray = Timer.set(1, 'h', 'Freeze the fruit on the tray until the pieces are firm and separate', {
+            equipment: ['sheet pan'], ingredients: [BANANA, CHERRY, BERRY_BLEND],
+        });
+        freezeTray.prep = true;
+        freezeTray.prepOnly = true;
+        s(freezeTray);
+        const bagPrep = bag.add(FROZEN_PACK);
         bagPrep.prep = true;
+        bagPrep.prepOnly = true;
         s(bagPrep);
-        s(mixer.add([
-            MACADAMIA_MILK,
-            i.lemonJuice(2, u.tbsp),
-            i.cocoaNibs(1, u.tsp),
-            i.chiaSeed(1, u.tsp),
-            i.hempSeed(1, u.tbsp),
-            i.vanillaExtract(0.25, u.tsp),
-        ]));
+        s(prepOnly(`Press the air out of the ${bag.name}, seal it, and freeze it flat`, {
+            equipment: [bag.name],
+        }));
+        s(mixer.add([MACADAMIA_MILK, MACADAMIA_NUT, LEMON, NIBS, CHIA, HEMP, VANILLA]));
         s(mixer.mix());
-        s(bag.transfer(mixer, [MACADAMIA_NUT, CHERRY, BERRY_BLEND, KALE, SPINACH, CELERY, BANANA]));
-        s(Timer.set(30, 's', 'Let mixer settle', { equipment: [mixer.name] }));
+        s(instruction(`Snap the flat ${bag.name} apart by hand so the frozen pack breaks into pieces`, {
+            equipment: [bag.name],
+        }));
+        s(bag.transfer(mixer, FROZEN_PACK));
+        s(Timer.set(4, 'm', 'Let the frozen pack sit in the cup (3–5 min)', { equipment: [mixer.name] }));
         s(mixer.mix());
         return steps;
-    })(), undefined, 8), { planMinutes: 8, portable: false }),
+    })(), undefined, 8), { planMinutes: 8, portable: false, prepMinutes: 75 }),
     withPlan(createRecipe('blueprint-smoothie-nuwave', 'Blueprint Smoothie (Nuwave) (x2)', (() => {
         const mixer = e.bulletMixer();
-        const bag = e.siliconeBag('OXO silicone bag');
-        const MACADAMIA_MILK = i.macadamiaNutMilk(2, u.cup);
+        const bagA = e.siliconeBag('OXO silicone bag 1');
+        const bagB = e.siliconeBag('OXO silicone bag 2');
+        const knife = e.knife();
+        const board = e.cuttingBoard();
+        const MACADAMIA_MILK = i.macadamiaNutMilk(2.5, u.cup);
         const MACADAMIA_NUT = i.macadamiaNut(0.5, u.cup);
-        const CHERRY = i.cherry(6, u.unit);
-        const BERRY_BLEND = i.antiOxidantBerryBlend(1, u.cup);
-        const KALE = i.kale(1, u.cup);
-        const SPINACH = i.spinach(0.5, u.cup);
-        const CELERY = i.celery(2, u.unit);
-        const BANANA = i.banana(2, u.unit);
+        const LEMON = i.lemonJuice(4, u.tbsp);
+        const NIBS = i.cocoaNibs(2, u.tsp);
+        const CHIA = i.chiaSeed(2, u.tsp);
+        const HEMP = i.hempSeed(2, u.tbsp);
+        const VANILLA = i.vanillaExtract(0.5, u.tsp);
+        const BANANA_A = i.banana(1, u.unit);
+        const BANANA_B = i.banana(1, u.unit);
+        const CHERRY_A = i.cherry(3, u.unit);
+        const CHERRY_B = i.cherry(3, u.unit);
+        const BERRY_A = i.antiOxidantBerryBlend(0.5, u.cup);
+        const BERRY_B = i.antiOxidantBerryBlend(0.5, u.cup);
+        const KALE_A = i.kale(0.5, u.cup);
+        const KALE_B = i.kale(0.5, u.cup);
+        const SPINACH_A = i.spinach(0.25, u.cup);
+        const SPINACH_B = i.spinach(0.25, u.cup);
+        const CELERY_A = i.celery(1, u.unit);
+        const CELERY_B = i.celery(1, u.unit);
+        const PACK_A = [BANANA_A, CHERRY_A, BERRY_A, KALE_A, SPINACH_A, CELERY_A];
+        const PACK_B = [BANANA_B, CHERRY_B, BERRY_B, KALE_B, SPINACH_B, CELERY_B];
         const steps = [];
         const s = (...newSteps) => steps.push(...newSteps);
-        const bagPrep = bag.add([
-            MACADAMIA_NUT,
-            CHERRY,
-            BERRY_BLEND,
-            KALE,
-            SPINACH,
-            CELERY,
-            BANANA,
-        ]);
-        bagPrep.prep = true;
-        s(bagPrep);
-        s(mixer.add([
-            MACADAMIA_MILK,
-            i.lemonJuice(4, u.tbsp),
-            i.cocoaNibs(2, u.tsp),
-            i.chiaSeed(2, u.tsp),
-            i.hempSeed(2, u.tbsp),
-            i.vanillaExtract(0.5, u.tsp),
-        ]));
-        s(bag.transfer(mixer, [MACADAMIA_NUT, CHERRY, BERRY_BLEND, KALE, SPINACH, CELERY, BANANA]));
+        s(info(`Use two ${bagA.name.replace(' 1', '')}s, one serving of produce in each, not one double bag. For the week, repeat the tray-freeze and flat-bag steps once per smoothie. Keep the macadamia nuts, cocoa nibs, chia, and hemp out of the freezer and pre-portion one serving of them into a small pantry jar.`));
+        s(prepOnly(`Slice ${formatIngredient(BANANA_A)} for each bag`, {
+            ingredients: [BANANA_A, BANANA_B], equipment: [knife.name, board.name],
+        }));
+        s(prepOnly(`Pat ${formatIngredient(KALE_A)}, ${formatIngredient(SPINACH_A)}, and ${formatIngredient(CELERY_A)} dry for each bag`, {
+            ingredients: [KALE_A, KALE_B, SPINACH_A, SPINACH_B, CELERY_A, CELERY_B],
+        }));
+        s(prepOnly(`Chop ${formatIngredient(CELERY_A)} into about ½-inch pieces for each bag`, {
+            ingredients: [CELERY_A, CELERY_B], equipment: [knife.name, board.name],
+        }));
+        s(prepOnly(`Line a sheet pan with parchment and spread ${formatIngredient(BANANA_A)}, ${formatIngredient(CHERRY_A)}, and ${formatIngredient(BERRY_A)} per bag in a single layer so the pieces do not touch`, {
+            ingredients: [BANANA_A, BANANA_B, CHERRY_A, CHERRY_B, BERRY_A, BERRY_B], equipment: ['sheet pan'],
+        }));
+        const freezeTray = Timer.set(1, 'h', 'Freeze the fruit on the tray until the pieces are firm and separate', {
+            equipment: ['sheet pan'],
+            ingredients: [BANANA_A, BANANA_B, CHERRY_A, CHERRY_B, BERRY_A, BERRY_B],
+        });
+        freezeTray.prep = true;
+        freezeTray.prepOnly = true;
+        s(freezeTray);
+        const bagPrepA = bagA.add(PACK_A);
+        bagPrepA.prep = true;
+        bagPrepA.prepOnly = true;
+        s(bagPrepA);
+        const bagPrepB = bagB.add(PACK_B);
+        bagPrepB.prep = true;
+        bagPrepB.prepOnly = true;
+        s(bagPrepB);
+        s(prepOnly(`Press the air out of ${bagA.name} and ${bagB.name}, seal them, and freeze each bag flat`, {
+            equipment: [bagA.name, bagB.name],
+        }));
+        s(mixer.add([MACADAMIA_MILK, MACADAMIA_NUT, LEMON, NIBS, CHIA, HEMP, VANILLA]));
         s(Timer.set(90, 's', 'Use Nut Milk setting', { equipment: [mixer.name], ingredients: [MACADAMIA_MILK] }));
+        s(instruction(`Snap ${bagA.name} and ${bagB.name} apart by hand so each frozen pack breaks into pieces`, {
+            equipment: [bagA.name, bagB.name],
+        }));
+        s(bagA.transfer(mixer, PACK_A));
+        s(bagB.transfer(mixer, PACK_B));
+        s(Timer.set(4, 'm', 'Let the frozen packs sit in the cup (3–5 min)', { equipment: [mixer.name] }));
         s(mixer.mix());
         return steps;
-    })(), undefined, 8), { planMinutes: 8, portable: false }),
+    })(), undefined, 8), { planMinutes: 8, portable: false, prepMinutes: 75 }),
     withPlan(createRecipe('instant-oatmeal-maple-brown-sugar', 'Instant Oatmeal (Maple & Brown Sugar, Lower Sugar)', (() => {
         const bowl = e.bowl();
         const kettle = e.kettle();
