@@ -1,5 +1,9 @@
 /* Shared document, form, and table utilities for the static kitchen pages. */
 
+:root {
+    color-scheme: light;
+}
+
 body {
     margin: 0;
     padding: 1rem;
@@ -120,4 +124,9 @@ tr.completed a { color: #fff; }
 
 .status {
     min-block-size: 1.5rem;
+}
+
+form:tool-form-active {
+    outline: 2px dashed #0b57d0;
+    outline-offset: 4px;
 }

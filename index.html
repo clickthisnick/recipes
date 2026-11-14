@@ -3,10 +3,12 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'">
     <title>Kitchen tools | Recipes</title>
     <link rel="stylesheet" href="./src/site.css">
     <style>
-        html { background: #000; }
+        html { background: #000; color-scheme: dark; }
         body { background: #000; color: #fff; }
         a { color: #d3d3d3; }
         h1 { font-size: 1.75rem; }
@@ -32,5 +34,22 @@
             </ul>
         </nav>
     </main>
+    <script type="module">
+        import { registerAgentTools } from './src/site-logic.js';
+        registerAgentTools([{
+            name: 'list-kitchen-tools',
+            description: 'List the kitchen tools linked from this home page.',
+            inputSchema: { type: 'object', properties: {} },
+            execute() {
+                return {
+                    tools: [...document.querySelectorAll('nav a')].map((link) => ({
+                        name: link.textContent,
+                        href: link.getAttribute('href'),
+                    })),
+                };
+            },
+            annotations: { readOnlyHint: true },
+        }]);
+    </script>
 </body>
 </html>

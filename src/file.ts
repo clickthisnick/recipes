@@ -3803,6 +3803,7 @@ button, a, input, select { touch-action: manipulation; }
 /* Block pinch-zoom gestures page-wide (belt-and-suspenders alongside the viewport meta
    tag's maximum-scale/user-scalable, which some iOS versions/accessibility settings can
    partially override) - still allow normal scrolling in both directions. */
+html { color-scheme: dark; }
 html, body { touch-action: pan-x pan-y; }
 
 body {
@@ -4099,7 +4100,9 @@ h1, h2 { margin-top: 0; font-size: 28px; }
 .panel.completed { background: #1a5c2a; color: white; border-color: #2d9e4a; }
 .panel.skipped   { background: #374151; color: #9ca3af; border-color: #4b5563; text-decoration: line-through; }
 
-.panel.ringing { background: #7f1d1d; color: white; border-color: #ef4444; animation: alarmPulse 1s ease-in-out infinite; }
+.panel.ringing { background: #7f1d1d; color: white; border-color: #ef4444;
+    @media (prefers-reduced-motion: no-preference) { animation: alarmPulse 1s ease-in-out infinite; }
+}
 @keyframes alarmPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.65; } }
 .ringing-label { font-weight: 600; }
 .ringing-countdown { margin-top: 6px; font-size: 15px; opacity: 0.85; }
@@ -4108,7 +4111,8 @@ h1, h2 { margin-top: 0; font-size: 28px; }
     position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
     background: #7f1d1d; color: white; border-bottom: 2px solid #ef4444;
     padding: 10px 16px; text-align: center; font-size: 15px; font-weight: 600;
-    cursor: pointer; animation: alarmPulse 1s ease-in-out infinite;
+    cursor: pointer;
+    @media (prefers-reduced-motion: no-preference) { animation: alarmPulse 1s ease-in-out infinite; }
 }
 .sound-error {
     margin-top: 8px; font-size: 13px; font-weight: 600; color: #fecaca;
@@ -4144,7 +4148,9 @@ h1, h2 { margin-top: 0; font-size: 28px; }
     0%   { border-color: #2d9e4a; background: rgba(45, 158, 74, 0.15); }
     100% { border-color: #444;    background: transparent; }
 }
-.panel.step-unlocked { animation: unlockFlash 0.8s ease-out forwards; }
+.panel.step-unlocked {
+    @media (prefers-reduced-motion: no-preference) { animation: unlockFlash 0.8s ease-out forwards; }
+}
 
 .purchase-links { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
 .purchase-link { color: #60a5fa; font-size: 16px; text-decoration: none; }
@@ -4378,6 +4384,111 @@ function bootstrap(): void {
     } else {
         render();
     }
+    registerRecipeAgentTools();
+}
+
+const RECIPE_SCREENS = ['select', 'shopping', 'cooking', 'nutrition', 'add-ingredient', 'prep', 'plan'] as const;
+
+function registerRecipeAgentTools(): void {
+    if (!('modelContext' in document)) return;
+    const modelContext = (document as Document & {
+        modelContext?: { registerTool: (tool: object, options?: { signal: AbortSignal }) => Promise<unknown> | unknown };
+    }).modelContext;
+    if (!modelContext) return;
+    const controller = new AbortController();
+    const recipes = () => [...state.recipes.values()].filter(recipe => !recipe.hidden || state.showHidden);
+
+    const tools = [
+        {
+            name: 'search-recipes',
+            description: 'Find recipes by name. Use when choosing what to cook.',
+            inputSchema: {
+                type: 'object',
+                properties: { query: { type: 'string', description: 'Words from the recipe name. An empty query lists visible recipes.' } },
+            },
+            execute(input: { query?: unknown }) {
+                const query = typeof input?.query === 'string' ? input.query.trim().toLowerCase() : '';
+                return {
+                    recipes: recipes()
+                        .filter(recipe => !query || recipe.name.toLowerCase().includes(query))
+                        .slice(0, 20)
+                        .map(recipe => ({ id: recipe.id, name: recipe.name, group: recipe.group ?? '' })),
+                };
+            },
+            annotations: { readOnlyHint: true },
+        },
+        {
+            name: 'list-selected-recipes',
+            description: 'Read how many servings are currently selected.',
+            inputSchema: { type: 'object', properties: {} },
+            execute() {
+                const counts = new Map<string, number>();
+                for (const id of state.selectedRecipeIds) counts.set(id, (counts.get(id) ?? 0) + 1);
+                return {
+                    selected: [...counts].map(([id, servings]) => ({ id, name: state.recipes.get(id)?.name ?? id, servings })),
+                };
+            },
+            annotations: { readOnlyHint: true },
+        },
+        {
+            name: 'add-recipe-serving',
+            description: 'Add one serving of a recipe to the current selection.',
+            inputSchema: {
+                type: 'object',
+                properties: { recipeId: { type: 'string', description: 'Recipe id from search-recipes.' } },
+                required: ['recipeId'],
+            },
+            execute(input: { recipeId?: unknown }) {
+                const recipe = typeof input?.recipeId === 'string' ? state.recipes.get(input.recipeId) : undefined;
+                if (!recipe) return { error: 'Unknown recipe id. Call search-recipes first.' };
+                state.selectedRecipeIds.push(recipe.id);
+                render();
+                const servings = state.selectedRecipeIds.filter(id => id === recipe.id).length;
+                return { recipeId: recipe.id, name: recipe.name, servings };
+            },
+            annotations: { readOnlyHint: false },
+        },
+        {
+            name: 'remove-recipe-serving',
+            description: 'Remove one serving of a selected recipe.',
+            inputSchema: {
+                type: 'object',
+                properties: { recipeId: { type: 'string', description: 'Recipe id from list-selected-recipes.' } },
+                required: ['recipeId'],
+            },
+            execute(input: { recipeId?: unknown }) {
+                if (typeof input?.recipeId !== 'string') return { error: 'Pass a recipe id.' };
+                const idx = state.selectedRecipeIds.lastIndexOf(input.recipeId);
+                if (idx === -1) return { error: 'That recipe has no selected servings.' };
+                state.selectedRecipeIds.splice(idx, 1);
+                render();
+                const servings = state.selectedRecipeIds.filter(id => id === input.recipeId).length;
+                return { recipeId: input.recipeId, servings };
+            },
+            annotations: { readOnlyHint: false },
+        },
+        {
+            name: 'open-recipe-screen',
+            description: 'Show a recipe app screen for the current selection.',
+            inputSchema: {
+                type: 'object',
+                properties: { screen: { type: 'string', enum: [...RECIPE_SCREENS], description: 'Which screen to show.' } },
+                required: ['screen'],
+            },
+            execute(input: { screen?: unknown }) {
+                if (typeof input?.screen !== 'string' || !(RECIPE_SCREENS as readonly string[]).includes(input.screen)) {
+                    return { error: 'Unknown screen.', screens: RECIPE_SCREENS };
+                }
+                navigateTo(input.screen as Screen);
+                return { screen: input.screen };
+            },
+            annotations: { readOnlyHint: false },
+        },
+    ];
+    for (const tool of tools) {
+        void Promise.resolve(modelContext.registerTool(tool, { signal: controller.signal })).catch(() => {});
+    }
+    window.addEventListener('pagehide', () => controller.abort(), { once: true });
 }
 
 // ============================================================
