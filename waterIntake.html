@@ -3,6 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
+    <meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'">
     <title>Water intake | Recipes</title>
     <link rel="stylesheet" href="./src/site.css">
 </head>
@@ -34,15 +36,15 @@
         </div>
 
         <h2>What you drank</h2>
-        <form id="water-form">
+        <form id="water-form" toolname="calculate-gallons" tooldescription="Convert liters and clean bottles into gallons using the chart on this page." toolautosubmit>
             <div class="field">
                 <label for="liters">Liters</label>
-                <input id="liters" name="liters" type="number" min="0" step="any" inputmode="decimal" value="0" required data-error="liters-error" data-testid="liters">
+                <input id="liters" name="liters" type="number" min="0" step="any" inputmode="decimal" value="0" required data-error="liters-error" data-testid="liters" toolparamdescription="How many liters were drunk.">
                 <p id="liters-error" class="error-msg"><span role="img" aria-label="Error">❌</span> Enter zero or a positive number of liters.</p>
             </div>
             <div class="field">
                 <label for="clean-bottles">Clean bottles</label>
-                <input id="clean-bottles" name="bottles" type="number" min="0" step="any" inputmode="decimal" value="0" required data-error="bottles-error" data-testid="clean-bottles">
+                <input id="clean-bottles" name="bottles" type="number" min="0" step="any" inputmode="decimal" value="0" required data-error="bottles-error" data-testid="clean-bottles" toolparamdescription="How many clean bottles were drunk.">
                 <p id="bottles-error" class="error-msg"><span role="img" aria-label="Error">❌</span> Enter zero or a positive number of clean bottles.</p>
             </div>
             <button type="submit" id="calculate-gallons" data-testid="calculate-gallons">Calculate gallons</button>
@@ -84,9 +86,15 @@
         }
 
         form.addEventListener('submit', (event) => {
-            if (!form.checkValidity()) return;
+            if (!form.checkValidity()) {
+                if (event.agentInvoked && event.respondWith) {
+                    event.respondWith(Promise.resolve('Enter zero or a positive number for each container.'));
+                }
+                return;
+            }
             event.preventDefault();
             showResult();
+            if (event.agentInvoked && event.respondWith) event.respondWith(Promise.resolve(result.textContent));
         });
 
         if (params.has('liters') || params.has('bottles')) showResult();

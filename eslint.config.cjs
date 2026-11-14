@@ -26,6 +26,7 @@ module.exports = [
                 Buffer: 'readonly',
                 setTimeout: 'readonly',
                 clearTimeout: 'readonly',
+                AbortController: 'readonly',
                 URL: 'readonly',
                 URLSearchParams: 'readonly',
                 document: 'readonly',

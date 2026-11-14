@@ -3,6 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
+    <meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'">
     <title>Frozen food portions | Recipes</title>
     <link rel="stylesheet" href="./src/site.css">
 </head>
@@ -19,5 +21,17 @@
             <li>Ham Steaks - Oven 170 Degrees for 5 min to get rid of some of excess water Then cut in half and freeze</li>
         </ul>
     </main>
+    <script type="module">
+        import { registerAgentTools } from './src/site-logic.js';
+        registerAgentTools([{
+            name: 'read-freezer-notes',
+            description: 'Read the freezer portion notes on this page.',
+            inputSchema: { type: 'object', properties: {} },
+            execute() {
+                return { notes: [...document.querySelectorAll('main li')].map((item) => item.textContent) };
+            },
+            annotations: { readOnlyHint: true },
+        }]);
+    </script>
 </body>
 </html>

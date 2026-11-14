@@ -3,6 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
+    <meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'">
     <title>Grocery list | Recipes</title>
     <link rel="stylesheet" href="./src/site.css">
 </head>
@@ -163,7 +165,7 @@
         </div>
     </main>
     <script type="module">
-        import { addCalendarDays, formatUsDate, isoDate } from './src/site-logic.js';
+        import { addCalendarDays, formatUsDate, isoDate, registerAgentTools } from './src/site-logic.js';
 
         const today = new Date();
         const ahead = addCalendarDays(today, 7);
@@ -180,6 +182,49 @@
                 status.textContent = box.checked ? `${name} marked purchased` : `${name} marked still needed`;
             });
         }
+
+        function groceryItems() {
+            return [...document.querySelectorAll('#grocery-rows tr')].map((row) => ({
+                name: row.querySelector('td')?.textContent ?? '',
+                quantity: row.querySelectorAll('td')[1]?.textContent ?? '',
+                purchased: Boolean(row.querySelector('input')?.checked),
+            }));
+        }
+
+        registerAgentTools([
+            {
+                name: 'list-groceries',
+                description: 'Read the grocery rows and which ones are marked purchased.',
+                inputSchema: { type: 'object', properties: {} },
+                execute() { return { items: groceryItems() }; },
+                annotations: { readOnlyHint: true },
+            },
+            {
+                name: 'set-grocery-purchased',
+                description: 'Mark one grocery row purchased or still needed.',
+                inputSchema: {
+                    type: 'object',
+                    properties: {
+                        name: { type: 'string', description: 'Item name as shown in the list.' },
+                        purchased: { type: 'boolean', description: 'Whether the item has been bought.' },
+                    },
+                    required: ['name', 'purchased'],
+                },
+                execute(input) {
+                    if (typeof input?.name !== 'string' || typeof input?.purchased !== 'boolean') {
+                        return { error: 'Pass the item name and whether it is purchased.' };
+                    }
+                    const row = [...document.querySelectorAll('#grocery-rows tr')]
+                        .find((entry) => entry.querySelector('td')?.textContent === input.name);
+                    if (!row) return { error: `No grocery item named "${input.name}".`, items: groceryItems().map((item) => item.name) };
+                    const box = row.querySelector('input');
+                    box.checked = input.purchased;
+                    box.dispatchEvent(new Event('change'));
+                    return { name: input.name, purchased: box.checked };
+                },
+                annotations: { readOnlyHint: false },
+            },
+        ]);
     </script>
 </body>
 </html>

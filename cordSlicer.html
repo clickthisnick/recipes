@@ -3,6 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
+    <meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'">
     <title>Pull cord slicer amount | Recipes</title>
     <link rel="stylesheet" href="./src/site.css">
 </head>
@@ -32,5 +34,22 @@
             </table>
         </div>
     </main>
+    <script type="module">
+        import { registerAgentTools } from './src/site-logic.js';
+        registerAgentTools([{
+            name: 'read-slice-amounts',
+            description: 'Read the cord slicer slice counts shown on this chart.',
+            inputSchema: { type: 'object', properties: {} },
+            execute() {
+                return {
+                    rows: [...document.querySelectorAll('tbody tr')].map((row) => ({
+                        item: row.querySelector('th')?.textContent ?? '',
+                        slices: row.querySelector('td')?.textContent ?? '',
+                    })).filter((row) => row.slices),
+                };
+            },
+            annotations: { readOnlyHint: true },
+        }]);
+    </script>
 </body>
 </html>

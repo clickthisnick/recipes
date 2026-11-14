@@ -3,6 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
+    <meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'">
     <title>Nutrition tracker | Recipes</title>
     <link rel="stylesheet" href="./src/site.css">
     <style>
@@ -52,7 +54,7 @@
     <section id="custom" hidden>
         <h2>Add Custom Food</h2>
         <p>Copy this JSON and manually add it to your foods list in your app repo.</p>
-        <form id="custom-form">
+        <form id="custom-form" toolname="build-custom-food" tooldescription="Build JSON for a custom food so it can be pasted into the tracker source." toolautosubmit>
             <div class="field">
                 <label for="custom-name">Food name</label>
                 <input id="custom-name" name="name" type="text" required maxlength="80" autocomplete="off" data-error="custom-name-error" data-testid="custom-name">
@@ -72,7 +74,7 @@
     </section>
 
     <script type="module">
-        import { TRACKER_NUTRIENTS, bindUserInvalid, customFoodRecord, sumSelectedNutrition } from './src/site-logic.js';
+        import { TRACKER_NUTRIENTS, bindUserInvalid, customFoodRecord, registerAgentTools, sumSelectedNutrition } from './src/site-logic.js';
 
         const units = { c: 'cal', g: 'g', mg: 'mg' };
         const fdaLimits = {
@@ -288,7 +290,12 @@
         bindUserInvalid(customForm);
         const jsonBox = document.getElementById('custom-food-json');
         customForm.addEventListener('submit', (event) => {
-            if (!customForm.checkValidity()) return;
+            if (!customForm.checkValidity()) {
+                if (event.agentInvoked && event.respondWith) {
+                    event.respondWith(Promise.resolve('Name and every nutrient are required, and nutrients cannot be negative.'));
+                }
+                return;
+            }
             event.preventDefault();
             const values = {};
             TRACKER_NUTRIENTS.forEach(([key]) => {
@@ -297,10 +304,12 @@
             const built = customFoodRecord(customForm.elements.name.value, values);
             if (!built.ok) {
                 status.textContent = built.errors[0];
+                if (event.agentInvoked && event.respondWith) event.respondWith(Promise.resolve(built.errors[0]));
                 return;
             }
             jsonBox.value = JSON.stringify({ [built.record.key]: built.record.entry }, null, 2);
             status.textContent = 'JSON ready to copy.';
+            if (event.agentInvoked && event.respondWith) event.respondWith(Promise.resolve(jsonBox.value));
         });
 
         const copyButton = document.getElementById('copy-custom-food');
@@ -330,6 +339,55 @@
         } else {
             copyButton.addEventListener('click', () => copyJson());
         }
+
+        function selectedSummary() {
+            return Object.entries(selectedFoods).map(([key, quantity]) => ({
+                key,
+                name: foodData[key].name,
+                quantity,
+            }));
+        }
+
+        registerAgentTools([
+            {
+                name: 'list-tracker-foods',
+                description: 'List foods that can be added to the nutrition tracker, plus the current selection.',
+                inputSchema: { type: 'object', properties: {} },
+                execute() {
+                    return {
+                        foods: Object.entries(foodData).map(([key, food]) => ({ key, name: food.name })),
+                        selected: selectedSummary(),
+                    };
+                },
+                annotations: { readOnlyHint: true },
+            },
+            {
+                name: 'set-tracker-quantity',
+                description: 'Set how many of a tracker food are selected. Zero removes it.',
+                inputSchema: {
+                    type: 'object',
+                    properties: {
+                        key: { type: 'string', description: 'Food key from list-tracker-foods.' },
+                        quantity: { type: 'number', minimum: 0, description: 'How many of that food to count.' },
+                    },
+                    required: ['key', 'quantity'],
+                },
+                execute(input) {
+                    if (typeof input?.key !== 'string' || !Number.isFinite(input?.quantity) || input.quantity < 0) {
+                        return { error: 'Pass a food key and a quantity of zero or more.' };
+                    }
+                    if (!foodData[input.key]) {
+                        return { error: `Unknown food key "${input.key}".`, keys: Object.keys(foodData) };
+                    }
+                    if (input.quantity === 0) delete selectedFoods[input.key];
+                    else selectedFoods[input.key] = input.quantity;
+                    renderSelectedFoods();
+                    document.getElementById('update-nutrition').click();
+                    return { key: input.key, quantity: selectedFoods[input.key] ?? 0 };
+                },
+                annotations: { readOnlyHint: false },
+            },
+        ]);
     </script>
 </body>
 </html>

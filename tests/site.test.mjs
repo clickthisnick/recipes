@@ -10,6 +10,7 @@ import {
     formatUsDate,
     gallonsDrank,
     isoDate,
+    registerAgentTools,
     sumSelectedNutrition,
 } from '../src/site-logic.js';
 import {
@@ -168,4 +169,12 @@ test('static pages keep the fixes agents and the calculators rely on', () => {
     assert.match(index, /<title>Kitchen tools \| Recipes<\/title>/);
     assert.equal(index.match(/<h1>/g).length, 1);
     assert.match(index, /tracker\.html/);
+    assert.match(water, /toolname="calculate-gallons"/);
+    assert.match(readFileSync(resolve('src/file.ts'), 'utf8'), /name: 'search-recipes'/);
+});
+
+test('WebMCP registration does nothing unless the browser provides it', () => {
+    const stop = registerAgentTools([{ name: 'unused', description: 'unused', inputSchema: { type: 'object', properties: {} }, execute() { return {}; } }]);
+    assert.equal(typeof stop, 'function');
+    stop();
 });
