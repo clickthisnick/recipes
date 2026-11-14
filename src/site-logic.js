@@ -147,11 +147,63 @@ export function bindUserInvalid(form) {
 }
 
 // WebMCP is an early Chromium preview. Other browsers have no modelContext, so this is a no-op.
+export const SITE_PAGES = [
+    { id: 'home', name: 'Kitchen tools', path: 'index.html' },
+    { id: 'recipes', name: 'Recipes', path: 'dist/main.html' },
+    { id: 'tracker', name: 'Nutrition tracker', path: 'tracker.html' },
+    { id: 'tracker-custom', name: 'Add custom food', path: 'tracker.html#custom' },
+    { id: 'meat-temperature', name: 'Meat temperature', path: 'meatTemp.html' },
+    { id: 'water-intake', name: 'Water intake', path: 'waterIntake.html' },
+    { id: 'grocery-list', name: 'Grocery list', path: 'groceryList.html' },
+    { id: 'expiration', name: 'Expiration calculator', path: 'expirationCalculator.html' },
+    { id: 'cord-slicer', name: 'Pull cord slicer', path: 'cordSlicer.html' },
+    { id: 'frozen-food', name: 'Frozen food portions', path: 'frozenFood.html' },
+    { id: 'eat-this', name: 'Eat this instead', path: 'eatThis.html' },
+];
+
+function siteRootHref() {
+    const url = new URL(window.location.href);
+    return new URL(url.pathname.includes('/dist/') ? '../' : './', url);
+}
+
+export function siteNavigationTools() {
+    if (typeof window === 'undefined') return [];
+    const hrefFor = (path) => new URL(path, siteRootHref()).href;
+    return [
+        {
+            name: 'list-pages',
+            description: 'List every kitchen tool page and its address.',
+            inputSchema: { type: 'object', properties: {} },
+            execute() {
+                return { pages: SITE_PAGES.map((page) => ({ id: page.id, name: page.name, href: hrefFor(page.path) })) };
+            },
+            annotations: { readOnlyHint: true },
+        },
+        {
+            name: 'open-page',
+            description: 'Open another kitchen tool page.',
+            inputSchema: {
+                type: 'object',
+                properties: { pageId: { type: 'string', description: 'Page id from list-pages.' } },
+                required: ['pageId'],
+            },
+            execute(input) {
+                const page = SITE_PAGES.find((entry) => entry.id === input?.pageId);
+                if (!page) return { error: 'Unknown page.', pages: SITE_PAGES.map((entry) => entry.id) };
+                const href = hrefFor(page.path);
+                window.location.assign(href);
+                return { opened: page.id, href };
+            },
+            annotations: { readOnlyHint: false },
+        },
+    ];
+}
+
 export function registerAgentTools(tools) {
     const context = typeof document !== 'undefined' ? document.modelContext : undefined;
     if (!context || typeof context.registerTool !== 'function') return () => {};
     const controller = new AbortController();
-    for (const tool of tools) {
+    for (const tool of [...tools, ...siteNavigationTools()]) {
         Promise.resolve(context.registerTool(tool, { signal: controller.signal })).catch(() => {});
     }
     const stop = () => controller.abort();

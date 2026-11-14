@@ -13,6 +13,48 @@ Personal static site for cooking, shopping, and nutrition. No accounts and no se
 - `/meatTemp.html` and `/cordSlicer.html` are reference charts.
 - `/frozenFood.html` and `/eatThis.html` are notes. Eat This rows have a Tried checkbox.
 
+## WebMCP tools
+
+These exist only in browsers that implement `document.modelContext`. Other browsers ignore them. A bad call returns `{ "error": "..." }`.
+
+### Every page
+
+- `list-pages` lists the tool pages and their addresses.
+- `open-page` opens one of those pages.
+
+### Recipe app (`/dist/main.html`)
+
+- `search-recipes` finds recipes by name.
+- `list-recipes` lists the visible recipes.
+- `list-categories` lists recipe groups.
+- `get-recipe` reads one recipe's title, servings, ingredients, steps, times, and notes.
+- `list-selected-recipes` reads the current servings.
+- `add-recipe-serving` adds one serving.
+- `remove-recipe-serving` removes one serving.
+- `list-bundles` lists one-tap bundles.
+- `add-bundle` adds a bundle to the selection.
+- `open-recipe-screen` shows select, shopping, cooking, nutrition, add-ingredient, prep, or plan.
+- `get-shopping-list` reads the combined list, scaled by servings.
+- `reset-selection` clears the selection and timers, the same as Start Over.
+- `read-cooking-status` reads each cooking step's state.
+- `advance-cooking-step` taps the next ready step once.
+- `start-cooking-timer` starts one timer.
+- `skip-cooking-timer` skips a running timer.
+- `answer-cooking-gate` answers yes or no on a check step.
+- `stop-alarm` stops one ringing alarm, or all of them.
+- `read-day-plan` reads the saved day plan.
+- `list-prep-steps` reads prep-ahead steps for the selection.
+
+### Other tools
+
+- `list-kitchen-tools` lists the links on the home page.
+- `calculate-gallons` converts liters and clean bottles. `read-water-chart` reads the chart and the current result.
+- `list-groceries` reads the grocery list. `set-grocery-purchased` checks one row.
+- `list-expiration-dates` reads expiration dates. `set-item-used` checks one item.
+- `list-eating-alternatives` reads the eat-this table. `set-alternative-tried` checks one food.
+- `list-tracker-foods` lists tracker foods. `set-tracker-quantity` sets a quantity and updates the table. `read-tracker-totals` reads that table. `build-custom-food` builds custom-food JSON.
+- `read-meat-temperatures`, `read-slice-amounts`, and `read-freezer-notes` read those reference pages.
+
 ## Run locally
 
 ```

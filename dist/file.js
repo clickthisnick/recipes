@@ -2535,37 +2535,38 @@ function skipTimer(step, panel, onDone) {
 // ============================================================
 // START OVER
 // ============================================================
+function resetSession() {
+    state.timers.forEach((id) => window.clearInterval(id));
+    state.timers.clear();
+    releaseWakeLockIfIdle();
+    state.ringingAlarms.forEach((id) => window.clearInterval(id));
+    state.ringingAlarms.clear();
+    activeAlarms.clear();
+    continuousRingSteps.clear();
+    audio.loop = false;
+    audio.pause();
+    audio.currentTime = 0;
+    state.gateRunCounts.clear();
+    state.selectedRecipeIds = [];
+    state.cookingPlanSteps = [];
+    state.searchQuery = '';
+    state.cookingStartedAt = null;
+    state.audioUnlocked = false;
+    nutritionExclusions.clear();
+    nutritionRecipeExclusions.clear();
+    nutritionExpanded.clear();
+    for (const [id, recipe] of state.recipes) {
+        if (recipe.adhoc)
+            state.recipes.delete(id);
+    }
+    if (state.cookingElapsedInterval !== null) {
+        window.clearInterval(state.cookingElapsedInterval);
+        state.cookingElapsedInterval = null;
+    }
+    navigateTo('select');
+}
 function createStartOverButton() {
-    const btn = createButton('↩ Start Over', () => {
-        state.timers.forEach((id) => window.clearInterval(id));
-        state.timers.clear();
-        releaseWakeLockIfIdle();
-        state.ringingAlarms.forEach((id) => window.clearInterval(id));
-        state.ringingAlarms.clear();
-        activeAlarms.clear();
-        continuousRingSteps.clear();
-        audio.loop = false;
-        audio.pause();
-        audio.currentTime = 0;
-        state.gateRunCounts.clear();
-        state.selectedRecipeIds = [];
-        state.cookingPlanSteps = [];
-        state.searchQuery = '';
-        state.cookingStartedAt = null;
-        state.audioUnlocked = false;
-        nutritionExclusions.clear();
-        nutritionRecipeExclusions.clear();
-        nutritionExpanded.clear();
-        for (const [id, recipe] of state.recipes) {
-            if (recipe.adhoc)
-                state.recipes.delete(id);
-        }
-        if (state.cookingElapsedInterval !== null) {
-            window.clearInterval(state.cookingElapsedInterval);
-            state.cookingElapsedInterval = null;
-        }
-        navigateTo('select');
-    });
+    const btn = createButton('↩ Start Over', () => resetSession());
     btn.className = 'start-over-btn';
     return btn;
 }
@@ -3846,7 +3847,7 @@ h1, h2 { margin-top: 0; font-size: 28px; }
 // Replaced with the real compile timestamp by scripts/validate-recipes.js's postbuild
 // step, right after `tsc` emits dist/file.js. Left as-is (and reported as "dev build")
 // when running straight from source, e.g. under `vite`.
-const BUILD_TIME = '2026-11-14T14:14:42.761Z';
+const BUILD_TIME = '2026-11-14T14:24:10.898Z';
 function formatBuildTime() {
     const date = new Date(BUILD_TIME);
     if (isNaN(date.getTime()))
@@ -3885,6 +3886,126 @@ function bootstrap() {
     registerRecipeAgentTools();
 }
 const RECIPE_SCREENS = ['select', 'shopping', 'cooking', 'nutrition', 'add-ingredient', 'prep', 'plan'];
+function describeStepsForAgent(steps) {
+    return steps.map((step) => ({
+        id: step.id,
+        type: step.type,
+        text: step.text,
+        durationSeconds: step.durationSeconds ?? null,
+        equipment: step.equipment ?? [],
+        ingredients: (step.ingredients ?? []).filter((ing) => !isComposite(ing)).map((ing) => formatIngredient(ing)),
+        prep: Boolean(step.prep),
+        prepOnly: Boolean(step.prepOnly),
+        note: step.type === 'info' ? step.text : undefined,
+        linkRecipeId: step.linkRecipeId,
+        children: step.children?.length ? describeStepsForAgent(step.children) : undefined,
+    }));
+}
+function collectRecipeIngredients(steps, seen = new Set()) {
+    const out = [];
+    for (const step of steps) {
+        for (const ing of step.ingredients ?? []) {
+            if (seen.has(ing) || isComposite(ing))
+                continue;
+            seen.add(ing);
+            out.push(ing);
+        }
+        if (step.children?.length)
+            out.push(...collectRecipeIngredients(step.children, seen));
+    }
+    return out;
+}
+function recipeNotes(steps) {
+    const notes = [];
+    for (const step of steps) {
+        if (step.type === 'info')
+            notes.push(step.text);
+        if (step.children?.length)
+            notes.push(...recipeNotes(step.children));
+    }
+    return notes;
+}
+export function agentRecipeDetails(idOrName) {
+    const needle = idOrName.trim().toLowerCase();
+    const byId = state.recipes.get(idOrName);
+    const matches = byId
+        ? [byId]
+        : [...state.recipes.values()].filter((recipe) => recipe.name.toLowerCase().includes(needle));
+    if (!byId && matches.length === 0)
+        return { error: 'No recipe matched.', query: idOrName };
+    if (!byId && matches.length > 1 && !matches.some((recipe) => recipe.name.toLowerCase() === needle)) {
+        return { error: 'More than one recipe matched. Pass an id.', matches: matches.slice(0, 10).map((recipe) => ({ id: recipe.id, name: recipe.name })) };
+    }
+    const recipe = byId ?? matches.find((entry) => entry.name.toLowerCase() === needle) ?? matches[0];
+    return {
+        id: recipe.id,
+        title: recipe.name,
+        group: recipe.group ?? '',
+        servings: getServings(recipe.id),
+        estimatedMinutes: recipe.estimatedMinutes ?? null,
+        planMinutes: recipe.planMinutes ?? null,
+        prepMinutes: recipe.prepMinutes ?? null,
+        cookTime: formatCookTime(recipeCookSeconds(recipe)),
+        ingredients: collectRecipeIngredients(recipe.steps).map((ing) => ({
+            text: formatIngredient(ing),
+            quantity: ing.quantity,
+            unit: ing.unit?.name ?? '',
+        })),
+        steps: describeStepsForAgent(recipe.steps),
+        notes: recipeNotes(recipe.steps),
+    };
+}
+export function agentShoppingList() {
+    const inventory = loadInventory();
+    return {
+        items: buildShoppingList().map((ing) => ({
+            text: formatIngredient(ing),
+            name: ing.name,
+            quantity: ing.quantity,
+            unit: ing.unit?.name ?? '',
+            have: inventory[inventoryKey(ing, false)] ?? 0,
+            havePackages: inventory[inventoryKey(ing, true)] ?? 0,
+        })),
+    };
+}
+function cookingStepStatus(stepId) {
+    const el = document.getElementById(`step-${stepId}`);
+    if (!el)
+        return 'not-rendered';
+    if (el.classList.contains('completed'))
+        return 'completed';
+    if (el.classList.contains('skipped'))
+        return 'skipped';
+    if (el.classList.contains('ringing'))
+        return 'ringing';
+    if (el.classList.contains('timer'))
+        return 'timing';
+    if (el.classList.contains('step-locked'))
+        return 'locked';
+    return 'ready';
+}
+function ensureCookingScreen() {
+    if (state.screen !== 'cooking')
+        navigateTo('cooking');
+}
+const SITE_PAGE_LIST = [
+    { id: 'home', path: 'index.html' },
+    { id: 'recipes', path: 'dist/main.html' },
+    { id: 'tracker', path: 'tracker.html' },
+    { id: 'tracker-custom', path: 'tracker.html#custom' },
+    { id: 'meat-temperature', path: 'meatTemp.html' },
+    { id: 'water-intake', path: 'waterIntake.html' },
+    { id: 'grocery-list', path: 'groceryList.html' },
+    { id: 'expiration', path: 'expirationCalculator.html' },
+    { id: 'cord-slicer', path: 'cordSlicer.html' },
+    { id: 'frozen-food', path: 'frozenFood.html' },
+    { id: 'eat-this', path: 'eatThis.html' },
+];
+function sitePageHref(path) {
+    const url = new URL(window.location.href);
+    const root = new URL(url.pathname.includes('/dist/') ? '../' : './', url);
+    return new URL(path, root).href;
+}
 function registerRecipeAgentTools() {
     if (!('modelContext' in document))
         return;
@@ -3980,6 +4101,310 @@ function registerRecipeAgentTools() {
                 }
                 navigateTo(input.screen);
                 return { screen: input.screen };
+            },
+            annotations: { readOnlyHint: false },
+        },
+        {
+            name: 'list-recipes',
+            description: 'List visible recipes and the group each one belongs to.',
+            inputSchema: { type: 'object', properties: {} },
+            execute() {
+                return {
+                    recipes: recipes().map((recipe) => ({
+                        id: recipe.id,
+                        name: recipe.name,
+                        group: recipe.group ?? '',
+                        hidden: Boolean(recipe.hidden),
+                        estimatedMinutes: recipe.estimatedMinutes ?? null,
+                    })),
+                };
+            },
+            annotations: { readOnlyHint: true },
+        },
+        {
+            name: 'list-categories',
+            description: 'List recipe groups and the recipes in each group.',
+            inputSchema: { type: 'object', properties: {} },
+            execute() {
+                const groups = new Map();
+                for (const recipe of recipes()) {
+                    const name = recipe.group || 'Ungrouped';
+                    const list = groups.get(name) ?? [];
+                    list.push({ id: recipe.id, name: recipe.name });
+                    groups.set(name, list);
+                }
+                return { categories: [...groups].map(([name, items]) => ({ name, recipes: items })) };
+            },
+            annotations: { readOnlyHint: true },
+        },
+        {
+            name: 'get-recipe',
+            description: 'Read one recipe, including servings, ingredients, steps, times, and notes.',
+            inputSchema: {
+                type: 'object',
+                properties: { idOrName: { type: 'string', description: 'Recipe id or name.' } },
+                required: ['idOrName'],
+            },
+            execute(input) {
+                if (typeof input?.idOrName !== 'string' || !input.idOrName.trim())
+                    return { error: 'Pass a recipe id or name.' };
+                return agentRecipeDetails(input.idOrName);
+            },
+            annotations: { readOnlyHint: true },
+        },
+        {
+            name: 'get-shopping-list',
+            description: 'Read the combined shopping list for the selected recipes, scaled by servings.',
+            inputSchema: { type: 'object', properties: {} },
+            execute() { return agentShoppingList(); },
+            annotations: { readOnlyHint: true },
+        },
+        {
+            name: 'reset-selection',
+            description: 'Clear the current selection, timers, and cooking progress, the same as Start Over.',
+            inputSchema: { type: 'object', properties: {} },
+            execute() {
+                resetSession();
+                return { reset: true };
+            },
+            annotations: { readOnlyHint: false },
+        },
+        {
+            name: 'list-bundles',
+            description: 'List one-tap recipe bundles.',
+            inputSchema: { type: 'object', properties: {} },
+            execute() {
+                return {
+                    bundles: [...state.bundles.values()].map((bundle) => ({ id: bundle.id, name: bundle.name, recipeIds: bundle.recipeIds })),
+                };
+            },
+            annotations: { readOnlyHint: true },
+        },
+        {
+            name: 'add-bundle',
+            description: 'Add every recipe in a bundle to the selection.',
+            inputSchema: {
+                type: 'object',
+                properties: { bundleId: { type: 'string', description: 'Bundle id from list-bundles.' } },
+                required: ['bundleId'],
+            },
+            execute(input) {
+                const bundle = typeof input?.bundleId === 'string' ? state.bundles.get(input.bundleId) : undefined;
+                if (!bundle)
+                    return { error: 'Unknown bundle.', bundles: [...state.bundles.keys()] };
+                for (const id of bundle.recipeIds)
+                    state.selectedRecipeIds.push(id);
+                render();
+                return { bundleId: bundle.id, added: bundle.recipeIds.length };
+            },
+            annotations: { readOnlyHint: false },
+        },
+        {
+            name: 'read-cooking-status',
+            description: 'Read the cooking steps and whether each one is ready, timing, locked, or ringing.',
+            inputSchema: { type: 'object', properties: {} },
+            execute() {
+                return {
+                    screen: state.screen,
+                    alarms: [...activeAlarms.keys()],
+                    steps: state.cookingPlanSteps.map((step) => ({
+                        id: step.id,
+                        recipeId: step.recipeId,
+                        type: step.type,
+                        text: step.text,
+                        durationSeconds: step.durationSeconds ?? null,
+                        status: cookingStepStatus(step.id),
+                    })),
+                };
+            },
+            annotations: { readOnlyHint: true },
+        },
+        {
+            name: 'advance-cooking-step',
+            description: 'Tap the next ready cooking step once. That completes an instruction or starts its timer.',
+            inputSchema: { type: 'object', properties: {} },
+            execute() {
+                ensureCookingScreen();
+                const panel = [...document.querySelectorAll('#app .panel')].find((el) => el.id.startsWith('step-') &&
+                    !el.classList.contains('info-step') &&
+                    !el.classList.contains('container-step') &&
+                    !el.classList.contains('completed') &&
+                    !el.classList.contains('skipped') &&
+                    !el.classList.contains('ringing') &&
+                    !el.classList.contains('step-locked') &&
+                    !el.classList.contains('timer'));
+                if (!panel)
+                    return { error: 'No cooking step is ready.' };
+                const stepId = Number(panel.id.slice('step-'.length));
+                const step = state.cookingPlanSteps.find((entry) => entry.id === stepId);
+                if (step?.type === 'gate')
+                    return { error: 'This step is waiting for yes or no. Use answer-cooking-gate.', stepId, text: step.text };
+                if (step?.type === 'timer') {
+                    startTimer(step, panel);
+                    return { stepId, action: 'started-timer', text: step.text };
+                }
+                panel.click();
+                return { stepId, action: 'completed', text: step?.text ?? '' };
+            },
+            annotations: { readOnlyHint: false },
+        },
+        {
+            name: 'start-cooking-timer',
+            description: 'Start the countdown for one cooking timer step.',
+            inputSchema: {
+                type: 'object',
+                properties: { stepId: { type: 'number', description: 'Step id from read-cooking-status.' } },
+                required: ['stepId'],
+            },
+            execute(input) {
+                ensureCookingScreen();
+                const step = state.cookingPlanSteps.find((entry) => entry.id === input?.stepId);
+                const panel = typeof input?.stepId === 'number' ? document.getElementById(`step-${input.stepId}`) : null;
+                if (!step || step.type !== 'timer' || !panel)
+                    return { error: 'That step is not a timer on the cooking screen.' };
+                if (panel.classList.contains('step-locked'))
+                    return { error: 'That timer is still waiting on an earlier step.', stepId: step.id };
+                if (state.timers.has(step.id) || panel.classList.contains('ringing'))
+                    return { error: 'That timer has already started.', stepId: step.id };
+                startTimer(step, panel);
+                return { stepId: step.id, action: 'started-timer', text: step.text };
+            },
+            annotations: { readOnlyHint: false },
+        },
+        {
+            name: 'skip-cooking-timer',
+            description: 'Skip a running cooking timer, the same as tapping it three times.',
+            inputSchema: {
+                type: 'object',
+                properties: { stepId: { type: 'number', description: 'Step id from read-cooking-status.' } },
+                required: ['stepId'],
+            },
+            execute(input) {
+                const step = state.cookingPlanSteps.find((entry) => entry.id === input?.stepId);
+                const panel = typeof input?.stepId === 'number' ? document.getElementById(`step-${input.stepId}`) : null;
+                if (!step || !panel)
+                    return { error: 'That step is not on the cooking screen.' };
+                if (step.type === 'gate') {
+                    skipGateRetryTimer(step, panel);
+                    return { stepId: step.id, action: 'skipped-gate-timer' };
+                }
+                if (!state.timers.has(step.id))
+                    return { error: 'That timer is not running.', stepId: step.id };
+                skipTimer(step, panel);
+                return { stepId: step.id, action: 'skipped-timer' };
+            },
+            annotations: { readOnlyHint: false },
+        },
+        {
+            name: 'answer-cooking-gate',
+            description: 'Answer yes or no on a cooking check step.',
+            inputSchema: {
+                type: 'object',
+                properties: {
+                    stepId: { type: 'number', description: 'Step id from read-cooking-status.' },
+                    ready: { type: 'boolean', description: 'True when the food is done.' },
+                },
+                required: ['stepId', 'ready'],
+            },
+            execute(input) {
+                if (typeof input?.stepId !== 'number' || typeof input.ready !== 'boolean')
+                    return { error: 'Pass a step id and whether it is ready.' };
+                const panel = document.getElementById(`step-${input.stepId}`);
+                const button = panel?.querySelector(input.ready ? '.gate-yes-btn' : '.gate-no-btn');
+                if (!button)
+                    return { error: 'That step is not waiting for yes or no.', stepId: input.stepId };
+                button.click();
+                return { stepId: input.stepId, ready: input.ready };
+            },
+            annotations: { readOnlyHint: false },
+        },
+        {
+            name: 'stop-alarm',
+            description: 'Stop one ringing alarm, or every ringing alarm when no step is given.',
+            inputSchema: {
+                type: 'object',
+                properties: { stepId: { type: 'number', description: 'Optional step id. Omit it to stop every alarm.' } },
+            },
+            execute(input) {
+                const ids = typeof input?.stepId === 'number' ? [input.stepId] : [...activeAlarms.keys()];
+                if (typeof input?.stepId === 'number' && !activeAlarms.has(input.stepId))
+                    return { error: 'That step is not ringing.', stepId: input.stepId };
+                if (!ids.length)
+                    return { error: 'No alarm is ringing.' };
+                for (const id of ids)
+                    acknowledgeAlarm(id);
+                return { stopped: ids };
+            },
+            annotations: { readOnlyHint: false },
+        },
+        {
+            name: 'read-day-plan',
+            description: 'Read the saved day-plan blocks and where the selected recipes fit.',
+            inputSchema: { type: 'object', properties: {} },
+            execute() {
+                const cfg = loadPlanConfig();
+                const selected = getSelectedRecipes().filter((recipe) => !recipe.adhoc).map((recipe) => ({ recipe, count: getServings(recipe.id) }));
+                const plan = schedulePlan(cfg, selected);
+                return {
+                    blocks: cfg.blocks,
+                    caloriesCutoff: cfg.caloriesCutoff,
+                    scheduled: plan.scheduled.map((item) => ({
+                        id: item.recipe.id,
+                        name: item.recipe.name,
+                        servings: item.count,
+                        start: fromMinutes(item.startMin),
+                        blockType: item.blockType,
+                        afterCutoff: item.afterCutoff,
+                    })),
+                    unscheduled: plan.unscheduled.map((item) => ({ id: item.recipe.id, name: item.recipe.name, servings: item.count })),
+                };
+            },
+            annotations: { readOnlyHint: true },
+        },
+        {
+            name: 'list-prep-steps',
+            description: 'Read the prep-ahead steps for the selected recipes.',
+            inputSchema: { type: 'object', properties: {} },
+            execute() {
+                const prep = [];
+                const walk = (recipeId, steps) => {
+                    for (const step of steps) {
+                        if (step.prep || step.prepOnly)
+                            prep.push({ recipeId, id: step.id, text: step.text, prepOnly: Boolean(step.prepOnly) });
+                        if (step.children?.length)
+                            walk(recipeId, step.children);
+                    }
+                };
+                for (const recipe of getSelectedRecipes())
+                    walk(recipe.id, recipe.steps);
+                return { steps: prep };
+            },
+            annotations: { readOnlyHint: true },
+        },
+        {
+            name: 'list-pages',
+            description: 'List every kitchen tool page and its address.',
+            inputSchema: { type: 'object', properties: {} },
+            execute() {
+                return { pages: SITE_PAGE_LIST.map((page) => ({ id: page.id, href: sitePageHref(page.path) })) };
+            },
+            annotations: { readOnlyHint: true },
+        },
+        {
+            name: 'open-page',
+            description: 'Open another kitchen tool page.',
+            inputSchema: {
+                type: 'object',
+                properties: { pageId: { type: 'string', description: 'Page id from list-pages.' } },
+                required: ['pageId'],
+            },
+            execute(input) {
+                const page = SITE_PAGE_LIST.find((entry) => entry.id === input?.pageId);
+                if (!page)
+                    return { error: 'Unknown page.', pages: SITE_PAGE_LIST.map((entry) => entry.id) };
+                const href = sitePageHref(page.path);
+                window.location.assign(href);
+                return { opened: page.id, href };
             },
             annotations: { readOnlyHint: false },
         },

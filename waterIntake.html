@@ -52,7 +52,7 @@
         <p id="gallons-result" class="status" role="status" aria-live="polite">Gallons drank: 0</p>
     </main>
     <script type="module">
-        import { bindUserInvalid, gallonsDrank } from './src/site-logic.js';
+        import { bindUserInvalid, gallonsDrank, registerAgentTools } from './src/site-logic.js';
 
         const form = document.getElementById('water-form');
         const liters = document.getElementById('liters');
@@ -98,6 +98,20 @@
         });
 
         if (params.has('liters') || params.has('bottles')) showResult();
+
+        registerAgentTools([{
+            name: 'read-water-chart',
+            description: 'Read how many liters and clean bottles make one gallon, and the current result.',
+            inputSchema: { type: 'object', properties: {} },
+            execute() {
+                return {
+                    litersPerGallon: document.getElementById('liters-per-gallon').textContent,
+                    bottlesPerGallon: document.getElementById('bottles-per-gallon').textContent,
+                    result: result.textContent,
+                };
+            },
+            annotations: { readOnlyHint: true },
+        }]);
     </script>
 </body>
 </html>

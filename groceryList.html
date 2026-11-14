@@ -196,7 +196,12 @@
                 name: 'list-groceries',
                 description: 'Read the grocery rows and which ones are marked purchased.',
                 inputSchema: { type: 'object', properties: {} },
-                execute() { return { items: groceryItems() }; },
+                execute() {
+                    return {
+                        expirationDate: document.getElementById('week-ahead').textContent,
+                        items: groceryItems(),
+                    };
+                },
                 annotations: { readOnlyHint: true },
             },
             {

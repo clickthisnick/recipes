@@ -387,6 +387,23 @@
                 },
                 annotations: { readOnlyHint: false },
             },
+            {
+                name: 'read-tracker-totals',
+                description: 'Read the nutrition table after Update Nutrition has been used.',
+                inputSchema: { type: 'object', properties: {} },
+                execute() {
+                    const table = document.getElementById('nutrition-table');
+                    if (table.hidden) return { error: 'Nutrition has not been totaled yet. Set a quantity first.' };
+                    return {
+                        rows: [...table.querySelectorAll('tbody tr')].map((row) => ({
+                            nutrient: row.querySelector('th')?.textContent ?? '',
+                            intake: row.querySelectorAll('td')[0]?.textContent ?? '',
+                            limit: row.querySelectorAll('td')[1]?.textContent ?? '',
+                        })),
+                    };
+                },
+                annotations: { readOnlyHint: true },
+            },
         ]);
     </script>
 </body>

@@ -14,6 +14,8 @@ import {
     sumSelectedNutrition,
 } from '../src/site-logic.js';
 import {
+    agentRecipeDetails,
+    agentShoppingList,
     cheapestListing,
     convertUnits,
     convertWithDensity,
@@ -171,6 +173,20 @@ test('static pages keep the fixes agents and the calculators rely on', () => {
     assert.match(index, /tracker\.html/);
     assert.match(water, /toolname="calculate-gallons"/);
     assert.match(readFileSync(resolve('src/file.ts'), 'utf8'), /name: 'search-recipes'/);
+});
+
+test('get-recipe and the shopping list describe the catalog', () => {
+    const details = agentRecipeDetails('iced-coffee');
+    assert.equal(details.error, undefined);
+    assert.equal(details.title, 'Iced Coffee');
+    assert.equal(details.servings, 0);
+    assert.ok(details.ingredients.length > 0);
+    assert.ok(details.steps.length > 0);
+    assert.ok(Array.isArray(details.notes));
+    const missing = agentRecipeDetails('not-a-real-recipe');
+    assert.match(missing.error, /No recipe matched/);
+    const list = agentShoppingList();
+    assert.deepEqual(list.items, []);
 });
 
 test('WebMCP registration does nothing unless the browser provides it', () => {
