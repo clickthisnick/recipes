@@ -1,173 +1,31 @@
-## [Recipe Main](https://www.clickthisnick.com/recipes)
+# Recipes
 
-## [Recipe App](https://www.clickthisnick.com/recipes/dist/main.html)
+Personal kitchen tools. The live site is [clickthisnick.com/recipes](https://www.clickthisnick.com/recipes).
 
-## [Meat Temperature](https://www.clickthisnick.com/recipes/meatTemp.html)
+## Run locally
 
-## [Water Intake](https://www.clickthisnick.com/recipes/waterIntake.html)
+```bash
+npm ci
+npm run build    # typecheck src/file.ts, write dist/file.js, validate recipes
+npm start        # http://localhost:3000/  (PORT overrides the port)
+npm test
+npm run lint
+```
 
-## [Grocery List](https://www.clickthisnick.com/recipes/groceryList.html)
+`npm run dev` starts Vite for work on `src/file.ts`. The recipe app is [dist/main.html](http://localhost:3000/dist/main.html). Open a single recipe with `?recipe=`, for example `dist/main.html?recipe=blueprint-smoothie`.
 
-## [Expiration Calculator](https://www.clickthisnick.com/recipes/expirationCalculator.html)
+`npm run audit-amazon` checks Amazon prices. It needs Chrome already listening on the debugging port described in `scripts/audit-products.js`. It does not run in CI.
 
-## [Pull Cord Slicer Amount](https://www.clickthisnick.com/recipes/cordSlicer.html)
+## Tools
 
-## [Frozen Food Portions](https://www.clickthisnick.com/recipes/frozenFood.html)
+- [Recipes](https://www.clickthisnick.com/recipes/dist/main.html)
+- [Nutrition tracker](https://www.clickthisnick.com/recipes/tracker.html)
+- [Meat temperature](https://www.clickthisnick.com/recipes/meatTemp.html)
+- [Water intake](https://www.clickthisnick.com/recipes/waterIntake.html)
+- [Grocery list](https://www.clickthisnick.com/recipes/groceryList.html)
+- [Expiration calculator](https://www.clickthisnick.com/recipes/expirationCalculator.html)
+- [Pull cord slicer amount](https://www.clickthisnick.com/recipes/cordSlicer.html)
+- [Frozen food portions](https://www.clickthisnick.com/recipes/frozenFood.html)
+- [Eat this instead](https://www.clickthisnick.com/recipes/eatThis.html)
 
-# Recipes List
-
-# 1 Meal
-
-## [BuffaloKaleBowl](https://www.clickthisnick.com/recipes/dist/buffalokalebowl.html)
-
-## [ButterChicken](https://www.clickthisnick.com/recipes/dist/butterchicken.html)
-
-## [ChipotleMarinade](https://www.clickthisnick.com/recipes/dist/chipotlemarinade.html)
-
-## [Coffee](https://www.clickthisnick.com/recipes/dist/coffee.html)
-
-## [DijonChicken](https://www.clickthisnick.com/recipes/dist/dijonchicken.html)
-
-## [Hotdog](https://www.clickthisnick.com/recipes/dist/hotdog.html)
-
-## [NinjaChickenThings](https://www.clickthisnick.com/recipes/dist/ninjachickenthings.html)
-
-## [Pasta](https://www.clickthisnick.com/recipes/dist/pasta.html)
-
-## [Smoothie](https://www.clickthisnick.com/recipes/dist/smoothie.html)
-
-## [SouvideSteak](https://www.clickthisnick.com/recipes/dist/souvidesteak.html)
-
-## [Sushi](https://www.clickthisnick.com/recipes/dist/sushi.html)
-
-# Component
-
-## [Asparagus](https://www.clickthisnick.com/recipes/dist/asparagus.html)
-
-## [BabyBackRibs](https://www.clickthisnick.com/recipes/dist/babybackribs.html)
-
-## [BarbequeSauce](https://www.clickthisnick.com/recipes/dist/barbequesauce.html)
-
-## [DateBalls](https://www.clickthisnick.com/recipes/dist/dateballs.html)
-
-## [Guacamole](https://www.clickthisnick.com/recipes/dist/guacamole.html)
-
-## [LentilHalfCup](https://www.clickthisnick.com/recipes/dist/lentilhalfcup.html)
-
-## [Mushroom](https://www.clickthisnick.com/recipes/dist/mushroom.html)
-
-## [Popcorn](https://www.clickthisnick.com/recipes/dist/popcorn.html)
-
-## [Rice](https://www.clickthisnick.com/recipes/dist/rice.html)
-
-# Frozen
-
-## [SpiralHam](https://www.clickthisnick.com/recipes/dist/spiralham.html)
-
-# Heavy Cleanup Meal
-
-## [BakedZiti](https://www.clickthisnick.com/recipes/dist/bakedziti.html)
-
-# 1 Meal
-
-## [BuffaloKaleBowl](https://www.clickthisnick.com/recipes/dist/buffalokalebowl.html)
-
-## [ButterChicken](https://www.clickthisnick.com/recipes/dist/butterchicken.html)
-
-## [ChipotleMarinade](https://www.clickthisnick.com/recipes/dist/chipotlemarinade.html)
-
-## [Coffee](https://www.clickthisnick.com/recipes/dist/coffee.html)
-
-## [DijonChicken](https://www.clickthisnick.com/recipes/dist/dijonchicken.html)
-
-## [Hotdog](https://www.clickthisnick.com/recipes/dist/hotdog.html)
-
-## [Ninja Chicken](https://www.clickthisnick.com/recipes/dist/ninjachicken.html)
-
-## [Pasta](https://www.clickthisnick.com/recipes/dist/pasta.html)
-
-## [Smoothie](https://www.clickthisnick.com/recipes/dist/smoothie.html)
-
-## [SouvideSteak](https://www.clickthisnick.com/recipes/dist/souvidesteak.html)
-
-## [Sushi](https://www.clickthisnick.com/recipes/dist/sushi.html)
-
-# Component
-
-## [Asparagus](https://www.clickthisnick.com/recipes/dist/asparagus.html)
-
-## [BabyBackRibs](https://www.clickthisnick.com/recipes/dist/babybackribs.html)
-
-## [BarbequeSauce](https://www.clickthisnick.com/recipes/dist/barbequesauce.html)
-
-## [DateBalls](https://www.clickthisnick.com/recipes/dist/dateballs.html)
-
-## [Guacamole](https://www.clickthisnick.com/recipes/dist/guacamole.html)
-
-## [LentilHalfCup](https://www.clickthisnick.com/recipes/dist/lentilhalfcup.html)
-
-## [Mushroom](https://www.clickthisnick.com/recipes/dist/mushroom.html)
-
-## [Popcorn](https://www.clickthisnick.com/recipes/dist/popcorn.html)
-
-## [Rice](https://www.clickthisnick.com/recipes/dist/rice.html)
-
-# Frozen
-
-## [SpiralHam](https://www.clickthisnick.com/recipes/dist/spiralham.html)
-
-# Heavy Cleanup Meal
-
-## [BakedZiti](https://www.clickthisnick.com/recipes/dist/bakedziti.html)
-
-# 1 Meal
-
-## [BuffaloKaleBowl](https://www.clickthisnick.com/recipes/dist/buffalokalebowl.html)
-
-## [ButterChicken](https://www.clickthisnick.com/recipes/dist/butterchicken.html)
-
-## [ChipotleMarinade](https://www.clickthisnick.com/recipes/dist/chipotlemarinade.html)
-
-## [Coffee](https://www.clickthisnick.com/recipes/dist/coffee.html)
-
-## [DijonChicken](https://www.clickthisnick.com/recipes/dist/dijonchicken.html)
-
-## [Hotdog](https://www.clickthisnick.com/recipes/dist/hotdog.html)
-
-## [Ninja Chicken](https://www.clickthisnick.com/recipes/dist/ninjachicken.html)
-
-## [Pasta](https://www.clickthisnick.com/recipes/dist/pasta.html)
-
-## [Smoothie](https://www.clickthisnick.com/recipes/dist/smoothie.html)
-
-## [SouvideSteak](https://www.clickthisnick.com/recipes/dist/souvidesteak.html)
-
-## [Sushi](https://www.clickthisnick.com/recipes/dist/sushi.html)
-
-# Component
-
-## [Asparagus](https://www.clickthisnick.com/recipes/dist/asparagus.html)
-
-## [BabyBackRibs](https://www.clickthisnick.com/recipes/dist/babybackribs.html)
-
-## [BarbequeSauce](https://www.clickthisnick.com/recipes/dist/barbequesauce.html)
-
-## [DateBalls](https://www.clickthisnick.com/recipes/dist/dateballs.html)
-
-## [Guacamole](https://www.clickthisnick.com/recipes/dist/guacamole.html)
-
-## [LentilHalfCup](https://www.clickthisnick.com/recipes/dist/lentilhalfcup.html)
-
-## [Mushroom](https://www.clickthisnick.com/recipes/dist/mushroom.html)
-
-## [Popcorn](https://www.clickthisnick.com/recipes/dist/popcorn.html)
-
-## [Rice](https://www.clickthisnick.com/recipes/dist/rice.html)
-
-# Frozen
-
-## [SpiralHam](https://www.clickthisnick.com/recipes/dist/spiralham.html)
-
-# Heavy Cleanup Meal
-
-## [BakedZiti](https://www.clickthisnick.com/recipes/dist/bakedziti.html)
+Recipes are edited in `src/file.ts`. The old per-recipe HTML files under `dist/` are not published; the app is the one page above. `llms.txt` describes the controls for a browser agent.
