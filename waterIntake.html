@@ -1,142 +1,95 @@
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water intake | Recipes</title>
+    <link rel="stylesheet" href="./src/site.css">
+</head>
+<body>
+    <a class="skip-link visually-hidden" href="#content">Skip to content</a>
+    <main id="content">
+        <h1>Water intake</h1>
+        <p>How many containers are needed to drink a gallon of water.</p>
+        <div class="table-wrap" tabindex="0" role="region" aria-labelledby="gallon-chart-caption">
+            <table class="stack">
+                <caption id="gallon-chart-caption">Containers per gallon</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Container</th>
+                        <th scope="col">Quantity needed for a gallon</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="band">
+                        <th scope="row">Liter</th>
+                        <td id="liters-per-gallon" data-label="Quantity needed for a gallon">3.78</td>
+                    </tr>
+                    <tr class="band">
+                        <th scope="row">Clean bottles</th>
+                        <td id="bottles-per-gallon" data-label="Quantity needed for a gallon">5.12</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-<style>
-    tr:nth-child(2),
-    tr:nth-child(3),
-    tr:nth-child(4),
-    tr:nth-child(5),
-    tr:nth-child(6),
-    tr:nth-child(7),
-    tr:nth-child(13),
-    tr:nth-child(14),
-    tr:nth-child(15)
-	{
-		background-color: rgb(186, 225, 248);
-		color:black;
-	}
+        <h2>What you drank</h2>
+        <form id="water-form">
+            <div class="field">
+                <label for="liters">Liters</label>
+                <input id="liters" name="liters" type="number" min="0" step="any" inputmode="decimal" value="0" required data-error="liters-error" data-testid="liters">
+                <p id="liters-error" class="error-msg"><span role="img" aria-label="Error">❌</span> Enter zero or a positive number of liters.</p>
+            </div>
+            <div class="field">
+                <label for="clean-bottles">Clean bottles</label>
+                <input id="clean-bottles" name="bottles" type="number" min="0" step="any" inputmode="decimal" value="0" required data-error="bottles-error" data-testid="clean-bottles">
+                <p id="bottles-error" class="error-msg"><span role="img" aria-label="Error">❌</span> Enter zero or a positive number of clean bottles.</p>
+            </div>
+            <button type="submit" id="calculate-gallons" data-testid="calculate-gallons">Calculate gallons</button>
+        </form>
+        <p id="gallons-result" class="status" role="status" aria-live="polite">Gallons drank: 0</p>
+    </main>
+    <script type="module">
+        import { bindUserInvalid, gallonsDrank } from './src/site-logic.js';
 
-    tr:nth-child(8),
-    tr:nth-child(9),
-    tr:nth-child(10),
-    tr:nth-child(11),
-    tr:nth-child(12),
-    tr:nth-child(16)
-	{
-		background-color: rgb(248, 247, 186);
-		color:black;
-	}
+        const form = document.getElementById('water-form');
+        const liters = document.getElementById('liters');
+        const bottles = document.getElementById('clean-bottles');
+        const result = document.getElementById('gallons-result');
+        bindUserInvalid(form);
 
-    table {
-        color: #333;
-        /* Lighten up font color */
-        font-family: Helvetica, Arial, sans-serif;
-        /* Nicer font */
-        width: 640px;
-        border-collapse: collapse;
-        border-spacing: 0;
-    }
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('liters')) liters.value = params.get('liters');
+        if (params.has('bottles')) bottles.value = params.get('bottles');
 
-    td,
-    th {
-        border: 1px solid #CCC;
-        height: 30px;
-    }
+        function ratesFromChart() {
+            return {
+                litersPerGallon: Number(document.getElementById('liters-per-gallon').textContent),
+                bottlesPerGallon: Number(document.getElementById('bottles-per-gallon').textContent),
+            };
+        }
 
-    /* Make cells a bit taller */
+        function showResult() {
+            const outcome = gallonsDrank(liters.value, bottles.value, ratesFromChart());
+            if (!outcome.ok) {
+                result.textContent = outcome.error;
+                return;
+            }
+            const gallons = outcome.gallons.toFixed(2);
+            result.textContent = `Gallons drank: ${gallons}`;
+            const next = new URL(window.location.href);
+            next.searchParams.set('liters', liters.value);
+            next.searchParams.set('bottles', bottles.value);
+            window.history.replaceState(null, '', next);
+        }
 
-    th {
-        background: #F3F3F3;
-        /* Light grey background */
-        font-weight: bold;
-        /* Make sure they're bold */
-    }
+        form.addEventListener('submit', (event) => {
+            if (!form.checkValidity()) return;
+            event.preventDefault();
+            showResult();
+        });
 
-    td {
-
-        /* Lighter grey background */
-        text-align: left;
-        /* Center our text */
-        padding-left: 1rem;
-    }
-
-    body {
-        padding: 1rem;
-    }
-
-</style>
-
-<h2>How many containers needed to drink a gallon of water</h2>
-<table>
-    <tr>
-        <th>
-            Container
-        </th>
-        <th>
-            Quantity Needed For Gallon
-        </th>
-    </tr>
-    <tr>
-        <td>
-            Liter
-        </td>
-        <td>
-            3.78
-        </td>
-    </tr>
-    <tr>
-        <td>
-            Clean Bottles
-        </td>
-        <td>
-            5.12
-        </td>
-    </tr>
-</table>
-
-
-<script>
-    function calculateWater() {
-        const liters = document.getElementById('liters').value;
-        const cleanBottles = document.getElementById('cleanBottles').value;
-        const gallonsDrank = (liters * .26) + (cleanBottles * .19);
-        const gallonsDrankElement = document.getElementById("gallonsDrank")
-
-        gallonsDrankElement.innerHTML = gallonsDrank
-    }
-</script>
-
-</br></br>
-<table>
-    <tr>
-        <td>
-            Quantity
-        </td>
-        <td>
-            Amount Drank
-        </td>
-    </tr>
-    <tr>
-        <td>
-            Liters:
-        </td>
-        <td>
-            <input id="liters"></input>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            Clean Bottles:
-        </td>
-        <td>
-            <input id="cleanBottles"></input>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            Gallons Drank: <span id="gallonsDrank">0</span>
-        </td>
-        <td>
-            <input type="submit" onclick="calculateWater();">
-        </td>
-    </tr>
-</table>
+        if (params.has('liters') || params.has('bottles')) showResult();
+    </script>
+</body>
+</html>

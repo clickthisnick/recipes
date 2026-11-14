@@ -1,195 +1,190 @@
-
-<style>
-
-
-    table {
-        color: #333;
-        /* Lighten up font color */
-        font-family: Helvetica, Arial, sans-serif;
-        /* Nicer font */
-        width: 640px;
-        border-collapse: collapse;
-        border-spacing: 0;
-    }
-
-    td,
-    th {
-        border: 1px solid #CCC;
-        height: 30px;
-    }
-
-    /* Make cells a bit taller */
-
-    th {
-        background: #F3F3F3;
-        /* Light grey background */
-        font-weight: bold;
-        /* Make sure they're bold */
-    }
-
-    td {
-        /* Lighter grey background */
-        text-align: left;
-        /* Center our text */
-        padding-left: 1rem;
-    }
-
-    .completed {
-        background-color:green;
-        color: white;
-    }
-
-    a:visited {
-        color:blue;
-    }
-
-    body {
-        padding: 1rem;
-    }
-
-</style>
-<br><br>
-
-Going Out To Eat:</br>
-<b>Look for acai bowl / yogurt / smoothie place</b>
-<br><br><br>
-Healthy Alternative Table:</br>
-<table>
-    <th>Food</th>
-    <th>Calories</th>
-    <th>Price</th>
-    <th>Description</th>
-    <!-- <tr onclick="this.classList.toggle('completed')">
-        <td>Altoids</td>
-        <td><5</td>
-        <td>Candy</td>
-        <td>-</td>
-        <td>-</td>
-    </tr> -->
-    <tr onclick="this.classList.toggle('completed')">
-        <td><b>Kefir</b></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr onclick="this.classList.toggle('completed')">
-        <td>Sugar Free Chobani Yogurt</td>
-        <td></td>
-        <td>$7.99</td>
-        <td>Good. Have to buy in bulk though</td>
-    </tr>
-    <tr onclick="this.classList.toggle('completed')">
-        <td><b>Ice Cream</b></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr onclick="this.classList.toggle('completed')">
-        <td>Nick's Mint Chokladchip</td>
-        <td>270</td>
-        <td>$7.99</td>
-        <td>Expensive. Sometimes melty and refrozen which tastes awful.</td>
-    </tr>
-    <tr onclick="this.classList.toggle('completed')">
-        <td>Chobani Yogurt Flip Cup</td>
-        <td></td>
-        <td></td>
-        <td>Tastes good. Too small to satisfy though.</td>
-    </tr>
-    <tr onclick="this.classList.toggle('completed')">
-        <td><b>Meat</b></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr onclick="this.classList.toggle('completed')">
-        <td>Buffalo Wild Wings</td>
-        <td></td>
-        <td>$50</td>
-        <td>Expensive and too much food. Very salty.</td>
-    </tr>
-    <tr onclick="this.classList.toggle('completed')">
-        <td>TGI Fridays Frozen Wings</td>
-        <td></td>
-        <td>$20</td>
-        <td>Sugary and lots of breading</td>
-    </tr>
-    <tr onclick="this.classList.toggle('completed')">
-        <td>Frozen Hot Wings</td>
-        <td></td>
-        <td>$12</td>
-        <td>Tastes good enough to satisfy the itch</td>
-    </tr>
-    <tr onclick="this.classList.toggle('completed')">
-        <td>Quinoa Mushroom Burger With Franks Hot Sauce</td>
-        <td></td>
-        <td>$5</td>
-        <td>Non Meat - Meaty and Salt</td>
-    </tr>
-    <tr onclick="this.classList.toggle('completed')">
-        <td><b>Pastries</b></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr onclick="this.classList.toggle('completed')">
-        <td>Kodiak Frozen Waffles</td>
-        <td></td>
-        <td></td>
-        <td>Tastes dense and good with allulose</td>
-    </tr>
-    <tr onclick="this.classList.toggle('completed')">
-        <td>Bagel Point Plain Bagel</td>
-        <td></td>
-        <td>2</td>
-        <td>Bready and delicious</td>
-    </tr>
-    <tr onclick="this.classList.toggle('completed')">
-        <td>Funfetti Pancake Mix</td>
-        <td></td>
-        <td>11</td>
-        <td>1g Sugar but tastes good</td>
-    </tr>    
-    <tr onclick="this.classList.toggle('completed')">
-        <td><b>Pizza</b></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr onclick="this.classList.toggle('completed')">
-        <td>Trader Joe's Frozen Tart</td>
-        <td>600</td>
-        <td>$5.49</td>
-        <td>Crunchy Fluffy Tarte, small but flavorful</td>
-    </tr>
-    <tr onclick="this.classList.toggle('completed')">
-        <td>Margarita Frozen Pesto Pizza</td>
-        <td>900</td>
-        <td>$9.00</td>
-        <td>Cardboard</td>
-    </tr>
-    <tr onclick="this.classList.toggle('completed')">
-        <td>Pizza / Pepperoni Pizza</td>
-        <td>1740</td>
-        <td>$9.00</td>
-        <td>Lots of dough</td>
-    </tr>
-    <tr onclick="this.classList.toggle('completed')">
-        <td><b>Chips Salsa</b></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr onclick="this.classList.toggle('completed')">
-        <td>Salsa With Crunched Up Pita Chips (Like Fatoushe / Add Cucumbers Ingredients)</td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr onclick="this.classList.toggle('completed')">
-        <td>Mediterranean Salad</td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-</table>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eat this instead | Recipes</title>
+    <link rel="stylesheet" href="./src/site.css">
+</head>
+<body>
+    <a class="skip-link visually-hidden" href="#content">Skip to content</a>
+    <main id="content">
+        <h1>Eat this instead</h1>
+        <p>Going out to eat: <strong>Look for acai bowl / yogurt / smoothie place</strong></p>
+        <p id="eat-status" class="status visually-hidden" role="status" aria-live="polite"></p>
+        <div class="table-wrap" tabindex="0" role="region" aria-labelledby="eat-caption">
+            <table class="stack" id="eat-table">
+                <caption id="eat-caption">Healthy alternative table</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Food</th>
+                        <th scope="col">Calories</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Tried</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">Kefir</th>
+                        <td data-label="Calories"></td>
+                        <td data-label="Price"></td>
+                        <td data-label="Description"></td>
+                        <td data-label="Tried"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Sugar Free Chobani Yogurt</th>
+                        <td data-label="Calories"></td>
+                        <td data-label="Price">$7.99</td>
+                        <td data-label="Description">Good. Have to buy in bulk though</td>
+                        <td data-label="Tried"><input id="tried-chobani" type="checkbox"> <label for="tried-chobani">Tried<span class="visually-hidden"> Sugar Free Chobani Yogurt</span></label></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Ice Cream</th>
+                        <td data-label="Calories"></td>
+                        <td data-label="Price"></td>
+                        <td data-label="Description"></td>
+                        <td data-label="Tried"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Nick's Mint Chokladchip</th>
+                        <td data-label="Calories">270</td>
+                        <td data-label="Price">$7.99</td>
+                        <td data-label="Description">Expensive. Sometimes melty and refrozen which tastes awful.</td>
+                        <td data-label="Tried"><input id="tried-nicks" type="checkbox"> <label for="tried-nicks">Tried<span class="visually-hidden"> Nick's Mint Chokladchip</span></label></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Chobani Yogurt Flip Cup</th>
+                        <td data-label="Calories"></td>
+                        <td data-label="Price"></td>
+                        <td data-label="Description">Tastes good. Too small to satisfy though.</td>
+                        <td data-label="Tried"><input id="tried-flip" type="checkbox"> <label for="tried-flip">Tried<span class="visually-hidden"> Chobani Yogurt Flip Cup</span></label></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Meat</th>
+                        <td data-label="Calories"></td>
+                        <td data-label="Price"></td>
+                        <td data-label="Description"></td>
+                        <td data-label="Tried"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Buffalo Wild Wings</th>
+                        <td data-label="Calories"></td>
+                        <td data-label="Price">$50</td>
+                        <td data-label="Description">Expensive and too much food. Very salty.</td>
+                        <td data-label="Tried"><input id="tried-bww" type="checkbox"> <label for="tried-bww">Tried<span class="visually-hidden"> Buffalo Wild Wings</span></label></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">TGI Fridays Frozen Wings</th>
+                        <td data-label="Calories"></td>
+                        <td data-label="Price">$20</td>
+                        <td data-label="Description">Sugary and lots of breading</td>
+                        <td data-label="Tried"><input id="tried-tgi" type="checkbox"> <label for="tried-tgi">Tried<span class="visually-hidden"> TGI Fridays Frozen Wings</span></label></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Frozen Hot Wings</th>
+                        <td data-label="Calories"></td>
+                        <td data-label="Price">$12</td>
+                        <td data-label="Description">Tastes good enough to satisfy the itch</td>
+                        <td data-label="Tried"><input id="tried-hot-wings" type="checkbox"> <label for="tried-hot-wings">Tried<span class="visually-hidden"> Frozen Hot Wings</span></label></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Quinoa Mushroom Burger With Franks Hot Sauce</th>
+                        <td data-label="Calories"></td>
+                        <td data-label="Price">$5</td>
+                        <td data-label="Description">Non Meat - Meaty and Salt</td>
+                        <td data-label="Tried"><input id="tried-burger" type="checkbox"> <label for="tried-burger">Tried<span class="visually-hidden"> Quinoa Mushroom Burger With Franks Hot Sauce</span></label></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Pastries</th>
+                        <td data-label="Calories"></td>
+                        <td data-label="Price"></td>
+                        <td data-label="Description"></td>
+                        <td data-label="Tried"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Kodiak Frozen Waffles</th>
+                        <td data-label="Calories"></td>
+                        <td data-label="Price"></td>
+                        <td data-label="Description">Tastes dense and good with allulose</td>
+                        <td data-label="Tried"><input id="tried-waffles" type="checkbox"> <label for="tried-waffles">Tried<span class="visually-hidden"> Kodiak Frozen Waffles</span></label></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Bagel Point Plain Bagel</th>
+                        <td data-label="Calories"></td>
+                        <td data-label="Price">2</td>
+                        <td data-label="Description">Bready and delicious</td>
+                        <td data-label="Tried"><input id="tried-bagel" type="checkbox"> <label for="tried-bagel">Tried<span class="visually-hidden"> Bagel Point Plain Bagel</span></label></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Funfetti Pancake Mix</th>
+                        <td data-label="Calories"></td>
+                        <td data-label="Price">11</td>
+                        <td data-label="Description">1g Sugar but tastes good</td>
+                        <td data-label="Tried"><input id="tried-funfetti" type="checkbox"> <label for="tried-funfetti">Tried<span class="visually-hidden"> Funfetti Pancake Mix</span></label></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Pizza</th>
+                        <td data-label="Calories"></td>
+                        <td data-label="Price"></td>
+                        <td data-label="Description"></td>
+                        <td data-label="Tried"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Trader Joe's Frozen Tart</th>
+                        <td data-label="Calories">600</td>
+                        <td data-label="Price">$5.49</td>
+                        <td data-label="Description">Crunchy Fluffy Tarte, small but flavorful</td>
+                        <td data-label="Tried"><input id="tried-tart" type="checkbox"> <label for="tried-tart">Tried<span class="visually-hidden"> Trader Joe's Frozen Tart</span></label></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Margarita Frozen Pesto Pizza</th>
+                        <td data-label="Calories">900</td>
+                        <td data-label="Price">$9.00</td>
+                        <td data-label="Description">Cardboard</td>
+                        <td data-label="Tried"><input id="tried-pesto" type="checkbox"> <label for="tried-pesto">Tried<span class="visually-hidden"> Margarita Frozen Pesto Pizza</span></label></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Pizza / Pepperoni Pizza</th>
+                        <td data-label="Calories">1740</td>
+                        <td data-label="Price">$9.00</td>
+                        <td data-label="Description">Lots of dough</td>
+                        <td data-label="Tried"><input id="tried-pepperoni" type="checkbox"> <label for="tried-pepperoni">Tried<span class="visually-hidden"> Pizza / Pepperoni Pizza</span></label></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Chips Salsa</th>
+                        <td data-label="Calories"></td>
+                        <td data-label="Price"></td>
+                        <td data-label="Description"></td>
+                        <td data-label="Tried"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Salsa With Crunched Up Pita Chips (Like Fatoushe / Add Cucumbers Ingredients)</th>
+                        <td data-label="Calories"></td>
+                        <td data-label="Price"></td>
+                        <td data-label="Description"></td>
+                        <td data-label="Tried"><input id="tried-salsa" type="checkbox"> <label for="tried-salsa">Tried<span class="visually-hidden"> Salsa With Crunched Up Pita Chips</span></label></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Mediterranean Salad</th>
+                        <td data-label="Calories"></td>
+                        <td data-label="Price"></td>
+                        <td data-label="Description"></td>
+                        <td data-label="Tried"><input id="tried-salad" type="checkbox"> <label for="tried-salad">Tried<span class="visually-hidden"> Mediterranean Salad</span></label></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+    <script type="module">
+        const status = document.getElementById('eat-status');
+        for (const box of document.querySelectorAll('#eat-table input[type="checkbox"]')) {
+            box.addEventListener('change', () => {
+                box.closest('tr').classList.toggle('completed', box.checked);
+                const name = box.closest('tr').querySelector('th').textContent;
+                status.textContent = box.checked ? `${name} marked tried` : `${name} marked not tried`;
+            });
+        }
+    </script>
+</body>
+</html>

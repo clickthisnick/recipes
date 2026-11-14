@@ -1,0 +1,24 @@
+# Kitchen tools
+
+Personal static site for cooking, shopping, and nutrition. No accounts and no server-side data. Open a page, use the labeled controls, and read the status text after each action.
+
+## Pages
+
+- `/` lists every tool.
+- `/dist/main.html` is the recipe app. Search recipes, add servings with the recipe button, remove one serving with the minus button, then use Go Shopping, Nutrition, Plan, Prep, or Start Cooking. A recipe deep link is `/dist/main.html?recipe=<id>`, for example `?recipe=blueprint-smoothie`.
+- `/tracker.html` totals selected foods against the FDA limits on the page. Choose a food from the Food list, change quantity with the plus and minus buttons, then press Update Nutrition. The other tab, Add Custom Food (`#custom`), checks a food and shows JSON to paste into the page source. `#tracker` opens the tracker tab.
+- `/waterIntake.html` turns liters and clean bottles into gallons using the amounts in the chart on the page. Submit Calculate gallons. The result is in the status line. `?liters=` and `?bottles=` refill the form.
+- `/groceryList.html` is a checklist. Each row has a Purchased checkbox. The date at the top is seven days ahead.
+- `/expirationCalculator.html` adds each item's days to expire onto today. Mark used with the checkbox.
+- `/meatTemp.html` and `/cordSlicer.html` are reference charts.
+- `/frozenFood.html` and `/eatThis.html` are notes. Eat This rows have a Tried checkbox.
+
+## Run locally
+
+```
+npm ci
+npm run build
+npm start
+```
+
+Open http://localhost:3000/ . The recipe app is http://localhost:3000/dist/main.html . `npm test` runs the checks. `npm run dev` starts Vite.

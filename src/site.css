@@ -1,0 +1,123 @@
+/* Shared document, form, and table utilities for the static kitchen pages. */
+
+body {
+    margin: 0;
+    padding: 1rem;
+    font-family: Helvetica, Arial, sans-serif;
+    line-height: 1.4;
+    color: #222;
+}
+
+main {
+    max-width: 50rem;
+}
+
+a { color: #0b57d0; }
+
+.skip-link {
+    color: #000;
+    background: #fff;
+}
+
+.visually-hidden:where(:not(:focus-within, :active)) {
+    position: absolute !important;
+    clip-path: inset(50%) !important;
+    overflow: hidden !important;
+    width: 1px !important;
+    height: 1px !important;
+    margin: -1px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    white-space: nowrap !important;
+}
+
+label, button, input, select, textarea {
+    font: inherit;
+    font-size: max(1rem, 1em);
+}
+
+button, input, select, textarea {
+    min-block-size: 2.75rem;
+}
+
+button {
+    min-inline-size: 2.75rem;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-block: 0.75rem;
+    max-width: 28rem;
+}
+
+.error-msg {
+    display: none;
+    color: #8a1c13;
+    margin: 0;
+}
+
+:is(input, textarea, select):user-invalid + .error-msg,
+:is(input, textarea, select).user-invalid-fallback + .error-msg {
+    display: block;
+}
+
+:is(input, textarea, select):user-invalid,
+:is(input, textarea, select).user-invalid-fallback {
+    border-color: #8a1c13;
+    background: #fdecea;
+}
+
+.table-wrap {
+    overflow: auto;
+    max-inline-size: 100%;
+}
+
+.table-wrap:focus-visible {
+    outline: 2px solid #0b57d0;
+    outline-offset: 2px;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 50rem;
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: 0.4rem 0.75rem;
+    text-align: start;
+}
+
+th {
+    background: #f3f3f3;
+}
+
+caption {
+    text-align: start;
+    font-weight: 700;
+    margin-block-end: 0.5rem;
+}
+
+.band { background: rgb(186, 225, 248); color: #000; }
+.band-warm { background: rgb(248, 247, 186); color: #000; }
+
+tr.completed { background: green; color: #fff; }
+tr.completed a { color: #fff; }
+
+.tabs {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-block: 1rem;
+}
+
+.tabs button[aria-pressed="true"] {
+    font-weight: 700;
+}
+
+.status {
+    min-block-size: 1.5rem;
+}

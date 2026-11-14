@@ -307,7 +307,7 @@ function parseNutritionSummary(text) {
     if (!match) return undefined;
 
     const [, servingSizeText, , calories, sodium, fiber, sugar, protein] = match;
-    const sizeMatch = servingSizeText.match(/^([\d.\/]+)\s*(.+)$/);
+    const sizeMatch = servingSizeText.match(/^([\d./]+)\s*(.+)$/);
 
     return {
         servingSizeText: servingSizeText.trim(),

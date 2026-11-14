@@ -1,13 +1,15 @@
 {
     "name": "recipes",
     "version": "1.0.0",
-    "description": "Recipes",
-    "main": "index.js",
+    "description": "Personal recipes and kitchen tools",
     "scripts": {
         "build": "tsc",
         "postbuild": "node scripts/validate-recipes.js",
         "dev": "vite",
         "start": "node scripts/serve.js",
+        "pretest": "npm run build",
+        "test": "node --experimental-detect-module --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test tests/*.test.mjs",
+        "lint": "eslint .",
         "audit-amazon": "node scripts/audit-products.js"
     },
     "repository": {
@@ -21,10 +23,11 @@
     },
     "homepage": "https://github.com/clickthisnick/recipes#readme",
     "dependencies": {
-        "typescript": "^5.9.3",
-        "vite": "^8.0.14"
+        "typescript": "^5.9.3"
     },
     "devDependencies": {
-        "playwright": "^1.61.1"
+        "eslint": "^9.39.5",
+        "playwright": "^1.65.1",
+        "vite": "^8.3.8"
     }
 }
