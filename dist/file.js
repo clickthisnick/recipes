@@ -3575,7 +3575,7 @@ h2 { margin-top: 0; font-size: 28px; }
 // Replaced with the real compile timestamp by scripts/validate-recipes.js's postbuild
 // step, right after `tsc` emits dist/file.js. Left as-is (and reported as "dev build")
 // when running straight from source, e.g. under `vite`.
-const BUILD_TIME = '2026-11-12T12:39:14.039Z';
+const BUILD_TIME = '2026-11-14T00:55:00.265Z';
 function formatBuildTime() {
     const date = new Date(BUILD_TIME);
     if (isNaN(date.getTime()))
@@ -4743,6 +4743,33 @@ export const i = {
                 },
             }],
     }),
+    // Generic/typical nutrition (not from a specific brand's label) - fresh cranberries
+    // per 12 oz bag, based on standard USDA values (1 cup whole = ~100g).
+    cranberry: ingredientFactory('Fresh Cranberries', {
+        defaultBrand: 'generic',
+        products: [{
+                brand: 'generic', variant: 'Fresh Cranberries (12 oz bag)', size: 12, sizeUnit: u.ounce,
+                listings: [{ price: 3.99 }],
+                nutrition: {
+                    [u.ounce.name]: { servings: 1, servingSize: 1, calories: 14, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 3.6, sodium: 0, sugar: 1.4, protein: 0.1, fiber: 1.4 },
+                },
+            }],
+    }),
+    sugar: ingredientFactory('Sugar', {
+        conversions: {
+            [u.cup.name]: { to: u.ounce, factor: 7.1 },
+        },
+        nutrition: {
+            [u.cup.name]: { servings: 1, servingSize: 1, calories: 773, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 200, sodium: 0, sugar: 200, protein: 0, fiber: 0 },
+        },
+    }),
+    // Generic/typical nutrition (not from a specific brand's label) - zest of one medium
+    // orange (~2 tbsp, ~6g), negligible macros but real flavor.
+    orangeZest: ingredientFactory('Orange Zest', {
+        nutrition: {
+            [u.unit.name]: { servings: 1, servingSize: 1, calories: 1, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0.3, sodium: 0, sugar: 0, protein: 0, fiber: 0.1 },
+        },
+    }),
 };
 // ============================================================
 // RECIPES
@@ -5503,6 +5530,33 @@ registerGroup('Dinner', [
         s(Timer.set(10, 'm', 'Rest before serving', { equipment: [pan.name], ingredients: [PORK] }));
         return steps;
     })()),
+    withPlan(createRecipe('cranberry-sauce-serves-24', 'Cranberry Sauce (Serves 24, about 9 cups)', (() => {
+        const pot = e.pot('6-quart pot');
+        const steps = [];
+        const s = (...newSteps) => steps.push(...newSteps);
+        const CRANBERRIES = i.cranberry(4, u.bag);
+        const SUGAR = i.sugar(4, u.cup);
+        const ORANGE_JUICE = i.orangeJuice(2, u.cup);
+        const WATER = i.water(2, u.cup);
+        const ZEST = i.orangeZest(2, u.unit);
+        const SALT = i.seaSalt(0.125, u.tsp);
+        s(info('Makes about 9 cups, enough for 24 people. It thickens as it sits, and keeps about 10 days in the fridge.'));
+        s(pot.add([
+            [CRANBERRIES, '4 bags (12 oz each)'],
+            [SUGAR, '4 cups'],
+            [ORANGE_JUICE, 'or water if you do not have juice'],
+            [WATER, '2 cups'],
+            [ZEST, 'zest of 2 oranges'],
+            [SALT, 'a pinch'],
+        ], 'simmer everything in a big pot'));
+        s(instruction('Set the NuWave induction to 215°F and bring everything to a gentle simmer', { equipment: [pot.name], ingredients: [CRANBERRIES, SUGAR, ORANGE_JUICE, WATER, ZEST, SALT] }));
+        s(Timer.set(2, 'm', 'Reach a gentle simmer at 215°F', { equipment: [pot.name], ingredients: [CRANBERRIES, SUGAR, ORANGE_JUICE, WATER, ZEST, SALT] }));
+        s(Timer.gate('Is the mixture simmering gently (215°F on the NuWave)?', 5, 'm', { equipment: [pot.name], ingredients: [CRANBERRIES, SUGAR, ORANGE_JUICE, WATER, ZEST, SALT] }));
+        s(Timer.set(15, 'm', 'Simmer at 215°F until the berries pop - start checking at 10 minutes', { equipment: [pot.name], ingredients: [CRANBERRIES, SUGAR, ORANGE_JUICE, WATER, ZEST, SALT] }));
+        s(Timer.gate('Have the berries popped?', 3, 'm', { equipment: [pot.name], ingredients: [CRANBERRIES, SUGAR, ORANGE_JUICE, WATER, ZEST, SALT] }));
+        s(Timer.set(30, 'm', 'Let cool until lukewarm or room temperature (about 30 minutes)', { equipment: [pot.name], ingredients: [CRANBERRIES, SUGAR, ORANGE_JUICE, WATER, ZEST, SALT] }));
+        return steps;
+    })()), { planMinutes: 15, portable: false, prepMinutes: 30, perishableDays: 10 }),
 ]);
 registerGroup('Blueprint', [
     withPlan(createRecipe('protein-nutmix-oliveoil', 'Blueprint (Nutty Pudding) - Protein, Nut Mix & Olive Oil', [
