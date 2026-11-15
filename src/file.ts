@@ -525,9 +525,9 @@ class Equipment {
     }
 
     // The target temp this vessel was last preheated to.  Later steps (e.g. addOil +
-    // heatUp) read it so the heat-up wait reflects how hot the pan already is.  For a bare
-    // stovetop pan this is an aspirational target, not a thermostat reading - only
-    // thermostat-controlled vessels (e.g. the NuWave) actually self-regulate to it..
+    // heatUp) read it so the heat-up wait reflects how hot the pan already is.
+    // Pan overrides preheat with the NuWave induction timings. Other equipment keeps
+    // the 15-minute default below.
     protected _targetTemp: number | undefined;
 
     get targetTemp(): number | undefined { return this._targetTemp; }
@@ -737,8 +737,13 @@ class Equipment {
     }
 }
 
-class NuwaveEquipment extends Equipment {
+// The one stovetop pan. Every recipe pan is this NuWave induction pan.
+// A label overrides the displayed name (granola's 8×8, the panko pan, the test pan)
+// without changing preheat timings. Instances stay separate so contents and the
+// preheat target do not leak between recipes.
+class Pan extends Equipment {
     constructor(label?: string) { super('Nuwave pan', label); }
+
     preheat(temperature: number): Step {
         this._targetTemp = temperature;
         const duration = temperature <= 350 ? time.seconds(45) : time.minutes(2);
@@ -748,7 +753,7 @@ class NuwaveEquipment extends Equipment {
 
 export const e = {
     bowl:         (label?: string) => new Equipment('bowl',          label),
-    pan:          (label?: string) => new Equipment('pan',           label),
+    pan:          (label?: string) => new Pan(label),
     pot:          (label?: string) => new Equipment('pot',           label),
     oven:         (label?: string) => new Equipment('oven',          label),
     toasterOven:  (label?: string) => new Equipment('toaster oven',  label),
@@ -760,7 +765,6 @@ export const e = {
     colander:     (label?: string) => new Equipment('colander',      label),
     platter:      (label?: string) => new Equipment('platter',       label),
     kettle:       (label?: string) => new Equipment('tea kettle',    label),
-    nuwavePan:    (label?: string) => new NuwaveEquipment(label),
     glass:        (label?: string) => new Equipment('glass',         label),
     siliconeBag:  (label?: string) => new Equipment('silicone bag',  label),
 };
@@ -5892,7 +5896,7 @@ registerGroup('Breakfast', [
     })()), { planMinutes: 5, portable: false }),
     withPlan(createRecipe('scrambled-eggs', 'Scrambled Eggs (NuWave, Stainless Steel)', (() => {
         const bowl = e.bowl();
-        const pan  = e.nuwavePan();
+        const pan  = e.pan();
         const steps: Step[] = [];
         const s = (...newSteps: Step[]) => steps.push(...newSteps);
 
@@ -6245,7 +6249,7 @@ registerGroup('Dinner', [
     })(), undefined, 45),
 
     createRecipe('pan-seared-chicken-sausage', 'Pan-Seared Chicken Sausage (Sear + Cover to Finish)', (() => {
-        const pan = e.nuwavePan();
+        const pan = e.pan();
         const SAUSAGES = i.chickenSausage(5, u.unit);
         const steps: Step[] = [];
         const s = (...newSteps: Step[]) => steps.push(...newSteps);
@@ -6269,7 +6273,7 @@ registerGroup('Dinner', [
 
     createRecipe('abbot-pea-protein-spaghetti', 'Abbot Pea Protein Spaghetti', (() => {
         const pot = e.pot();
-        const pan = e.nuwavePan();
+        const pan = e.pan();
         const steps: Step[] = [];
         const s = (...newSteps: Step[]) => steps.push(...newSteps);
 
@@ -6427,7 +6431,7 @@ registerGroup('Dinner', [
     })()),
 
     createRecipe('nuwave-chicken-thighs', 'Nuwave Chicken Thighs (325°F)', (() => {
-        const pan = e.nuwavePan();
+        const pan = e.pan();
         const seasoningBowl = e.bowl('seasoning bowl');
         const THIGHS = i.chickenThigh(2, u.unit);
         const steps: Step[] = [];
@@ -6509,7 +6513,7 @@ registerGroup('Dinner', [
     })()),
 
     createRecipe('dr-praegers-cauliflower-burger-nuwave', "Dr. Praeger's Crunchy Cauliflower Burger - NuWave", (() => {
-        const pan    = e.nuwavePan();
+        const pan    = e.pan();
         const board  = e.cuttingBoard();
         const knife  = e.knife();
         const BURGER = i.drPraegersCrunchyCauliflowerBurger(2, u.unit);
@@ -6629,7 +6633,7 @@ registerGroup('Dinner', [
     ), { planMinutes: 7, portable: false }),
 
     createRecipe('nuwave-pork-shoulder', 'Pork Shoulder (NuWave, 2 lb)', (() => {
-        const pan = e.nuwavePan();
+        const pan = e.pan();
         const PORK = i.porkShoulder(2, u.pound);
         const steps: Step[] = [];
         const s = (...newSteps: Step[]) => steps.push(...newSteps);
@@ -6868,7 +6872,7 @@ registerRecipe(withPlan(createRecipe(
         const pan          = e.pan('test pan');
         const pot          = e.pot();
         const oven         = e.oven();
-        const nuwave       = e.nuwavePan();
+        const nuwave       = e.pan();
         const cuttingBoard = e.cuttingBoard();
         const platter      = e.platter();
 
@@ -6903,7 +6907,7 @@ registerRecipe(withPlan(createRecipe(
         }));
 
         s(oven.preheat(400));    // fixed 15 min duration - tap 3× to skip
-        s(nuwave.preheat(325));  // NuwaveEquipment override - fixed 45 s duration - tap 3× to skip
+        s(nuwave.preheat(325));  // Pan preheat - 45 s at 325° - tap 3× to skip
 
         s(pan.add([i.oliveOil(1, u.tbsp)]));
         s(cuttingBoard.slice(MUSHROOM));

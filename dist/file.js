@@ -522,7 +522,11 @@ class Equipment {
         });
     }
 }
-class NuwaveEquipment extends Equipment {
+// The one stovetop pan. Every recipe pan is this NuWave induction pan.
+// A label overrides the displayed name (granola's 8×8, the panko pan, the test pan)
+// without changing preheat timings. Instances stay separate so contents and the
+// preheat target do not leak between recipes.
+class Pan extends Equipment {
     constructor(label) { super('Nuwave pan', label); }
     preheat(temperature) {
         this._targetTemp = temperature;
@@ -532,7 +536,7 @@ class NuwaveEquipment extends Equipment {
 }
 export const e = {
     bowl: (label) => new Equipment('bowl', label),
-    pan: (label) => new Equipment('pan', label),
+    pan: (label) => new Pan(label),
     pot: (label) => new Equipment('pot', label),
     oven: (label) => new Equipment('oven', label),
     toasterOven: (label) => new Equipment('toaster oven', label),
@@ -544,7 +548,6 @@ export const e = {
     colander: (label) => new Equipment('colander', label),
     platter: (label) => new Equipment('platter', label),
     kettle: (label) => new Equipment('tea kettle', label),
-    nuwavePan: (label) => new NuwaveEquipment(label),
     glass: (label) => new Equipment('glass', label),
     siliconeBag: (label) => new Equipment('silicone bag', label),
 };
@@ -3846,7 +3849,7 @@ h1, h2 { margin-top: 0; font-size: 28px; }
 // Replaced with the real compile timestamp by scripts/validate-recipes.js's postbuild
 // step, right after `tsc` emits dist/file.js. Left as-is (and reported as "dev build")
 // when running straight from source, e.g. under `vite`.
-const BUILD_TIME = '2026-11-15T15:49:48.516Z';
+const BUILD_TIME = '2026-11-15T15:57:39.262Z';
 function formatBuildTime() {
     const date = new Date(BUILD_TIME);
     if (isNaN(date.getTime()))
@@ -5245,7 +5248,7 @@ registerGroup('Breakfast', [
     })()), { planMinutes: 5, portable: false }),
     withPlan(createRecipe('scrambled-eggs', 'Scrambled Eggs (NuWave, Stainless Steel)', (() => {
         const bowl = e.bowl();
-        const pan = e.nuwavePan();
+        const pan = e.pan();
         const steps = [];
         const s = (...newSteps) => steps.push(...newSteps);
         s(pan.preheat(300));
@@ -5550,7 +5553,7 @@ registerGroup('Dinner', [
         return steps;
     })(), undefined, 45),
     createRecipe('pan-seared-chicken-sausage', 'Pan-Seared Chicken Sausage (Sear + Cover to Finish)', (() => {
-        const pan = e.nuwavePan();
+        const pan = e.pan();
         const SAUSAGES = i.chickenSausage(5, u.unit);
         const steps = [];
         const s = (...newSteps) => steps.push(...newSteps);
@@ -5571,7 +5574,7 @@ registerGroup('Dinner', [
     })()),
     createRecipe('abbot-pea-protein-spaghetti', 'Abbot Pea Protein Spaghetti', (() => {
         const pot = e.pot();
-        const pan = e.nuwavePan();
+        const pan = e.pan();
         const steps = [];
         const s = (...newSteps) => steps.push(...newSteps);
         s(pan.add([i.avocadoOil(1, u.spray), i.abbotPeaItalianSausage(1, u.bag)]));
@@ -5706,7 +5709,7 @@ registerGroup('Dinner', [
         return steps;
     })()),
     createRecipe('nuwave-chicken-thighs', 'Nuwave Chicken Thighs (325°F)', (() => {
-        const pan = e.nuwavePan();
+        const pan = e.pan();
         const seasoningBowl = e.bowl('seasoning bowl');
         const THIGHS = i.chickenThigh(2, u.unit);
         const steps = [];
@@ -5775,7 +5778,7 @@ registerGroup('Dinner', [
         return steps;
     })()),
     createRecipe('dr-praegers-cauliflower-burger-nuwave', "Dr. Praeger's Crunchy Cauliflower Burger - NuWave", (() => {
-        const pan = e.nuwavePan();
+        const pan = e.pan();
         const board = e.cuttingBoard();
         const knife = e.knife();
         const BURGER = i.drPraegersCrunchyCauliflowerBurger(2, u.unit);
@@ -5875,7 +5878,7 @@ registerGroup('Dinner', [
         return steps;
     })()), { planMinutes: 7, portable: false }),
     createRecipe('nuwave-pork-shoulder', 'Pork Shoulder (NuWave, 2 lb)', (() => {
-        const pan = e.nuwavePan();
+        const pan = e.pan();
         const PORK = i.porkShoulder(2, u.pound);
         const steps = [];
         const s = (...newSteps) => steps.push(...newSteps);
@@ -6076,7 +6079,7 @@ registerRecipe(withPlan(createRecipe('test-recipe-all-features', 'Test Recipe (A
     const pan = e.pan('test pan');
     const pot = e.pot();
     const oven = e.oven();
-    const nuwave = e.nuwavePan();
+    const nuwave = e.pan();
     const cuttingBoard = e.cuttingBoard();
     const platter = e.platter();
     // requiresDateLabel: true - exercises the auto-inserted put-away/date-label step
@@ -6105,7 +6108,7 @@ registerRecipe(withPlan(createRecipe('test-recipe-all-features', 'Test Recipe (A
         ingredients: [bowl.result, i.blueZonesBasilPestoVeggieBowl(0, u.unit)], equipment: [bowl.name],
     }));
     s(oven.preheat(400)); // fixed 15 min duration - tap 3× to skip
-    s(nuwave.preheat(325)); // NuwaveEquipment override - fixed 45 s duration - tap 3× to skip
+    s(nuwave.preheat(325)); // Pan preheat - 45 s at 325° - tap 3× to skip
     s(pan.add([i.oliveOil(1, u.tbsp)]));
     s(cuttingBoard.slice(MUSHROOM));
     s(pan.add([MUSHROOM]));
