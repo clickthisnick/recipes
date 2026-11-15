@@ -3846,7 +3846,7 @@ h1, h2 { margin-top: 0; font-size: 28px; }
 // Replaced with the real compile timestamp by scripts/validate-recipes.js's postbuild
 // step, right after `tsc` emits dist/file.js. Left as-is (and reported as "dev build")
 // when running straight from source, e.g. under `vite`.
-const BUILD_TIME = '2026-11-14T14:14:42.761Z';
+const BUILD_TIME = '2026-11-15T15:49:48.516Z';
 function formatBuildTime() {
     const date = new Date(BUILD_TIME);
     if (isNaN(date.getTime()))
@@ -5550,20 +5550,20 @@ registerGroup('Dinner', [
         return steps;
     })(), undefined, 45),
     createRecipe('pan-seared-chicken-sausage', 'Pan-Seared Chicken Sausage (Sear + Cover to Finish)', (() => {
-        const pan = e.pan();
+        const pan = e.nuwavePan();
         const SAUSAGES = i.chickenSausage(5, u.unit);
         const steps = [];
         const s = (...newSteps) => steps.push(...newSteps);
-        s(pan.preheat(350));
+        s(pan.preheat(325));
         s(pan.add([
             i.avocadoOil(1, u.spray),
             [SAUSAGES, 'add in a single layer'],
         ]));
-        s(pan.cook('Sear first side, uncovered - golden crust, no lid', time.minutes(4), 350));
+        s(pan.cook('Sear first side, uncovered - golden crust, no lid', time.minutes(5), 325));
         s(pan.flip());
-        s(pan.cook('Sear second side, uncovered - golden crust, no lid', time.minutes(4), 350));
+        s(pan.cook('Sear second side, uncovered - golden crust, no lid', time.minutes(5), 325));
         s(instruction(`Cover the pan with the lid over ${formatIngredient(SAUSAGES)}`, { equipment: [pan.name], ingredients: [SAUSAGES] }));
-        s(pan.cook('Cook with the lid on until the sausages reach 165°F in the center', time.minutes(3), 350));
+        s(pan.cook('Cook with the lid on until the sausages reach 165°F in the center', time.minutes(3), 325));
         s(Timer.gate('Are the sausages at least 165°F in the center?', 2, 'm', { ingredients: [SAUSAGES], equipment: [pan.name] }));
         s(instruction('Remove the lid and rest the sausages 5 minutes before serving', { equipment: [pan.name], ingredients: [SAUSAGES] }));
         s(Timer.set(5, 'm', 'Rest before serving', { equipment: [pan.name], ingredients: [SAUSAGES] }));
@@ -5571,7 +5571,7 @@ registerGroup('Dinner', [
     })()),
     createRecipe('abbot-pea-protein-spaghetti', 'Abbot Pea Protein Spaghetti', (() => {
         const pot = e.pot();
-        const pan = e.pan();
+        const pan = e.nuwavePan();
         const steps = [];
         const s = (...newSteps) => steps.push(...newSteps);
         s(pan.add([i.avocadoOil(1, u.spray), i.abbotPeaItalianSausage(1, u.bag)]));
