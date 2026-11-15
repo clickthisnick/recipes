@@ -525,9 +525,9 @@ class Equipment {
     }
 
     // The target temp this vessel was last preheated to.  Later steps (e.g. addOil +
-    // heatUp) read it so the heat-up wait reflects how hot the pan already is.  For a bare
-    // stovetop pan this is an aspirational target, not a thermostat reading - only
-    // thermostat-controlled vessels (e.g. the NuWave) actually self-regulate to it..
+    // heatUp) read it so the heat-up wait reflects how hot the pan already is.
+    // Pan overrides preheat with the NuWave induction timings. Other equipment keeps
+    // the 15-minute default below.
     protected _targetTemp: number | undefined;
 
     get targetTemp(): number | undefined { return this._targetTemp; }
@@ -737,8 +737,13 @@ class Equipment {
     }
 }
 
-class NuwaveEquipment extends Equipment {
+// The one stovetop pan. Every recipe pan is this NuWave induction pan.
+// A label overrides the displayed name (granola's 8×8, the panko pan, the test pan)
+// without changing preheat timings. Instances stay separate so contents and the
+// preheat target do not leak between recipes.
+class Pan extends Equipment {
     constructor(label?: string) { super('Nuwave pan', label); }
+
     preheat(temperature: number): Step {
         this._targetTemp = temperature;
         const duration = temperature <= 350 ? time.seconds(45) : time.minutes(2);
@@ -748,7 +753,7 @@ class NuwaveEquipment extends Equipment {
 
 export const e = {
     bowl:         (label?: string) => new Equipment('bowl',          label),
-    pan:          (label?: string) => new Equipment('pan',           label),
+    pan:          (label?: string) => new Pan(label),
     pot:          (label?: string) => new Equipment('pot',           label),
     oven:         (label?: string) => new Equipment('oven',          label),
     toasterOven:  (label?: string) => new Equipment('toaster oven',  label),
@@ -760,7 +765,6 @@ export const e = {
     colander:     (label?: string) => new Equipment('colander',      label),
     platter:      (label?: string) => new Equipment('platter',       label),
     kettle:       (label?: string) => new Equipment('tea kettle',    label),
-    nuwavePan:    (label?: string) => new NuwaveEquipment(label),
     glass:        (label?: string) => new Equipment('glass',         label),
     siliconeBag:  (label?: string) => new Equipment('silicone bag',  label),
 };
@@ -3804,6 +3808,7 @@ button, a, input, select { touch-action: manipulation; }
 /* Block pinch-zoom gestures page-wide (belt-and-suspenders alongside the viewport meta
    tag's maximum-scale/user-scalable, which some iOS versions/accessibility settings can
    partially override) - still allow normal scrolling in both directions. */
+html { color-scheme: dark; }
 html, body { touch-action: pan-x pan-y; }
 
 body {
@@ -4100,7 +4105,9 @@ h1, h2 { margin-top: 0; font-size: 28px; }
 .panel.completed { background: #1a5c2a; color: white; border-color: #2d9e4a; }
 .panel.skipped   { background: #374151; color: #9ca3af; border-color: #4b5563; text-decoration: line-through; }
 
-.panel.ringing { background: #7f1d1d; color: white; border-color: #ef4444; animation: alarmPulse 1s ease-in-out infinite; }
+.panel.ringing { background: #7f1d1d; color: white; border-color: #ef4444;
+    @media (prefers-reduced-motion: no-preference) { animation: alarmPulse 1s ease-in-out infinite; }
+}
 @keyframes alarmPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.65; } }
 .ringing-label { font-weight: 600; }
 .ringing-countdown { margin-top: 6px; font-size: 15px; opacity: 0.85; }
@@ -4109,7 +4116,8 @@ h1, h2 { margin-top: 0; font-size: 28px; }
     position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
     background: #7f1d1d; color: white; border-bottom: 2px solid #ef4444;
     padding: 10px 16px; text-align: center; font-size: 15px; font-weight: 600;
-    cursor: pointer; animation: alarmPulse 1s ease-in-out infinite;
+    cursor: pointer;
+    @media (prefers-reduced-motion: no-preference) { animation: alarmPulse 1s ease-in-out infinite; }
 }
 .sound-error {
     margin-top: 8px; font-size: 13px; font-weight: 600; color: #fecaca;
@@ -4145,7 +4153,9 @@ h1, h2 { margin-top: 0; font-size: 28px; }
     0%   { border-color: #2d9e4a; background: rgba(45, 158, 74, 0.15); }
     100% { border-color: #444;    background: transparent; }
 }
-.panel.step-unlocked { animation: unlockFlash 0.8s ease-out forwards; }
+.panel.step-unlocked {
+    @media (prefers-reduced-motion: no-preference) { animation: unlockFlash 0.8s ease-out forwards; }
+}
 
 .purchase-links { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
 .purchase-link { color: #60a5fa; font-size: 16px; text-decoration: none; }
@@ -4379,6 +4389,111 @@ function bootstrap(): void {
     } else {
         render();
     }
+    registerRecipeAgentTools();
+}
+
+const RECIPE_SCREENS = ['select', 'shopping', 'cooking', 'nutrition', 'add-ingredient', 'prep', 'plan'] as const;
+
+function registerRecipeAgentTools(): void {
+    if (!('modelContext' in document)) return;
+    const modelContext = (document as Document & {
+        modelContext?: { registerTool: (tool: object, options?: { signal: AbortSignal }) => Promise<unknown> | unknown };
+    }).modelContext;
+    if (!modelContext) return;
+    const controller = new AbortController();
+    const recipes = () => [...state.recipes.values()].filter(recipe => !recipe.hidden || state.showHidden);
+
+    const tools = [
+        {
+            name: 'search-recipes',
+            description: 'Find recipes by name. Use when choosing what to cook.',
+            inputSchema: {
+                type: 'object',
+                properties: { query: { type: 'string', description: 'Words from the recipe name. An empty query lists visible recipes.' } },
+            },
+            execute(input: { query?: unknown }) {
+                const query = typeof input?.query === 'string' ? input.query.trim().toLowerCase() : '';
+                return {
+                    recipes: recipes()
+                        .filter(recipe => !query || recipe.name.toLowerCase().includes(query))
+                        .slice(0, 20)
+                        .map(recipe => ({ id: recipe.id, name: recipe.name, group: recipe.group ?? '' })),
+                };
+            },
+            annotations: { readOnlyHint: true },
+        },
+        {
+            name: 'list-selected-recipes',
+            description: 'Read how many servings are currently selected.',
+            inputSchema: { type: 'object', properties: {} },
+            execute() {
+                const counts = new Map<string, number>();
+                for (const id of state.selectedRecipeIds) counts.set(id, (counts.get(id) ?? 0) + 1);
+                return {
+                    selected: [...counts].map(([id, servings]) => ({ id, name: state.recipes.get(id)?.name ?? id, servings })),
+                };
+            },
+            annotations: { readOnlyHint: true },
+        },
+        {
+            name: 'add-recipe-serving',
+            description: 'Add one serving of a recipe to the current selection.',
+            inputSchema: {
+                type: 'object',
+                properties: { recipeId: { type: 'string', description: 'Recipe id from search-recipes.' } },
+                required: ['recipeId'],
+            },
+            execute(input: { recipeId?: unknown }) {
+                const recipe = typeof input?.recipeId === 'string' ? state.recipes.get(input.recipeId) : undefined;
+                if (!recipe) return { error: 'Unknown recipe id. Call search-recipes first.' };
+                state.selectedRecipeIds.push(recipe.id);
+                render();
+                const servings = state.selectedRecipeIds.filter(id => id === recipe.id).length;
+                return { recipeId: recipe.id, name: recipe.name, servings };
+            },
+            annotations: { readOnlyHint: false },
+        },
+        {
+            name: 'remove-recipe-serving',
+            description: 'Remove one serving of a selected recipe.',
+            inputSchema: {
+                type: 'object',
+                properties: { recipeId: { type: 'string', description: 'Recipe id from list-selected-recipes.' } },
+                required: ['recipeId'],
+            },
+            execute(input: { recipeId?: unknown }) {
+                if (typeof input?.recipeId !== 'string') return { error: 'Pass a recipe id.' };
+                const idx = state.selectedRecipeIds.lastIndexOf(input.recipeId);
+                if (idx === -1) return { error: 'That recipe has no selected servings.' };
+                state.selectedRecipeIds.splice(idx, 1);
+                render();
+                const servings = state.selectedRecipeIds.filter(id => id === input.recipeId).length;
+                return { recipeId: input.recipeId, servings };
+            },
+            annotations: { readOnlyHint: false },
+        },
+        {
+            name: 'open-recipe-screen',
+            description: 'Show a recipe app screen for the current selection.',
+            inputSchema: {
+                type: 'object',
+                properties: { screen: { type: 'string', enum: [...RECIPE_SCREENS], description: 'Which screen to show.' } },
+                required: ['screen'],
+            },
+            execute(input: { screen?: unknown }) {
+                if (typeof input?.screen !== 'string' || !(RECIPE_SCREENS as readonly string[]).includes(input.screen)) {
+                    return { error: 'Unknown screen.', screens: RECIPE_SCREENS };
+                }
+                navigateTo(input.screen as Screen);
+                return { screen: input.screen };
+            },
+            annotations: { readOnlyHint: false },
+        },
+    ];
+    for (const tool of tools) {
+        void Promise.resolve(modelContext.registerTool(tool, { signal: controller.signal })).catch(() => {});
+    }
+    window.addEventListener('pagehide', () => controller.abort(), { once: true });
 }
 
 // ============================================================
@@ -5833,7 +5948,7 @@ registerGroup('Breakfast', [
     })()), { planMinutes: 5, portable: false }),
     withPlan(createRecipe('scrambled-eggs', 'Scrambled Eggs (NuWave, Stainless Steel)', (() => {
         const bowl = e.bowl();
-        const pan  = e.nuwavePan();
+        const pan  = e.pan();
         const steps: Step[] = [];
         const s = (...newSteps: Step[]) => steps.push(...newSteps);
 
@@ -6191,16 +6306,16 @@ registerGroup('Dinner', [
         const steps: Step[] = [];
         const s = (...newSteps: Step[]) => steps.push(...newSteps);
 
-        s(pan.preheat(350));
+        s(pan.preheat(325));
         s(pan.add([
             i.avocadoOil(1, u.spray),
             [SAUSAGES, 'add in a single layer'],
         ]));
-        s(pan.cook('Sear first side, uncovered - golden crust, no lid', time.minutes(4), 350));
+        s(pan.cook('Sear first side, uncovered - golden crust, no lid', time.minutes(5), 325));
         s(pan.flip());
-        s(pan.cook('Sear second side, uncovered - golden crust, no lid', time.minutes(4), 350));
+        s(pan.cook('Sear second side, uncovered - golden crust, no lid', time.minutes(5), 325));
         s(instruction(`Cover the pan with the lid over ${formatIngredient(SAUSAGES)}`, { equipment: [pan.name], ingredients: [SAUSAGES] }));
-        s(pan.cook('Cook with the lid on until the sausages reach 165°F in the center', time.minutes(3), 350));
+        s(pan.cook('Cook with the lid on until the sausages reach 165°F in the center', time.minutes(3), 325));
         s(Timer.gate('Are the sausages at least 165°F in the center?', 2, 'm', { ingredients: [SAUSAGES], equipment: [pan.name] }));
         s(instruction('Remove the lid and rest the sausages 5 minutes before serving', { equipment: [pan.name], ingredients: [SAUSAGES] }));
         s(Timer.set(5, 'm', 'Rest before serving', { equipment: [pan.name], ingredients: [SAUSAGES] }));
@@ -6368,7 +6483,7 @@ registerGroup('Dinner', [
     })()),
 
     createRecipe('nuwave-chicken-thighs', 'Nuwave Chicken Thighs (325°F)', (() => {
-        const pan = e.nuwavePan();
+        const pan = e.pan();
         const seasoningBowl = e.bowl('seasoning bowl');
         const THIGHS = i.chickenThigh(2, u.unit);
         const steps: Step[] = [];
@@ -6450,7 +6565,7 @@ registerGroup('Dinner', [
     })()),
 
     createRecipe('dr-praegers-cauliflower-burger-nuwave', "Dr. Praeger's Crunchy Cauliflower Burger - NuWave", (() => {
-        const pan    = e.nuwavePan();
+        const pan    = e.pan();
         const board  = e.cuttingBoard();
         const knife  = e.knife();
         const BURGER = i.drPraegersCrunchyCauliflowerBurger(2, u.unit);
@@ -6570,7 +6685,7 @@ registerGroup('Dinner', [
     ), { planMinutes: 7, portable: false }),
 
     createRecipe('nuwave-pork-shoulder', 'Pork Shoulder (NuWave, 2 lb)', (() => {
-        const pan = e.nuwavePan();
+        const pan = e.pan();
         const PORK = i.porkShoulder(2, u.pound);
         const steps: Step[] = [];
         const s = (...newSteps: Step[]) => steps.push(...newSteps);
@@ -6809,7 +6924,7 @@ registerRecipe(withPlan(createRecipe(
         const pan          = e.pan('test pan');
         const pot          = e.pot();
         const oven         = e.oven();
-        const nuwave       = e.nuwavePan();
+        const nuwave       = e.pan();
         const cuttingBoard = e.cuttingBoard();
         const platter      = e.platter();
 
@@ -6844,7 +6959,7 @@ registerRecipe(withPlan(createRecipe(
         }));
 
         s(oven.preheat(400));    // fixed 15 min duration - tap 3× to skip
-        s(nuwave.preheat(325));  // NuwaveEquipment override - fixed 45 s duration - tap 3× to skip
+        s(nuwave.preheat(325));  // Pan preheat - 45 s at 325° - tap 3× to skip
 
         s(pan.add([i.oliveOil(1, u.tbsp)]));
         s(cuttingBoard.slice(MUSHROOM));

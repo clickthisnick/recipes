@@ -297,7 +297,7 @@ const factoryType = {};
     const eBlock = src.match(/export const e = \{([\s\S]*?)\n\};/);
     if (eBlock) {
         for (const m of eBlock[1].matchAll(/(\w+):\s*\([^)]*\)\s*=>\s*new (\w+)\((?:'([^']+)')?/g)) {
-            const type = (m[3] || (m[2] === 'NuwaveEquipment' ? 'Nuwave pan' : m[1])).toLowerCase();
+            const type = (m[3] || m[1]).toLowerCase();
             factoryType[m[1]] = type;
             equipmentWords.add(type);
         }
@@ -578,7 +578,7 @@ const OIL_SMOKE_POINTS = {
 
         // Only flag oils used on a direct-heat pan surface — var must be *assigned*
         // here (`const v = e.pan(...)`), not merely mentioned in step text.
-        if (!/const\s+\w+\s*=\s*e\.(?:pan|nuwavePan)\(/.test(block)) continue;
+        if (!/const\s+\w+\s*=\s*e\.pan\(/.test(block)) continue;
 
         const usedOils = Object.keys(OIL_SMOKE_POINTS).filter(
             (key) => new RegExp(`\\bi\\.${key}\\(`).test(block)

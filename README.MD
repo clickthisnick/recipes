@@ -28,4 +28,4 @@ npm run lint
 - [Frozen food portions](https://www.clickthisnick.com/recipes/frozenFood.html)
 - [Eat this instead](https://www.clickthisnick.com/recipes/eatThis.html)
 
-Recipes are edited in `src/file.ts`. The old per-recipe HTML files under `dist/` are not published; the app is the one page above. `llms.txt` describes the controls for a browser agent.
+Recipes are edited in `src/file.ts`. `npm run build` writes `dist/file.js`, and GitHub Pages serves that file plus `dist/main.html`. The other tools are the HTML files at the repo root. The expiration page fills its dates in the browser. `archived/` is old recipe notes and is not part of the site. `llms.txt` describes the controls for a browser agent.

@@ -3,6 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
+    <meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'">
     <title>Eat this instead | Recipes</title>
     <link rel="stylesheet" href="./src/site.css">
 </head>
@@ -177,6 +179,7 @@
         </div>
     </main>
     <script type="module">
+        import { registerAgentTools } from './src/site-logic.js';
         const status = document.getElementById('eat-status');
         for (const box of document.querySelectorAll('#eat-table input[type="checkbox"]')) {
             box.addEventListener('change', () => {
@@ -185,6 +188,51 @@
                 status.textContent = box.checked ? `${name} marked tried` : `${name} marked not tried`;
             });
         }
+
+        function alternatives() {
+            return [...document.querySelectorAll('#eat-table tbody tr')].map((row) => ({
+                food: row.querySelector('th')?.textContent ?? '',
+                calories: row.querySelectorAll('td')[0]?.textContent ?? '',
+                price: row.querySelectorAll('td')[1]?.textContent ?? '',
+                description: row.querySelectorAll('td')[2]?.textContent ?? '',
+                tried: Boolean(row.querySelector('input')?.checked),
+            }));
+        }
+
+        registerAgentTools([
+            {
+                name: 'list-eating-alternatives',
+                description: 'Read the eating-out alternatives and which ones are marked tried.',
+                inputSchema: { type: 'object', properties: {} },
+                execute() { return { foods: alternatives() }; },
+                annotations: { readOnlyHint: true },
+            },
+            {
+                name: 'set-alternative-tried',
+                description: 'Mark one eating alternative tried or not tried.',
+                inputSchema: {
+                    type: 'object',
+                    properties: {
+                        food: { type: 'string', description: 'Food name as shown in the table.' },
+                        tried: { type: 'boolean', description: 'Whether that food has been tried.' },
+                    },
+                    required: ['food', 'tried'],
+                },
+                execute(input) {
+                    if (typeof input?.food !== 'string' || typeof input?.tried !== 'boolean') {
+                        return { error: 'Pass the food name and whether it was tried.' };
+                    }
+                    const row = [...document.querySelectorAll('#eat-table tbody tr')]
+                        .find((entry) => entry.querySelector('th')?.textContent === input.food);
+                    const box = row?.querySelector('input');
+                    if (!box) return { error: `No food named "${input.food}" with a Tried checkbox.`, foods: alternatives().filter((item) => item.food).map((item) => item.food) };
+                    box.checked = input.tried;
+                    box.dispatchEvent(new Event('change'));
+                    return { food: input.food, tried: box.checked };
+                },
+                annotations: { readOnlyHint: false },
+            },
+        ]);
     </script>
 </body>
 </html>

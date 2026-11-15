@@ -522,7 +522,11 @@ class Equipment {
         });
     }
 }
-class NuwaveEquipment extends Equipment {
+// The one stovetop pan. Every recipe pan is this NuWave induction pan.
+// A label overrides the displayed name (granola's 8×8, the panko pan, the test pan)
+// without changing preheat timings. Instances stay separate so contents and the
+// preheat target do not leak between recipes.
+class Pan extends Equipment {
     constructor(label) { super('Nuwave pan', label); }
     preheat(temperature) {
         this._targetTemp = temperature;
@@ -532,7 +536,7 @@ class NuwaveEquipment extends Equipment {
 }
 export const e = {
     bowl: (label) => new Equipment('bowl', label),
-    pan: (label) => new Equipment('pan', label),
+    pan: (label) => new Pan(label),
     pot: (label) => new Equipment('pot', label),
     oven: (label) => new Equipment('oven', label),
     toasterOven: (label) => new Equipment('toaster oven', label),
@@ -544,7 +548,6 @@ export const e = {
     colander: (label) => new Equipment('colander', label),
     platter: (label) => new Equipment('platter', label),
     kettle: (label) => new Equipment('tea kettle', label),
-    nuwavePan: (label) => new NuwaveEquipment(label),
     glass: (label) => new Equipment('glass', label),
     siliconeBag: (label) => new Equipment('silicone bag', label),
 };
@@ -3309,6 +3312,7 @@ button, a, input, select { touch-action: manipulation; }
 /* Block pinch-zoom gestures page-wide (belt-and-suspenders alongside the viewport meta
    tag's maximum-scale/user-scalable, which some iOS versions/accessibility settings can
    partially override) - still allow normal scrolling in both directions. */
+html { color-scheme: dark; }
 html, body { touch-action: pan-x pan-y; }
 
 body {
@@ -3605,7 +3609,9 @@ h1, h2 { margin-top: 0; font-size: 28px; }
 .panel.completed { background: #1a5c2a; color: white; border-color: #2d9e4a; }
 .panel.skipped   { background: #374151; color: #9ca3af; border-color: #4b5563; text-decoration: line-through; }
 
-.panel.ringing { background: #7f1d1d; color: white; border-color: #ef4444; animation: alarmPulse 1s ease-in-out infinite; }
+.panel.ringing { background: #7f1d1d; color: white; border-color: #ef4444;
+    @media (prefers-reduced-motion: no-preference) { animation: alarmPulse 1s ease-in-out infinite; }
+}
 @keyframes alarmPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.65; } }
 .ringing-label { font-weight: 600; }
 .ringing-countdown { margin-top: 6px; font-size: 15px; opacity: 0.85; }
@@ -3614,7 +3620,8 @@ h1, h2 { margin-top: 0; font-size: 28px; }
     position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
     background: #7f1d1d; color: white; border-bottom: 2px solid #ef4444;
     padding: 10px 16px; text-align: center; font-size: 15px; font-weight: 600;
-    cursor: pointer; animation: alarmPulse 1s ease-in-out infinite;
+    cursor: pointer;
+    @media (prefers-reduced-motion: no-preference) { animation: alarmPulse 1s ease-in-out infinite; }
 }
 .sound-error {
     margin-top: 8px; font-size: 13px; font-weight: 600; color: #fecaca;
@@ -3650,7 +3657,9 @@ h1, h2 { margin-top: 0; font-size: 28px; }
     0%   { border-color: #2d9e4a; background: rgba(45, 158, 74, 0.15); }
     100% { border-color: #444;    background: transparent; }
 }
-.panel.step-unlocked { animation: unlockFlash 0.8s ease-out forwards; }
+.panel.step-unlocked {
+    @media (prefers-reduced-motion: no-preference) { animation: unlockFlash 0.8s ease-out forwards; }
+}
 
 .purchase-links { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
 .purchase-link { color: #60a5fa; font-size: 16px; text-decoration: none; }
@@ -3842,7 +3851,7 @@ h1, h2 { margin-top: 0; font-size: 28px; }
 // Replaced with the real compile timestamp by scripts/validate-recipes.js's postbuild
 // step, right after `tsc` emits dist/file.js. Left as-is (and reported as "dev build")
 // when running straight from source, e.g. under `vite`.
-const BUILD_TIME = '2026-11-14T17:14:04.396Z';
+const BUILD_TIME = '2026-11-15T15:57:39.262Z';
 function formatBuildTime() {
     const date = new Date(BUILD_TIME);
     if (isNaN(date.getTime()))
@@ -3878,6 +3887,112 @@ function bootstrap() {
     else {
         render();
     }
+    registerRecipeAgentTools();
+}
+const RECIPE_SCREENS = ['select', 'shopping', 'cooking', 'nutrition', 'add-ingredient', 'prep', 'plan'];
+function registerRecipeAgentTools() {
+    if (!('modelContext' in document))
+        return;
+    const modelContext = document.modelContext;
+    if (!modelContext)
+        return;
+    const controller = new AbortController();
+    const recipes = () => [...state.recipes.values()].filter(recipe => !recipe.hidden || state.showHidden);
+    const tools = [
+        {
+            name: 'search-recipes',
+            description: 'Find recipes by name. Use when choosing what to cook.',
+            inputSchema: {
+                type: 'object',
+                properties: { query: { type: 'string', description: 'Words from the recipe name. An empty query lists visible recipes.' } },
+            },
+            execute(input) {
+                const query = typeof input?.query === 'string' ? input.query.trim().toLowerCase() : '';
+                return {
+                    recipes: recipes()
+                        .filter(recipe => !query || recipe.name.toLowerCase().includes(query))
+                        .slice(0, 20)
+                        .map(recipe => ({ id: recipe.id, name: recipe.name, group: recipe.group ?? '' })),
+                };
+            },
+            annotations: { readOnlyHint: true },
+        },
+        {
+            name: 'list-selected-recipes',
+            description: 'Read how many servings are currently selected.',
+            inputSchema: { type: 'object', properties: {} },
+            execute() {
+                const counts = new Map();
+                for (const id of state.selectedRecipeIds)
+                    counts.set(id, (counts.get(id) ?? 0) + 1);
+                return {
+                    selected: [...counts].map(([id, servings]) => ({ id, name: state.recipes.get(id)?.name ?? id, servings })),
+                };
+            },
+            annotations: { readOnlyHint: true },
+        },
+        {
+            name: 'add-recipe-serving',
+            description: 'Add one serving of a recipe to the current selection.',
+            inputSchema: {
+                type: 'object',
+                properties: { recipeId: { type: 'string', description: 'Recipe id from search-recipes.' } },
+                required: ['recipeId'],
+            },
+            execute(input) {
+                const recipe = typeof input?.recipeId === 'string' ? state.recipes.get(input.recipeId) : undefined;
+                if (!recipe)
+                    return { error: 'Unknown recipe id. Call search-recipes first.' };
+                state.selectedRecipeIds.push(recipe.id);
+                render();
+                const servings = state.selectedRecipeIds.filter(id => id === recipe.id).length;
+                return { recipeId: recipe.id, name: recipe.name, servings };
+            },
+            annotations: { readOnlyHint: false },
+        },
+        {
+            name: 'remove-recipe-serving',
+            description: 'Remove one serving of a selected recipe.',
+            inputSchema: {
+                type: 'object',
+                properties: { recipeId: { type: 'string', description: 'Recipe id from list-selected-recipes.' } },
+                required: ['recipeId'],
+            },
+            execute(input) {
+                if (typeof input?.recipeId !== 'string')
+                    return { error: 'Pass a recipe id.' };
+                const idx = state.selectedRecipeIds.lastIndexOf(input.recipeId);
+                if (idx === -1)
+                    return { error: 'That recipe has no selected servings.' };
+                state.selectedRecipeIds.splice(idx, 1);
+                render();
+                const servings = state.selectedRecipeIds.filter(id => id === input.recipeId).length;
+                return { recipeId: input.recipeId, servings };
+            },
+            annotations: { readOnlyHint: false },
+        },
+        {
+            name: 'open-recipe-screen',
+            description: 'Show a recipe app screen for the current selection.',
+            inputSchema: {
+                type: 'object',
+                properties: { screen: { type: 'string', enum: [...RECIPE_SCREENS], description: 'Which screen to show.' } },
+                required: ['screen'],
+            },
+            execute(input) {
+                if (typeof input?.screen !== 'string' || !RECIPE_SCREENS.includes(input.screen)) {
+                    return { error: 'Unknown screen.', screens: RECIPE_SCREENS };
+                }
+                navigateTo(input.screen);
+                return { screen: input.screen };
+            },
+            annotations: { readOnlyHint: false },
+        },
+    ];
+    for (const tool of tools) {
+        void Promise.resolve(modelContext.registerTool(tool, { signal: controller.signal })).catch(() => { });
+    }
+    window.addEventListener('pagehide', () => controller.abort(), { once: true });
 }
 // ============================================================
 // STORES
@@ -5188,7 +5303,7 @@ registerGroup('Breakfast', [
     })()), { planMinutes: 5, portable: false }),
     withPlan(createRecipe('scrambled-eggs', 'Scrambled Eggs (NuWave, Stainless Steel)', (() => {
         const bowl = e.bowl();
-        const pan = e.nuwavePan();
+        const pan = e.pan();
         const steps = [];
         const s = (...newSteps) => steps.push(...newSteps);
         s(pan.preheat(300));
@@ -5497,16 +5612,16 @@ registerGroup('Dinner', [
         const SAUSAGES = i.chickenSausage(5, u.unit);
         const steps = [];
         const s = (...newSteps) => steps.push(...newSteps);
-        s(pan.preheat(350));
+        s(pan.preheat(325));
         s(pan.add([
             i.avocadoOil(1, u.spray),
             [SAUSAGES, 'add in a single layer'],
         ]));
-        s(pan.cook('Sear first side, uncovered - golden crust, no lid', time.minutes(4), 350));
+        s(pan.cook('Sear first side, uncovered - golden crust, no lid', time.minutes(5), 325));
         s(pan.flip());
-        s(pan.cook('Sear second side, uncovered - golden crust, no lid', time.minutes(4), 350));
+        s(pan.cook('Sear second side, uncovered - golden crust, no lid', time.minutes(5), 325));
         s(instruction(`Cover the pan with the lid over ${formatIngredient(SAUSAGES)}`, { equipment: [pan.name], ingredients: [SAUSAGES] }));
-        s(pan.cook('Cook with the lid on until the sausages reach 165°F in the center', time.minutes(3), 350));
+        s(pan.cook('Cook with the lid on until the sausages reach 165°F in the center', time.minutes(3), 325));
         s(Timer.gate('Are the sausages at least 165°F in the center?', 2, 'm', { ingredients: [SAUSAGES], equipment: [pan.name] }));
         s(instruction('Remove the lid and rest the sausages 5 minutes before serving', { equipment: [pan.name], ingredients: [SAUSAGES] }));
         s(Timer.set(5, 'm', 'Rest before serving', { equipment: [pan.name], ingredients: [SAUSAGES] }));
@@ -5649,7 +5764,7 @@ registerGroup('Dinner', [
         return steps;
     })()),
     createRecipe('nuwave-chicken-thighs', 'Nuwave Chicken Thighs (325°F)', (() => {
-        const pan = e.nuwavePan();
+        const pan = e.pan();
         const seasoningBowl = e.bowl('seasoning bowl');
         const THIGHS = i.chickenThigh(2, u.unit);
         const steps = [];
@@ -5718,7 +5833,7 @@ registerGroup('Dinner', [
         return steps;
     })()),
     createRecipe('dr-praegers-cauliflower-burger-nuwave', "Dr. Praeger's Crunchy Cauliflower Burger - NuWave", (() => {
-        const pan = e.nuwavePan();
+        const pan = e.pan();
         const board = e.cuttingBoard();
         const knife = e.knife();
         const BURGER = i.drPraegersCrunchyCauliflowerBurger(2, u.unit);
@@ -5818,7 +5933,7 @@ registerGroup('Dinner', [
         return steps;
     })()), { planMinutes: 7, portable: false }),
     createRecipe('nuwave-pork-shoulder', 'Pork Shoulder (NuWave, 2 lb)', (() => {
-        const pan = e.nuwavePan();
+        const pan = e.pan();
         const PORK = i.porkShoulder(2, u.pound);
         const steps = [];
         const s = (...newSteps) => steps.push(...newSteps);
@@ -6019,7 +6134,7 @@ registerRecipe(withPlan(createRecipe('test-recipe-all-features', 'Test Recipe (A
     const pan = e.pan('test pan');
     const pot = e.pot();
     const oven = e.oven();
-    const nuwave = e.nuwavePan();
+    const nuwave = e.pan();
     const cuttingBoard = e.cuttingBoard();
     const platter = e.platter();
     // requiresDateLabel: true - exercises the auto-inserted put-away/date-label step
@@ -6048,7 +6163,7 @@ registerRecipe(withPlan(createRecipe('test-recipe-all-features', 'Test Recipe (A
         ingredients: [bowl.result, i.blueZonesBasilPestoVeggieBowl(0, u.unit)], equipment: [bowl.name],
     }));
     s(oven.preheat(400)); // fixed 15 min duration - tap 3× to skip
-    s(nuwave.preheat(325)); // NuwaveEquipment override - fixed 45 s duration - tap 3× to skip
+    s(nuwave.preheat(325)); // Pan preheat - 45 s at 325° - tap 3× to skip
     s(pan.add([i.oliveOil(1, u.tbsp)]));
     s(cuttingBoard.slice(MUSHROOM));
     s(pan.add([MUSHROOM]));

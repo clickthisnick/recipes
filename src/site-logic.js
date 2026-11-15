@@ -145,3 +145,16 @@ export function bindUserInvalid(form) {
         invalid[0].focus();
     });
 }
+
+// WebMCP is an early Chromium preview. Other browsers have no modelContext, so this is a no-op.
+export function registerAgentTools(tools) {
+    const context = typeof document !== 'undefined' ? document.modelContext : undefined;
+    if (!context || typeof context.registerTool !== 'function') return () => {};
+    const controller = new AbortController();
+    for (const tool of tools) {
+        Promise.resolve(context.registerTool(tool, { signal: controller.signal })).catch(() => {});
+    }
+    const stop = () => controller.abort();
+    if (typeof window !== 'undefined') window.addEventListener('pagehide', stop, { once: true });
+    return stop;
+}

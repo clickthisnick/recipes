@@ -3,6 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
+    <meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'">
     <title>Meat temperature | Recipes</title>
     <link rel="stylesheet" href="./src/site.css">
 </head>
@@ -40,5 +42,22 @@
             </table>
         </div>
     </main>
+    <script type="module">
+        import { registerAgentTools } from './src/site-logic.js';
+        registerAgentTools([{
+            name: 'read-meat-temperatures',
+            description: 'Read the doneness temperatures shown on this chart.',
+            inputSchema: { type: 'object', properties: {} },
+            execute() {
+                return {
+                    rows: [...document.querySelectorAll('tbody tr')].map((row) => ({
+                        meat: row.querySelector('th')?.textContent ?? '',
+                        temp: row.querySelector('td')?.textContent ?? '',
+                    })).filter((row) => row.temp),
+                };
+            },
+            annotations: { readOnlyHint: true },
+        }]);
+    </script>
 </body>
 </html>
