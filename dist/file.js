@@ -5365,11 +5365,11 @@ registerGroup('Breakfast', [
         s(addStickyBase);
         const addDates = foodProcessor.add([DATES]).waitFor(soakStep);
         s(addDates);
-        s(foodProcessor.mix('sticky date-nut butter paste'));
+        foodProcessor.mix('sticky date-nut butter paste');
         const DATE_PASTE = foodProcessor.result;
-        s(instruction(`Process ${formatIngredient(DATE_PASTE)} until you have a smooth, sticky paste`, {
+        s(Timer.set(25, 's', 'Pulse on low for 25 seconds into a sticky date-nut butter paste', {
             equipment: [foodProcessor.name],
-            ingredients: [DATE_PASTE],
+            ingredients: [PSYLLIUM, PSYLLIUM_WATER, PEANUT_BUTTER, ALLULOSE, MAPLE, VANILLA, SALT, DATES, DATE_PASTE],
         }));
         s(bowl.add([
             OATS,
