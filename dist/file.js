@@ -5350,7 +5350,7 @@ registerGroup('Breakfast', [
         });
         s(soakStep);
         s(foodProcessor.add([PSYLLIUM, PSYLLIUM_WATER]));
-        const psylliumTimer = Timer.set(5, 'm', `Let ${formatIngredient(PSYLLIUM)} and ${formatIngredient(PSYLLIUM_WATER)} thicken into a gel in the bullet mixer`, {
+        const psylliumTimer = Timer.set(2, 'm', `Let ${formatIngredient(PSYLLIUM)} and ${formatIngredient(PSYLLIUM_WATER)} thicken into a gel in the bullet mixer`, {
             equipment: [foodProcessor.name],
             ingredients: [PSYLLIUM, PSYLLIUM_WATER],
         });
