@@ -442,7 +442,7 @@ const saucePan = e.pan('sauce pan');   // claim key: "recipeId::eq::sauce pan"
 const plainPan = e.pan();              // claim key: "recipeId::eq::pan"
 ```
 
-Available factories: `e.bowl()`, `e.pan()`, `e.pot()`, `e.oven()`, `e.toasterOven()`, `e.instantPot()`, `e.bulletMixer()`, `e.knife()`, `e.cuttingBoard()`, `e.colander()`, `e.platter()`, `e.kettle()`, `e.nuwavePan()`, `e.microwave()`.
+Available factories: `e.bowl()`, `e.pan()`, `e.pot()`, `e.oven()`, `e.toasterOven()`, `e.instantPot()`, `e.bulletMixer()`, `e.knife()`, `e.cuttingBoard()`, `e.colander()`, `e.platter()`, `e.kettle()`, `e.microwave()`.
 
 ### Contents tracking
 Each `Equipment` instance tracks its current `contents: Ingredient[]`, updated by `add()`, `transfer()`, `mix()`, and `combine()`. `cook()` and `broil()` automatically inherit the contents of nested vessels (registered via `place()`) so downstream steps are locked correctly without manual ingredient listing.
@@ -452,7 +452,7 @@ Each `Equipment` instance tracks its current `contents: Ingredient[]`, updated b
 
 ### Methods
 
-- `.preheat(temp)` → timer step `"Preheat {name} to {temp}°"`, 15 minutes
+- `.preheat(temp)` → timer step `"Preheat {name} to {temp}°"`, 15 minutes by default (for example the oven and other equipment). Pans created with `e.pan()` (the Pan class) take 45 seconds at 350° or below and 2 minutes above 350°.
 - `.cook(label, duration, temperature?, extraEquipment?)` → timer step. Automatically claims this vessel, all nested vessels (placed via `.place()`), and all their contents. `extraEquipment` adds additional vessels not yet nested.
 - `.broil(label, duration)` → timer step `"Broil — {label}"`. Same auto-inheritance as `.cook()`.
 - `.place(vessel, label?, duration?, temperature?)` → registers `vessel` as nested inside this one. Without `label`/`duration` produces an instruction step `"Place {vessel} in {this}"`. With both, produces a timer step combining placement and cooking into one card.
