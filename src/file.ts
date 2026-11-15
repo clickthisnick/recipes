@@ -5980,7 +5980,6 @@ withPlan(createRecipe(
     'Shelf-Stable Vanilla-Chip Chewy Granola Bars (Makes 10)',
     (() => {
         const bowl         = e.bowl();
-        const binderBowl   = e.bowl('binder bowl');
         const foodProcessor = e.bulletMixer();
         const pan          = e.pan('8×8-inch pan');
         const steps: Step[] = [];
@@ -6005,24 +6004,28 @@ withPlan(createRecipe(
         });
         s(soakStep);
 
-        s(binderBowl.combine([PSYLLIUM, PSYLLIUM_WATER], 'let thicken into a binder gel'));
-        const BINDER_GEL = binderBowl.result;
-        BINDER_GEL.rename('Binder Gel');
+        s(foodProcessor.add([PSYLLIUM, PSYLLIUM_WATER]));
+        const psylliumTimer = Timer.set(2, 'm', `Let ${formatIngredient(PSYLLIUM)} and ${formatIngredient(PSYLLIUM_WATER)} thicken into a gel in the bullet mixer`, {
+            equipment: [foodProcessor.name],
+            ingredients: [PSYLLIUM, PSYLLIUM_WATER],
+        });
+        s(psylliumTimer);
 
-        s(foodProcessor.add([
+        const addStickyBase = foodProcessor.add([
             PEANUT_BUTTER,
             ALLULOSE,
             MAPLE,
             VANILLA,
             SALT,
-        ]));
-        const addStickyBase = foodProcessor.add([DATES, BINDER_GEL]).waitFor(soakStep);
+        ]).waitFor(psylliumTimer);
         s(addStickyBase);
-        s(foodProcessor.mix('sticky date-nut butter paste'));
+        const addDates = foodProcessor.add([DATES]).waitFor(soakStep);
+        s(addDates);
+        foodProcessor.mix('sticky date-nut butter paste');
         const DATE_PASTE = foodProcessor.result;
-        s(instruction(`Process ${formatIngredient(DATE_PASTE)} until you have a smooth, sticky paste`, {
+        s(Timer.set(25, 's', 'Pulse on low for 25 seconds into a sticky date-nut butter paste', {
             equipment: [foodProcessor.name],
-            ingredients: [DATE_PASTE],
+            ingredients: [PSYLLIUM, PSYLLIUM_WATER, PEANUT_BUTTER, ALLULOSE, MAPLE, VANILLA, SALT, DATES, DATE_PASTE],
         }));
         s(bowl.add([
             OATS,
