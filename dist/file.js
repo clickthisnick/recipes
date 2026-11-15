@@ -1193,7 +1193,6 @@ function renderRecipeList() {
         empty.className = 'empty';
         root.appendChild(empty);
         appendAddIngredientButton(root);
-        appendBuildFooter(root);
         return;
     }
     if (state.bundles.size > 0 && !state.searchQuery) {
@@ -1319,7 +1318,6 @@ function renderRecipeList() {
         });
     });
     appendAddIngredientButton(root);
-    appendBuildFooter(root);
 }
 function appendAddIngredientButton(root) {
     const addRow = document.createElement('div');
@@ -3585,7 +3583,6 @@ h1, h2 { margin-top: 0; font-size: 28px; }
 .info-step-collapsed .info-step-body { display: none; }
 
 #recipe-list { padding-bottom: 120px; }
-.build-footer { margin-top: 24px; text-align: center; font-size: 12px; color: #666; }
 
 .panel {
     border: 2px solid #444; border-radius: 12px; padding: 20px; margin: 10px 0;
@@ -3845,25 +3842,6 @@ h1, h2 { margin-top: 0; font-size: 28px; }
     .panel { font-size: 18px; padding: 14px; }
 }
 `;
-// ============================================================
-// BUILD INFO
-// ============================================================
-// Replaced with the real compile timestamp by scripts/validate-recipes.js's postbuild
-// step, right after `tsc` emits dist/file.js. Left as-is (and reported as "dev build")
-// when running straight from source, e.g. under `vite`.
-const BUILD_TIME = '2026-11-15T15:57:39.262Z';
-function formatBuildTime() {
-    const date = new Date(BUILD_TIME);
-    if (isNaN(date.getTime()))
-        return 'dev build';
-    return date.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
-}
-function appendBuildFooter(root) {
-    const footer = document.createElement('div');
-    footer.className = 'build-footer';
-    footer.textContent = `Last compiled: ${formatBuildTime()}`;
-    root.appendChild(footer);
-}
 // ============================================================
 // BOOTSTRAP
 // ============================================================
@@ -5621,7 +5599,7 @@ registerGroup('Dinner', [
         s(pan.flip());
         s(pan.cook('Sear second side, uncovered - golden crust, no lid', time.minutes(5), 325));
         s(instruction(`Cover the pan with the lid over ${formatIngredient(SAUSAGES)}`, { equipment: [pan.name], ingredients: [SAUSAGES] }));
-        s(pan.cook('Cook with the lid on until the sausages reach 165°F in the center', time.minutes(3), 325));
+        s(pan.cook('Cook with the lid on until the sausages reach 165°F in the center', time.minutes(6), 325));
         s(Timer.gate('Are the sausages at least 165°F in the center?', 2, 'm', { ingredients: [SAUSAGES], equipment: [pan.name] }));
         s(instruction('Remove the lid and rest the sausages 5 minutes before serving', { equipment: [pan.name], ingredients: [SAUSAGES] }));
         s(Timer.set(5, 'm', 'Rest before serving', { equipment: [pan.name], ingredients: [SAUSAGES] }));

@@ -665,14 +665,7 @@ Runs automatically as the `postbuild` step after `tsc` (`npm run build`). Checks
 4. **Explicit instruction amounts** — an `instruction()` that declares `ingredients` must state an amount inline. Prefer `Verb ${formatIngredient(INGREDIENT)}`, which guarantees the text stays synchronized with the declared ingredient; a literal numerical or fractional amount is also accepted for broader instructions. Fails the build. `Equipment.add()` is exempt because it generates amount-bearing child steps automatically.
 5. **Equipment/ingredient mention scan** (warning-only, never fails the build) — a heuristic, non-exhaustive scan of the literal text passed to `instruction()`/`prep()`/`Timer.set()`/`Timer.gate()`/`timerStep()` calls, checking whether words matching a known equipment type or ingredient name are actually declared in that step's `equipment:`/`ingredients:` arrays. Steps built via `Equipment` methods (`.add()`, `.mix()`, etc.) already populate these arrays automatically and aren't scanned; `info()` steps are excluded too (narrative notes, not action steps). Expect some false positives — printed as non-blocking warnings for a human to judge (e.g. "text mentions X but doesn't declare it").
 
-The script also stamps the real compile timestamp into the freshly-built `dist/file.js`, replacing the `__BUILD_TIME__` placeholder `src/file.ts` declares — see [Build Info](#build-info).
-
 `transfer()` validation errors are caught separately, at recipe-definition time (the IIFE throws immediately if an ingredient being transferred isn't actually in the source vessel) — this happens naturally whenever the module loads/compiles, not as a separate check in this script.
-
----
-
-## Build Info
-The Select screen shows a small "Last compiled: {date}" footer at the bottom of the recipe list (part of the normal scrollable content, not the fixed action bar). `src/file.ts` declares a `BUILD_TIME` placeholder constant (`'__BUILD_TIME__'`); the `validate-recipes.js` postbuild step rewrites it in `dist/file.js` with the real compile timestamp (see [Validation Script](#validation-script-scriptsvalidate-recipesjs)). Running straight from source (e.g. under `vite`, without a `tsc` build) leaves the placeholder in place, which renders as `"dev build"` instead of a date.
 
 ---
 
