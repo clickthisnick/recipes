@@ -5927,12 +5927,6 @@ registerGroup('Breakfast', [
         const steps: Step[] = [];
         const s = (...newSteps: Step[]) => steps.push(...newSteps);
 
-        s(pan.preheat(300));
-        s(instruction('Flick a wet finger at the pan to test - the droplet should bead and skitter rather than vanish instantly. If it violently sprays everywhere, the pan is too hot - lower the temperature briefly', { equipment: [pan.name] }));
-        const OIL         = i.oliveOil(1.5, u.tsp);
-        s(pan.addOil(OIL));
-        s(pan.heatUp(OIL));
-
         s(bowl.add([
             i.egg(3, u.unit),
             i.seaSalt(0.125, u.tsp),
@@ -5941,6 +5935,12 @@ registerGroup('Breakfast', [
         s(bowl.mix('whisked eggs'));
         const WHISKED = bowl.result;
         const EGG     = i.egg(3, u.unit);
+
+        s(pan.preheat(300));
+        s(instruction('Flick a wet finger at the pan to test - the droplet should bead and skitter rather than vanish instantly. If it violently sprays everywhere, the pan is too hot - lower the temperature briefly', { equipment: [pan.name] }));
+        const OIL         = i.oliveOil(1.5, u.tsp);
+        s(pan.addOil(OIL));
+        s(pan.heatUp(OIL));
 
         s(pan.setTemp(250));
         s(bowl.transfer(pan, [WHISKED]));
