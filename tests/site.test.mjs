@@ -23,7 +23,7 @@ import {
     schedulePlan,
     subscribeAndSavePercent,
     u,
-} from '../dist/file.js';
+} from '../src/file.js';
 
 const require = createRequire(import.meta.url);
 const { requestPath, resolveSafePath } = require('../scripts/static-path.js');

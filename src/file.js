@@ -7,36 +7,43 @@
 // TYPES
 // ============================================================
 
-export type StepType = 'instruction' | 'timer' | 'cleanup' | 'info' | 'gate';
-export type Screen   = 'select' | 'shopping' | 'cooking' | 'nutrition' | 'add-ingredient' | 'prep' | 'plan';
+/** @typedef {'instruction' | 'timer' | 'cleanup' | 'info' | 'gate'} StepType */
+/** @typedef {'select' | 'shopping' | 'cooking' | 'nutrition' | 'add-ingredient' | 'prep' | 'plan'} Screen */
 
-export interface Unit {
-    name: string;
-    plural?: string;
-}
+/**
+ * @typedef {Object} Unit
+ * @property {string} name
+ * @property {string} [plural]
+ */
 
-const NUTRIENT_KEYS = ['calories', 'fat', 'saturatedFat', 'transFat', 'cholesterol', 'carbs', 'sodium', 'sugar', 'protein', 'fiber'] as const;
-type NutritionTotals = Record<typeof NUTRIENT_KEYS[number], number>;
+const NUTRIENT_KEYS = /** @type {const} */ (['calories', 'fat', 'saturatedFat', 'transFat', 'cholesterol', 'carbs', 'sodium', 'sugar', 'protein', 'fiber']);
+/** @typedef {Record<typeof NUTRIENT_KEYS[number], number>} NutritionTotals */
 
-// A nutrition label, keyed by unit name (e.g. 'cup', 'tsp'). Values are per
-// serving; servingSize is in the keyed unit.
-export type NutritionLabel = Record<string, { servings: number; servingSize: number } & NutritionTotals>;
+/**
+ * A nutrition label, keyed by unit name (e.g. 'cup', 'tsp'). Values are per
+ * serving; servingSize is in the keyed unit.
+ * @typedef {Record<string, { servings: number; servingSize: number } & NutritionTotals>} NutritionLabel
+ */
 
-// Amazon's Subscribe & Save auto-delivery discount, expressed as eligibility for each
-// percent tier rather than a hardcoded price - the discounted price is always a percent
-// off whatever this product's current price is, so it can't go stale as price changes.
-// Only applies when bought directly from Amazon (checked against product.store at the
-// call site); Whole Foods and other retailers don't offer it even for the same item.
-export interface Discount {
-    subscribeAndSave5?: boolean;
-    subscribeAndSave10?: boolean;
-    subscribeAndSave15?: boolean;
-    // Amazon's separate "5+ subscriptions in one delivery" bonus; value is the flat
-    // percent bonus, unrelated to the subscribeAndSave tiers above.
-    subscribe5Products?: number;
-}
+/**
+ * Amazon's Subscribe & Save auto-delivery discount, expressed as eligibility for each
+ * percent tier rather than a hardcoded price - the discounted price is always a percent
+ * off whatever this product's current price is, so it can't go stale as price changes.
+ * Only applies when bought directly from Amazon (checked against product.store at the
+ * call site); Whole Foods and other retailers don't offer it even for the same item.
+ * @typedef {Object} Discount
+ * @property {boolean} [subscribeAndSave5]
+ * @property {boolean} [subscribeAndSave10]
+ * @property {boolean} [subscribeAndSave15]
+ * @property {number} [subscribe5Products] Amazon's separate "5+ subscriptions in one delivery" bonus; value is the flat
+ *     percent bonus, unrelated to the subscribeAndSave tiers above.
+ */
 
-export function subscribeAndSavePercent(discount?: Discount): number | undefined {
+/**
+ * @param {Discount} [discount]
+ * @returns {number | undefined}
+ */
+export function subscribeAndSavePercent(discount) {
     if (!discount) return undefined;
     if (discount.subscribeAndSave15) return 15;
     if (discount.subscribeAndSave10) return 10;
@@ -44,125 +51,138 @@ export function subscribeAndSavePercent(discount?: Discount): number | undefined
     return undefined;
 }
 
-// Where/how a Product can be bought - retailer-specific and non-exclusive: the same
-// physical product can have several of these (e.g. the same jar sold on Amazon AND on
-// the brand's own site, at different prices with different links). Nutrition/brand/size
-// stay on Product since those describe the item itself, not where you buy it.
-export interface Listing {
-    store?: string;
-    link?: string;
-    price?: number;
-    discount?: Discount;
-}
+/**
+ * Where/how a Product can be bought - retailer-specific and non-exclusive: the same
+ * physical product can have several of these (e.g. the same jar sold on Amazon AND on
+ * the brand's own site, at different prices with different links). Nutrition/brand/size
+ * stay on Product since those describe the item itself, not where you buy it.
+ * @typedef {Object} Listing
+ * @property {string} [store]
+ * @property {string} [link]
+ * @property {number} [price]
+ * @property {Discount} [discount]
+ */
 
-export interface Product {
-    brand: string;
-    variant?: string;
-    size?: number;
-    sizeUnit?: Unit;
-    organic?: boolean;
-    nutrition?: NutritionLabel;
-    listings?: Listing[];
-    // Most products are bought as a discrete, countable container (a can, a bag,
-    // a bunch) - size/sizeUnit describe that one container, so "have N of them"
-    // tracking on the shopping screen is on by default, labeled with this word
-    // when set (falls back to the generic "package" otherwise).
-    packageUnit?: Unit;
-    // Set for products priced per unit weight/volume with no real fixed-size
-    // container to count (e.g. cabbage sold loose per lb) - disables package
-    // tracking so the shopping screen falls back to entering the recipe unit
-    // (cups, lbs, ...) directly instead of a fake "package" count.
-    bulk?: boolean;
-}
+/**
+ * @typedef {Object} Product
+ * @property {string} brand
+ * @property {string} [variant]
+ * @property {number} [size]
+ * @property {Unit} [sizeUnit]
+ * @property {boolean} [organic]
+ * @property {NutritionLabel} [nutrition]
+ * @property {Listing[]} [listings]
+ * @property {Unit} [packageUnit] Most products are bought as a discrete, countable container (a can, a bag,
+ *     a bunch) - size/sizeUnit describe that one container, so "have N of them"
+ *     tracking on the shopping screen is on by default, labeled with this word
+ *     when set (falls back to the generic "package" otherwise).
+ * @property {boolean} [bulk] Set for products priced per unit weight/volume with no real fixed-size
+ *     container to count (e.g. cabbage sold loose per lb) - disables package
+ *     tracking so the shopping screen falls back to entering the recipe unit
+ *     (cups, lbs, ...) directly instead of a fake "package" count.
+ */
 
-// The listing (of the selected product) actually used for cost/price display - the
-// cheapest one, since that's what a shopper would realistically buy. Listings with no
-// price are ignored, and returns undefined only if none of them have a price at all.
-export function cheapestListing(product: Product): Listing | undefined {
-    return (product.listings ?? []).reduce<Listing | undefined>((cheapest, listing) => {
+/**
+ * The listing (of the selected product) actually used for cost/price display - the
+ * cheapest one, since that's what a shopper would realistically buy. Listings with no
+ * price are ignored, and returns undefined only if none of them have a price at all.
+ * @param {Product} product
+ * @returns {Listing | undefined}
+ */
+export function cheapestListing(product) {
+    return (product.listings ?? []).reduce((cheapest, listing) => {
         if (listing.price === undefined) return cheapest;
         if (cheapest === undefined || cheapest.price === undefined || listing.price < cheapest.price) return listing;
         return cheapest;
-    }, undefined);
+    }, /** @type {Listing | undefined} */ (undefined));
 }
 
-declare const __ingredient: unique symbol;
+/**
+ * Substance-specific unit conversions (e.g. volume → weight via density).
+ * Keyed by the "from" unit name; value is the target unit and multiplication factor.
+ * Used after physical CONVERSION_FACTORS fail, before declaring uncomputable.
+ * @typedef {Record<string, { to: Unit; factor: number }>} IngredientConversions
+ */
 
-// Substance-specific unit conversions (e.g. volume → weight via density).
-// Keyed by the "from" unit name; value is the target unit and multiplication factor.
-// Used after physical CONVERSION_FACTORS fail, before declaring uncomputable.
-export type IngredientConversions = Record<string, { to: Unit; factor: number }>;
+/**
+ * Made only by ingredient factories (the type-only `__ingredient` brand stops a plain
+ * object literal from passing as one).
+ * @typedef {{ readonly __ingredient: true } & IngredientFields} Ingredient
+ */
 
-export interface Ingredient {
-    readonly [__ingredient]: true;
-    name: string;
-    // Recipe ingredients must always be measured.  Keeping these required makes an
-    // unmeasured i.ingredient() call a TypeScript/build error instead of silently
-    // rendering as an ingredient with no amount.
-    quantity: number;
-    unit: Unit;
-    perishableDays?: number;
-    nutrition?: NutritionLabel;
-    products?: Product[];
-    defaultBrand?: string;
-    isMeatProduct?: boolean;
-    requiresDateLabel?: boolean;
-    conversions?: IngredientConversions;
-    // Pan temp at which this fat reaches its shimmer point.  Refined/high-smoke-point oils
-    // (e.g. avocado) shimmer hotter; delicate ones (e.g. extra-virgin olive oil)
-    // shimmer cooler.  Heat steps read this to time how long the oil needs in a hot pan.
-    shimmerAt?: number;
-    rename(newName: string): void;
-}
+/**
+ * @typedef {Object} IngredientFields
+ * @property {string} name
+ * @property {number} quantity Recipe ingredients must always be measured. Keeping these required makes an
+ *     unmeasured i.ingredient() call a type-check error instead of silently rendering as an
+ *     ingredient with no amount.
+ * @property {Unit} unit
+ * @property {number} [perishableDays]
+ * @property {NutritionLabel} [nutrition]
+ * @property {Product[]} [products]
+ * @property {string} [defaultBrand]
+ * @property {boolean} [isMeatProduct]
+ * @property {boolean} [requiresDateLabel]
+ * @property {IngredientConversions} [conversions]
+ * @property {number} [shimmerAt] Pan temp at which this fat reaches its shimmer point. Refined/high-smoke-point
+ *     oils (e.g. avocado) shimmer hotter; delicate ones (e.g. extra-virgin olive oil) shimmer
+ *     cooler. Heat steps read this to time how long the oil needs in a hot pan.
+ * @property {(newName: string) => void} rename
+ */
 
-export interface Step {
-    id: number;
-    type: StepType;
-    text: string;
-    durationSeconds?: number;
-    equipment?: string[];
-    ingredients?: Ingredient[];
-    children?: Step[];
-    recipeId?: string;
-    waitForIds?: number[];
-    startWhenIds?: number[];
-    prep?: boolean;
-    prepOnly?: boolean;
-    linkRecipeId?: string;  // info steps only: renders a clickable link to another recipe
-    waitFor(...steps: Step[]): this;
-    startWhen(...steps: Step[]): this;
-}
+/**
+ * @typedef {Object} Step
+ * @property {number} id
+ * @property {StepType} type
+ * @property {string} text
+ * @property {number} [durationSeconds]
+ * @property {string[]} [equipment]
+ * @property {Ingredient[]} [ingredients]
+ * @property {Step[]} [children]
+ * @property {string} [recipeId]
+ * @property {number[]} [waitForIds]
+ * @property {number[]} [startWhenIds]
+ * @property {boolean} [prep]
+ * @property {boolean} [prepOnly]
+ * @property {string} [linkRecipeId] info steps only: renders a clickable link to another recipe
+ * @property {(...steps: Step[]) => Step} waitFor
+ * @property {(...steps: Step[]) => Step} startWhen
+ */
 
-export interface Recipe {
-    id: string;
-    name: string;
-    group?: string;
-    steps: Step[];
-    estimatedMinutes?: number;
-    adhoc?: boolean;
-    portable?: boolean;       // can be eaten away from home (no cooking needed)
-    planMinutes?: number;     // eating time on the day (assumes prepped if applicable)
-    prepMinutes?: number;     // advance prep/cook time (can be done ahead of eating)
-    perishableDays?: number;  // days the prepped item keeps in the fridge
-    sortOrder?: number;       // overrides alphabetical sort among recipes that both define it
-    hidden?: boolean;         // excluded from the default recipe list; still reachable by search or "Show hidden"
-}
+/**
+ * @typedef {Object} Recipe
+ * @property {string} id
+ * @property {string} name
+ * @property {string} [group]
+ * @property {Step[]} steps
+ * @property {number} [estimatedMinutes]
+ * @property {boolean} [adhoc]
+ * @property {boolean} [portable] can be eaten away from home (no cooking needed)
+ * @property {number} [planMinutes] eating time on the day (assumes prepped if applicable)
+ * @property {number} [prepMinutes] advance prep/cook time (can be done ahead of eating)
+ * @property {number} [perishableDays] days the prepped item keeps in the fridge
+ * @property {number} [sortOrder] overrides alphabetical sort among recipes that both define it
+ * @property {boolean} [hidden] excluded from the default recipe list; still reachable by search or "Show hidden"
+ */
 
-export interface PlanBlock {
-    id: string;
-    start: string;  // "HH:MM" 24h
-    end: string;
-    type: 'home' | 'away' | 'portable';
-}
+/**
+ * @typedef {Object} PlanBlock
+ * @property {string} id
+ * @property {string} start "HH:MM" 24h
+ * @property {string} end
+ * @property {'home' | 'away' | 'portable'} type
+ */
 
-export interface PlanConfig {
-    blocks: PlanBlock[];
-    caloriesCutoff: string;  // "HH:MM" - prefer placing all eating before this time
-}
+/**
+ * @typedef {Object} PlanConfig
+ * @property {PlanBlock[]} blocks
+ * @property {string} caloriesCutoff "HH:MM" - prefer placing all eating before this time
+ */
 
 const PLAN_CONFIG_KEY = 'recipe-plan-config';
 
-const DEFAULT_PLAN_CONFIG: PlanConfig = {
+/** @type {PlanConfig} */
+const DEFAULT_PLAN_CONFIG = {
     blocks: [
         { id: 'b1', start: '07:00', end: '08:00', type: 'home' },
         { id: 'b2', start: '08:00', end: '12:00', type: 'away' },
@@ -173,22 +193,30 @@ const DEFAULT_PLAN_CONFIG: PlanConfig = {
     caloriesCutoff: '14:00',
 };
 
-export function isHhmm(value: unknown): value is string {
+/**
+ * @param {unknown} value
+ * @returns {value is string}
+ */
+export function isHhmm(value) {
     return typeof value === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
 }
 
-// Saved plans are untrusted (old builds, partial writes, private-mode exceptions).
-// Drop entries that would crash the planner, and keep a valid empty block list
-// when the user deleted every block on purpose.
-export function normalizePlanConfig(value: unknown): PlanConfig {
-    const fallback = JSON.parse(JSON.stringify(DEFAULT_PLAN_CONFIG)) as PlanConfig;
+/**
+ * Saved plans are untrusted (old builds, partial writes, private-mode exceptions).
+ * Drop entries that would crash the planner, and keep a valid empty block list
+ * when the user deleted every block on purpose.
+ * @param {unknown} value
+ * @returns {PlanConfig}
+ */
+export function normalizePlanConfig(value) {
+    const fallback = /** @type {PlanConfig} */ (JSON.parse(JSON.stringify(DEFAULT_PLAN_CONFIG)));
     if (!value || typeof value !== 'object' || Array.isArray(value)) return fallback;
-    const raw = value as { blocks?: unknown; caloriesCutoff?: unknown };
+    const raw = /** @type {{ blocks?: unknown; caloriesCutoff?: unknown }} */ (value);
     if (!Array.isArray(raw.blocks)) return fallback;
-    const seen = new Set<string>();
-    const blocks = raw.blocks.flatMap((block): PlanBlock[] => {
+    const seen = /** @type {Set<string>} */ (new Set());
+    const blocks = raw.blocks.flatMap(/** @returns {PlanBlock[]} */ (block) => {
         if (!block || typeof block !== 'object') return [];
-        const candidate = block as Partial<PlanBlock>;
+        const candidate = /** @type {Partial<PlanBlock>} */ (block);
         if (typeof candidate.id !== 'string' || !candidate.id || seen.has(candidate.id)) return [];
         if (!isHhmm(candidate.start) || !isHhmm(candidate.end)) return [];
         if (candidate.type !== 'home' && candidate.type !== 'away' && candidate.type !== 'portable') return [];
@@ -202,7 +230,11 @@ export function normalizePlanConfig(value: unknown): PlanConfig {
     };
 }
 
-function storageGet(key: string): string | null {
+/**
+ * @param {string} key
+ * @returns {string | null}
+ */
+function storageGet(key) {
     try {
         if (typeof localStorage === 'undefined') return null;
         return localStorage.getItem(key);
@@ -211,7 +243,11 @@ function storageGet(key: string): string | null {
     }
 }
 
-function storageSet(key: string, value: string): void {
+/**
+ * @param {string} key
+ * @param {string} value
+ */
+function storageSet(key, value) {
     try {
         if (typeof localStorage === 'undefined') return;
         localStorage.setItem(key, value);
@@ -220,7 +256,8 @@ function storageSet(key: string, value: string): void {
     }
 }
 
-function loadPlanConfig(): PlanConfig {
+/** @returns {PlanConfig} */
+function loadPlanConfig() {
     const raw = storageGet(PLAN_CONFIG_KEY);
     if (!raw) return normalizePlanConfig(undefined);
     try {
@@ -230,15 +267,17 @@ function loadPlanConfig(): PlanConfig {
     }
 }
 
-function savePlanConfig(cfg: PlanConfig): void {
+/** @param {PlanConfig} cfg */
+function savePlanConfig(cfg) {
     storageSet(PLAN_CONFIG_KEY, JSON.stringify(cfg));
 }
 
-export interface RecipeBundle {
-    id: string;
-    name: string;
-    recipeIds: string[];
-}
+/**
+ * @typedef {Object} RecipeBundle
+ * @property {string} id
+ * @property {string} name
+ * @property {string[]} recipeIds
+ */
 
 // ============================================================
 // GLOBAL STATE
@@ -247,36 +286,45 @@ export interface RecipeBundle {
 const SHOW_HIDDEN_RECIPES_KEY = 'recipe-show-hidden';
 
 const state = {
-    recipes:           new Map<string, Recipe>(),
-    bundles:           new Map<string, RecipeBundle>(),
-    selectedRecipeIds: [] as string[],
-    timers:            new Map<number, number>(),
-    ringingAlarms:     new Map<number, number>(),
-    gateRunCounts:     new Map<number, number>(),
-    screen:            'select' as Screen,
+    recipes:           /** @type {Map<string, Recipe>} */ (new Map()),
+    bundles:           /** @type {Map<string, RecipeBundle>} */ (new Map()),
+    selectedRecipeIds: /** @type {string[]} */ ([]),
+    timers:            /** @type {Map<number, number>} */ (new Map()),
+    ringingAlarms:     /** @type {Map<number, number>} */ (new Map()),
+    gateRunCounts:     /** @type {Map<number, number>} */ (new Map()),
+    screen:            /** @type {Screen} */ ('select'),
     searchQuery:       '',
-    cookingPlanSteps:  [] as Step[],
-    cookingStartedAt:  null as number | null,
-    cookingElapsedInterval: null as number | null,
+    cookingPlanSteps:  /** @type {Step[]} */ ([]),
+    cookingStartedAt:  /** @type {number | null} */ (null),
+    cookingElapsedInterval: /** @type {number | null} */ (null),
     audioUnlocked:     false,
     showHidden:        storageGet(SHOW_HIDDEN_RECIPES_KEY) === 'true',
 };
 
-function setShowHidden(value: boolean): void {
+/** @param {boolean} value */
+function setShowHidden(value) {
     state.showHidden = value;
     storageSet(SHOW_HIDDEN_RECIPES_KEY, String(value));
 }
 
 const macroTargets = { calories: 2550, protein: 147, fat: 114, saturatedFat: 20, transFat: 0, carbs: 234, sodium: 2300, fiber: 38 };
 
-const nutritionExclusions = new Map<string, Set<Ingredient>>();
+const nutritionExclusions = /** @type {Map<string, Set<Ingredient>>} */ (new Map());
 // Recipes explicitly deselected from nutrition totals. Absence = counted (selected by default).
-const nutritionRecipeExclusions = new Set<string>();
-const nutritionExpanded   = new Set<string>();
+const nutritionRecipeExclusions = /** @type {Set<string>} */ (new Set());
+const nutritionExpanded   = /** @type {Set<string>} */ (new Set());
 let nutritionAddRecipeQuery = '';
-function getNutritionExcluded(recipeId: string): Set<Ingredient> {
-    if (!nutritionExclusions.has(recipeId)) nutritionExclusions.set(recipeId, new Set());
-    return nutritionExclusions.get(recipeId)!;
+/**
+ * @param {string} recipeId
+ * @returns {Set<Ingredient>}
+ */
+function getNutritionExcluded(recipeId) {
+    let excluded = nutritionExclusions.get(recipeId);
+    if (!excluded) {
+        excluded = new Set();
+        nutritionExclusions.set(recipeId, excluded);
+    }
+    return excluded;
 }
 
 // ============================================================
@@ -284,16 +332,17 @@ function getNutritionExcluded(recipeId: string): Set<Ingredient> {
 // ============================================================
 
 let nextStepId = 1;
-function createId(): number { return nextStepId++; }
+/** @returns {number} */
+function createId() { return nextStepId++; }
 
 // ============================================================
 // TIME HELPERS
 // ============================================================
 
 export const time = {
-    seconds: (v: number): number => v,
-    minutes: (v: number): number => v * 60,
-    hours:   (v: number): number => v * 3600,
+    seconds: /** @param {number} v @returns {number} */ (v) => v,
+    minutes: /** @param {number} v @returns {number} */ (v) => v * 60,
+    hours:   /** @param {number} v @returns {number} */ (v) => v * 3600,
 };
 
 // ============================================================
@@ -325,7 +374,8 @@ export const u = {
 // UNIT CONVERSION
 // ============================================================
 
-const CONVERSION_FACTORS: Record<string, Record<string, number>> = {
+/** @type {Record<string, Record<string, number>>} */
+const CONVERSION_FACTORS = {
     // Volume cluster
     [u.tsp.name]:        { [u.tsp.name]: 1,    [u.tbsp.name]: 1/3,  [u.cup.name]: 1/48, [u.fluidOunce.name]: 1/6  },
     [u.tbsp.name]:       { [u.tsp.name]: 3,    [u.tbsp.name]: 1,    [u.cup.name]: 1/16, [u.fluidOunce.name]: 1/2  },
@@ -337,22 +387,36 @@ const CONVERSION_FACTORS: Record<string, Record<string, number>> = {
     [u.gram.name]:  { [u.ounce.name]: 1/28.3495, [u.pound.name]: 1/453.592,  [u.gram.name]: 1        },
 };
 
-export function convertUnits(quantity: number, from: string, to: string): number | null {
+/**
+ * @param {number} quantity
+ * @param {string} from
+ * @param {string} to
+ * @returns {number | null}
+ */
+export function convertUnits(quantity, from, to) {
     if (from === to) return quantity;
     const factor = CONVERSION_FACTORS[from]?.[to];
     if (factor === undefined) return null;
     return quantity * factor;
 }
 
-// Extends convertUnits with ingredient-specific density conversions (e.g. unit → cup → oz).
-// Recursively chains density hops until a physical conversion closes the gap, or returns null.
+/**
+ * Extends convertUnits with ingredient-specific density conversions (e.g. unit → cup → oz).
+ * Recursively chains density hops until a physical conversion closes the gap, or returns null.
+ * @param {number} quantity
+ * @param {string} from
+ * @param {string} to
+ * @param {IngredientConversions} [conversions]
+ * @param {Set<string>} [seen]
+ * @returns {number | null}
+ */
 export function convertWithDensity(
-    quantity: number,
-    from: string,
-    to: string,
-    conversions?: IngredientConversions,
-    seen: Set<string> = new Set()
-): number | null {
+    quantity,
+    from,
+    to,
+    conversions,
+    seen = new Set()
+) {
     const physical = convertUnits(quantity, from, to);
     if (physical !== null) return physical;
     if (!conversions || seen.has(from)) return null;
@@ -369,12 +433,22 @@ export function convertWithDensity(
 // FORMATTERS
 // ============================================================
 
-function pluralize(word: string, count: number): string {
+/**
+ * @param {string} word
+ * @param {number} count
+ * @returns {string}
+ */
+function pluralize(word, count) {
     return Math.abs(count) <= 1 ? word : `${word}s`;
 }
 
-function formatQuantity(quantity: number): string {
-    const fractions: Record<number, string> = {
+/**
+ * @param {number} quantity
+ * @returns {string}
+ */
+function formatQuantity(quantity) {
+    /** @type {Record<number, string>} */
+    const fractions = {
         0.125: '⅛', 0.167: '⅙', 0.25: '¼', 0.333: '⅓', 0.5: '½', 0.667: '⅔', 0.75: '¾',
     };
     const whole   = Math.floor(quantity);
@@ -386,7 +460,11 @@ function formatQuantity(quantity: number): string {
     return `${whole || ''}${fraction}`;
 }
 
-export function formatIngredient(ingredient: Ingredient): string {
+/**
+ * @param {Ingredient} ingredient
+ * @returns {string}
+ */
+export function formatIngredient(ingredient) {
     const { quantity, unit, name } = ingredient;
     if (!unit || !unit.name) return name;
     const amount = quantity ?? 0;
@@ -397,9 +475,14 @@ export function formatIngredient(ingredient: Ingredient): string {
     return `${formatQuantity(amount)} ${unitText} ${name}`;
 }
 
-// Same as formatIngredient but without the item name - used to describe an
-// arbitrary quantity (e.g. "how much is still needed") in an ingredient's unit.
-function formatQuantityUnit(quantity: number, unit?: Unit): string {
+/**
+ * Same as formatIngredient but without the item name - used to describe an
+ * arbitrary quantity (e.g. "how much is still needed") in an ingredient's unit.
+ * @param {number} quantity
+ * @param {Unit} [unit]
+ * @returns {string}
+ */
+function formatQuantityUnit(quantity, unit) {
     if (!unit || !unit.name) return formatQuantity(quantity);
     const unitText = Math.abs(quantity) <= 1 ? unit.name : (unit.plural || unit.name);
     return `${formatQuantity(quantity)} ${unitText}`;
@@ -409,15 +492,20 @@ function formatQuantityUnit(quantity: number, unit?: Unit): string {
 // STEP FACTORIES
 // ============================================================
 
-function createStep(input: Partial<Step> & { type: StepType; text: string }): Step {
-    const step: Step = { id: createId(), equipment: [], ingredients: [], children: [], ...input } as any;
-    (step as any).waitFor = function(...steps: Step[]): Step {
+/**
+ * @param {Partial<Step> & { type: StepType; text: string }} input
+ * @returns {Step}
+ */
+function createStep(input) {
+    /** @type {Step} */
+    const step = /** @type {any} */ ({ id: createId(), equipment: [], ingredients: [], children: [], ...input });
+    (/** @type {any} */ (step)).waitFor = /** @param {...Step} steps @returns {Step} */ function(...steps) {
         for (const dep of steps) {
             step.waitForIds = [...(step.waitForIds ?? []), dep.id];
         }
         return step;
     };
-    (step as any).startWhen = function(...steps: Step[]): Step {
+    (/** @type {any} */ (step)).startWhen = /** @param {...Step} steps @returns {Step} */ function(...steps) {
         for (const dep of steps) {
             step.startWhenIds = [...(step.startWhenIds ?? []), dep.id];
         }
@@ -426,41 +514,85 @@ function createStep(input: Partial<Step> & { type: StepType; text: string }): St
     return step;
 }
 
-export function instruction(text: string, opts: Partial<Step> = {}): Step {
+/**
+ * @param {string} text
+ * @param {Partial<Step>} [opts]
+ * @returns {Step}
+ */
+export function instruction(text, opts = {}) {
     return createStep({ type: 'instruction', text, ...opts });
 }
 
-export function prep(text: string, opts: Partial<Step> = {}): Step {
+/**
+ * @param {string} text
+ * @param {Partial<Step>} [opts]
+ * @returns {Step}
+ */
+export function prep(text, opts = {}) {
     return createStep({ type: 'instruction', text, prep: true, ...opts });
 }
 
-export function prepOnly(text: string, opts: Partial<Step> = {}): Step {
+/**
+ * @param {string} text
+ * @param {Partial<Step>} [opts]
+ * @returns {Step}
+ */
+export function prepOnly(text, opts = {}) {
     return createStep({ type: 'instruction', text, prep: true, prepOnly: true, ...opts });
 }
 
+/**
+ * @param {string} label
+ * @param {number} durationSeconds
+ * @param {Partial<Step>} [opts]
+ * @returns {Step}
+ */
 export function timerStep(
-    label: string,
-    durationSeconds: number,
-    opts: Partial<Step> = {}
-): Step {
+    label,
+    durationSeconds,
+    opts = {}
+) {
     return createStep({ type: 'timer', text: label, durationSeconds, ...opts });
 }
 
-const toSeconds = (amount: number, unit: 's' | 'm' | 'h'): number =>
+/**
+ * @param {number} amount
+ * @param {'s' | 'm' | 'h'} unit
+ * @returns {number}
+ */
+const toSeconds = (amount, unit) =>
     ({ s: time.seconds, m: time.minutes, h: time.hours })[unit](amount);
 
 export const Timer = {
-    set: (amount: number, unit: 's' | 'm' | 'h', label: string, opts: Partial<Step> = {}): Step => {
+    /**
+     * @param {number} amount
+     * @param {'s' | 'm' | 'h'} unit
+     * @param {string} label
+     * @param {Partial<Step>} [opts]
+     * @returns {Step}
+     */
+    set: (amount, unit, label, opts = {}) => {
         return createStep({ type: 'timer', text: label, durationSeconds: toSeconds(amount, unit), ...opts });
     },
-    // Asks `question` immediately. "No" cooks for `retryAmount retryUnit` (with an alarm at
-    // the end) and re-asks; "Yes" completes the step. Loops until answered "Yes".
-    gate: (question: string, retryAmount: number, retryUnit: 's' | 'm' | 'h', opts: Partial<Step> = {}): Step => {
+    /**
+     * Asks `question` immediately. "No" cooks for `retryAmount retryUnit` (with an alarm at
+     * the end) and re-asks; "Yes" completes the step. Loops until answered "Yes".
+     * @param {string} question
+     * @param {number} retryAmount
+     * @param {'s' | 'm' | 'h'} retryUnit
+     * @param {Partial<Step>} [opts]
+     * @returns {Step}
+     */
+    gate: (question, retryAmount, retryUnit, opts = {}) => {
         return createStep({ type: 'gate', text: question, durationSeconds: toSeconds(retryAmount, retryUnit), ...opts });
     },
 };
 
-export function cleanup(equipmentName: string): Step {
+/**
+ * @param {string} equipmentName
+ * @returns {Step}
+ */
+export function cleanup(equipmentName) {
     return createStep({
         type: 'cleanup',
         text: `Clean and put away ${equipmentName}`,
@@ -468,14 +600,24 @@ export function cleanup(equipmentName: string): Step {
     });
 }
 
-export function info(text: string, opts: Partial<Step> = {}): Step {
+/**
+ * @param {string} text
+ * @param {Partial<Step>} [opts]
+ * @returns {Step}
+ */
+export function info(text, opts = {}) {
     return createStep({ type: 'info', text, ...opts });
 }
 
+/**
+ * @param {Ingredient[]} ingredients
+ * @param {Record<string, string>} [customTexts]
+ * @returns {Step[]}
+ */
 export function generateCleanupLabels(
-    ingredients: Ingredient[],
-    customTexts?: Record<string, string>
-): Step[] {
+    ingredients,
+    customTexts
+) {
     return ingredients
         .filter(ing => ing.requiresDateLabel)
         .map(ing => instruction(
@@ -488,49 +630,88 @@ export function generateCleanupLabels(
 // ============================================================
 
 class Equipment {
-    constructor(public type: string, public label?: string) {}
+    /**
+     * @param {string} type
+     * @param {string} [label]
+     */
+    constructor(type, label) {
+        this.type = type;
+        this.label = label;
+    }
 
-    get name(): string { return this.label ?? this.type; }
+    /** @returns {string} */
+    get name() { return this.label ?? this.type; }
 
-    private contents: Ingredient[] = [];
-    private nestedVessels: Equipment[] = [];
-    private _result: Ingredient | null = null;
+    /**
+     * @private
+     * @type {Ingredient[]}
+     */
+    contents = [];
+    /**
+     * @private
+     * @type {Equipment[]}
+     */
+    nestedVessels = [];
+    /**
+     * @private
+     * @type {Ingredient | null}
+     */
+    _result = null;
 
-    get result(): Ingredient {
+    /** @returns {Ingredient} */
+    get result() {
         if (!this._result) throw new Error(`${this.name}.result accessed before any mix() or combine() call`);
         return this._result;
     }
 
-    getContents(): Ingredient[] {
+    /** @returns {Ingredient[]} */
+    getContents() {
         return [
             ...this.contents,
             ...this.nestedVessels.flatMap(v => v.getContents()),
         ];
     }
 
-    private getAllEquipment(): string[] {
+    /**
+     * @private
+     * @returns {string[]}
+     */
+    getAllEquipment() {
         return [
             this.name,
             ...this.nestedVessels.flatMap(v => [v.name, ...v.nestedVessels.map(n => n.name)]),
         ];
     }
 
-    // The target temp this vessel was last preheated to.  Later steps (e.g. addOil +
-    // heatUp) read it so the heat-up wait reflects how hot the pan already is.  For a bare
-    // stovetop pan this is an aspirational target, not a thermostat reading - only
-    // thermostat-controlled vessels (e.g. the NuWave) actually self-regulate to it..
-    protected _targetTemp: number | undefined;
+    /**
+     * The target temp this vessel was last preheated to.  Later steps (e.g. addOil +
+     * heatUp) read it so the heat-up wait reflects how hot the pan already is.  For a bare
+     * stovetop pan this is an aspirational target, not a thermostat reading - only
+     * thermostat-controlled vessels (e.g. the NuWave) actually self-regulate to it..
+     * @protected
+     * @type {number | undefined}
+     */
+    _targetTemp;
 
-    get targetTemp(): number | undefined { return this._targetTemp; }
+    /** @returns {number | undefined} */
+    get targetTemp() { return this._targetTemp; }
 
-    preheat(temperature: number): Step {
+    /**
+     * @param {number} temperature
+     * @returns {Step}
+     */
+    preheat(temperature) {
         this._targetTemp = temperature;
         return timerStep(`Preheat ${this.name} to ${temperature}°`, time.minutes(15), {
             equipment: [this.name],
         });
     }
 
-    setTemp(temperature: number): Step {
+    /**
+     * @param {number} temperature
+     * @returns {Step}
+     */
+    setTemp(temperature) {
         this._targetTemp = temperature;
         return createStep({
             type: 'instruction',
@@ -543,7 +724,12 @@ class Equipment {
     // steps can reference it,but gives oils a dedicated verb on Equipment: e.g.
     // `pan.addOil(oil)`` then `pan.heatUp()` reads the pan's temp to time the wait..
 
-    addOil(oil: Ingredient, note?: string): Step {
+    /**
+     * @param {Ingredient} oil
+     * @param {string} [note]
+     * @returns {Step}
+     */
+    addOil(oil, note) {
         this.contents.push(oil);
         const single = createStep({
             type: 'instruction',
@@ -560,7 +746,14 @@ class Equipment {
         });
     }
 
-    cook(label: string, durationSeconds: number, temperature?: number, extraEquipment: Equipment[] = []): Step {
+    /**
+     * @param {string} label
+     * @param {number} durationSeconds
+     * @param {number} [temperature]
+     * @param {Equipment[]} [extraEquipment]
+     * @returns {Step}
+     */
+    cook(label, durationSeconds, temperature, extraEquipment = []) {
         const text = temperature !== undefined ? `${label} (${temperature}°)` : label;
         const allEquipment   = [...this.getAllEquipment(), ...extraEquipment.map(eq => eq.name)];
         const allIngredients = [...this.getContents(), ...extraEquipment.flatMap(eq => eq.getContents())];
@@ -570,7 +763,12 @@ class Equipment {
         });
     }
 
-    add(ingredients: (Ingredient | [Ingredient, string])[], note?: string): Step {
+    /**
+     * @param {(Ingredient | [Ingredient, string])[]} ingredients
+     * @param {string} [note]
+     * @returns {Step}
+     */
+    add(ingredients, note) {
         const allIngredients = ingredients.map(e => Array.isArray(e) ? e[0] : e);
         this.contents.push(...allIngredients);
         const children = ingredients.map((entry) => {
@@ -593,7 +791,12 @@ class Equipment {
         });
     }
 
-    transfer(target: Equipment, ingredients: Ingredient[]): Step {
+    /**
+     * @param {Equipment} target
+     * @param {Ingredient[]} ingredients
+     * @returns {Step}
+     */
+    transfer(target, ingredients) {
         for (const ing of ingredients) {
             const idx = this.contents.findIndex(c => c.name === ing.name);
             if (idx === -1) {
@@ -615,7 +818,12 @@ class Equipment {
         });
     }
 
-    broil(label: string, durationSeconds: number): Step {
+    /**
+     * @param {string} label
+     * @param {number} durationSeconds
+     * @returns {Step}
+     */
+    broil(label, durationSeconds) {
         const allEquipment   = this.getAllEquipment();
         const allIngredients = this.getContents();
         return timerStep(`Broil - ${label}`, durationSeconds, {
@@ -624,7 +832,11 @@ class Equipment {
         });
     }
 
-    slice(ingredient: Ingredient): Step {
+    /**
+     * @param {Ingredient} ingredient
+     * @returns {Step}
+     */
+    slice(ingredient) {
         return createStep({
             type: 'instruction',
             text: `Slice ${ingredient.name}`,
@@ -633,7 +845,12 @@ class Equipment {
         });
     }
 
-    spray(ingredient: Ingredient, opts: { heatUp?: boolean } = {}): Step[] {
+    /**
+     * @param {Ingredient} ingredient
+     * @param {{ heatUp?: boolean }} [opts]
+     * @returns {Step[]}
+     */
+    spray(ingredient, opts = {}) {
         const sprayStep = createStep({
             type: 'instruction',
             text: `Spray ${ingredient.name} on ${this.name}`,
@@ -647,11 +864,16 @@ class Equipment {
         return [sprayStep, this.heatUp(ingredient)];
     }
 
-    // Heats oil on this pan up to its shimmer point before food goes in.  A real countdown
-    // timer, not a passive instruction -the point is the delay.  How long depends on how hot
-    // the pan already is (its preheat target)and on the oil:a hotter pan shimmers faster,
-    // and an oil with a lower shimmerAt reaches shimmer sooner than a high-temp one..
-    heatUp(oil?: Ingredient, overrideSeconds?: number): Step {
+    /**
+     * Heats oil on this pan up to its shimmer point before food goes in.  A real countdown
+     * timer, not a passive instruction -the point is the delay.  How long depends on how hot
+     * the pan already is (its preheat target)and on the oil:a hotter pan shimmers faster,
+     * and an oil with a lower shimmerAt reaches shimmer sooner than a high-temp one..
+     * @param {Ingredient} [oil]
+     * @param {number} [overrideSeconds]
+     * @returns {Step}
+     */
+    heatUp(oil, overrideSeconds) {
         const target = this.targetTemp ?? 325;
         const shimmerAt = oil ? (oil.shimmerAt ?? 300) : 300;
         const delta = Math.max(Math.min(target - shimmerAt, 150), 20);
@@ -666,7 +888,8 @@ class Equipment {
         );
     }
 
-    flip(): Step {
+    /** @returns {Step} */
+    flip() {
         return createStep({
             type: 'instruction',
             text: `Flip contents of ${this.name}`,
@@ -675,7 +898,14 @@ class Equipment {
         });
     }
 
-    place(vessel: Equipment, label?: string, durationSeconds?: number, temperature?: number): Step {
+    /**
+     * @param {Equipment} vessel
+     * @param {string} [label]
+     * @param {number} [durationSeconds]
+     * @param {number} [temperature]
+     * @returns {Step}
+     */
+    place(vessel, label, durationSeconds, temperature) {
         this.nestedVessels.push(vessel);
         const allEquipment   = [this.name, vessel.name];
         const allIngredients = vessel.getContents();
@@ -694,31 +924,43 @@ class Equipment {
         });
     }
 
-    stir(): Step { return instruction(`Stir ${this.name}`, { equipment: [this.name] }); }
+    /** @returns {Step} */
+    stir() { return instruction(`Stir ${this.name}`, { equipment: [this.name] }); }
 
-    mix(resultName?: string): Step {
+    /**
+     * @param {string} [resultName]
+     * @returns {Step}
+     */
+    mix(resultName) {
         const allContents = this.getContents();
         if (resultName) {
-            const produced: any = { name: resultName, quantity: 1, unit: u.none };
-            produced.rename = (newName: string) => { produced.name = newName; };
+            /** @type {any} */
+            const produced = { name: resultName, quantity: 1, unit: u.none };
+            produced.rename = /** @param {string} newName */ (newName) => { produced.name = newName; };
             produced._constituents = allContents;
-            this.contents = [produced as Ingredient];
-            this._result  = produced as Ingredient;
+            this.contents = [/** @type {Ingredient} */ (produced)];
+            this._result  = /** @type {Ingredient} */ (produced);
         }
         return instruction(`Mix ${this.name}`, { equipment: [this.name], ingredients: allContents });
     }
 
-    combine(ingredients: Ingredient[], note?: string): Step {
+    /**
+     * @param {Ingredient[]} ingredients
+     * @param {string} [note]
+     * @returns {Step}
+     */
+    combine(ingredients, note) {
         const allConstituents = [...this.getContents(), ...ingredients];
-        const produced: any = {
+        /** @type {any} */
+        const produced = {
             name: ingredients.map(i => i.name).join(' + '),
             quantity: ingredients[0]?.quantity ?? 1,
             unit: ingredients[0]?.unit ?? u.none,
             _constituents: allConstituents,
         };
-        produced.rename = (newName: string) => { produced.name = newName; };
-        this.contents = [produced as Ingredient];
-        this._result  = produced as Ingredient;
+        produced.rename = /** @param {string} newName */ (newName) => { produced.name = newName; };
+        this.contents = [/** @type {Ingredient} */ (produced)];
+        this._result  = /** @type {Ingredient} */ (produced);
         return createStep({
             type: 'instruction',
             text: `Combine ${ingredients.map(i => i.name).join(', ')} in ${this.name}${note ? ` - ${note}` : ''}`,
@@ -729,8 +971,13 @@ class Equipment {
 }
 
 class NuwaveEquipment extends Equipment {
-    constructor(label?: string) { super('Nuwave pan', label); }
-    preheat(temperature: number): Step {
+    /** @param {string} [label] */
+    constructor(label) { super('Nuwave pan', label); }
+    /**
+     * @param {number} temperature
+     * @returns {Step}
+     */
+    preheat(temperature) {
         this._targetTemp = temperature;
         const duration = temperature <= 350 ? time.seconds(45) : time.minutes(2);
         return timerStep(`Preheat ${this.name} to ${temperature}°`, duration, { equipment: [this.name] });
@@ -738,46 +985,63 @@ class NuwaveEquipment extends Equipment {
 }
 
 export const e = {
-    bowl:         (label?: string) => new Equipment('bowl',          label),
-    pan:          (label?: string) => new Equipment('pan',           label),
-    pot:          (label?: string) => new Equipment('pot',           label),
-    oven:         (label?: string) => new Equipment('oven',          label),
-    toasterOven:  (label?: string) => new Equipment('toaster oven',  label),
-    instantPot:   (label?: string) => new Equipment('instant pot',   label),
-    microwave:    (label?: string) => new Equipment('microwave',     label),
-    bulletMixer:  (label?: string) => new Equipment('bullet mixer',  label),
-    knife:        (label?: string) => new Equipment('knife',         label),
-    cuttingBoard: (label?: string) => new Equipment('cutting board', label),
-    colander:     (label?: string) => new Equipment('colander',      label),
-    platter:      (label?: string) => new Equipment('platter',       label),
-    kettle:       (label?: string) => new Equipment('tea kettle',    label),
-    nuwavePan:    (label?: string) => new NuwaveEquipment(label),
-    glass:        (label?: string) => new Equipment('glass',         label),
-    siliconeBag:  (label?: string) => new Equipment('silicone bag',  label),
+    bowl:         /** @param {string} [label] */ (label) => new Equipment('bowl',          label),
+    pan:          /** @param {string} [label] */ (label) => new Equipment('pan',           label),
+    pot:          /** @param {string} [label] */ (label) => new Equipment('pot',           label),
+    oven:         /** @param {string} [label] */ (label) => new Equipment('oven',          label),
+    toasterOven:  /** @param {string} [label] */ (label) => new Equipment('toaster oven',  label),
+    instantPot:   /** @param {string} [label] */ (label) => new Equipment('instant pot',   label),
+    microwave:    /** @param {string} [label] */ (label) => new Equipment('microwave',     label),
+    bulletMixer:  /** @param {string} [label] */ (label) => new Equipment('bullet mixer',  label),
+    knife:        /** @param {string} [label] */ (label) => new Equipment('knife',         label),
+    cuttingBoard: /** @param {string} [label] */ (label) => new Equipment('cutting board', label),
+    colander:     /** @param {string} [label] */ (label) => new Equipment('colander',      label),
+    platter:      /** @param {string} [label] */ (label) => new Equipment('platter',       label),
+    kettle:       /** @param {string} [label] */ (label) => new Equipment('tea kettle',    label),
+    nuwavePan:    /** @param {string} [label] */ (label) => new NuwaveEquipment(label),
+    glass:        /** @param {string} [label] */ (label) => new Equipment('glass',         label),
+    siliconeBag:  /** @param {string} [label] */ (label) => new Equipment('silicone bag',  label),
 };
 
 // ============================================================
 // RECIPE REGISTRATION
 // ============================================================
 
-// Every step, parent before its children, in recipe order.
-export function* walkSteps(steps: Step[]): Generator<Step> {
+/**
+ * Every step, parent before its children, in recipe order.
+ * @param {Step[]} steps
+ * @returns {Generator<Step>}
+ */
+export function* walkSteps(steps) {
     for (const step of steps) {
         yield step;
         if (step.children) yield* walkSteps(step.children);
     }
 }
 
-// Distinct ingredients used anywhere in these steps, in first-use order.
-function stepIngredients(steps: Step[]): Set<Ingredient> {
+/**
+ * Distinct ingredients used anywhere in these steps, in first-use order.
+ * @param {Step[]} steps
+ * @returns {Set<Ingredient>}
+ */
+function stepIngredients(steps) {
     return new Set([...walkSteps(steps)].flatMap(step => step.ingredients ?? []));
 }
 
-function collectIngredientsWithLabel(steps: Step[]): Ingredient[] {
+/**
+ * @param {Step[]} steps
+ * @returns {Ingredient[]}
+ */
+function collectIngredientsWithLabel(steps) {
     return [...stepIngredients(steps)].filter(ing => ing.requiresDateLabel);
 }
 
-function findLastStepIndexForIngredient(steps: Step[], targetIng: Ingredient): number {
+/**
+ * @param {Step[]} steps
+ * @param {Ingredient} targetIng
+ * @returns {number}
+ */
+function findLastStepIndexForIngredient(steps, targetIng) {
     let lastIndex = -1;
     for (let i = 0; i < steps.length; i++) {
         const step = steps[i];
@@ -792,16 +1056,25 @@ function findLastStepIndexForIngredient(steps: Step[], targetIng: Ingredient): n
     return lastIndex;
 }
 
+/**
+ * @param {string} id
+ * @param {string} name
+ * @param {Step[]} steps
+ * @param {string} [group]
+ * @param {number} [estimatedMinutes]
+ * @returns {Recipe}
+ */
 export function createRecipe(
-    id: string,
-    name: string,
-    steps: Step[],
-    group?: string,
-    estimatedMinutes?: number
-): Recipe {
+    id,
+    name,
+    steps,
+    group,
+    estimatedMinutes
+) {
     steps.forEach(s => { s.recipeId = id; });
     const ingredientsToLabel = collectIngredientsWithLabel(steps);
-    const stepsToInsert: { index: number; step: Step }[] = [];
+    /** @type {{ index: number; step: Step }[]} */
+    const stepsToInsert = [];
     for (const ing of ingredientsToLabel) {
         const lastIndex = findLastStepIndexForIngredient(steps, ing);
         if (lastIndex !== -1) {
@@ -814,19 +1087,30 @@ export function createRecipe(
     return { id, name, steps, group, estimatedMinutes };
 }
 
-export function registerRecipe(recipe: Recipe): void {
+/** @param {Recipe} recipe */
+export function registerRecipe(recipe) {
     state.recipes.set(recipe.id, recipe);
 }
 
-function withPlan(recipe: Recipe, opts: { planMinutes?: number; portable?: boolean; prepMinutes?: number; perishableDays?: number; sortOrder?: number; hidden?: boolean }): Recipe {
+/**
+ * @param {Recipe} recipe
+ * @param {{ planMinutes?: number; portable?: boolean; prepMinutes?: number; perishableDays?: number; sortOrder?: number; hidden?: boolean }} opts
+ * @returns {Recipe}
+ */
+function withPlan(recipe, opts) {
     return Object.assign(recipe, opts);
 }
 
-export function registerGroup(group: string, recipes: Recipe[]): void {
+/**
+ * @param {string} group
+ * @param {Recipe[]} recipes
+ */
+export function registerGroup(group, recipes) {
     recipes.forEach((recipe) => registerRecipe({ ...recipe, group }));
 }
 
-export function registerBundle(bundle: RecipeBundle): void {
+/** @param {RecipeBundle} bundle */
+export function registerBundle(bundle) {
     state.bundles.set(bundle.id, bundle);
 }
 
@@ -836,29 +1120,43 @@ export function registerBundle(bundle: RecipeBundle): void {
 
 const ADHOC_GROUP = 'Custom additions';
 
-function createAdhocRecipe(ingredient: Ingredient): Recipe {
+/**
+ * @param {Ingredient} ingredient
+ * @returns {Recipe}
+ */
+function createAdhocRecipe(ingredient) {
     const id  = `adhoc:${ingredient.name.toLowerCase().replace(/\s+/g, '-')}:${Date.now()}-${Math.floor(Math.random() * 1e4)}`;
     const step = instruction(`Have ${formatIngredient(ingredient)} on hand`, { ingredients: [ingredient] });
     step.recipeId = id;
     return { id, name: formatIngredient(ingredient), group: ADHOC_GROUP, steps: [step], adhoc: true };
 }
 
-export function getSelectedRecipes(): Recipe[] {
+/** @returns {Recipe[]} */
+export function getSelectedRecipes() {
     return [...new Set(state.selectedRecipeIds)].flatMap(id => state.recipes.get(id) ?? []);
 }
 
-// How many times each id appears, in first-appearance order.
-function countBy(ids: string[]): Map<string, number> {
-    const counts = new Map<string, number>();
+/**
+ * How many times each id appears, in first-appearance order.
+ * @param {string[]} ids
+ * @returns {Map<string, number>}
+ */
+function countBy(ids) {
+    const counts = /** @type {Map<string, number>} */ (new Map());
     for (const id of ids) counts.set(id, (counts.get(id) ?? 0) + 1);
     return counts;
 }
 
-export function getServings(recipeId: string): number {
+/**
+ * @param {string} recipeId
+ * @returns {number}
+ */
+export function getServings(recipeId) {
     return state.selectedRecipeIds.filter(id => id === recipeId).length;
 }
 
-function getFilteredRecipes(): Recipe[] {
+/** @returns {Recipe[]} */
+function getFilteredRecipes() {
     const q   = state.searchQuery.toLowerCase();
     const all = [...state.recipes.values()];
     // Hidden recipes are excluded from the unfiltered list, but still turn up
@@ -875,12 +1173,16 @@ function getFilteredRecipes(): Recipe[] {
     });
 }
 
-// Like getFilteredRecipes(), but keyed off its own search string rather than the Select
-// screen's `state.searchQuery` - used by the Nutrition screen's "Add a recipe" search so
-// typing there doesn't clobber (or get clobbered by) whatever's typed on Select. Ad-hoc
-// recipes are excluded: they're synthetic one-offs created by the ingredient picker, not
-// reusable catalog entries to search for.
-function getNutritionAddableRecipes(query: string): Recipe[] {
+/**
+ * Like getFilteredRecipes(), but keyed off its own search string rather than the Select
+ * screen's `state.searchQuery` - used by the Nutrition screen's "Add a recipe" search so
+ * typing there doesn't clobber (or get clobbered by) whatever's typed on Select. Ad-hoc
+ * recipes are excluded: they're synthetic one-offs created by the ingredient picker, not
+ * reusable catalog entries to search for.
+ * @param {string} query
+ * @returns {Recipe[]}
+ */
+function getNutritionAddableRecipes(query) {
     const q   = query.toLowerCase().trim();
     const all = [...state.recipes.values()].filter((r) => !r.adhoc);
     const matched = q
@@ -893,10 +1195,19 @@ function getNutritionAddableRecipes(query: string): Recipe[] {
 // COOK TIME
 // ============================================================
 
-function recipeCookSeconds(recipe: Recipe): number {
-    const releaseAt = new Map<string, number>();
-    function claimKeysForStep(step: Step): string[] {
-        const keys: string[] = [];
+/**
+ * @param {Recipe} recipe
+ * @returns {number}
+ */
+function recipeCookSeconds(recipe) {
+    const releaseAt = /** @type {Map<string, number>} */ (new Map());
+    /**
+     * @param {Step} step
+     * @returns {string[]}
+     */
+    function claimKeysForStep(step) {
+        /** @type {string[]} */
+        const keys = [];
         for (const eq of (step.equipment ?? [])) keys.push(`eq::${eq}`);
         for (const ing of (step.ingredients ?? [])) keys.push(`ing::${ing.name}`);
         return keys;
@@ -913,7 +1224,11 @@ function recipeCookSeconds(recipe: Recipe): number {
     return totalTime;
 }
 
-function formatCookTime(seconds: number): string {
+/**
+ * @param {number} seconds
+ * @returns {string}
+ */
+function formatCookTime(seconds) {
     const totalMinutes = Math.ceil(seconds / 60);
     if (totalMinutes < 60) return `${totalMinutes} min`;
     const hrs  = Math.floor(totalMinutes / 60);
@@ -925,21 +1240,35 @@ function formatCookTime(seconds: number): string {
 // COOKING PLAN
 // ============================================================
 
-function buildCookingPlan(recipes: Recipe[]): Step[] {
+/**
+ * @param {Recipe[]} recipes
+ * @returns {Step[]}
+ */
+function buildCookingPlan(recipes) {
     const steps = recipes.flatMap(r => r.steps.filter(s => !s.prepOnly));
-    const manualWaits = new Map<number, number[]>();
-    const manualStartWhens = new Map<number, number[]>();
+    const manualWaits = /** @type {Map<number, number[]>} */ (new Map());
+    const manualStartWhens = /** @type {Map<number, number[]>} */ (new Map());
     steps.forEach(s => {
         if (s.waitForIds && s.waitForIds.length > 0) manualWaits.set(s.id, [...s.waitForIds]);
         s.waitForIds = undefined;
         if (s.startWhenIds && s.startWhenIds.length > 0) manualStartWhens.set(s.id, [...s.startWhenIds]);
         s.startWhenIds = undefined;
     });
-    const equipClaims: Map<string, number>     = new Map();
-    const ingClaims:   Map<Ingredient, number> = new Map();
-    const claimableIng = (ing: Ingredient): boolean => ing.name !== 'Water';
-    function getBlockingIds(step: Step): number[] {
-        const blocking = new Set<number>();
+    /** @type {Map<string, number>} */
+    const equipClaims     = new Map();
+    /** @type {Map<Ingredient, number>} */
+    const ingClaims = new Map();
+    /**
+     * @param {Ingredient} ing
+     * @returns {boolean}
+     */
+    const claimableIng = (ing) => ing.name !== 'Water';
+    /**
+     * @param {Step} step
+     * @returns {number[]}
+     */
+    function getBlockingIds(step) {
+        const blocking = /** @type {Set<number>} */ (new Set());
         for (const eq of (step.equipment ?? [])) {
             const id = equipClaims.get(`${step.recipeId}::eq::${eq}`);
             if (id !== undefined) blocking.add(id);
@@ -951,7 +1280,8 @@ function buildCookingPlan(recipes: Recipe[]): Step[] {
         }
         return [...blocking];
     }
-    function setClaims(step: Step): void {
+    /** @param {Step} step */
+    function setClaims(step) {
         for (const eq of (step.equipment ?? [])) equipClaims.set(`${step.recipeId}::eq::${eq}`, step.id);
         for (const ing of (step.ingredients ?? [])) {
             if (!claimableIng(ing)) continue;
@@ -959,10 +1289,10 @@ function buildCookingPlan(recipes: Recipe[]): Step[] {
         }
     }
     for (const step of steps) {
-        const startWhen = new Set<number>();
+        const startWhen = /** @type {Set<number>} */ (new Set());
         for (const id of (manualStartWhens.get(step.id) ?? [])) startWhen.add(id);
         if (startWhen.size > 0) step.startWhenIds = [...startWhen];
-        const waitFor = new Set<number>();
+        const waitFor = /** @type {Set<number>} */ (new Set());
         for (const id of (manualWaits.get(step.id) ?? [])) waitFor.add(id);
         for (const id of getBlockingIds(step)) waitFor.add(id);
         if (waitFor.size > 0) step.waitForIds = [...waitFor];
@@ -975,8 +1305,9 @@ function buildCookingPlan(recipes: Recipe[]): Step[] {
 // SHOPPING LIST
 // ============================================================
 
-function buildShoppingList(): Ingredient[] {
-    const combined = new Map<string, Ingredient>();
+/** @returns {Ingredient[]} */
+function buildShoppingList() {
+    const combined = /** @type {Map<string, Ingredient>} */ (new Map());
     getSelectedRecipes().forEach((recipe) => {
         const servings = getServings(recipe.id);
         for (const ingredient of stepIngredients(recipe.steps)) {
@@ -985,9 +1316,9 @@ function buildShoppingList(): Ingredient[] {
             const addQty   = (ingredient.quantity ?? 0) * servings;
             const existing = combined.get(key);
             if (!existing) {
-                combined.set(key, { ...ingredient, quantity: addQty } as Ingredient);
+                combined.set(key, /** @type {Ingredient} */ ({ ...ingredient, quantity: addQty }));
             } else {
-                (existing as any).quantity = (existing.quantity ?? 0) + addQty;
+                (/** @type {any} */ (existing)).quantity = (existing.quantity ?? 0) + addQty;
             }
         }
     });
@@ -1002,16 +1333,22 @@ function buildShoppingList(): Ingredient[] {
 // which recipes are selected. Persisted in localStorage so it survives reloads.
 const INVENTORY_KEY = 'recipe-inventory';
 
-export function normalizeInventory(value: unknown): Record<string, number> {
+/**
+ * @param {unknown} value
+ * @returns {Record<string, number>}
+ */
+export function normalizeInventory(value) {
     if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
-    const inventory: Record<string, number> = {};
+    /** @type {Record<string, number>} */
+    const inventory = {};
     for (const [key, amount] of Object.entries(value)) {
         if (typeof amount === 'number' && Number.isFinite(amount)) inventory[key] = amount;
     }
     return inventory;
 }
 
-function loadInventory(): Record<string, number> {
+/** @returns {Record<string, number>} */
+function loadInventory() {
     const raw = storageGet(INVENTORY_KEY);
     if (!raw) return {};
     try {
@@ -1021,15 +1358,21 @@ function loadInventory(): Record<string, number> {
     }
 }
 
-function saveInventory(inventory: Record<string, number>): void {
+/** @param {Record<string, number>} inventory */
+function saveInventory(inventory) {
     storageSet(INVENTORY_KEY, JSON.stringify(inventory));
 }
 
-// Same key shape buildShoppingList() combines on, so "have" quantities line up
-// with combined shopping-list quantities regardless of which recipes contributed them.
-// byPackage gets its own key suffix so a value entered as "packages" is never
-// misread as raw recipe-unit quantity (or vice versa) if the tracking mode changes.
-function inventoryKey(ingredient: Ingredient, byPackage: boolean): string {
+/**
+ * Same key shape buildShoppingList() combines on, so "have" quantities line up
+ * with combined shopping-list quantities regardless of which recipes contributed them.
+ * byPackage gets its own key suffix so a value entered as "packages" is never
+ * misread as raw recipe-unit quantity (or vice versa) if the tracking mode changes.
+ * @param {Ingredient} ingredient
+ * @param {boolean} byPackage
+ * @returns {string}
+ */
+function inventoryKey(ingredient, byPackage) {
     const base = `${ingredient.name}-${ingredient.unit?.name ?? ''}`;
     return byPackage ? `${base}::pkg` : base;
 }
@@ -1038,42 +1381,76 @@ function inventoryKey(ingredient: Ingredient, byPackage: boolean): string {
 // NUTRITION + COST
 // ============================================================
 
-type NutritionResult =
-    | { status: 'ok'; totals: NutritionTotals; brand?: string }
-    | { status: 'missing' }
-    | { status: 'uncomputable'; reason: string };
+/**
+ * @typedef {{ status: 'ok'; totals: NutritionTotals; brand?: string }
+ *     | { status: 'missing' }
+ *     | { status: 'uncomputable'; reason: string }} NutritionResult
+ */
 
-type CostResult =
-    | { status: 'ok'; cost: number; brand?: string }
-    | { status: 'missing' }
-    | { status: 'uncomputable'; reason: string };
+/**
+ * @typedef {{ status: 'ok'; cost: number; brand?: string }
+ *     | { status: 'missing' }
+ *     | { status: 'uncomputable'; reason: string }} CostResult
+ */
 
-const mapTotals = (fn: (key: keyof NutritionTotals) => number): NutritionTotals =>
-    Object.fromEntries(NUTRIENT_KEYS.map(key => [key, fn(key)])) as NutritionTotals;
-const emptyTotals = (): NutritionTotals => mapTotals(() => 0);
-const addTotals   = (a: NutritionTotals, b: NutritionTotals): NutritionTotals => mapTotals(key => a[key] + b[key]);
-const scaleTotals = (t: NutritionTotals, n: number): NutritionTotals => mapTotals(key => t[key] * n);
+/**
+ * @param {(key: keyof NutritionTotals) => number} fn
+ * @returns {NutritionTotals}
+ */
+const mapTotals = (fn) =>
+    /** @type {NutritionTotals} */ (Object.fromEntries(NUTRIENT_KEYS.map(key => [key, fn(key)])));
+/** @returns {NutritionTotals} */
+const emptyTotals = () => mapTotals(() => 0);
+/**
+ * @param {NutritionTotals} a
+ * @param {NutritionTotals} b
+ * @returns {NutritionTotals}
+ */
+const addTotals   = (a, b) => mapTotals(key => a[key] + b[key]);
+/**
+ * @param {NutritionTotals} t
+ * @param {number} n
+ * @returns {NutritionTotals}
+ */
+const scaleTotals = (t, n) => mapTotals(key => t[key] * n);
 
-function isComposite(ing: Ingredient): boolean {
-    return Array.isArray((ing as any)._constituents);
+/**
+ * @param {Ingredient} ing
+ * @returns {boolean}
+ */
+function isComposite(ing) {
+    return Array.isArray((/** @type {any} */ (ing))._constituents);
 }
 
-function selectedProduct(ing: Ingredient): Product | undefined {
+/**
+ * @param {Ingredient} ing
+ * @returns {Product | undefined}
+ */
+function selectedProduct(ing) {
     const ps = ing.products ?? [];
     if (ps.length === 0) return undefined;
     return ps.find(p => p.brand === ing.defaultBrand) ?? ps[0];
 }
 
-function nutritionSource(ing: Ingredient): { label?: NutritionLabel; brand?: string } {
+/**
+ * @param {Ingredient} ing
+ * @returns {{ label?: NutritionLabel; brand?: string }}
+ */
+function nutritionSource(ing) {
     const product = selectedProduct(ing);
     if (product?.nutrition) return { label: product.nutrition, brand: product.brand };
     return { label: ing.nutrition };
 }
 
+/**
+ * @param {Ingredient} ing
+ * @param {NutritionLabel} label
+ * @returns {{ facts: NutritionLabel[string]; convertedQty: number; matchedUnit: string } | null}
+ */
 function resolveNutritionFacts(
-    ing: Ingredient,
-    label: NutritionLabel
-): { facts: NutritionLabel[string]; convertedQty: number; matchedUnit: string } | null {
+    ing,
+    label
+) {
     const recipeUnit = ing.unit?.name ?? '';
     const qty        = ing.quantity ?? 0;
 
@@ -1093,7 +1470,11 @@ function resolveNutritionFacts(
     return null;
 }
 
-function ingredientNutrition(ing: Ingredient): NutritionResult {
+/**
+ * @param {Ingredient} ing
+ * @returns {NutritionResult}
+ */
+function ingredientNutrition(ing) {
     const { label, brand } = nutritionSource(ing);
     if (!label || Object.keys(label).length === 0) return { status: 'missing' };
     if (!ing.unit || !ing.unit.name) {
@@ -1121,7 +1502,11 @@ function ingredientNutrition(ing: Ingredient): NutritionResult {
     };
 }
 
-function ingredientCost(ing: Ingredient): CostResult {
+/**
+ * @param {Ingredient} ing
+ * @returns {CostResult}
+ */
+function ingredientCost(ing) {
     const product = selectedProduct(ing);
     if (!product) return { status: 'missing' };
     const listing = cheapestListing(product);
@@ -1151,10 +1536,15 @@ function ingredientCost(ing: Ingredient): CostResult {
     };
 }
 
-// How many recipe-unit quantities (e.g. cups) a single package (e.g. a 13.4oz can)
-// contains - the inverse of the recipeUnit → packageUnit conversion used above, derived
-// from the same physical/density conversion data rather than a separately entered figure.
-function unitsPerPackage(ing: Ingredient, product: Product): number | null {
+/**
+ * How many recipe-unit quantities (e.g. cups) a single package (e.g. a 13.4oz can)
+ * contains - the inverse of the recipeUnit → packageUnit conversion used above, derived
+ * from the same physical/density conversion data rather than a separately entered figure.
+ * @param {Ingredient} ing
+ * @param {Product} product
+ * @returns {number | null}
+ */
+function unitsPerPackage(ing, product) {
     const recipeUnit = ing.unit?.name;
     if (!recipeUnit || product.size === undefined || !product.sizeUnit) return null;
     const packageUnit = product.sizeUnit.name;
@@ -1164,18 +1554,23 @@ function unitsPerPackage(ing: Ingredient, product: Product): number | null {
     return product.size / packageUnitsPerRecipeUnit;
 }
 
-interface RecipeNutrition {
-    totals:       NutritionTotals;
-    cost:         number;         // sum of ok ingredient costs (unscaled - multiply by servings)
-    covered:      number;
-    missing:      number;
-    uncomputable: number;
-    costMissing:  number;         // ingredients with no price data (missing or uncomputable)
-    total:        number;
-    breakdown:    { ing: Ingredient; result: NutritionResult; costResult: CostResult }[];
-}
+/**
+ * @typedef {Object} RecipeNutrition
+ * @property {NutritionTotals} totals
+ * @property {number} cost sum of ok ingredient costs (unscaled - multiply by servings)
+ * @property {number} covered
+ * @property {number} missing
+ * @property {number} uncomputable
+ * @property {number} costMissing ingredients with no price data (missing or uncomputable)
+ * @property {number} total
+ * @property {{ ing: Ingredient; result: NutritionResult; costResult: CostResult }[]} breakdown
+ */
 
-function recipeNutrition(recipe: Recipe): RecipeNutrition {
+/**
+ * @param {Recipe} recipe
+ * @returns {RecipeNutrition}
+ */
+function recipeNutrition(recipe) {
     const breakdown = [...stepIngredients(recipe.steps)]
         .filter(ing => !isComposite(ing))
         .map(ing => ({ ing, result: ingredientNutrition(ing), costResult: ingredientCost(ing) }));
@@ -1201,7 +1596,12 @@ function recipeNutrition(recipe: Recipe): RecipeNutrition {
     };
 }
 
-function formatTotals(t: NutritionTotals, cost?: number): string {
+/**
+ * @param {NutritionTotals} t
+ * @param {number} [cost]
+ * @returns {string}
+ */
+function formatTotals(t, cost) {
     const costStr = cost !== undefined ? `$${cost.toFixed(2)} · ` : '';
     return `${costStr}${Math.round(t.calories)} cal · ${Math.round(t.protein)} g protein · ` +
            `${Math.round(t.fat)} g fat (${Math.round(t.saturatedFat)} sat${t.transFat > 0 ? ` / ${Math.round(t.transFat)} trans` : ''}) · ` +
@@ -1210,13 +1610,26 @@ function formatTotals(t: NutritionTotals, cost?: number): string {
            `${Math.round(t.fiber)} g fiber · ${Math.round(t.sugar)} g sugar · ${Math.round(t.sodium)} mg sodium`;
 }
 
-// Nutrition line when any ingredient has data, else just the cost, else a placeholder.
-function totalsText(covered: number, totals: NutritionTotals, hasCost: boolean, cost: number): string {
+/**
+ * Nutrition line when any ingredient has data, else just the cost, else a placeholder.
+ * @param {number} covered
+ * @param {NutritionTotals} totals
+ * @param {boolean} hasCost
+ * @param {number} cost
+ * @returns {string}
+ */
+function totalsText(covered, totals, hasCost, cost) {
     if (covered > 0) return formatTotals(totals, hasCost ? cost : undefined);
     return hasCost ? `$${cost.toFixed(2)}` : '- no computable data';
 }
 
-function coverageLabel(covered: number, total: number, flagged: number): string {
+/**
+ * @param {number} covered
+ * @param {number} total
+ * @param {number} flagged
+ * @returns {string}
+ */
+function coverageLabel(covered, total, flagged) {
     if (total === 0) return 'No ingredients';
     if (flagged === 0) return `All ${total} ingredients have data`;
     return `${covered} of ${total} ingredients have data · ${flagged} flagged`;
@@ -1226,27 +1639,41 @@ function coverageLabel(covered: number, total: number, flagged: number): string 
 // DOM HELPERS
 // ============================================================
 
-function getElement<T extends HTMLElement>(id: string): T {
+/**
+ * @param {string} id
+ * @returns {HTMLElement}
+ */
+function getElement(id) {
     const el = document.getElementById(id);
     if (!el) throw new Error(`Missing element: ${id}`);
-    return el as T;
+    return el;
 }
 
-function clear(el: HTMLElement): void { el.innerHTML = ''; }
+/** @param {HTMLElement} el */
+function clear(el) { el.innerHTML = ''; }
 
-type Child = Node | string | null | undefined | false;
-interface Props {
-    class?: string;
-    text?: string;
-    testid?: string;
-    attrs?: Record<string, string>;
-    on?: { [K in keyof HTMLElementEventMap]?: (ev: HTMLElementEventMap[K]) => void };
-    [prop: string]: unknown;  // any other DOM property: id, type, value, htmlFor, href, min...
-}
+/** @typedef {Node | string | null | undefined | false} Child */
+/**
+ * @typedef {{
+ *     class?: string;
+ *     text?: string;
+ *     testid?: string;
+ *     attrs?: Record<string, string>;
+ *     on?: { [K in keyof HTMLElementEventMap]?: (ev: HTMLElementEventMap[K]) => void };
+ *     [prop: string]: unknown;
+ * }} Props Any other key is a DOM property: id, type, value, htmlFor, href, min...
+ */
 
-// Build an element in one call: h('span', { class: 'badge', text: '×2' }, child, ...).
-// Buttons default to type="button".
-function h<K extends keyof HTMLElementTagNameMap>(tag: K, props: Props = {}, ...children: Child[]): HTMLElementTagNameMap[K] {
+/**
+ * Build an element in one call: h('span', { class: 'badge', text: '×2' }, child, ...).
+ * Buttons default to type="button".
+ * @template {keyof HTMLElementTagNameMap} K
+ * @param {K} tag
+ * @param {Props} [props]
+ * @param {...Child} children
+ * @returns {HTMLElementTagNameMap[K]}
+ */
+function h(tag, props = {}, ...children) {
     const el = document.createElement(tag);
     const { class: className, text, testid, attrs, on, ...rest } = props;
     if (el instanceof HTMLButtonElement) el.type = 'button';
@@ -1255,46 +1682,69 @@ function h<K extends keyof HTMLElementTagNameMap>(tag: K, props: Props = {}, ...
     if (text !== undefined) el.textContent = text;
     if (testid) el.setAttribute('data-testid', testid);
     for (const [name, value] of Object.entries(attrs ?? {})) el.setAttribute(name, value);
-    for (const [type, listener] of Object.entries(on ?? {})) el.addEventListener(type, listener as EventListener);
-    el.append(...children.filter((child): child is Node | string => child !== null && child !== undefined && child !== false));
+    for (const [type, listener] of Object.entries(on ?? {})) el.addEventListener(type, /** @type {EventListener} */ (listener));
+    el.append(...children.filter(/** @returns {child is Node | string} */ (child) => child !== null && child !== undefined && child !== false));
     return el;
 }
 
-// Extra words for screen readers only, e.g. which recipe a "−" button belongs to.
-function srOnly(text: string): HTMLSpanElement {
+/**
+ * Extra words for screen readers only, e.g. which recipe a "−" button belongs to.
+ * @param {string} text
+ * @returns {HTMLSpanElement}
+ */
+function srOnly(text) {
     return h('span', { class: 'visually-hidden', text: ` ${text}` });
 }
 
-function announce(message: string): void {
+/** @param {string} message */
+function announce(message) {
     const region = document.getElementById('status-live');
     if (!region) return;
     region.textContent = '';
     window.setTimeout(() => { region.textContent = message; }, 50);
 }
 
-// Clear #app and give the screen its heading.
-function screen(title: string): HTMLDivElement {
-    const root = getElement<HTMLDivElement>('app');
+/**
+ * Clear #app and give the screen its heading.
+ * @param {string} title
+ * @returns {HTMLElement}
+ */
+function screen(title) {
+    const root = getElement('app');
     clear(root);
     root.appendChild(h('h1', { text: title }));
     return root;
 }
 
-function searchField(id: string, label: string, placeholder: string, value: string, onInput: (value: string) => void): [HTMLLabelElement, HTMLInputElement] {
+/**
+ * @param {string} id
+ * @param {string} label
+ * @param {string} placeholder
+ * @param {string} value
+ * @param {(value: string) => void} onInput
+ * @returns {[HTMLLabelElement, HTMLInputElement]}
+ */
+function searchField(id, label, placeholder, value, onInput) {
     return [
         h('label', { htmlFor: id, class: 'search-label', text: label }),
         h('input', {
             id, type: 'search', placeholder, value, class: 'search-input', autocomplete: 'off', testid: id,
-            on: { input: (ev) => onInput((ev.target as HTMLInputElement).value) },
+            on: { input: (ev) => onInput((/** @type {HTMLInputElement} */ (ev.target)).value) },
         }),
     ];
 }
 
-function backButton(label: string, onClick: () => void): HTMLButtonElement {
+/**
+ * @param {string} label
+ * @param {() => void} onClick
+ * @returns {HTMLButtonElement}
+ */
+function backButton(label, onClick) {
     return h('button', { class: 'start-over-btn', text: label, on: { click: onClick } });
 }
 
-function removeServing(recipeId: string): void {
+/** @param {string} recipeId */
+function removeServing(recipeId) {
     const idx = state.selectedRecipeIds.lastIndexOf(recipeId);
     if (idx !== -1) state.selectedRecipeIds.splice(idx, 1);
 }
@@ -1303,16 +1753,28 @@ function removeServing(recipeId: string): void {
 // COPY TO CLIPBOARD
 // ============================================================
 
-function getRecipeURL(recipeId: string): string {
+/**
+ * @param {string} recipeId
+ * @returns {string}
+ */
+function getRecipeURL(recipeId) {
     const baseURL = window.location.origin + window.location.pathname;
     return `${baseURL}?recipe=${recipeId}`;
 }
 
-function createCopyButton(recipeId: string): HTMLButtonElement {
+/**
+ * @param {string} recipeId
+ * @returns {HTMLButtonElement}
+ */
+function createCopyButton(recipeId) {
     const recipeName = state.recipes.get(recipeId)?.name ?? recipeId;
     const restingLabel = `Copy link to ${recipeName}`;
-    // Show the result for 1.5s, then go back to "Copy".
-    const flash = (text: string, label: string): void => {
+    /**
+     * Show the result for 1.5s, then go back to "Copy".
+     * @param {string} text
+     * @param {string} label
+     */
+    const flash = (text, label) => {
         btn.textContent = text;
         btn.setAttribute('aria-label', label);
         announce(label);
@@ -1341,7 +1803,7 @@ function createCopyButton(recipeId: string): HTMLButtonElement {
 // AUDIO UNLOCK
 // ============================================================
 
-function unlockAudioContext(): void {
+function unlockAudioContext() {
     if (state.audioUnlocked) return;
     state.audioUnlocked = true;
     // Prime the *actual* alarm element with a direct, gesture-triggered play(), not a
@@ -1364,7 +1826,7 @@ function unlockAudioContext(): void {
 // SCREEN: SELECT
 // ============================================================
 
-function renderSelectScreen(): void {
+function renderSelectScreen() {
     const root = screen('Recipes');
     root.appendChild(h('search', {}, ...searchField('recipe-search', 'Search recipes', 'Recipe name', state.searchQuery, (value) => {
         state.searchQuery = value;
@@ -1390,8 +1852,8 @@ function renderSelectScreen(): void {
     refreshSelect();
 }
 
-function renderRecipeList(): void {
-    const root = getElement<HTMLDivElement>('recipe-list');
+function renderRecipeList() {
+    const root = getElement('recipe-list');
     clear(root);
 
     const recipes = getFilteredRecipes();
@@ -1427,11 +1889,12 @@ function renderRecipeList(): void {
         });
     }
 
-    const groups = new Map<string, Recipe[]>();
+    const groups = /** @type {Map<string, Recipe[]>} */ (new Map());
     recipes.forEach((recipe) => {
         const key = recipe.group ?? '';
-        if (!groups.has(key)) groups.set(key, []);
-        groups.get(key)!.push(recipe);
+        const group = groups.get(key);
+        if (group) group.push(recipe);
+        else groups.set(key, [recipe]);
     });
 
     groups.forEach((groupRecipes, groupName) => {
@@ -1490,12 +1953,13 @@ function renderRecipeList(): void {
     appendBuildFooter(root);
 }
 
-function refreshSelect(): void {
+function refreshSelect() {
     renderRecipeList();
     updateActionButtons();
 }
 
-function appendAddIngredientButton(root: HTMLElement): void {
+/** @param {HTMLElement} root */
+function appendAddIngredientButton(root) {
     root.appendChild(h('div', { class: 'add-ingredient-row' },
         h('button', {
             class: 'add-ingredient-btn', testid: 'add-ingredient', text: '+ Add an ingredient',
@@ -1509,16 +1973,19 @@ function appendAddIngredientButton(root: HTMLElement): void {
     ));
 }
 
-function updateActionButtons(): void {
-    const actions = getElement<HTMLDivElement>('actions');
+function updateActionButtons() {
+    const actions = getElement('actions');
     clear(actions);
     if (state.selectedRecipeIds.length === 0) return;
 
     const selectedRecipes = getSelectedRecipes();
     const hasPrep     = selectedRecipes.some(r => [...walkSteps(r.steps)].some(s => s.prep));
     const hasCookable = selectedRecipes.some(r => !r.adhoc);
-    // Order matters: .action-btn:first-child / :last-child pick the blue and green colors.
-    const buttons: [label: string, screen: Screen, className: string, testid: string, show: boolean][] = [
+    /**
+     * Order matters: .action-btn:first-child / :last-child pick the blue and green colors.
+     * @type {[label: string, screen: Screen, className: string, testid: string, show: boolean][]}
+     */
+    const buttons = [
         ['🛒 Go Shopping',   'shopping',  'action-btn',                      'go-shopping',   true],
         ['📊 Nutrition',     'nutrition', 'action-btn action-btn-nutrition', 'open-nutrition', true],
         ['📅 Plan',          'plan',      'action-btn action-btn-plan',      'open-plan',      true],
@@ -1535,7 +2002,7 @@ function updateActionButtons(): void {
 // SCREEN: SHOPPING
 // ============================================================
 
-function renderShoppingScreen(): void {
+function renderShoppingScreen() {
     const root = screen('Shopping List');
     const inventory = loadInventory();
 
@@ -1553,15 +2020,20 @@ function renderShoppingScreen(): void {
         const trackByPackage = perPackage !== null && perPackage > 0;
         const key = inventoryKey(ingredient, trackByPackage);
 
-        const packageWord = (count: number): string => {
-            const unit = packageUnit as Unit;
+        /**
+         * @param {number} count
+         * @returns {string}
+         */
+        const packageWord = (count) => {
+            const unit = /** @type {Unit} */ (packageUnit);
             return count === 1 ? unit.name : (unit.plural || pluralize(unit.name, count));
         };
 
         const haveId = `have-${key.replace(/[^a-z0-9]+/gi, '-')}`;
         const neededEl = h('span', { class: 'inventory-needed' });
-        const updateNeeded = (have: number) => {
-            const haveInRecipeUnits = trackByPackage ? have * (perPackage as number) : have;
+        /** @param {number} have */
+        const updateNeeded = (have) => {
+            const haveInRecipeUnits = trackByPackage ? have * (/** @type {number} */ (perPackage)) : have;
             const needed = Math.max(0, required - haveInRecipeUnits);
             if (needed <= 0 && required > 0) {
                 neededEl.textContent = '✓ have enough';
@@ -1569,7 +2041,7 @@ function renderShoppingScreen(): void {
             } else {
                 let text = `Need ${formatQuantityUnit(needed, ingredient.unit)} more`;
                 if (trackByPackage) {
-                    const packagesNeeded = Math.ceil(needed / (perPackage as number));
+                    const packagesNeeded = Math.ceil(needed / (/** @type {number} */ (perPackage)));
                     if (packagesNeeded > 0) text += ` (~${packagesNeeded} more ${packageWord(packagesNeeded)})`;
                 }
                 neededEl.textContent = text;
@@ -1600,7 +2072,7 @@ function renderShoppingScreen(): void {
             neededEl,
             trackByPackage && h('span', {
                 class: 'inventory-package-hint',
-                text: `1 ${packageWord(1)} ≈ ${formatQuantityUnit(perPackage as number, ingredient.unit)}${product?.variant ? ` (${product.variant})` : ''}`,
+                text: `1 ${packageWord(1)} ≈ ${formatQuantityUnit(/** @type {number} */ (perPackage), ingredient.unit)}${product?.variant ? ` (${product.variant})` : ''}`,
             }),
         ));
 
@@ -1611,7 +2083,12 @@ function renderShoppingScreen(): void {
         if (pairs.length > 0) {
             const chosenProduct = selectedProduct(ingredient);
             const chosenListing = chosenProduct ? cheapestListing(chosenProduct) : undefined;
-            const perUnit = (price: number | undefined, size: number | undefined): number =>
+            /**
+             * @param {number | undefined} price
+             * @param {number | undefined} size
+             * @returns {number}
+             */
+            const perUnit = (price, size) =>
                 price !== undefined && size !== undefined ? price / size : Infinity;
             const sorted = [...pairs].sort((a, b) => perUnit(a.listing.price, a.product.size) - perUnit(b.listing.price, b.product.size));
             panel.appendChild(h('div', { class: 'purchase-links' }, ...sorted.map(({ product, listing }) => {
@@ -1641,7 +2118,7 @@ function renderShoppingScreen(): void {
         }
 
         panel.addEventListener('click', (ev) => {
-            const tag = (ev.target as HTMLElement).tagName;
+            const tag = (/** @type {HTMLElement} */ (ev.target)).tagName;
             if (tag === 'A' || tag === 'INPUT' || tag === 'LABEL') return;
             panel.classList.toggle('completed');
         });
@@ -1655,22 +2132,40 @@ function renderShoppingScreen(): void {
 // MACRO TARGETS PANEL
 // ============================================================
 
-function renderMacroTargetsPanel(grand: NutritionTotals): HTMLElement {
+/**
+ * @param {NutritionTotals} grand
+ * @returns {HTMLElement}
+ */
+function renderMacroTargetsPanel(grand) {
     const panel = h('div', { class: 'panel macro-targets' },
         h('div', { class: 'macro-targets-title', text: 'Daily Targets' }),
         h('div', { class: 'macro-row macro-header' }, ...['', 'Target', 'Eaten', 'Remaining'].map(text => h('span', { text }))),
     );
 
     const totalCals = grand.calories > 0 ? grand.calories : null;
-    const pct = (grams: number | null, calsPerGram: number): string =>
+    /**
+     * @param {number | null} grams
+     * @param {number} calsPerGram
+     * @returns {string}
+     */
+    const pct = (grams, calsPerGram) =>
         grams !== null && totalCals ? ` (${Math.round((grams * calsPerGram / totalCals) * 100)}%)` : '';
 
     const totalMacroG = grand.protein + grand.fat + grand.carbs;
-    const macroPct = (grams: number | null): string =>
+    /**
+     * @param {number | null} grams
+     * @returns {string}
+     */
+    const macroPct = (grams) =>
         grams !== null && totalMacroG > 0 ? ` / ${Math.round((grams / totalMacroG) * 100)}%` : '';
 
-    const round1 = (v: number): number => Math.round(v * 10) / 10;
-    const rowDefs: { label: string; key: keyof typeof macroTargets; unit: string; round?: (v: number) => number; calsPerGram?: number; macro?: boolean; indent?: boolean; cap?: boolean }[] = [
+    /**
+     * @param {number} v
+     * @returns {number}
+     */
+    const round1 = (v) => Math.round(v * 10) / 10;
+    /** @type {{ label: string; key: keyof typeof macroTargets; unit: string; round?: (v: number) => number; calsPerGram?: number; macro?: boolean; indent?: boolean; cap?: boolean }[]} */
+    const rowDefs = [
         { label: 'Calories',    key: 'calories',     unit: 'kcal' },
         { label: 'Protein',     key: 'protein',      unit: 'g',  calsPerGram: 4, macro: true },
         { label: 'Fat',         key: 'fat',          unit: 'g',  calsPerGram: 9, macro: true },
@@ -1692,12 +2187,14 @@ function renderMacroTargetsPanel(grand: NutritionTotals): HTMLElement {
 
     rows.forEach(({ label, key, actual, unit, indent, cap, calPct, macroPct }) => {
         const initRemaining = actual !== null ? macroTargets[key] - actual : null;
-        const remainClass = (rem: number | null) => {
+        /** @param {number | null} rem */
+        const remainClass = (rem) => {
             if (rem === null) return 'macro-remaining';
             if (cap) return rem < 0 ? 'macro-remaining over' : rem === 0 ? 'macro-remaining met' : 'macro-remaining';
             return rem <= 0 ? 'macro-remaining met' : 'macro-remaining';
         };
-        const remainText = (rem: number | null) => {
+        /** @param {number | null} rem */
+        const remainText = (rem) => {
             if (rem === null) return '-';
             if (cap) return rem < 0 ? `${Math.round(-rem)} ${unit} over` : rem === 0 ? '✓ at limit' : `${Math.round(rem)} ${unit} left`;
             return rem > 0 ? `${Math.round(rem)} ${unit}` : '✓ met';
@@ -1733,9 +2230,18 @@ function renderMacroTargetsPanel(grand: NutritionTotals): HTMLElement {
 // RECIPE SUGGESTIONS
 // ============================================================
 
-interface SuggestedRecipe { recipe: Recipe; score: number; totals: NutritionTotals; }
+/**
+ * @typedef {Object} SuggestedRecipe
+ * @property {Recipe} recipe
+ * @property {number} score
+ * @property {NutritionTotals} totals
+ */
 
-function buildRecipeSuggestions(grand: NutritionTotals): SuggestedRecipe[] {
+/**
+ * @param {NutritionTotals} grand
+ * @returns {SuggestedRecipe[]}
+ */
+function buildRecipeSuggestions(grand) {
     const remCals = macroTargets.calories - grand.calories;
     if (remCals < 50) return [];  // nearly full - no suggestions needed
 
@@ -1746,7 +2252,8 @@ function buildRecipeSuggestions(grand: NutritionTotals): SuggestedRecipe[] {
         carbs:    Math.max(0, macroTargets.carbs   - grand.carbs),
     };
 
-    const results: SuggestedRecipe[] = [];
+    /** @type {SuggestedRecipe[]} */
+    const results = [];
 
     for (const recipe of state.recipes.values()) {
         if (recipe.adhoc) continue;
@@ -1787,7 +2294,7 @@ function buildRecipeSuggestions(grand: NutritionTotals): SuggestedRecipe[] {
 // SCREEN: NUTRITION
 // ============================================================
 
-function renderNutritionScreen(): void {
+function renderNutritionScreen() {
     const root = screen('Nutrition');
     const recipes = getSelectedRecipes();
 
@@ -1846,8 +2353,12 @@ function renderNutritionScreen(): void {
     ));
     root.appendChild(renderMacroTargetsPanel(grand));
 
-    // ── Bulk select/unselect ─────────────────────────────────
-    const bulkButton = (text: string, apply: (id: string) => void) => h('button', {
+    /**
+     * ── Bulk select/unselect ─────────────────────────────────
+     * @param {string} text
+     * @param {(id: string) => void} apply
+     */
+    const bulkButton = (text, apply) => h('button', {
         class: 'nutrition-bulk-btn', text,
         on: { click: () => { recipes.forEach(r => apply(r.id)); renderNutritionScreen(); } },
     });
@@ -1856,8 +2367,14 @@ function renderNutritionScreen(): void {
         bulkButton('Unselect All', id => nutritionRecipeExclusions.add(id)),
     ));
 
-    // Header buttons re-render the screen; stopPropagation keeps the header from toggling first.
-    const headerButton = (cls: string, text: string, hidden: string, onClick: () => void) => h('button', {
+    /**
+     * Header buttons re-render the screen; stopPropagation keeps the header from toggling first.
+     * @param {string} cls
+     * @param {string} text
+     * @param {string} hidden
+     * @param {() => void} onClick
+     */
+    const headerButton = (cls, text, hidden, onClick) => h('button', {
         class: cls, text,
         on: { click: (ev) => { ev.stopPropagation(); onClick(); renderNutritionScreen(); } },
     }, srOnly(hidden));
@@ -1919,14 +2436,14 @@ function renderNutritionScreen(): void {
                             },
                         },
                     }, srOnly(isExcluded ? `Include ${ing.name} in totals` : `Exclude ${ing.name} from totals`)),
-                    h('span', { class: 'nutrition-ingredient-name', text: formatIngredient(scaledIng as Ingredient) }),
+                    h('span', { class: 'nutrition-ingredient-name', text: formatIngredient(/** @type {Ingredient} */ (scaledIng)) }),
                     detail,
                     !isExcluded && result.status === 'uncomputable' && h('div', { class: 'nutrition-flag-reason', text: result.reason }),
                     !isExcluded && result.status === 'ok' && costResult.status !== 'ok' && h('div', {
                         class: 'nutrition-cost-flag',
                         text: costResult.status === 'missing'
                             ? '⚠ no price data'
-                            : `⚠ cost can't compute - ${(costResult as { reason: string }).reason}`,
+                            : `⚠ cost can't compute - ${(/** @type {{ reason: string }} */ (costResult)).reason}`,
                     }),
                     !isExcluded && result.status === 'ok' && result.brand && h('div', {
                         class: 'nutrition-provenance',
@@ -1937,8 +2454,8 @@ function renderNutritionScreen(): void {
         );
 
         header.addEventListener('click', (ev) => {
-            if ((ev.target as HTMLElement).closest('.nutrition-serving-controls')) return;
-            if ((ev.target as HTMLElement).closest('.nutrition-eaten-btn')) return;
+            if ((/** @type {HTMLElement} */ (ev.target)).closest('.nutrition-serving-controls')) return;
+            if ((/** @type {HTMLElement} */ (ev.target)).closest('.nutrition-eaten-btn')) return;
             const collapsed = list.classList.toggle('collapsed');
             caret.textContent = collapsed ? '▸' : '▾';
             if (collapsed) nutritionExpanded.delete(recipe.id);
@@ -1984,8 +2501,14 @@ function renderNutritionScreen(): void {
     root.appendChild(createStartOverButton());
 }
 
-// A recipe with an "+ Add" button that adds a serving and re-renders Nutrition.
-function suggestionRow(recipe: Recipe, stats?: HTMLElement, testid?: string): HTMLDivElement {
+/**
+ * A recipe with an "+ Add" button that adds a serving and re-renders Nutrition.
+ * @param {Recipe} recipe
+ * @param {HTMLElement} [stats]
+ * @param {string} [testid]
+ * @returns {HTMLDivElement}
+ */
+function suggestionRow(recipe, stats, testid) {
     return h('div', { class: 'suggestion-row' },
         h('div', { class: 'suggestion-info' }, h('span', { class: 'suggestion-name', text: recipe.name }), stats),
         h('button', {
@@ -2000,8 +2523,8 @@ function suggestionRow(recipe: Recipe, stats?: HTMLElement, testid?: string): HT
     );
 }
 
-function renderNutritionAddRecipeList(): void {
-    const root = getElement<HTMLDivElement>('nutrition-add-recipe-list');
+function renderNutritionAddRecipeList() {
+    const root = getElement('nutrition-add-recipe-list');
     clear(root);
 
     const matched   = getNutritionAddableRecipes(nutritionAddRecipeQuery);
@@ -2021,22 +2544,30 @@ function renderNutritionAddRecipeList(): void {
 // ============================================================
 
 let adhocSearchQuery = '';
-let adhocSelectedKey: string | null = null;
+/** @type {string | null} */
+let adhocSelectedKey = null;
 let adhocQuantity   = 1;
 let adhocUnitName   = '';
-// Which screen opened the ingredient picker (Select or Nutrition) - Back/Add to list return
-// here instead of always landing on Select, so adding from Nutrition doesn't strand the user
-// somewhere they didn't ask to go.
-let adhocReturnScreen: Screen = 'select';
+/**
+ * Which screen opened the ingredient picker (Select or Nutrition) - Back/Add to list return
+ * here instead of always landing on Select, so adding from Nutrition doesn't strand the user
+ * somewhere they didn't ask to go.
+ * @type {Screen}
+ */
+let adhocReturnScreen = 'select';
 
-function resetAdhoc(): void {
+function resetAdhoc() {
     adhocSearchQuery = '';
     adhocSelectedKey = null;
     adhocQuantity    = 1;
     adhocUnitName    = '';
 }
 
-function pickDefaultUnit(ing: Ingredient): Unit {
+/**
+ * @param {Ingredient} ing
+ * @returns {Unit}
+ */
+function pickDefaultUnit(ing) {
     const productUnits = ing.products?.[0]?.nutrition && Object.keys(ing.products[0].nutrition);
     const ownUnits     = ing.nutrition && Object.keys(ing.nutrition);
     const hint = productUnits?.[0] ?? ownUnits?.[0];
@@ -2047,17 +2578,19 @@ function pickDefaultUnit(ing: Ingredient): Unit {
     return u.unit;
 }
 
-let adhocCatalog: { key: string; name: string; sample: Ingredient }[] | null = null;
-function getAdhocCatalog(): { key: string; name: string; sample: Ingredient }[] {
+/** @type {{ key: string; name: string; sample: Ingredient }[] | null} */
+let adhocCatalog = null;
+/** @returns {{ key: string; name: string; sample: Ingredient }[]} */
+function getAdhocCatalog() {
     if (adhocCatalog) return adhocCatalog;
     adhocCatalog = Object.entries(i).map(([key, factory]) => {
-        const sample = (factory as (q?: number, u?: Unit) => Ingredient)();
+        const sample = (/** @type {(q?: number, u?: Unit) => Ingredient} */ (factory))();
         return { key, name: sample.name, sample };
     }).sort((a, b) => a.name.localeCompare(b.name));
     return adhocCatalog;
 }
 
-function renderAddIngredientScreen(): void {
+function renderAddIngredientScreen() {
     const root = screen('Add an ingredient');
     root.append(
         h('p', { class: 'adhoc-sub', text: 'Pick an ingredient to add to your shopping list and nutrition totals.' }),
@@ -2076,8 +2609,8 @@ function renderAddIngredientScreen(): void {
     renderAdhocDetail();
 }
 
-function renderAdhocList(): void {
-    const root = getElement<HTMLDivElement>('adhoc-list');
+function renderAdhocList() {
+    const root = getElement('adhoc-list');
     clear(root);
 
     const q   = adhocSearchQuery.toLowerCase().trim();
@@ -2103,8 +2636,8 @@ function renderAdhocList(): void {
     })));
 }
 
-function renderAdhocDetail(): void {
-    const root = getElement<HTMLDivElement>('adhoc-detail');
+function renderAdhocDetail() {
+    const root = getElement('adhoc-detail');
     clear(root);
     if (!adhocSelectedKey) return;
 
@@ -2117,18 +2650,18 @@ function renderAdhocDetail(): void {
             type: 'number', min: '0', step: '0.25', value: String(adhocQuantity), class: 'adhoc-qty',
             on: {
                 input: (ev) => {
-                    const v = parseFloat((ev.target as HTMLInputElement).value);
+                    const v = parseFloat((/** @type {HTMLInputElement} */ (ev.target)).value);
                     adhocQuantity = isNaN(v) ? 0 : v;
                 },
             },
         }),
-        h('select', { class: 'adhoc-unit', on: { change: (ev) => { adhocUnitName = (ev.target as HTMLSelectElement).value; } } },
+        h('select', { class: 'adhoc-unit', on: { change: (ev) => { adhocUnitName = (/** @type {HTMLSelectElement} */ (ev.target)).value; } } },
             ...Object.values(u).map(unit => h('option', { value: unit.name, text: unit.name || '(none)', selected: unit.name === adhocUnitName }))),
         h('button', {
             class: 'adhoc-confirm', text: 'Add to list',
             on: {
                 click: () => {
-                    const factory  = (i as any)[adhocSelectedKey!] as (q?: number, u?: Unit) => Ingredient;
+                    const factory  = /** @type {(q?: number, u?: Unit) => Ingredient} */ ((/** @type {any} */ (i))[/** @type {string} */ (adhocSelectedKey)]);
                     const unit     = Object.values(u).find(uu => uu.name === adhocUnitName) ?? u.unit;
                     const recipe   = createAdhocRecipe(factory(adhocQuantity, unit));
                     registerRecipe(recipe);
@@ -2145,14 +2678,18 @@ function renderAdhocDetail(): void {
 // SCREEN: COOKING
 // ============================================================
 
-function formatElapsed(seconds: number): string {
+/**
+ * @param {number} seconds
+ * @returns {string}
+ */
+function formatElapsed(seconds) {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return m > 0 ? `${m}m ${String(s).padStart(2, '0')}s` : `${s}s`;
 }
 
 
-function renderCookingScreen(): void {
+function renderCookingScreen() {
     const root = screen('Cooking');
 
     if (state.cookingStartedAt === null) state.cookingStartedAt = Date.now();
@@ -2171,8 +2708,10 @@ function renderCookingScreen(): void {
         }));
     }
 
-    let lastRecipeId: string | undefined;
-    const badgeUpdaters: (() => void)[] = [];
+    /** @type {string | undefined} */
+    let lastRecipeId;
+    /** @type {(() => void)[]} */
+    const badgeUpdaters = [];
 
     // Every step renders in its natural recipe order, whether locked or not - a locked
     // step just looks/behaves locked in place (see applyLock). Nothing ever moves once
@@ -2190,7 +2729,7 @@ function renderCookingScreen(): void {
                 const hardcodedText  = recipe.estimatedMinutes ? `${recipe.estimatedMinutes} min` : null;
 
                 const updateBadge = () => {
-                    const secs = Math.floor((Date.now() - state.cookingStartedAt!) / 1000);
+                    const secs = Math.floor((Date.now() - /** @type {number} */ (state.cookingStartedAt)) / 1000);
                     const estimateDisplay = hardcodedText
                         ? `estimated ${hardcodedText} (${calculatedText} calculated)`
                         : `estimated ${calculatedText}`;
@@ -2205,7 +2744,8 @@ function renderCookingScreen(): void {
         }
 
         if (step.type === 'info') {
-            const group: Step[] = [step];
+            /** @type {Step[]} */
+            const group = [step];
             while (
                 idx + 1 < state.cookingPlanSteps.length &&
                 state.cookingPlanSteps[idx + 1].type === 'info' &&
@@ -2225,7 +2765,7 @@ function renderCookingScreen(): void {
     if (state.cookingElapsedInterval !== null) window.clearInterval(state.cookingElapsedInterval);
     state.cookingElapsedInterval = window.setInterval(() => {
         if (!document.querySelector('#app .panel:not(.completed):not(.skipped)')) {
-            window.clearInterval(state.cookingElapsedInterval!);
+            window.clearInterval(state.cookingElapsedInterval ?? undefined);
             state.cookingElapsedInterval = null;
             return;
         }
@@ -2235,10 +2775,15 @@ function renderCookingScreen(): void {
     root.appendChild(createStartOverButton());
 }
 
-// A collapsed "Notes" box. Native <details> opens and closes it; CSS swaps the caret.
-// Info notes are a panel with one line per step plus recipe links; prep notes are a
-// lighter box. `inline` puts a single step's text straight into the body.
-function notesBox(kind: 'info' | 'prep', steps: Step[], inline = false): HTMLDetailsElement {
+/**
+ * A collapsed "Notes" box. Native <details> opens and closes it; CSS swaps the caret.
+ * Info notes are a panel with one line per step plus recipe links; prep notes are a
+ * lighter box. `inline` puts a single step's text straight into the body.
+ * @param {'info' | 'prep'} kind
+ * @param {Step[]} steps
+ * @returns {HTMLDetailsElement}
+ */
+function notesBox(kind, steps, inline = false) {
     const prefix = kind === 'info' ? 'info-step' : 'prep-info';
     const body = h('div', { class: `${prefix}-body` });
     steps.forEach(step => {
@@ -2264,7 +2809,11 @@ function notesBox(kind: 'info' | 'prep', steps: Step[], inline = false): HTMLDet
 // STEP LOCKING
 // ============================================================
 
-function applyLock(panel: HTMLElement, step: Step): void {
+/**
+ * @param {HTMLElement} panel
+ * @param {Step} step
+ */
+function applyLock(panel, step) {
     const waitForIds = step.waitForIds;
     const startWhenIds = step.startWhenIds;
     if ((!waitForIds || waitForIds.length === 0) && (!startWhenIds || startWhenIds.length === 0)) return;
@@ -2272,12 +2821,19 @@ function applyLock(panel: HTMLElement, step: Step): void {
     const appEl = document.getElementById('app');
     if (!appEl) return;
 
-    const stepMatches = (id: number, selector: string): boolean => {
+    /**
+     * @param {number} id
+     * @param {string} selector
+     * @returns {boolean}
+     */
+    const stepMatches = (id, selector) => {
         const el = document.getElementById(`step-${id}`);
         return !el || el.matches(selector);
     };
-    const isStarted  = (id: number) => stepMatches(id, '.timer, .ringing, .completed, .skipped, .done-child');
-    const isFinished = (id: number) => stepMatches(id, '.completed, .skipped, .ringing');
+    /** @param {number} id */
+    const isStarted  = (id) => stepMatches(id, '.timer, .ringing, .completed, .skipped, .done-child');
+    /** @param {number} id */
+    const isFinished = (id) => stepMatches(id, '.completed, .skipped, .ringing');
 
     const isUnlocked = () =>
         (!waitForIds || waitForIds.length === 0 || waitForIds.every(isFinished)) &&
@@ -2304,7 +2860,12 @@ function applyLock(panel: HTMLElement, step: Step): void {
 // STEP RENDERING
 // ============================================================
 
-function renderStep(step: Step, onDone?: () => void): HTMLElement {
+/**
+ * @param {Step} step
+ * @param {() => void} [onDone]
+ * @returns {HTMLElement}
+ */
+function renderStep(step, onDone) {
     const panel = h('div', { class: 'panel', id: `step-${step.id}` });
 
     if (step.children && step.children.length > 0) {
@@ -2377,10 +2938,16 @@ function renderStep(step: Step, onDone?: () => void): HTMLElement {
     return panel;
 }
 
-// `dueAt` - the timer's original deadline, if this completion followed a countdown (omitted
-// for a gate's immediate "Yes", which never ran one) - lets the card show not just when it
-// was acknowledged but how late that was, mirroring the overdue readout shown while ringing.
-function completeTimer(step: Step, panel: HTMLElement, onDone?: () => void, dueAt?: number): void {
+/**
+ * `dueAt` - the timer's original deadline, if this completion followed a countdown (omitted
+ * for a gate's immediate "Yes", which never ran one) - lets the card show not just when it
+ * was acknowledged but how late that was, mirroring the overdue readout shown while ringing.
+ * @param {Step} step
+ * @param {HTMLElement} panel
+ * @param {() => void} [onDone]
+ * @param {number} [dueAt]
+ */
+function completeTimer(step, panel, onDone, dueAt) {
     panel.classList.remove('timer');
     panel.classList.add('completed');
     const completedAtMs = Date.now();
@@ -2394,10 +2961,16 @@ function completeTimer(step: Step, panel: HTMLElement, onDone?: () => void, dueA
     onDone?.();
 }
 
-// Taps on a timer or gate panel. With no countdown running a tap calls `first`; three quick
-// taps during a countdown call `skip`. Locked and finished panels ignore taps, and so does a
-// ringing one (the document-wide click listener in startAlarm dismisses it instead).
-function onTimerTaps(panel: HTMLElement, step: Step, first: () => void, skip: () => void): void {
+/**
+ * Taps on a timer or gate panel. With no countdown running a tap calls `first`; three quick
+ * taps during a countdown call `skip`. Locked and finished panels ignore taps, and so does a
+ * ringing one (the document-wide click listener in startAlarm dismisses it instead).
+ * @param {HTMLElement} panel
+ * @param {Step} step
+ * @param {() => void} first
+ * @param {() => void} skip
+ */
+function onTimerTaps(panel, step, first, skip) {
     let clickCount = 0;
     let clickTimer = 0;
     panel.addEventListener('click', () => {
@@ -2410,14 +2983,23 @@ function onTimerTaps(panel: HTMLElement, step: Step, first: () => void, skip: ()
     });
 }
 
-function stopCountdown(step: Step, panel: HTMLElement): void {
+/**
+ * @param {Step} step
+ * @param {HTMLElement} panel
+ */
+function stopCountdown(step, panel) {
     const intervalId = state.timers.get(step.id);
     if (intervalId !== undefined) { window.clearInterval(intervalId); state.timers.delete(step.id); }
     releaseWakeLockIfIdle();
     panel.classList.remove('timer');
 }
 
-function skipTimer(step: Step, panel: HTMLElement, onDone?: () => void): void {
+/**
+ * @param {Step} step
+ * @param {HTMLElement} panel
+ * @param {() => void} [onDone]
+ */
+function skipTimer(step, panel, onDone) {
     stopCountdown(step, panel);
     panel.classList.add('skipped');
     panel.textContent = `⏭ ${step.text} - skipped at ${formatClockTime(Date.now())}`;
@@ -2428,7 +3010,8 @@ function skipTimer(step: Step, panel: HTMLElement, onDone?: () => void): void {
 // START OVER
 // ============================================================
 
-function createStartOverButton(): HTMLButtonElement {
+/** @returns {HTMLButtonElement} */
+function createStartOverButton() {
     return backButton('↩ Start Over', () => {
         state.timers.forEach((id) => window.clearInterval(id));
         state.timers.clear();
@@ -2464,7 +3047,8 @@ function createStartOverButton(): HTMLButtonElement {
 // NAVIGATION
 // ============================================================
 
-const SCREEN_TITLES: Record<Screen, string> = {
+/** @type {Record<Screen, string>} */
+const SCREEN_TITLES = {
     select: 'Recipes',
     shopping: 'Shopping list | Recipes',
     cooking: 'Cooking | Recipes',
@@ -2474,7 +3058,8 @@ const SCREEN_TITLES: Record<Screen, string> = {
     plan: 'Day planner | Recipes',
 };
 
-function navigateTo(screen: Screen): void {
+/** @param {Screen} screen */
+function navigateTo(screen) {
     state.screen = screen;
     if (typeof document !== 'undefined') document.title = SCREEN_TITLES[screen];
     render();
@@ -2488,9 +3073,11 @@ function navigateTo(screen: Screen): void {
 // it, the screen sleeps mid-cook, the browser suspends the page's JS (including the
 // countdown's setInterval), and a long timer can silently fail to ring.
 
-let wakeLockSentinel: WakeLockSentinel | null = null;
+/** @type {WakeLockSentinel | null} */
+let wakeLockSentinel = null;
 
-async function acquireWakeLock(): Promise<void> {
+/** @returns {Promise<void>} */
+async function acquireWakeLock() {
     if (wakeLockSentinel || !('wakeLock' in navigator)) return;
     try {
         wakeLockSentinel = await navigator.wakeLock.request('screen');
@@ -2500,7 +3087,7 @@ async function acquireWakeLock(): Promise<void> {
     }
 }
 
-function releaseWakeLockIfIdle(): void {
+function releaseWakeLockIfIdle() {
     if (state.timers.size > 0) return;
     wakeLockSentinel?.release();
     wakeLockSentinel = null;
@@ -2519,21 +3106,32 @@ if (typeof document !== 'undefined') {
 // TIMERS
 // ============================================================
 
-// Ticks against an absolute deadline (rather than decrementing a counter once per tick) so
-// that a countdown suspended by the browser (backgrounded tab, locked screen) still fires
-// immediately once the page wakes back up, instead of needing to "catch up" one tick at a
-// time for however many seconds were left when it was suspended.
-function formatClockTime(ms: number): string {
+/**
+ * Ticks against an absolute deadline (rather than decrementing a counter once per tick) so
+ * that a countdown suspended by the browser (backgrounded tab, locked screen) still fires
+ * immediately once the page wakes back up, instead of needing to "catch up" one tick at a
+ * time for however many seconds were left when it was suspended.
+ * @param {number} ms
+ * @returns {string}
+ */
+function formatClockTime(ms) {
     return new Date(ms).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
+/**
+ * @param {Step} step
+ * @param {HTMLElement} panel
+ * @param {number} durationSeconds
+ * @param {(mm: string, ss: string, dueAtLabel: string) => string} formatLabel
+ * @param {(dueAt: number) => void} onComplete
+ */
 function runCountdown(
-    step: Step,
-    panel: HTMLElement,
-    durationSeconds: number,
-    formatLabel: (mm: string, ss: string, dueAtLabel: string) => string,
-    onComplete: (dueAt: number) => void
-): void {
+    step,
+    panel,
+    durationSeconds,
+    formatLabel,
+    onComplete
+) {
     const endAt = Date.now() + durationSeconds * 1000;
     const dueAtLabel = formatClockTime(endAt);
     panel.classList.add('timer');
@@ -2551,7 +3149,12 @@ function runCountdown(
     state.timers.set(step.id, intervalId);
 }
 
-function startTimer(step: Step, panel: HTMLElement, onDone?: () => void): void {
+/**
+ * @param {Step} step
+ * @param {HTMLElement} panel
+ * @param {() => void} [onDone]
+ */
+function startTimer(step, panel, onDone) {
     if (!step.durationSeconds || state.timers.has(step.id)) return;
     runCountdown(
         step, panel, step.durationSeconds,
@@ -2572,12 +3175,22 @@ function startTimer(step: Step, panel: HTMLElement, onDone?: () => void): void {
 // GATE (check-then-loop) STEPS
 // ============================================================
 
-function renderGateQuestion(step: Step, panel: HTMLElement, onDone?: () => void): void {
+/**
+ * @param {Step} step
+ * @param {HTMLElement} panel
+ * @param {() => void} [onDone]
+ */
+function renderGateQuestion(step, panel, onDone) {
     panel.classList.remove('timer');
     panel.textContent = '';
 
     const runCount = state.gateRunCounts.get(step.id) ?? 0;
-    const answer = (cls: string, text: string, onClick: () => void) => h('button', {
+    /**
+     * @param {string} cls
+     * @param {string} text
+     * @param {() => void} onClick
+     */
+    const answer = (cls, text, onClick) => h('button', {
         class: cls, text,
         on: {
             click: (e) => {
@@ -2596,7 +3209,12 @@ function renderGateQuestion(step: Step, panel: HTMLElement, onDone?: () => void)
     );
 }
 
-function startGateRetryTimer(step: Step, panel: HTMLElement, onDone?: () => void): void {
+/**
+ * @param {Step} step
+ * @param {HTMLElement} panel
+ * @param {() => void} [onDone]
+ */
+function startGateRetryTimer(step, panel, onDone) {
     if (!step.durationSeconds || state.timers.has(step.id)) return;
     state.gateRunCounts.set(step.id, (state.gateRunCounts.get(step.id) ?? 0) + 1);
     panel.textContent = '';
@@ -2609,7 +3227,12 @@ function startGateRetryTimer(step: Step, panel: HTMLElement, onDone?: () => void
     );
 }
 
-function skipGateRetryTimer(step: Step, panel: HTMLElement, onDone?: () => void): void {
+/**
+ * @param {Step} step
+ * @param {HTMLElement} panel
+ * @param {() => void} [onDone]
+ */
+function skipGateRetryTimer(step, panel, onDone) {
     stopCountdown(step, panel);
     renderGateQuestion(step, panel, onDone);
 }
@@ -2618,48 +3241,57 @@ function skipGateRetryTimer(step: Step, panel: HTMLElement, onDone?: () => void)
 // AUDIO
 // ============================================================
 
-function createAlarmAudio(): HTMLAudioElement {
-    if (typeof Audio === 'function') return new Audio('../src/sounds/pager-beep.mp3');
-    return {
+/** @returns {HTMLAudioElement} */
+function createAlarmAudio() {
+    if (typeof Audio === 'function') return new Audio('src/sounds/pager-beep.mp3');
+    return /** @type {HTMLAudioElement} */ ({
         muted: false,
         loop: false,
         currentTime: 0,
         play: () => Promise.resolve(),
         pause: () => {},
-    } as HTMLAudioElement;
+    });
 }
 
 const audio = createAlarmAudio();
 
-// audio.play() can silently reject (e.g. autoplay blocked after the page has sat idle/
-// backgrounded for a while) - surface that visibly instead of only logging it, since a
-// failed alarm sound is otherwise indistinguishable from a timer that's still running.
-let soundBlockedBanner: HTMLElement | null = null;
+/**
+ * audio.play() can silently reject (e.g. autoplay blocked after the page has sat idle/
+ * backgrounded for a while) - surface that visibly instead of only logging it, since a
+ * failed alarm sound is otherwise indistinguishable from a timer that's still running.
+ * @type {HTMLElement | null}
+ */
+let soundBlockedBanner = null;
 
-function showSoundBlockedBanner(): void {
+function showSoundBlockedBanner() {
     if (soundBlockedBanner) return;
     soundBlockedBanner = document.body.appendChild(h('div', {
         class: 'sound-blocked-banner', text: '🔇 Alarm sound was blocked by the browser - tap anywhere to enable it',
     }));
 }
 
-function hideSoundBlockedBanner(): void {
+function hideSoundBlockedBanner() {
     if (!soundBlockedBanner) return;
     soundBlockedBanner.remove();
     soundBlockedBanner = null;
 }
 
-// Attaches the specific error to the step that tried to ring, so it's visible without
-// opening devtools. Skipped if the panel's already been replaced/removed (e.g. the sound
-// test panel swaps itself out immediately after triggering the failed play()).
-function showSoundErrorOnPanel(panel: HTMLElement, err: unknown): void {
+/**
+ * Attaches the specific error to the step that tried to ring, so it's visible without
+ * opening devtools. Skipped if the panel's already been replaced/removed (e.g. the sound
+ * test panel swaps itself out immediately after triggering the failed play()).
+ * @param {HTMLElement} panel
+ * @param {unknown} err
+ */
+function showSoundErrorOnPanel(panel, err) {
     if (!panel.isConnected) return;
     const message = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
-    const errEl = panel.querySelector<HTMLElement>('.sound-error') ?? panel.appendChild(h('div', { class: 'sound-error' }));
+    const errEl = /** @type {HTMLElement | null} */ (panel.querySelector('.sound-error')) ?? panel.appendChild(h('div', { class: 'sound-error' }));
     errEl.textContent = `🔇 sound failed: ${message}`;
 }
 
-function playSound(panel?: HTMLElement): void {
+/** @param {HTMLElement} [panel] */
+function playSound(panel) {
     audio.currentTime = 0;
     audio.play().then(hideSoundBlockedBanner).catch((err) => {
         console.error(err);
@@ -2675,13 +3307,17 @@ const ALARM_WARNING_SECONDS = 30;
 
 // Steps whose alarm is currently ringing (countdown or continuous phase),
 // keyed by step id, so a click anywhere on the page can dismiss them.
-const activeAlarms = new Map<number, { panel: HTMLElement; onAcknowledge: () => void }>();
+const activeAlarms = /** @type {Map<number, { panel: HTMLElement; onAcknowledge: () => void }>} */ (new Map());
 // Steps currently in the continuous-loop phase - the shared `audio` element only
 // truly stops once none of them are ringing anymore.
-const continuousRingSteps = new Set<number>();
+const continuousRingSteps = /** @type {Set<number>} */ (new Set());
 
-// mm:ss for durations under an hour; h:mm:ss once overdue runs past 60 minutes.
-function formatOverdueDuration(totalSeconds: number): string {
+/**
+ * mm:ss for durations under an hour; h:mm:ss once overdue runs past 60 minutes.
+ * @param {number} totalSeconds
+ * @returns {string}
+ */
+function formatOverdueDuration(totalSeconds) {
     const h  = Math.floor(totalSeconds / 3600);
     const m  = Math.floor((totalSeconds % 3600) / 60);
     const s  = totalSeconds % 60;
@@ -2690,7 +3326,13 @@ function formatOverdueDuration(totalSeconds: number): string {
     return h > 0 ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
 }
 
-function startAlarm(step: Step, panel: HTMLElement, dueAt: number, onAcknowledge: () => void): void {
+/**
+ * @param {Step} step
+ * @param {HTMLElement} panel
+ * @param {number} dueAt
+ * @param {() => void} onAcknowledge
+ */
+function startAlarm(step, panel, dueAt, onAcknowledge) {
     panel.classList.add('ringing');
     panel.textContent = '';
 
@@ -2711,10 +3353,12 @@ function startAlarm(step: Step, panel: HTMLElement, dueAt: number, onAcknowledge
     let remaining = ALARM_WARNING_SECONDS;
     let ringingContinuously = false;
 
-    // Overdue keeps incrementing (based on the original deadline, not this alarm's start)
-    // for as long as the alarm is left ringing, so a user who steps away can see exactly
-    // how late they are when they come back - not just that they're late.
-    const updateDisplay = (): void => {
+    /**
+     * Overdue keeps incrementing (based on the original deadline, not this alarm's start)
+     * for as long as the alarm is left ringing, so a user who steps away can see exactly
+     * how late they are when they come back - not just that they're late.
+     */
+    const updateDisplay = () => {
         const overdue = Math.max(0, Math.round((Date.now() - dueAt) / 1000));
         const overdueLabel = `up at ${dueAtLabel} - overdue by ${formatOverdueDuration(overdue)}`;
         countdown.textContent = ringingContinuously
@@ -2738,13 +3382,15 @@ function startAlarm(step: Step, panel: HTMLElement, dueAt: number, onAcknowledge
     state.ringingAlarms.set(step.id, intervalId);
 }
 
-function startContinuousRing(stepId: number): void {
+/** @param {number} stepId */
+function startContinuousRing(stepId) {
     continuousRingSteps.add(stepId);
     audio.loop = true;
     playSound(activeAlarms.get(stepId)?.panel);
 }
 
-function stopContinuousRing(stepId: number): void {
+/** @param {number} stepId */
+function stopContinuousRing(stepId) {
     continuousRingSteps.delete(stepId);
     if (continuousRingSteps.size === 0) {
         audio.loop = false;
@@ -2753,7 +3399,8 @@ function stopContinuousRing(stepId: number): void {
     }
 }
 
-function stopAlarm(stepId: number): void {
+/** @param {number} stepId */
+function stopAlarm(stepId) {
     const intervalId = state.ringingAlarms.get(stepId);
     if (intervalId !== undefined) { window.clearInterval(intervalId); state.ringingAlarms.delete(stepId); }
     stopContinuousRing(stepId);
@@ -2764,7 +3411,8 @@ function stopAlarm(stepId: number): void {
     hideSoundBlockedBanner();
 }
 
-function acknowledgeAlarm(stepId: number): void {
+/** @param {number} stepId */
+function acknowledgeAlarm(stepId) {
     const alarm = activeAlarms.get(stepId);
     if (!alarm) return; // already acknowledged
     stopAlarm(stepId);
@@ -2785,7 +3433,8 @@ if (typeof document !== 'undefined') {
     });
 }
 
-function createSoundTestPanel(): HTMLElement {
+/** @returns {HTMLElement} */
+function createSoundTestPanel() {
     const step = timerStep('🔔 Sound Test', 1);
     const panel = renderStep(step, () => panel.replaceWith(createSoundTestPanel()));
     panel.classList.add('sound-check-btn');
@@ -2796,7 +3445,8 @@ function createSoundTestPanel(): HTMLElement {
 // URL ROUTING
 // ============================================================
 
-function getRecipeIdFromURL(): string | null {
+/** @returns {string | null} */
+function getRecipeIdFromURL() {
     const params = new URLSearchParams(window.location.search);
     return params.get('recipe');
 }
@@ -2805,7 +3455,7 @@ function getRecipeIdFromURL(): string | null {
 // SCREEN: PREP
 // ============================================================
 
-function renderPrepScreen(): void {
+function renderPrepScreen() {
     const root = screen('Prep');
 
     let anyFound = false;
@@ -2839,7 +3489,7 @@ function renderPrepScreen(): void {
 // RENDER
 // ============================================================
 
-function render(): void {
+function render() {
     switch (state.screen) {
         case 'select':         return renderSelectScreen();
         case 'shopping':       return renderShoppingScreen();
@@ -2855,13 +3505,21 @@ function render(): void {
 // SCREEN: PLAN
 // ============================================================
 
-function toMinutes(hhmm: string): number {
+/**
+ * @param {string} hhmm
+ * @returns {number}
+ */
+function toMinutes(hhmm) {
     if (!isHhmm(hhmm)) return Number.NaN;
     const [h, m] = hhmm.split(':').map(Number);
     return h * 60 + m;
 }
 
-function fromMinutes(mins: number): string {
+/**
+ * @param {number} mins
+ * @returns {string}
+ */
+function fromMinutes(mins) {
     const h = Math.floor(mins / 60) % 24;
     const m = mins % 60;
     const ampm = h < 12 ? 'AM' : 'PM';
@@ -2869,26 +3527,34 @@ function fromMinutes(mins: number): string {
     return `${h12}:${String(m).padStart(2, '0')} ${ampm}`;
 }
 
-interface ScheduledItem {
-    recipe: Recipe;
-    count: number;
-    startMin: number;
-    blockType: 'home' | 'portable';
-    afterCutoff: boolean;
-}
+/**
+ * @typedef {Object} ScheduledItem
+ * @property {Recipe} recipe
+ * @property {number} count
+ * @property {number} startMin
+ * @property {'home' | 'portable'} blockType
+ * @property {boolean} afterCutoff
+ */
 
-export function schedulePlan(cfg: PlanConfig, recipes: { recipe: Recipe; count: number }[]): { scheduled: ScheduledItem[]; unscheduled: { recipe: Recipe; count: number }[] } {
+/**
+ * @param {PlanConfig} cfg
+ * @param {{ recipe: Recipe; count: number }[]} recipes
+ * @returns {{ scheduled: ScheduledItem[]; unscheduled: { recipe: Recipe; count: number }[] }}
+ */
+export function schedulePlan(cfg, recipes) {
     const cutoffParsed = toMinutes(cfg.caloriesCutoff);
     const cutoffMin = Number.isFinite(cutoffParsed) ? cutoffParsed : toMinutes(DEFAULT_PLAN_CONFIG.caloriesCutoff);
     const blocks = [...(cfg.blocks ?? [])]
         .filter(b => b.type !== 'away' && Number.isFinite(toMinutes(b.start)) && Number.isFinite(toMinutes(b.end)))
         .sort((a, b) => toMinutes(a.start) - toMinutes(b.start));
 
-    const cursors = new Map<string, number>();
+    const cursors = /** @type {Map<string, number>} */ (new Map());
     blocks.forEach(b => cursors.set(b.id, toMinutes(b.start)));
 
-    const scheduled: ScheduledItem[] = [];
-    const unscheduled: { recipe: Recipe; count: number }[] = [];
+    /** @type {ScheduledItem[]} */
+    const scheduled = [];
+    /** @type {{ recipe: Recipe; count: number }[]} */
+    const unscheduled = [];
 
     for (const { recipe, count } of recipes) {
         const dur = recipe.planMinutes ?? 0;
@@ -2898,7 +3564,7 @@ export function schedulePlan(cfg: PlanConfig, recipes: { recipe: Recipe; count: 
         let placed = false;
 
         for (const block of compatible) {
-            const cursor = cursors.get(block.id)!;
+            const cursor = /** @type {number} */ (cursors.get(block.id));
             const blockEnd = toMinutes(block.end);
             const startMin = cursor;
             if (startMin + dur <= blockEnd) {
@@ -2916,7 +3582,7 @@ export function schedulePlan(cfg: PlanConfig, recipes: { recipe: Recipe; count: 
     return { scheduled, unscheduled };
 }
 
-function renderPlanScreen(): void {
+function renderPlanScreen() {
     const root = screen('Day Planner');
     let cfg = loadPlanConfig();
 
@@ -2926,11 +3592,19 @@ function renderPlanScreen(): void {
     function renderBlocks() {
         clear(blockList);
         cfg.blocks.forEach((block, idx) => {
-            // A visually hidden label for a block's input.
-            const hiddenLabel = (forId: string, text: string) => h('label', { htmlFor: forId, class: 'visually-hidden', text });
+            /**
+             * A visually hidden label for a block's input.
+             * @param {string} forId
+             * @param {string} text
+             */
+            const hiddenLabel = (forId, text) => h('label', { htmlFor: forId, class: 'visually-hidden', text });
 
-            // A labelled time input bound to this block's start or end.
-            const timeField = (edge: 'start' | 'end'): [HTMLLabelElement, HTMLInputElement] => {
+            /**
+             * A labelled time input bound to this block's start or end.
+             * @param {'start' | 'end'} edge
+             * @returns {[HTMLLabelElement, HTMLInputElement]}
+             */
+            const timeField = (edge) => {
                 const input = h('input', {
                     type: 'time', id: `block-${idx}-${edge}`, value: block[edge], class: 'plan-time-input', required: true,
                     on: {
@@ -2945,7 +3619,7 @@ function renderPlanScreen(): void {
 
             const typeSelect = h('select', {
                 class: 'plan-type-select', id: `block-${idx}-type`,
-                on: { change: () => { cfg.blocks[idx].type = typeSelect.value as PlanBlock['type']; savePlanConfig(cfg); scheduleAndRender(); } },
+                on: { change: () => { cfg.blocks[idx].type = /** @type {PlanBlock['type']} */ (typeSelect.value); savePlanConfig(cfg); scheduleAndRender(); } },
             }, ...[['home', '🏠 Home'], ['portable', '🎒 Portable'], ['away', '🏢 Away']].map(([value, text]) =>
                 h('option', { value, text, selected: value === block.type })));
 
@@ -3016,7 +3690,8 @@ function renderPlanScreen(): void {
         const { scheduled, unscheduled } = schedulePlan(cfg, deduped);
 
         scheduled.forEach(({ recipe, count, startMin, afterCutoff }) => {
-            const meta: string[] = [];
+            /** @type {string[]} */
+            const meta = [];
             if (recipe.planMinutes) meta.push(`${recipe.planMinutes} min`);
             if (recipe.portable) meta.push('portable');
             if (afterCutoff) meta.push('⚠ after cutoff');
@@ -3044,7 +3719,7 @@ function renderPlanScreen(): void {
                 const days = recipe.perishableDays;
                 scheduleOut.appendChild(h('div', {
                     class: 'plan-batch-row',
-                    text: `${recipe.name} - ${recipe.prepMinutes!} min cook time` + (days ? ` · keeps ${days} day${days > 1 ? 's' : ''} in fridge` : ''),
+                    text: `${recipe.name} - ${recipe.prepMinutes} min cook time` + (days ? ` · keeps ${days} day${days > 1 ? 's' : ''} in fridge` : ''),
                 }));
             });
         }
@@ -3059,18 +3734,19 @@ function renderPlanScreen(): void {
 // BUILD INFO
 // ============================================================
 
-// Replaced with the real compile timestamp by scripts/stamp-build-time.js, right after
-// `tsc` emits dist/file.js. Left as-is (and reported as "dev build")
-// when the stamp step hasn't run.
-const BUILD_TIME = '__BUILD_TIME__';
-
-function formatBuildTime(): string {
-    const date = new Date(BUILD_TIME);
+/**
+ * When the site was last published. GitHub Pages serves every file with a Last-Modified
+ * header set at deploy time, which the browser exposes as document.lastModified.
+ * @returns {string}
+ */
+function formatBuildTime() {
+    const date = new Date(document.lastModified);
     if (isNaN(date.getTime())) return 'dev build';
     return date.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
 }
 
-function appendBuildFooter(root: HTMLElement): void {
+/** @param {HTMLElement} root */
+function appendBuildFooter(root) {
     root.appendChild(h('div', { class: 'build-footer', text: `Last compiled: ${formatBuildTime()}` }));
 }
 
@@ -3078,7 +3754,7 @@ function appendBuildFooter(root: HTMLElement): void {
 // BOOTSTRAP
 // ============================================================
 
-function bootstrap(): void {
+function bootstrap() {
     document.body.innerHTML = `<div id="app"></div><div id="status-live" class="visually-hidden" role="status" aria-live="polite"></div>`;
     document.title = SCREEN_TITLES[state.screen];
     document.addEventListener('click', () => unlockAudioContext(), { once: true });
@@ -3114,7 +3790,7 @@ export const stores = {
 // INGREDIENT FACTORY
 // ============================================================
 
-type IngredientDefaults = Partial<Omit<Ingredient, typeof __ingredient>>;
+/** @typedef {Partial<IngredientFields>} IngredientDefaults */
 
 // Every ingredient must resolve to real nutrition data - there is no "missing" path. That data
 // can live in exactly one of two places, and the two overloads below are what enforce it at
@@ -3125,19 +3801,28 @@ type IngredientDefaults = Partial<Omit<Ingredient, typeof __ingredient>>;
 //      butter: Organic Unsweetened / Creamy / Crunchy really do have different macros, so no
 //      single generic number would be honest for whichever variant isn't selected).
 // Passing neither is a compile error, not a silently-missing-data ingredient.
-function ingredientFactory(
-    name: string,
-    defaults: IngredientDefaults & { nutrition: NutritionLabel }
-): (quantity: number, unit: Unit) => Ingredient;
-function ingredientFactory(
-    name: string,
-    defaults: IngredientDefaults & { products: (Product & { nutrition: NutritionLabel })[] }
-): (quantity: number, unit: Unit) => Ingredient;
-function ingredientFactory(name: string, defaults: IngredientDefaults = {}) {
-    return (quantity: number, unit: Unit): Ingredient => {
-        const ing: any = { name, quantity, unit, ...defaults };
-        ing.rename = (newName: string) => { ing.name = newName; };
-        return ing as unknown as Ingredient;
+/**
+ * @overload
+ * @param {string} name
+ * @param {IngredientDefaults & { nutrition: NutritionLabel }} defaults
+ * @returns {(quantity: number, unit: Unit) => Ingredient}
+ */
+/**
+ * @overload
+ * @param {string} name
+ * @param {IngredientDefaults & { products: (Product & { nutrition: NutritionLabel })[] }} defaults
+ * @returns {(quantity: number, unit: Unit) => Ingredient}
+ */
+/**
+ * @param {string} name
+ * @param {IngredientDefaults} [defaults]
+ */
+function ingredientFactory(name, defaults = {}) {
+    return /** @param {number} quantity @param {Unit} unit @returns {Ingredient} */ (quantity, unit) => {
+        /** @type {any} */
+        const ing = { name, quantity, unit, ...defaults };
+        ing.rename = /** @param {string} newName */ (newName) => { ing.name = newName; };
+        return /** @type {Ingredient} */ (/** @type {unknown} */ (ing));
     };
 }
 
@@ -4333,8 +5018,10 @@ registerGroup('Breakfast', [
         const SPINACH        = i.spinach(0.25, u.cup);
         const CELERY         = i.celery(1, u.unit);
         const BANANA         = i.banana(1, u.unit);
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         const bagPrep = bag.add([
             MACADAMIA_NUT,
@@ -4375,8 +5062,10 @@ registerGroup('Breakfast', [
         const SPINACH        = i.spinach(0.5, u.cup);
         const CELERY         = i.celery(2, u.unit);
         const BANANA         = i.banana(2, u.unit);
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         const bagPrep = bag.add([
             MACADAMIA_NUT,
@@ -4410,8 +5099,10 @@ registerGroup('Breakfast', [
         const kettle = e.kettle();
         const OATMEAL = i.instantOatmeal(2, u.unit);
         const WATER   = i.water(8, u.fluidOunce);
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         s(bowl.add([OATMEAL]));
         s(kettle.add([WATER]));
@@ -4425,8 +5116,10 @@ registerGroup('Breakfast', [
     withPlan(createRecipe('scrambled-eggs', 'Scrambled Eggs (NuWave, Stainless Steel)', (() => {
         const bowl = e.bowl();
         const pan  = e.nuwavePan();
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         s(pan.preheat(300));
         s(instruction('Flick a wet finger at the pan to test - the droplet should bead and skitter rather than vanish instantly. If it violently sprays everywhere, the pan is too hot - lower the temperature briefly', { equipment: [pan.name] }));
@@ -4457,8 +5150,10 @@ registerGroup('Breakfast', [
     })()), { planMinutes: 6, portable: false }),
     withPlan(createRecipe('iced-coffee', 'Iced Coffee', (() => {
         const glass = e.glass();
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         const ICE = i.iceCube(3, u.unit);
         const CREAMER = i.coffeeCreamer(3, u.tbsp);
@@ -4484,8 +5179,10 @@ withPlan(createRecipe(
         const binderBowl   = e.bowl('binder bowl');
         const foodProcessor = e.bulletMixer();
         const pan          = e.pan('8×8-inch pan');
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         const OATS       = i.rolledOats(180, u.gram);
         const PEANUT_BUTTER = i.peanutButter(128, u.gram);
@@ -4602,8 +5299,10 @@ registerRecipe(createRecipe(
         const bowl         = e.bowl();
         const cuttingBoard = e.cuttingBoard();
         const ONION = i.whiteOnion(2, u.tbsp);
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         s(instruction(`Mince ${formatIngredient(ONION)}`, { ingredients: [ONION], equipment: [cuttingBoard.name] }));
         s(bowl.add([
@@ -4630,8 +5329,10 @@ registerRecipe(withPlan(createRecipe(
         const mixer        = e.bulletMixer();
         const colander     = e.colander();
         const jar          = e.bowl('jar');
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         const CHILE_ARBOL  = i.chileDeArbol(6, u.unit);
         const CHILE_PEQUIN = i.chilePequin(3, u.unit);
@@ -4683,8 +5384,10 @@ registerGroup('Dinner', [
     withPlan(createRecipe('tingly-chili-momofuku-noodles', 'Tingly Chili Momofuku Noodles', (() => {
         const pot     = e.pot();
         const colander = e.colander();
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         const WATER  = i.water(26, u.ounce);
         const NOODLES = i.tinglyChiliMomofukuNoodles(1, u.unit);
@@ -4710,8 +5413,10 @@ registerGroup('Dinner', [
         const cuttingBoard = e.cuttingBoard();
         const PANKO        = i.pankoBreadCrumbs(3, u.cup);
         const MUSHROOMS    = i.kingOysterMushroom(4, u.unit);
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         s(oven.preheat(450));
         s(pankoPan.add([PANKO]));
@@ -4749,8 +5454,10 @@ registerGroup('Dinner', [
         const CARROTS        = i.carrot(1, u.pound);
         const BELLA_MUSHROOMS = i.babyBellaMushroom(8, u.ounce);
         const YELLOW_ONION    = i.yellowOnion(1, u.unit);
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         s(oven.preheat(450));
         s(instruction('Place sheet pan in oven while it preheats', { equipment: ['oven', 'sheet pan'] }));
@@ -4779,8 +5486,10 @@ registerGroup('Dinner', [
     createRecipe('pan-seared-chicken-sausage', 'Pan-Seared Chicken Sausage (Sear + Cover to Finish)', (() => {
         const pan = e.pan();
         const SAUSAGES = i.chickenSausage(5, u.unit);
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         s(pan.preheat(350));
         s(pan.add([
@@ -4802,8 +5511,10 @@ registerGroup('Dinner', [
     createRecipe('abbot-pea-protein-spaghetti', 'Abbot Pea Protein Spaghetti', (() => {
         const pot = e.pot();
         const pan = e.pan();
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         s(pan.add([i.avocadoOil(1, u.spray), i.abbotPeaItalianSausage(1, u.bag)]));
         s(pan.cook('Cook sausage', time.minutes(5), 5));
@@ -4824,8 +5535,10 @@ registerGroup('Dinner', [
     })()),
 
     withPlan(createRecipe('asian-dense-bean-salad-kit', 'Asian Dense Bean Salad (Kit Version)', (() => {
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
         const bowl = e.bowl('salad bowl');
         const microwave = e.microwave();
 
@@ -4851,8 +5564,10 @@ registerGroup('Dinner', [
         const CABBAGE   = i.cabbage(2, u.cup);
         const CHICKPEAS = i.chickpeas(1, u.cup);
         const CANNELLINI = i.cannelliniBean(1, u.cup);
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         s(prep('Soak chickpeas and cannellini beans overnight', { ingredients: [CHICKPEAS, CANNELLINI] }));
         s(prep('Peel and shred carrots', { ingredients: [CARROTS] }));
@@ -4898,8 +5613,10 @@ registerGroup('Dinner', [
         const CHICKPEAS    = i.chickpeas(1.125, u.cup);
         const CANNELLINI   = i.cannelliniBean(1.125, u.cup);
         const EDAMAME      = i.edamame(1, u.cup);
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
         const microwave = e.microwave();
 
         s(Timer.set(80, 's', 'If eating right away and edamame is frozen: microwave edamame', { equipment: [microwave.name], ingredients: [EDAMAME] }));
@@ -4931,8 +5648,10 @@ registerGroup('Dinner', [
         const CHICKPEAS    = i.chickpeas(4, u.cup);
         const CANNELLINI   = i.cannelliniBean(4, u.cup);
         const EDAMAME      = i.edamame(4, u.cup);
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
         const microwave = e.microwave();
 
         s(Timer.set(80, 's', 'If eating right away and edamame is frozen: microwave edamame', { equipment: [microwave.name], ingredients: [EDAMAME] }));
@@ -4962,8 +5681,10 @@ registerGroup('Dinner', [
         const pan = e.nuwavePan();
         const seasoningBowl = e.bowl('seasoning bowl');
         const THIGHS = i.chickenThigh(2, u.unit);
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         s(seasoningBowl.add([
             i.seaSalt(0.5, u.tsp),
@@ -5001,8 +5722,10 @@ registerGroup('Dinner', [
         const ORANGE     = i.orange(1, u.unit);
         const GRAPEFRUIT = i.grapefruit(1, u.unit);
 
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         s(prep('Trim fennel stalks and slice bulbs thinly, reserving the fronds', {
             equipment: [board.name, knife.name], ingredients: [FENNEL],
@@ -5050,8 +5773,10 @@ registerGroup('Dinner', [
         const BUN    = i.hamburgerBun(2, u.unit);
         const MUSTARD = i.mustard(1, u.tbsp);
         const PICKLE = i.pickle(2, u.unit);
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         s(pan.preheat(320));
         s(...pan.spray(OIL, { heatUp: true }));
@@ -5082,8 +5807,10 @@ registerGroup('Dinner', [
     })(), 'Dinner', 18),
 
     withPlan(createRecipe('quinoa-falafel', 'Quinoa Falafel', (() => {
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
         const bowl      = e.bowl('mixing bowl');
         const pasteBowl = e.bowl('small bowl');
         const colander  = e.colander();
@@ -5144,8 +5871,10 @@ registerGroup('Dinner', [
         (() => {
             const microwave = e.microwave();
             const BOWL = i.blueZonesBasilPestoVeggieBowl(1, u.unit);
-            const steps: Step[] = [];
-            const s = (...newSteps: Step[]) => steps.push(...newSteps);
+            /** @type {Step[]} */
+            const steps = [];
+            /** @param {...Step} newSteps */
+            const s = (...newSteps) => steps.push(...newSteps);
 
             s(instruction(`Peel back the film and microwave ${formatIngredient(BOWL)} without it`, {
                 equipment: [microwave.name, 'bowl'],
@@ -5163,8 +5892,10 @@ registerGroup('Dinner', [
     createRecipe('nuwave-pork-shoulder', 'Pork Shoulder (NuWave, 2 lb)', (() => {
         const pan = e.nuwavePan();
         const PORK = i.porkShoulder(2, u.pound);
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         s(info('For a 2 lb pork shoulder. Set the NuWave to 375°F, brown the pork uncovered, then cook it covered at 225°F for 2–3 hours until it hits 195–205°F inside.'));
 
@@ -5205,8 +5936,10 @@ registerGroup('Dinner', [
         'Cranberry Sauce (Serves 24, about 9 cups)',
         (() => {
             const pot = e.pot('6-quart pot');
-            const steps: Step[] = [];
-            const s = (...newSteps: Step[]) => steps.push(...newSteps);
+            /** @type {Step[]} */
+            const steps = [];
+            /** @param {...Step} newSteps */
+            const s = (...newSteps) => steps.push(...newSteps);
 
             const CRANBERRIES = i.cranberry(4, u.bag);
             const SUGAR       = i.sugar(4, u.cup);
@@ -5272,8 +6005,10 @@ registerGroup('Blueprint', [
 
 registerGroup('Lentils', [
     withPlan(createRecipe('ing-black-lentils-induction-195g', 'Black Lentils (195g ×3) (Induction Stovetop)', (() => {
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
         const LENTILS = i.blackLentils(195, u.gram);
         const WATER = i.water(24, u.fluidOunce);
         const pot = e.pot();
@@ -5290,8 +6025,10 @@ registerGroup('Lentils', [
         return steps;
     })()), { planMinutes: 3, portable: true, prepMinutes: 24, perishableDays: 3, sortOrder: 0 }),
     withPlan(createRecipe('ing-black-lentils-induction-130g', 'Black Lentils (130g ×2) (Induction Stovetop)', (() => {
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
         const LENTILS = i.blackLentils(130, u.gram);
         const WATER = i.water(24, u.fluidOunce);
         const pot = e.pot();
@@ -5309,8 +6046,10 @@ registerGroup('Lentils', [
         return steps;
     })()), { planMinutes: 3, portable: true, prepMinutes: 24, perishableDays: 3, sortOrder: 1, hidden: true }),
     withPlan(createRecipe('ing-black-lentils-induction', 'Black Lentils (65g ×1) (Induction Stovetop)', (() => {
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
         const LENTILS = i.blackLentils(65, u.gram);
         const WATER = i.water(15, u.fluidOunce);
         const pot = e.pot();
@@ -5327,8 +6066,10 @@ registerGroup('Lentils', [
         return steps;
     })()), { planMinutes: 3, portable: true, prepMinutes: 21, perishableDays: 3, sortOrder: 2 }),
     withPlan(createRecipe('ing-black-lentils-gas', 'Black Lentils (65g ×1) (Gas Stovetop)', (() => {
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
         const LENTILS = i.blackLentils(65, u.gram);
         const WATER = i.water(15, u.fluidOunce);
         const pot = e.pot();
@@ -5362,8 +6103,10 @@ registerRecipe(createRecipe(
     'freeze-bananas',
     'Freeze Bananas',
     (() => {
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
         const BANANA = i.banana(4, u.unit);
         const bag    = e.siliconeBag();
 
@@ -5418,8 +6161,10 @@ registerRecipe(withPlan(createRecipe(
         const PEPPER_OZ        = i.blackPepper(1, u.ounce);
         const MUSHROOM         = i.kingOysterMushroom(1, u.unit);
 
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         s(info('Test recipe - exercises every step type, equipment method, and nutrition/cost edge case. Tap 3× rapidly on any timer/gate to skip it instantly.'));
         s(info('Info steps can link to another recipe.', { linkRecipeId: 'blueprint-smoothie' }));
@@ -5478,7 +6223,8 @@ registerRecipe(withPlan(createRecipe(
 // BUNDLES
 // ============================================================
 
-const DAILY_BLUEPRINT_RECIPE_IDS: string[] = [
+/** @type {string[]} */
+const DAILY_BLUEPRINT_RECIPE_IDS = [
     'blueprint-smoothie',
     'blueprint-longevity-drink',
     'ing-black-lentils-induction',
