@@ -37,7 +37,7 @@
         <div class="selected-foods" id="selected-foods"></div>
         <button type="button" id="update-nutrition" data-testid="update-nutrition">Update Nutrition</button>
         <div class="table-wrap" tabindex="0" role="region" aria-labelledby="nutrition-caption">
-            <table class="stack" id="nutrition-table" hidden>
+            <table id="nutrition-table" hidden>
                 <caption id="nutrition-caption">Intake compared with FDA daily limits</caption>
                 <thead>
                     <tr>
@@ -245,10 +245,8 @@
                 name.scope = 'row';
                 name.textContent = nutrient.replaceAll('_', ' ');
                 const intake = document.createElement('td');
-                intake.dataset.label = 'Your intake';
                 intake.textContent = `${totals[nutrient].toFixed(1)} ${fdaLimits[nutrient].unit}`;
                 const limit = document.createElement('td');
-                limit.dataset.label = 'FDA daily limit';
                 limit.textContent = `${fdaLimits[nutrient].value} ${fdaLimits[nutrient].unit}`;
                 row.append(name, intake, limit);
                 body.append(row);

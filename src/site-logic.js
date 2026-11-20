@@ -158,3 +158,14 @@ export function registerAgentTools(tools) {
     if (typeof window !== 'undefined') window.addEventListener('pagehide', stop, { once: true });
     return stop;
 }
+
+// Announces a checklist row change ("Kefir marked tried") in a live region. The row
+// highlight itself is CSS (tr:has(input:checked) in site.css).
+export function bindRowCheckboxes(status, checkedText, uncheckedText) {
+    for (const box of document.querySelectorAll('tbody input[type="checkbox"]')) {
+        box.addEventListener('change', () => {
+            const name = box.closest('tr').cells[0].textContent;
+            status.textContent = `${name} ${box.checked ? checkedText : uncheckedText}`;
+        });
+    }
+}
