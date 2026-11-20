@@ -446,16 +446,17 @@ export function timerStep(
     return createStep({ type: 'timer', text: label, durationSeconds, ...opts });
 }
 
+const toSeconds = (amount: number, unit: 's' | 'm' | 'h'): number =>
+    ({ s: time.seconds, m: time.minutes, h: time.hours })[unit](amount);
+
 export const Timer = {
     set: (amount: number, unit: 's' | 'm' | 'h', label: string, opts: Partial<Step> = {}): Step => {
-        const seconds = unit === 's' ? amount : unit === 'm' ? amount * 60 : amount * 3600;
-        return createStep({ type: 'timer', text: label, durationSeconds: seconds, ...opts });
+        return createStep({ type: 'timer', text: label, durationSeconds: toSeconds(amount, unit), ...opts });
     },
     // Asks `question` immediately. "No" cooks for `retryAmount retryUnit` (with an alarm at
     // the end) and re-asks; "Yes" completes the step. Loops until answered "Yes".
     gate: (question: string, retryAmount: number, retryUnit: 's' | 'm' | 'h', opts: Partial<Step> = {}): Step => {
-        const seconds = retryUnit === 's' ? retryAmount : retryUnit === 'm' ? retryAmount * 60 : retryAmount * 3600;
-        return createStep({ type: 'gate', text: question, durationSeconds: seconds, ...opts });
+        return createStep({ type: 'gate', text: question, durationSeconds: toSeconds(retryAmount, retryUnit), ...opts });
     },
 };
 
@@ -2326,6 +2327,13 @@ let adhocUnitName   = '';
 // somewhere they didn't ask to go.
 let adhocReturnScreen: Screen = 'select';
 
+function resetAdhoc(): void {
+    adhocSearchQuery = '';
+    adhocSelectedKey = null;
+    adhocQuantity    = 1;
+    adhocUnitName    = '';
+}
+
 function pickDefaultUnit(ing: Ingredient): Unit {
     const productUnits = ing.products?.[0]?.nutrition && Object.keys(ing.products[0].nutrition);
     const ownUnits     = ing.nutrition && Object.keys(ing.nutrition);
@@ -2388,10 +2396,7 @@ function renderAddIngredientScreen(): void {
     root.appendChild(detail);
 
     const backBtn = createButton('← Back', () => {
-        adhocSearchQuery = '';
-        adhocSelectedKey = null;
-        adhocQuantity    = 1;
-        adhocUnitName    = '';
+        resetAdhoc();
         navigateTo(adhocReturnScreen);
     });
     backBtn.className = 'start-over-btn';
@@ -2478,10 +2483,7 @@ function renderAdhocDetail(): void {
         const recipe   = createAdhocRecipe(fresh);
         registerRecipe(recipe);
         state.selectedRecipeIds.push(recipe.id);
-        adhocSearchQuery = '';
-        adhocSelectedKey = null;
-        adhocQuantity    = 1;
-        adhocUnitName    = '';
+        resetAdhoc();
         navigateTo(adhocReturnScreen);
     });
     confirmBtn.className = 'adhoc-confirm';
@@ -3292,7 +3294,7 @@ function renderPrepScreen(): void {
     if (!anyFound) {
         const empty = document.createElement('p');
         empty.textContent = 'No prep steps in the selected recipes.';
-        empty.style.color = '#888';
+        empty.className = 'muted-note';
         root.appendChild(empty);
     }
 
@@ -3410,33 +3412,25 @@ function renderPlanScreen(): void {
             const row = document.createElement('div');
             row.className = 'plan-block-row';
 
-            const startIn = document.createElement('input');
-            startIn.type = 'time'; startIn.id = `block-${idx}-start`; startIn.value = block.start; startIn.className = 'plan-time-input';
-            startIn.required = true;
-            const startLabel = document.createElement('label');
-            startLabel.htmlFor = startIn.id;
-            startLabel.className = 'visually-hidden';
-            startLabel.textContent = `Block ${idx + 1} start`;
-            startIn.addEventListener('change', () => {
-                if (!isHhmm(startIn.value)) { startIn.value = cfg.blocks[idx].start; return; }
-                cfg.blocks[idx].start = startIn.value; savePlanConfig(cfg); scheduleAndRender();
-            });
+            // A labelled time input bound to this block's start or end.
+            const timeField = (edge: 'start' | 'end'): [HTMLLabelElement, HTMLInputElement] => {
+                const input = document.createElement('input');
+                input.type = 'time'; input.id = `block-${idx}-${edge}`; input.value = block[edge]; input.className = 'plan-time-input';
+                input.required = true;
+                const label = document.createElement('label');
+                label.htmlFor = input.id;
+                label.className = 'visually-hidden';
+                label.textContent = `Block ${idx + 1} ${edge}`;
+                input.addEventListener('change', () => {
+                    if (!isHhmm(input.value)) { input.value = cfg.blocks[idx][edge]; return; }
+                    cfg.blocks[idx][edge] = input.value; savePlanConfig(cfg); scheduleAndRender();
+                });
+                return [label, input];
+            };
 
             const sep = document.createElement('span');
             sep.textContent = '→'; sep.className = 'plan-block-sep';
             sep.setAttribute('aria-hidden', 'true');
-
-            const endIn = document.createElement('input');
-            endIn.type = 'time'; endIn.id = `block-${idx}-end`; endIn.value = block.end; endIn.className = 'plan-time-input';
-            endIn.required = true;
-            const endLabel = document.createElement('label');
-            endLabel.htmlFor = endIn.id;
-            endLabel.className = 'visually-hidden';
-            endLabel.textContent = `Block ${idx + 1} end`;
-            endIn.addEventListener('change', () => {
-                if (!isHhmm(endIn.value)) { endIn.value = cfg.blocks[idx].end; return; }
-                cfg.blocks[idx].end = endIn.value; savePlanConfig(cfg); scheduleAndRender();
-            });
 
             const typeSelect = document.createElement('select');
             typeSelect.className = 'plan-type-select';
@@ -3459,7 +3453,7 @@ function renderPlanScreen(): void {
             hiddenText(delBtn, `Remove block ${idx + 1}`);
             delBtn.addEventListener('click', () => { cfg.blocks.splice(idx, 1); savePlanConfig(cfg); renderBlocks(); scheduleAndRender(); });
 
-            row.append(startLabel, startIn, sep, endLabel, endIn, typeLabel, typeSelect, delBtn);
+            row.append(...timeField('start'), sep, ...timeField('end'), typeLabel, typeSelect, delBtn);
             blockList.appendChild(row);
         });
 
@@ -3497,8 +3491,7 @@ function renderPlanScreen(): void {
 
     // ── Schedule output ───────────────────────────────────────
     const scheduleTitle = document.createElement('div');
-    scheduleTitle.className = 'plan-section-title';
-    scheduleTitle.style.marginTop = '24px';
+    scheduleTitle.className = 'plan-section-title plan-section-spaced';
     root.appendChild(scheduleTitle);
 
     const scheduleOut = document.createElement('div');
@@ -3506,7 +3499,6 @@ function renderPlanScreen(): void {
 
     function scheduleAndRender() {
         clear(scheduleOut);
-        const selectedRecipes = getSelectedRecipes().filter(r => !r.adhoc);
         const deduped = [...countBy(state.selectedRecipeIds)].flatMap(([id, count]) => {
             const recipe = state.recipes.get(id);
             return recipe && !recipe.adhoc ? [{ recipe, count }] : [];
@@ -3515,7 +3507,7 @@ function renderPlanScreen(): void {
         if (deduped.length === 0) {
             const empty = document.createElement('p');
             empty.textContent = 'No recipes selected.';
-            empty.style.color = '#888';
+            empty.className = 'muted-note';
             scheduleOut.appendChild(empty);
             return;
         }
@@ -3567,8 +3559,7 @@ function renderPlanScreen(): void {
         const batchPrep = deduped.filter(x => x.recipe.prepMinutes);
         if (batchPrep.length > 0) {
             const batchTitle = document.createElement('div');
-            batchTitle.className = 'plan-section-title';
-            batchTitle.style.marginTop = '24px';
+            batchTitle.className = 'plan-section-title plan-section-spaced';
             batchTitle.textContent = '🥘 Batch Prep (cook ahead)';
             scheduleOut.appendChild(batchTitle);
 
@@ -3973,6 +3964,8 @@ details[open] > summary :is(.info-step-caret, .prep-info-caret)::before { conten
 .start-over-btn { margin-top: 32px; font-size: 20px; padding: 16px 32px; border-radius: 12px; border: 2px solid #444; background: #222; color: #f0f0f0; cursor: pointer; }
 
 .empty { color: #666; font-style: italic; }
+.muted-note { color: #888; }
+.plan-section-spaced { margin-top: 24px; }
 
 .recipe-title-row { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
 .recipe-title-row h2 { margin: 0; flex: 1; }
