@@ -1234,19 +1234,35 @@ function getElement<T extends HTMLElement>(id: string): T {
 
 function clear(el: HTMLElement): void { el.innerHTML = ''; }
 
-function createButton(label: string, onClick: () => void): HTMLButtonElement {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.textContent = label;
-    btn.addEventListener('click', onClick);
-    return btn;
+type Child = Node | string | null | undefined | false;
+interface Props {
+    class?: string;
+    text?: string;
+    testid?: string;
+    attrs?: Record<string, string>;
+    on?: { [K in keyof HTMLElementEventMap]?: (ev: HTMLElementEventMap[K]) => void };
+    [prop: string]: unknown;  // any other DOM property: id, type, value, htmlFor, href, min...
 }
 
-function hiddenText(parent: HTMLElement, text: string): void {
-    const span = document.createElement('span');
-    span.className = 'visually-hidden';
-    span.textContent = ` ${text}`;
-    parent.appendChild(span);
+// Build an element in one call: h('span', { class: 'badge', text: '×2' }, child, ...).
+// Buttons default to type="button".
+function h<K extends keyof HTMLElementTagNameMap>(tag: K, props: Props = {}, ...children: Child[]): HTMLElementTagNameMap[K] {
+    const el = document.createElement(tag);
+    const { class: className, text, testid, attrs, on, ...rest } = props;
+    if (el instanceof HTMLButtonElement) el.type = 'button';
+    Object.assign(el, rest);
+    if (className) el.className = className;
+    if (text !== undefined) el.textContent = text;
+    if (testid) el.setAttribute('data-testid', testid);
+    for (const [name, value] of Object.entries(attrs ?? {})) el.setAttribute(name, value);
+    for (const [type, listener] of Object.entries(on ?? {})) el.addEventListener(type, listener as EventListener);
+    el.append(...children.filter((child): child is Node | string => child !== null && child !== undefined && child !== false));
+    return el;
+}
+
+// Extra words for screen readers only, e.g. which recipe a "−" button belongs to.
+function srOnly(text: string): HTMLSpanElement {
+    return h('span', { class: 'visually-hidden', text: ` ${text}` });
 }
 
 function announce(message: string): void {
@@ -1256,10 +1272,31 @@ function announce(message: string): void {
     window.setTimeout(() => { region.textContent = message; }, 50);
 }
 
-function createPanel(): HTMLDivElement {
-    const panel = document.createElement('div');
-    panel.className = 'panel';
-    return panel;
+// Clear #app and give the screen its heading.
+function screen(title: string): HTMLDivElement {
+    const root = getElement<HTMLDivElement>('app');
+    clear(root);
+    root.appendChild(h('h1', { text: title }));
+    return root;
+}
+
+function searchField(id: string, label: string, placeholder: string, value: string, onInput: (value: string) => void): [HTMLLabelElement, HTMLInputElement] {
+    return [
+        h('label', { htmlFor: id, class: 'search-label', text: label }),
+        h('input', {
+            id, type: 'search', placeholder, value, class: 'search-input', autocomplete: 'off', testid: id,
+            on: { input: (ev) => onInput((ev.target as HTMLInputElement).value) },
+        }),
+    ];
+}
+
+function backButton(label: string, onClick: () => void): HTMLButtonElement {
+    return h('button', { class: 'start-over-btn', text: label, on: { click: onClick } });
+}
+
+function removeServing(recipeId: string): void {
+    const idx = state.selectedRecipeIds.lastIndexOf(recipeId);
+    if (idx !== -1) state.selectedRecipeIds.splice(idx, 1);
 }
 
 // ============================================================
@@ -1274,12 +1311,6 @@ function getRecipeURL(recipeId: string): string {
 function createCopyButton(recipeId: string): HTMLButtonElement {
     const recipeName = state.recipes.get(recipeId)?.name ?? recipeId;
     const restingLabel = `Copy link to ${recipeName}`;
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'copy-link-btn';
-    btn.textContent = 'Copy';
-    btn.setAttribute('aria-label', restingLabel);
-    btn.setAttribute('data-testid', `copy-${recipeId}`);
     // Show the result for 1.5s, then go back to "Copy".
     const flash = (text: string, label: string): void => {
         btn.textContent = text;
@@ -1290,13 +1321,18 @@ function createCopyButton(recipeId: string): HTMLButtonElement {
             btn.setAttribute('aria-label', restingLabel);
         }, 1500);
     };
-    btn.addEventListener('click', (ev) => {
-        ev.stopPropagation();
-        // Wrapped so a missing Clipboard API (plain-http LAN address) also reads "Copy failed".
-        Promise.resolve().then(() => navigator.clipboard.writeText(getRecipeURL(recipeId))).then(
-            () => flash('Copied', `Copied link to ${recipeName}`),
-            () => flash('Copy failed', `Copy failed for ${recipeName}`),
-        );
+    const btn = h('button', {
+        class: 'copy-link-btn', text: 'Copy', attrs: { 'aria-label': restingLabel }, testid: `copy-${recipeId}`,
+        on: {
+            click: (ev) => {
+                ev.stopPropagation();
+                // Wrapped so a missing Clipboard API (plain-http LAN address) also reads "Copy failed".
+                Promise.resolve().then(() => navigator.clipboard.writeText(getRecipeURL(recipeId))).then(
+                    () => flash('Copied', `Copied link to ${recipeName}`),
+                    () => flash('Copy failed', `Copy failed for ${recipeName}`),
+                );
+            },
+        },
     });
     return btn;
 }
@@ -1329,54 +1365,28 @@ function unlockAudioContext(): void {
 // ============================================================
 
 function renderSelectScreen(): void {
-    const root = getElement<HTMLDivElement>('app');
-    clear(root);
-
-    const heading = document.createElement('h1');
-    heading.textContent = 'Recipes';
-    root.appendChild(heading);
-
-    const search = document.createElement('search');
-    const searchLabel = document.createElement('label');
-    searchLabel.htmlFor = 'recipe-search';
-    searchLabel.className = 'search-label';
-    searchLabel.textContent = 'Search recipes';
-    const searchInput = document.createElement('input');
-    searchInput.id          = 'recipe-search';
-    searchInput.type        = 'search';
-    searchInput.placeholder = 'Recipe name';
-    searchInput.value       = state.searchQuery;
-    searchInput.className   = 'search-input';
-    searchInput.autocomplete = 'off';
-    searchInput.setAttribute('data-testid', 'recipe-search');
-    searchInput.addEventListener('input', () => {
-        state.searchQuery = searchInput.value;
+    const root = screen('Recipes');
+    root.appendChild(h('search', {}, ...searchField('recipe-search', 'Search recipes', 'Recipe name', state.searchQuery, (value) => {
+        state.searchQuery = value;
         renderRecipeList();
-    });
-    search.append(searchLabel, searchInput);
-    root.appendChild(search);
+    })));
 
-    const hasHiddenRecipes = [...state.recipes.values()].some(r => r.hidden);
-    if (hasHiddenRecipes) {
+    if ([...state.recipes.values()].some(r => r.hidden)) {
         const toggleLabel = () => state.showHidden ? 'Hide hidden recipes' : 'Show hidden recipes';
-        const toggleBtn = createButton(toggleLabel(), () => {
-            setShowHidden(!state.showHidden);
-            renderRecipeList();
-            toggleBtn.textContent = toggleLabel();
+        const toggleBtn = h('button', {
+            class: 'show-hidden-toggle', text: toggleLabel(),
+            on: {
+                click: () => {
+                    setShowHidden(!state.showHidden);
+                    renderRecipeList();
+                    toggleBtn.textContent = toggleLabel();
+                },
+            },
         });
-        toggleBtn.className = 'show-hidden-toggle';
         root.appendChild(toggleBtn);
     }
 
-    const recipeList = document.createElement('div');
-    recipeList.id = 'recipe-list';
-    root.appendChild(recipeList);
-
-    const actions = document.createElement('div');
-    actions.id        = 'actions';
-    actions.className = 'actions';
-    root.appendChild(actions);
-
+    root.append(h('div', { id: 'recipe-list' }), h('div', { id: 'actions', class: 'actions' }));
     refreshSelect();
 }
 
@@ -1387,49 +1397,33 @@ function renderRecipeList(): void {
     const recipes = getFilteredRecipes();
 
     if (recipes.length === 0) {
-        const empty = document.createElement('p');
-        empty.textContent = 'No recipes found.';
-        empty.className   = 'empty';
-        root.appendChild(empty);
+        root.appendChild(h('p', { text: 'No recipes found.', class: 'empty' }));
         appendAddIngredientButton(root);
         appendBuildFooter(root);
         return;
     }
 
     if (state.bundles.size > 0 && !state.searchQuery) {
-        const bundleHeading = document.createElement('h2');
-        bundleHeading.textContent = 'Bundles';
-        bundleHeading.className   = 'group-heading';
-        root.appendChild(bundleHeading);
-
+        root.appendChild(h('h2', { text: 'Bundles', class: 'group-heading' }));
         state.bundles.forEach((bundle) => {
-            const row = document.createElement('div');
-            row.className = 'bundle-row';
-
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className   = 'bundle-btn';
-            btn.setAttribute('data-testid', `bundle-${bundle.id}`);
-            btn.textContent = bundle.name;
-
-            const sub = document.createElement('span');
-            sub.className   = 'bundle-sub';
-            sub.textContent = [...countBy(bundle.recipeIds)]
+            const names = [...countBy(bundle.recipeIds)]
                 .map(([id, count]) => {
                     const name = state.recipes.get(id)?.name ?? id;
                     return count > 1 ? `${name} ×${count}` : name;
                 })
                 .join(' · ');
-
-            btn.appendChild(sub);
-            btn.addEventListener('click', () => {
-                for (const id of bundle.recipeIds) state.selectedRecipeIds.push(id);
-                unlockAudioContext();
-                refreshSelect();
-            });
-
-            row.appendChild(btn);
-            root.appendChild(row);
+            root.appendChild(h('div', { class: 'bundle-row' },
+                h('button', {
+                    class: 'bundle-btn', testid: `bundle-${bundle.id}`, text: bundle.name,
+                    on: {
+                        click: () => {
+                            for (const id of bundle.recipeIds) state.selectedRecipeIds.push(id);
+                            unlockAudioContext();
+                            refreshSelect();
+                        },
+                    },
+                }, h('span', { class: 'bundle-sub', text: names })),
+            ));
         });
     }
 
@@ -1441,84 +1435,54 @@ function renderRecipeList(): void {
     });
 
     groups.forEach((groupRecipes, groupName) => {
-        if (groupName) {
-            const heading = document.createElement('h2');
-            heading.textContent = groupName;
-            heading.className   = 'group-heading';
-            root.appendChild(heading);
-        }
+        if (groupName) root.appendChild(h('h2', { text: groupName, class: 'group-heading' }));
 
         groupRecipes.forEach((recipe) => {
-            const row = document.createElement('div');
-            row.className = 'recipe-row';
-
-
-            const btn     = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'recipe-btn';
-            const count   = getServings(recipe.id);
+            const count = getServings(recipe.id);
+            const btn = h('button', {
+                class: 'recipe-btn', testid: `recipe-${recipe.id}`,
+                on: {
+                    click: () => {
+                        state.selectedRecipeIds.push(recipe.id);
+                        unlockAudioContext();
+                        announce(`Added a serving of ${recipe.name}. ${getServings(recipe.id)} selected.`);
+                        refreshSelect();
+                    },
+                },
+            },
+                h('span', { text: recipe.name }),
+                recipe.hidden && h('span', { class: 'hidden-badge', text: 'hidden' }),
+                count > 1 && h('span', { class: 'count-badge', text: `×${count}` }),
+            );
             btn.classList.toggle('selected', count > 0);
 
-            const nameSpan = document.createElement('span');
-            nameSpan.textContent = recipe.name;
-            btn.appendChild(nameSpan);
-            if (recipe.hidden) {
-                const hiddenBadge = document.createElement('span');
-                hiddenBadge.className   = 'hidden-badge';
-                hiddenBadge.textContent = 'hidden';
-                btn.appendChild(hiddenBadge);
-            }
-            if (count > 1) {
-                const badge = document.createElement('span');
-                badge.className   = 'count-badge';
-                badge.textContent = `×${count}`;
-                btn.appendChild(badge);
-            }
-
-            btn.setAttribute('data-testid', `recipe-${recipe.id}`);
-            btn.addEventListener('click', () => {
-                state.selectedRecipeIds.push(recipe.id);
-                unlockAudioContext();
-                const servings = getServings(recipe.id);
-                announce(`Added a serving of ${recipe.name}. ${servings} selected.`);
-                refreshSelect();
-            });
-
-            const minusBtn = document.createElement('button');
-            minusBtn.type = 'button';
-            minusBtn.className        = 'count-minus-btn';
-            minusBtn.textContent      = '−';
-            minusBtn.setAttribute('data-testid', `remove-serving-${recipe.id}`);
-            hiddenText(minusBtn, `Remove one serving of ${recipe.name}`);
+            const minusBtn = h('button', {
+                class: 'count-minus-btn', text: '−', testid: `remove-serving-${recipe.id}`,
+                on: {
+                    click: (ev) => {
+                        ev.stopPropagation();
+                        removeServing(recipe.id);
+                        announce(`Removed a serving of ${recipe.name}. ${getServings(recipe.id)} selected.`);
+                        refreshSelect();
+                    },
+                },
+            }, srOnly(`Remove one serving of ${recipe.name}`));
             minusBtn.style.visibility = count > 0 ? 'visible' : 'hidden';
-            minusBtn.addEventListener('click', (ev) => {
-                ev.stopPropagation();
-                const idx = state.selectedRecipeIds.lastIndexOf(recipe.id);
-                if (idx !== -1) state.selectedRecipeIds.splice(idx, 1);
-                const servings = getServings(recipe.id);
-                announce(`Removed a serving of ${recipe.name}. ${servings} selected.`);
-                refreshSelect();
-            });
 
-            row.appendChild(btn);
-            row.appendChild(minusBtn);
-            if (recipe.adhoc) {
-                const removeBtn = document.createElement('button');
-                removeBtn.type = 'button';
-                removeBtn.className   = 'adhoc-remove-btn';
-                removeBtn.textContent = '×';
-                hiddenText(removeBtn, `Remove ${recipe.name}`);
-                removeBtn.addEventListener('click', (ev) => {
-                    ev.stopPropagation();
-                    state.selectedRecipeIds = state.selectedRecipeIds.filter(id => id !== recipe.id);
-                    state.recipes.delete(recipe.id);
-                    refreshSelect();
-                });
-                row.appendChild(removeBtn);
-            } else {
-                row.appendChild(createCopyButton(recipe.id));
-            }
-            root.appendChild(row);
+            const lastBtn = recipe.adhoc
+                ? h('button', {
+                    class: 'adhoc-remove-btn', text: '×',
+                    on: {
+                        click: (ev) => {
+                            ev.stopPropagation();
+                            state.selectedRecipeIds = state.selectedRecipeIds.filter(id => id !== recipe.id);
+                            state.recipes.delete(recipe.id);
+                            refreshSelect();
+                        },
+                    },
+                }, srOnly(`Remove ${recipe.name}`))
+                : createCopyButton(recipe.id);
+            root.appendChild(h('div', { class: 'recipe-row' }, btn, minusBtn, lastBtn));
         });
     });
 
@@ -1532,16 +1496,17 @@ function refreshSelect(): void {
 }
 
 function appendAddIngredientButton(root: HTMLElement): void {
-    const addRow = document.createElement('div');
-    addRow.className = 'add-ingredient-row';
-    const addBtn = createButton('+ Add an ingredient', () => {
-        adhocReturnScreen = state.screen;
-        navigateTo('add-ingredient');
-    });
-    addBtn.className = 'add-ingredient-btn';
-    addBtn.setAttribute('data-testid', 'add-ingredient');
-    addRow.appendChild(addBtn);
-    root.appendChild(addRow);
+    root.appendChild(h('div', { class: 'add-ingredient-row' },
+        h('button', {
+            class: 'add-ingredient-btn', testid: 'add-ingredient', text: '+ Add an ingredient',
+            on: {
+                click: () => {
+                    adhocReturnScreen = state.screen;
+                    navigateTo('add-ingredient');
+                },
+            },
+        }),
+    ));
 }
 
 function updateActionButtons(): void {
@@ -1562,10 +1527,7 @@ function updateActionButtons(): void {
     ];
     for (const [label, screen, className, testid, show] of buttons) {
         if (!show) continue;
-        const btn = createButton(label, () => navigateTo(screen));
-        btn.className = className;
-        btn.setAttribute('data-testid', testid);
-        actions.appendChild(btn);
+        actions.appendChild(h('button', { class: className, testid, text: label, on: { click: () => navigateTo(screen) } }));
     }
 }
 
@@ -1574,21 +1536,11 @@ function updateActionButtons(): void {
 // ============================================================
 
 function renderShoppingScreen(): void {
-    const root = getElement<HTMLDivElement>('app');
-    clear(root);
-
-    const heading = document.createElement('h1');
-    heading.textContent = 'Shopping List';
-    root.appendChild(heading);
-
+    const root = screen('Shopping List');
     const inventory = loadInventory();
 
     buildShoppingList().forEach((ingredient) => {
-        const panel = createPanel();
-
-        const label = document.createElement('span');
-        label.textContent = formatIngredient(ingredient);
-        panel.appendChild(label);
+        const panel = h('div', { class: 'panel' }, h('span', { text: formatIngredient(ingredient) }));
 
         const required    = ingredient.quantity ?? 0;
         const product      = selectedProduct(ingredient);
@@ -1606,38 +1558,8 @@ function renderShoppingScreen(): void {
             return count === 1 ? unit.name : (unit.plural || pluralize(unit.name, count));
         };
 
-        const invRow = document.createElement('div');
-        invRow.className = 'inventory-row';
-
         const haveId = `have-${key.replace(/[^a-z0-9]+/gi, '-')}`;
-        const haveLabel = document.createElement('label');
-        haveLabel.className   = 'inventory-have-label';
-        haveLabel.htmlFor     = haveId;
-        haveLabel.textContent = trackByPackage ? `Have (${packageWord(2)}):` : 'Have:';
-        invRow.appendChild(haveLabel);
-
-        const haveInput = document.createElement('input');
-        haveInput.id        = haveId;
-        haveInput.type      = 'number';
-        haveInput.min       = '0';
-        haveInput.step      = 'any';
-        haveInput.className = 'inventory-have-input';
-        haveInput.placeholder = '0';
-        haveInput.autocomplete = 'off';
-        haveInput.value = inventory[key] ? String(inventory[key]) : '';
-        invRow.appendChild(haveInput);
-
-        const neededEl = document.createElement('span');
-        neededEl.className = 'inventory-needed';
-        invRow.appendChild(neededEl);
-
-        if (trackByPackage) {
-            const hint = document.createElement('span');
-            hint.className   = 'inventory-package-hint';
-            hint.textContent = `1 ${packageWord(1)} ≈ ${formatQuantityUnit(perPackage as number, ingredient.unit)}${product?.variant ? ` (${product.variant})` : ''}`;
-            invRow.appendChild(hint);
-        }
-
+        const neededEl = h('span', { class: 'inventory-needed' });
         const updateNeeded = (have: number) => {
             const haveInRecipeUnits = trackByPackage ? have * (perPackage as number) : have;
             const needed = Math.max(0, required - haveInRecipeUnits);
@@ -1656,59 +1578,66 @@ function renderShoppingScreen(): void {
         };
         updateNeeded(inventory[key] ?? 0);
 
-        haveInput.addEventListener('click', (ev) => ev.stopPropagation());
-        haveInput.addEventListener('input', () => {
-            const v = parseFloat(haveInput.value);
-            const have = isNaN(v) || v < 0 ? 0 : v;
-            if (have > 0) inventory[key] = have;
-            else delete inventory[key];
-            saveInventory(inventory);
-            updateNeeded(have);
+        const haveInput = h('input', {
+            id: haveId, type: 'number', min: '0', step: 'any', class: 'inventory-have-input', placeholder: '0', autocomplete: 'off',
+            value: inventory[key] ? String(inventory[key]) : '',
+            on: {
+                click: (ev) => ev.stopPropagation(),
+                input: () => {
+                    const v = parseFloat(haveInput.value);
+                    const have = isNaN(v) || v < 0 ? 0 : v;
+                    if (have > 0) inventory[key] = have;
+                    else delete inventory[key];
+                    saveInventory(inventory);
+                    updateNeeded(have);
+                },
+            },
         });
 
-        panel.appendChild(invRow);
+        panel.appendChild(h('div', { class: 'inventory-row' },
+            h('label', { class: 'inventory-have-label', htmlFor: haveId, text: trackByPackage ? `Have (${packageWord(2)}):` : 'Have:' }),
+            haveInput,
+            neededEl,
+            trackByPackage && h('span', {
+                class: 'inventory-package-hint',
+                text: `1 ${packageWord(1)} ≈ ${formatQuantityUnit(perPackage as number, ingredient.unit)}${product?.variant ? ` (${product.variant})` : ''}`,
+            }),
+        ));
 
         const products = ingredient.products ?? [];
         // One row per (product, listing) pair - a single product can have several listings
         // (e.g. the same item sold on Amazon and on the brand's own site at different prices).
         const pairs = products.flatMap((product) => (product.listings ?? []).map((listing) => ({ product, listing })));
         if (pairs.length > 0) {
-            const links = document.createElement('div');
-            links.className = 'purchase-links';
             const chosenProduct = selectedProduct(ingredient);
             const chosenListing = chosenProduct ? cheapestListing(chosenProduct) : undefined;
-            const sorted = [...pairs].sort((a, b) => {
-                const aPpu = a.listing.price !== undefined && a.product.size !== undefined ? a.listing.price / a.product.size : Infinity;
-                const bPpu = b.listing.price !== undefined && b.product.size !== undefined ? b.listing.price / b.product.size : Infinity;
-                return aPpu - bPpu;
-            });
-            sorted.forEach(({ product, listing }) => {
-                const a    = document.createElement('a');
-                a.href     = listing.link ?? '#';
-                a.target   = '_blank';
-                a.className = 'purchase-link';
+            const perUnit = (price: number | undefined, size: number | undefined): number =>
+                price !== undefined && size !== undefined ? price / size : Infinity;
+            const sorted = [...pairs].sort((a, b) => perUnit(a.listing.price, a.product.size) - perUnit(b.listing.price, b.product.size));
+            panel.appendChild(h('div', { class: 'purchase-links' }, ...sorted.map(({ product, listing }) => {
                 const isChosen = product === chosenProduct && listing === chosenListing;
-                if (isChosen) a.classList.add('default-product');
+                const unitName = product.sizeUnit?.name ?? 'unit';
                 const variant = product.variant ? ` ${product.variant}` : '';
                 const where   = listing.store ? ` · ${listing.store}` : '';
                 const pkg     = listing.price !== undefined && product.size !== undefined
                     ? ` - $${listing.price} / ${product.size} ${product.sizeUnit?.name ?? ''}`.trimEnd()
                     : '';
                 const ppu     = listing.price !== undefined && product.size !== undefined
-                    ? ` ($${(listing.price / product.size).toFixed(2)}/${product.sizeUnit?.name ?? 'unit'})`
+                    ? ` ($${(listing.price / product.size).toFixed(2)}/${unitName})`
                     : '';
                 const sasPercent = listing.store === stores.amazon ? subscribeAndSavePercent(listing.discount) : undefined;
                 const sasPrice   = sasPercent !== undefined && listing.price !== undefined
                     ? listing.price * (1 - sasPercent / 100) : undefined;
                 const sasPpu  = sasPrice !== undefined && product.size !== undefined
-                    ? ` ($${(sasPrice / product.size).toFixed(2)}/${product.sizeUnit?.name ?? 'unit'})` : '';
+                    ? ` ($${(sasPrice / product.size).toFixed(2)}/${unitName})` : '';
                 const sas     = sasPrice !== undefined
                     ? ` · S&S ${sasPercent}% $${sasPrice.toFixed(2)}${sasPpu}` : '';
                 const pick    = isChosen ? ' ✓' : '';
-                a.textContent = `${product.brand}${variant}${where}${pkg}${ppu}${sas}${pick}`;
-                links.appendChild(a);
-            });
-            panel.appendChild(links);
+                return h('a', {
+                    href: listing.link ?? '#', target: '_blank', class: isChosen ? 'purchase-link default-product' : 'purchase-link',
+                    text: `${product.brand}${variant}${where}${pkg}${ppu}${sas}${pick}`,
+                });
+            })));
         }
 
         panel.addEventListener('click', (ev) => {
@@ -1727,22 +1656,10 @@ function renderShoppingScreen(): void {
 // ============================================================
 
 function renderMacroTargetsPanel(grand: NutritionTotals): HTMLElement {
-    const panel = createPanel();
-    panel.className = 'panel macro-targets';
-
-    const title = document.createElement('div');
-    title.className   = 'macro-targets-title';
-    title.textContent = 'Daily Targets';
-    panel.appendChild(title);
-
-    const header = document.createElement('div');
-    header.className = 'macro-row macro-header';
-    ['', 'Target', 'Eaten', 'Remaining'].forEach(text => {
-        const cell = document.createElement('span');
-        cell.textContent = text;
-        header.appendChild(cell);
-    });
-    panel.appendChild(header);
+    const panel = h('div', { class: 'panel macro-targets' },
+        h('div', { class: 'macro-targets-title', text: 'Daily Targets' }),
+        h('div', { class: 'macro-row macro-header' }, ...['', 'Target', 'Eaten', 'Remaining'].map(text => h('span', { text }))),
+    );
 
     const totalCals = grand.calories > 0 ? grand.calories : null;
     const pct = (grams: number | null, calsPerGram: number): string =>
@@ -1774,33 +1691,6 @@ function renderMacroTargetsPanel(grand: NutritionTotals): HTMLElement {
     });
 
     rows.forEach(({ label, key, actual, unit, indent, cap, calPct, macroPct }) => {
-        const row = document.createElement('div');
-        row.className = 'macro-row' + (indent ? ' macro-row-indent' : '');
-
-        const labelEl = document.createElement('span');
-        labelEl.className   = 'macro-label' + (indent ? ' macro-label-sub' : '');
-        labelEl.textContent = label;
-        row.appendChild(labelEl);
-
-        const inputWrap = document.createElement('span');
-        inputWrap.className = 'macro-target-wrap';
-        const input = document.createElement('input');
-        input.type      = 'number';
-        input.min       = '0';
-        input.className = 'macro-target-input';
-        input.value     = String(macroTargets[key]);
-        const unitLabel = document.createElement('span');
-        unitLabel.className   = 'macro-unit-label';
-        unitLabel.textContent = unit;
-        inputWrap.appendChild(input);
-        inputWrap.appendChild(unitLabel);
-        row.appendChild(inputWrap);
-
-        const actualEl = document.createElement('span');
-        actualEl.className   = 'macro-actual';
-        actualEl.textContent = actual !== null ? `${actual} ${unit}${calPct ?? ''}${macroPct ?? ''}` : '-';
-        row.appendChild(actualEl);
-
         const initRemaining = actual !== null ? macroTargets[key] - actual : null;
         const remainClass = (rem: number | null) => {
             if (rem === null) return 'macro-remaining';
@@ -1812,22 +1702,28 @@ function renderMacroTargetsPanel(grand: NutritionTotals): HTMLElement {
             if (cap) return rem < 0 ? `${Math.round(-rem)} ${unit} over` : rem === 0 ? '✓ at limit' : `${Math.round(rem)} ${unit} left`;
             return rem > 0 ? `${Math.round(rem)} ${unit}` : '✓ met';
         };
-        const remainEl = document.createElement('span');
-        remainEl.className   = remainClass(initRemaining);
-        remainEl.textContent = remainText(initRemaining);
-        row.appendChild(remainEl);
-
-        input.addEventListener('change', () => {
-            const v = parseFloat(input.value);
-            if (!isNaN(v) && v > 0) {
-                macroTargets[key] = v;
-                const newRemaining = actual !== null ? v - actual : null;
-                remainEl.textContent = remainText(newRemaining);
-                remainEl.className   = remainClass(newRemaining);
-            }
+        const remainEl = h('span', { class: remainClass(initRemaining), text: remainText(initRemaining) });
+        const input = h('input', {
+            type: 'number', min: '0', class: 'macro-target-input', value: String(macroTargets[key]),
+            on: {
+                change: () => {
+                    const v = parseFloat(input.value);
+                    if (!isNaN(v) && v > 0) {
+                        macroTargets[key] = v;
+                        const newRemaining = actual !== null ? v - actual : null;
+                        remainEl.textContent = remainText(newRemaining);
+                        remainEl.className   = remainClass(newRemaining);
+                    }
+                },
+            },
         });
 
-        panel.appendChild(row);
+        panel.appendChild(h('div', { class: 'macro-row' + (indent ? ' macro-row-indent' : '') },
+            h('span', { class: 'macro-label' + (indent ? ' macro-label-sub' : ''), text: label }),
+            h('span', { class: 'macro-target-wrap' }, input, h('span', { class: 'macro-unit-label', text: unit })),
+            h('span', { class: 'macro-actual', text: actual !== null ? `${actual} ${unit}${calPct ?? ''}${macroPct ?? ''}` : '-' }),
+            remainEl,
+        ));
     });
 
     return panel;
@@ -1892,21 +1788,11 @@ function buildRecipeSuggestions(grand: NutritionTotals): SuggestedRecipe[] {
 // ============================================================
 
 function renderNutritionScreen(): void {
-    const root = getElement<HTMLDivElement>('app');
-    clear(root);
-
-    const heading = document.createElement('h1');
-    heading.textContent = 'Nutrition';
-    root.appendChild(heading);
-
+    const root = screen('Nutrition');
     const recipes = getSelectedRecipes();
 
     if (recipes.length === 0) {
-        const empty = document.createElement('p');
-        empty.className   = 'empty';
-        empty.textContent = 'No recipes selected.';
-        root.appendChild(empty);
-        root.appendChild(createStartOverButton());
+        root.append(h('p', { class: 'empty', text: 'No recipes selected.' }), createStartOverButton());
         return;
     }
 
@@ -1941,238 +1827,114 @@ function renderNutritionScreen(): void {
     const grandServings = perRecipe.reduce((a, p) => a + p.servings, 0);
     const hasCostData   = gTotal > gCostMissing;
 
-    const totalCard = createPanel();
-    totalCard.className = 'panel nutrition-total';
-
-    const totalTitle = document.createElement('div');
-    totalTitle.className = 'nutrition-total-title';
-    if (recipes.length === 1 && perRecipe[0].servings === 1) {
-        totalTitle.textContent = recipes[0].name;
-    } else if (recipes.length === 1) {
-        totalTitle.textContent = `${recipes[0].name} ×${perRecipe[0].servings}`;
-    } else {
-        totalTitle.textContent = `All selected recipes (${grandServings} serving${grandServings === 1 ? '' : 's'})`;
-    }
-    totalCard.appendChild(totalTitle);
-
-    const totalValue = document.createElement('div');
-    totalValue.className = 'nutrition-values';
-    totalValue.textContent = totalsText(gCovered, grand, hasCostData, grandCost);
-    totalCard.appendChild(totalValue);
-
-    // 30-day cost projection
-    if (hasCostData) {
-        const monthly = document.createElement('div');
-        monthly.className   = 'nutrition-monthly-cost';
-        monthly.textContent = `$${(grandCost * 30).toFixed(2)} / 30 days`;
-        totalCard.appendChild(monthly);
-    }
-
-    // Partial cost warning
-    if (gCostMissing > 0 && hasCostData) {
-        const costNote = document.createElement('div');
-        costNote.className   = 'nutrition-cost-note';
-        costNote.textContent = `⚠ cost is partial - ${gCostMissing} ingredient${gCostMissing === 1 ? '' : 's'} missing price data`;
-        totalCard.appendChild(costNote);
-    }
-
-    const totalCoverage = document.createElement('div');
-    totalCoverage.className   = 'nutrition-coverage' + (gFlagged > 0 ? ' flagged' : '');
-    totalCoverage.textContent = (gFlagged > 0 ? '⚠ ' : '') + coverageLabel(gCovered, gTotal, gFlagged);
-    totalCard.appendChild(totalCoverage);
-
-    root.appendChild(totalCard);
+    const totalTitle = recipes.length > 1
+        ? `All selected recipes (${grandServings} serving${grandServings === 1 ? '' : 's'})`
+        : perRecipe[0].servings === 1 ? recipes[0].name : `${recipes[0].name} ×${perRecipe[0].servings}`;
+    root.appendChild(h('div', { class: 'panel nutrition-total' },
+        h('div', { class: 'nutrition-total-title', text: totalTitle }),
+        h('div', { class: 'nutrition-values', text: totalsText(gCovered, grand, hasCostData, grandCost) }),
+        // 30-day cost projection
+        hasCostData && h('div', { class: 'nutrition-monthly-cost', text: `$${(grandCost * 30).toFixed(2)} / 30 days` }),
+        gCostMissing > 0 && hasCostData && h('div', {
+            class: 'nutrition-cost-note',
+            text: `⚠ cost is partial - ${gCostMissing} ingredient${gCostMissing === 1 ? '' : 's'} missing price data`,
+        }),
+        h('div', {
+            class: 'nutrition-coverage' + (gFlagged > 0 ? ' flagged' : ''),
+            text: (gFlagged > 0 ? '⚠ ' : '') + coverageLabel(gCovered, gTotal, gFlagged),
+        }),
+    ));
     root.appendChild(renderMacroTargetsPanel(grand));
 
     // ── Bulk select/unselect ─────────────────────────────────
-    const bulkActions = document.createElement('div');
-    bulkActions.className = 'nutrition-bulk-actions';
-
-    const selectAllBtn = createButton('Select All', () => {
-        recipes.forEach(r => nutritionRecipeExclusions.delete(r.id));
-        renderNutritionScreen();
+    const bulkButton = (text: string, apply: (id: string) => void) => h('button', {
+        class: 'nutrition-bulk-btn', text,
+        on: { click: () => { recipes.forEach(r => apply(r.id)); renderNutritionScreen(); } },
     });
-    selectAllBtn.className = 'nutrition-bulk-btn';
+    root.appendChild(h('div', { class: 'nutrition-bulk-actions' },
+        bulkButton('Select All', id => nutritionRecipeExclusions.delete(id)),
+        bulkButton('Unselect All', id => nutritionRecipeExclusions.add(id)),
+    ));
 
-    const unselectAllBtn = createButton('Unselect All', () => {
-        recipes.forEach(r => nutritionRecipeExclusions.add(r.id));
-        renderNutritionScreen();
-    });
-    unselectAllBtn.className = 'nutrition-bulk-btn';
-
-    bulkActions.appendChild(selectAllBtn);
-    bulkActions.appendChild(unselectAllBtn);
-    root.appendChild(bulkActions);
+    // Header buttons re-render the screen; stopPropagation keeps the header from toggling first.
+    const headerButton = (cls: string, text: string, hidden: string, onClick: () => void) => h('button', {
+        class: cls, text,
+        on: { click: (ev) => { ev.stopPropagation(); onClick(); renderNutritionScreen(); } },
+    }, srOnly(hidden));
 
     // ── Per recipe (expandable) ──────────────────────────────
     perRecipeEff.forEach(({ recipe, servings, nutrition, excluded, effTotals, effCost }) => {
-        const section = createPanel();
-        section.className = 'panel nutrition-recipe';
-        if (nutritionRecipeExclusions.has(recipe.id)) section.classList.add('nutrition-recipe-excluded');
-        else section.classList.add('nutrition-recipe-eaten');
-
+        const isRecipeExcluded  = nutritionRecipeExclusions.has(recipe.id);
         const flaggedCount      = nutrition.missing + nutrition.uncomputable;
         const sectionTotals     = scaleTotals(effTotals, servings);
         const sectionCost       = effCost * servings;
         const recipeHasCostData = nutrition.total > nutrition.costMissing;
+        const isExpanded        = nutritionExpanded.has(recipe.id);
 
-        const header = document.createElement('div');
-        header.className = 'nutrition-recipe-header';
+        const caret = h('span', { class: 'nutrition-caret', text: isExpanded ? '▾' : '▸' });
+        const header = h('div', { class: 'nutrition-recipe-header' },
+            caret,
+            h('span', { class: 'nutrition-recipe-name', text: servings > 1 ? `${recipe.name} ×${servings}` : recipe.name }),
+            h('div', { class: 'nutrition-serving-controls' },
+                headerButton('nutrition-serving-btn', '−', `Remove one serving of ${recipe.name}`, () => removeServing(recipe.id)),
+                h('span', { class: 'nutrition-serving-count', text: `×${servings}` }),
+                headerButton('nutrition-serving-btn', '+', `Add a serving of ${recipe.name}`, () => state.selectedRecipeIds.push(recipe.id)),
+            ),
+            headerButton('nutrition-eaten-btn', isRecipeExcluded ? '○' : '✓',
+                isRecipeExcluded ? `Include ${recipe.name} in totals` : `Exclude ${recipe.name} from totals`,
+                () => {
+                    if (isRecipeExcluded) nutritionRecipeExclusions.delete(recipe.id);
+                    else nutritionRecipeExclusions.add(recipe.id);
+                }),
+            h('span', { class: 'nutrition-recipe-sub', text: totalsText(nutrition.covered, sectionTotals, recipeHasCostData, sectionCost) }),
+        );
 
-        const caret = document.createElement('span');
-        caret.className   = 'nutrition-caret';
-        caret.textContent = nutritionExpanded.has(recipe.id) ? '▾' : '▸';
-
-        const name = document.createElement('span');
-        name.className   = 'nutrition-recipe-name';
-        name.textContent = servings > 1 ? `${recipe.name} ×${servings}` : recipe.name;
-
-        const sub = document.createElement('span');
-        sub.className = 'nutrition-recipe-sub';
-        sub.textContent = totalsText(nutrition.covered, sectionTotals, recipeHasCostData, sectionCost);
-
-        const servingControls = document.createElement('div');
-        servingControls.className = 'nutrition-serving-controls';
-
-        const minusBtn = document.createElement('button');
-        minusBtn.type = 'button';
-        minusBtn.className   = 'nutrition-serving-btn';
-        minusBtn.textContent = '−';
-        hiddenText(minusBtn, `Remove one serving of ${recipe.name}`);
-        minusBtn.addEventListener('click', (ev) => {
-            ev.stopPropagation();
-            const idx = state.selectedRecipeIds.lastIndexOf(recipe.id);
-            if (idx !== -1) state.selectedRecipeIds.splice(idx, 1);
-            renderNutritionScreen();
-        });
-
-        const countLabel = document.createElement('span');
-        countLabel.className   = 'nutrition-serving-count';
-        countLabel.textContent = `×${servings}`;
-
-        const plusBtn = document.createElement('button');
-        plusBtn.type = 'button';
-        plusBtn.className   = 'nutrition-serving-btn';
-        plusBtn.textContent = '+';
-        hiddenText(plusBtn, `Add a serving of ${recipe.name}`);
-        plusBtn.addEventListener('click', (ev) => {
-            ev.stopPropagation();
-            state.selectedRecipeIds.push(recipe.id);
-            renderNutritionScreen();
-        });
-
-        servingControls.appendChild(minusBtn);
-        servingControls.appendChild(countLabel);
-        servingControls.appendChild(plusBtn);
-
-        const isRecipeExcluded = nutritionRecipeExclusions.has(recipe.id);
-        const eatenBtn = document.createElement('button');
-        eatenBtn.type = 'button';
-        eatenBtn.className   = 'nutrition-eaten-btn';
-        eatenBtn.textContent = isRecipeExcluded ? '○' : '✓';
-        hiddenText(eatenBtn, isRecipeExcluded ? `Include ${recipe.name} in totals` : `Exclude ${recipe.name} from totals`);
-        eatenBtn.addEventListener('click', (ev) => {
-            ev.stopPropagation();
-            if (isRecipeExcluded) nutritionRecipeExclusions.delete(recipe.id);
-            else nutritionRecipeExclusions.add(recipe.id);
-            renderNutritionScreen();
-        });
-
-        header.appendChild(caret);
-        header.appendChild(name);
-        header.appendChild(servingControls);
-        header.appendChild(eatenBtn);
-        header.appendChild(sub);
-        section.appendChild(header);
-
-        const cov = document.createElement('div');
-        cov.className   = 'nutrition-coverage' + (flaggedCount > 0 ? ' flagged' : '');
-        const costNote  = nutrition.costMissing > 0
-            ? ` · ⚠ ${nutrition.costMissing} missing price`
-            : '';
-        cov.textContent = (flaggedCount > 0 ? '⚠ ' : '') +
-            coverageLabel(nutrition.covered, nutrition.total, flaggedCount) + costNote;
-        section.appendChild(cov);
+        const costNote = nutrition.costMissing > 0 ? ` · ⚠ ${nutrition.costMissing} missing price` : '';
 
         // Per-ingredient breakdown
-        const list = document.createElement('div');
-        const isExpanded = nutritionExpanded.has(recipe.id);
-        list.className = 'nutrition-ingredients' + (isExpanded ? '' : ' collapsed');
-
-        nutrition.breakdown.forEach(({ ing, result, costResult }) => {
-            const isExcluded = excluded.has(ing);
-            const row = document.createElement('div');
-            row.className = 'nutrition-ingredient-row';
-            if (isExcluded) row.classList.add('nutrition-ingredient-excluded');
-
-            const toggleBtn = document.createElement('button');
-            toggleBtn.type = 'button';
-            toggleBtn.className   = 'nutrition-ingredient-toggle';
-            toggleBtn.textContent = isExcluded ? '+' : '−';
-            hiddenText(toggleBtn, isExcluded ? `Include ${ing.name} in totals` : `Exclude ${ing.name} from totals`);
-            toggleBtn.addEventListener('click', () => {
-                if (isExcluded) excluded.delete(ing); else excluded.add(ing);
-                renderNutritionScreen();
-            });
-            row.appendChild(toggleBtn);
-
-            const ingName = document.createElement('span');
-            ingName.className   = 'nutrition-ingredient-name';
-            const scaledIng     = { ...ing, quantity: (ing.quantity ?? 0) * servings };
-            ingName.textContent = formatIngredient(scaledIng as Ingredient);
-            row.appendChild(ingName);
-
-            const detail = document.createElement('span');
-            if (isExcluded) {
-                detail.className   = 'nutrition-ingredient-value';
-                detail.textContent = '- excluded';
-            } else if (result.status === 'ok') {
-                detail.className = 'nutrition-ingredient-value';
-                const costSuffix = costResult.status === 'ok'
-                    ? ` · $${(costResult.cost * servings).toFixed(2)}`
-                    : '';
-                detail.textContent = formatTotals(scaleTotals(result.totals, servings)) + costSuffix;
-            } else if (result.status === 'missing') {
-                row.classList.add('flagged');
-                detail.className   = 'nutrition-flag';
-                detail.textContent = '⚠ no nutrition data';
-            } else {
-                row.classList.add('flagged');
-                detail.className   = 'nutrition-flag';
-                detail.textContent = "⚠ can't compute";
-                detail.title       = result.reason;
-            }
-            row.appendChild(detail);
-
-            if (!isExcluded && result.status === 'uncomputable') {
-                const reason = document.createElement('div');
-                reason.className   = 'nutrition-flag-reason';
-                reason.textContent = result.reason;
-                row.appendChild(reason);
-            }
-
-            if (!isExcluded && result.status === 'ok' && costResult.status !== 'ok') {
-                const costFlag = document.createElement('div');
-                costFlag.className = 'nutrition-cost-flag';
-                costFlag.textContent = costResult.status === 'missing'
-                    ? '⚠ no price data'
-                    : `⚠ cost can't compute - ${(costResult as { reason: string }).reason}`;
-                row.appendChild(costFlag);
-            }
-
-            if (!isExcluded && result.status === 'ok' && result.brand) {
+        const list = h('div', { class: 'nutrition-ingredients' + (isExpanded ? '' : ' collapsed') },
+            ...nutrition.breakdown.map(({ ing, result, costResult }) => {
+                const isExcluded = excluded.has(ing);
+                const scaledIng  = { ...ing, quantity: (ing.quantity ?? 0) * servings };
+                const flagged    = !isExcluded && result.status !== 'ok';
+                const detail = isExcluded
+                    ? h('span', { class: 'nutrition-ingredient-value', text: '- excluded' })
+                    : result.status === 'ok'
+                        ? h('span', {
+                            class: 'nutrition-ingredient-value',
+                            text: formatTotals(scaleTotals(result.totals, servings)) +
+                                (costResult.status === 'ok' ? ` · $${(costResult.cost * servings).toFixed(2)}` : ''),
+                        })
+                        : result.status === 'missing'
+                            ? h('span', { class: 'nutrition-flag', text: '⚠ no nutrition data' })
+                            : h('span', { class: 'nutrition-flag', text: "⚠ can't compute", title: result.reason });
                 const product = selectedProduct(ing);
-                const variant = product?.variant ? ` · ${product.variant}` : '';
-                const via = document.createElement('div');
-                via.className   = 'nutrition-provenance';
-                via.textContent = `via ${result.brand}${variant}`;
-                row.appendChild(via);
-            }
-
-            list.appendChild(row);
-        });
-
-        section.appendChild(list);
+                return h('div', { class: 'nutrition-ingredient-row' + (isExcluded ? ' nutrition-ingredient-excluded' : flagged ? ' flagged' : '') },
+                    h('button', {
+                        class: 'nutrition-ingredient-toggle', text: isExcluded ? '+' : '−',
+                        on: {
+                            click: () => {
+                                if (isExcluded) excluded.delete(ing); else excluded.add(ing);
+                                renderNutritionScreen();
+                            },
+                        },
+                    }, srOnly(isExcluded ? `Include ${ing.name} in totals` : `Exclude ${ing.name} from totals`)),
+                    h('span', { class: 'nutrition-ingredient-name', text: formatIngredient(scaledIng as Ingredient) }),
+                    detail,
+                    !isExcluded && result.status === 'uncomputable' && h('div', { class: 'nutrition-flag-reason', text: result.reason }),
+                    !isExcluded && result.status === 'ok' && costResult.status !== 'ok' && h('div', {
+                        class: 'nutrition-cost-flag',
+                        text: costResult.status === 'missing'
+                            ? '⚠ no price data'
+                            : `⚠ cost can't compute - ${(costResult as { reason: string }).reason}`,
+                    }),
+                    !isExcluded && result.status === 'ok' && result.brand && h('div', {
+                        class: 'nutrition-provenance',
+                        text: `via ${result.brand}${product?.variant ? ` · ${product.variant}` : ''}`,
+                    }),
+                );
+            }),
+        );
 
         header.addEventListener('click', (ev) => {
             if ((ev.target as HTMLElement).closest('.nutrition-serving-controls')) return;
@@ -2183,87 +1945,59 @@ function renderNutritionScreen(): void {
             else nutritionExpanded.add(recipe.id);
         });
 
-        root.appendChild(section);
+        root.appendChild(h('div', { class: 'panel nutrition-recipe ' + (isRecipeExcluded ? 'nutrition-recipe-excluded' : 'nutrition-recipe-eaten') },
+            header,
+            h('div', {
+                class: 'nutrition-coverage' + (flaggedCount > 0 ? ' flagged' : ''),
+                text: (flaggedCount > 0 ? '⚠ ' : '') + coverageLabel(nutrition.covered, nutrition.total, flaggedCount) + costNote,
+            }),
+            list,
+        ));
     });
 
     // ── Recipe suggestions ────────────────────────────────────
     const suggestions = buildRecipeSuggestions(grand);
     if (suggestions.length > 0) {
-        const suggestPanel = createPanel();
-        suggestPanel.className = 'panel nutrition-suggestions';
-
-        const suggestTitle = document.createElement('div');
-        suggestTitle.className   = 'nutrition-suggestions-title';
-        suggestTitle.textContent = 'Suggested to fill your gap';
-        suggestPanel.appendChild(suggestTitle);
-
-        suggestions.forEach(({ recipe, score, totals }) => {
-            const row = document.createElement('div');
-            row.className = 'suggestion-row';
-
-            const info = document.createElement('div');
-            info.className = 'suggestion-info';
-
-            const name = document.createElement('span');
-            name.className   = 'suggestion-name';
-            name.textContent = recipe.name;
-            info.appendChild(name);
-
-            const stats = document.createElement('span');
-            stats.className   = 'suggestion-stats';
-            stats.textContent = `${Math.round(totals.calories)} cal · ${Math.round(totals.protein)}g protein · ${Math.round(score * 100)}% match`;
-            info.appendChild(stats);
-
-            const addBtn = document.createElement('button');
-            addBtn.type = 'button';
-            addBtn.className   = 'suggestion-add-btn';
-            addBtn.textContent = '+ Add';
-            hiddenText(addBtn, recipe.name);
-            addBtn.setAttribute('data-testid', `suggest-${recipe.id}`);
-            addBtn.addEventListener('click', () => {
-                state.selectedRecipeIds.push(recipe.id);
-                renderNutritionScreen();
-            });
-
-            row.appendChild(info);
-            row.appendChild(addBtn);
-            suggestPanel.appendChild(row);
-        });
-
-        root.appendChild(suggestPanel);
+        root.appendChild(h('div', { class: 'panel nutrition-suggestions' },
+            h('div', { class: 'nutrition-suggestions-title', text: 'Suggested to fill your gap' }),
+            ...suggestions.map(({ recipe, score, totals }) => suggestionRow(recipe,
+                h('span', {
+                    class: 'suggestion-stats',
+                    text: `${Math.round(totals.calories)} cal · ${Math.round(totals.protein)}g protein · ${Math.round(score * 100)}% match`,
+                }),
+                `suggest-${recipe.id}`)),
+        ));
     }
 
     // ── Add more, without leaving this screen ──────────────────
-    const addMoreHeading = document.createElement('h2');
-    addMoreHeading.textContent = 'Add more';
-    addMoreHeading.className   = 'group-heading';
-    root.appendChild(addMoreHeading);
-
-    const addRecipeLabel = document.createElement('label');
-    addRecipeLabel.htmlFor = 'nutrition-recipe-search';
-    addRecipeLabel.className = 'search-label';
-    addRecipeLabel.textContent = 'Search recipes to add';
-    const addRecipeSearch = document.createElement('input');
-    addRecipeSearch.id          = 'nutrition-recipe-search';
-    addRecipeSearch.type        = 'search';
-    addRecipeSearch.placeholder = 'Recipe name';
-    addRecipeSearch.value       = nutritionAddRecipeQuery;
-    addRecipeSearch.className   = 'search-input';
-    addRecipeSearch.autocomplete = 'off';
-    addRecipeSearch.setAttribute('data-testid', 'nutrition-recipe-search');
-    addRecipeSearch.addEventListener('input', () => {
-        nutritionAddRecipeQuery = addRecipeSearch.value;
-        renderNutritionAddRecipeList();
-    });
-    root.append(addRecipeLabel, addRecipeSearch);
-
-    const addRecipeList = document.createElement('div');
-    addRecipeList.id = 'nutrition-add-recipe-list';
-    root.appendChild(addRecipeList);
+    root.append(
+        h('h2', { text: 'Add more', class: 'group-heading' }),
+        ...searchField('nutrition-recipe-search', 'Search recipes to add', 'Recipe name', nutritionAddRecipeQuery, (value) => {
+            nutritionAddRecipeQuery = value;
+            renderNutritionAddRecipeList();
+        }),
+        h('div', { id: 'nutrition-add-recipe-list' }),
+    );
     renderNutritionAddRecipeList();
 
     appendAddIngredientButton(root);
     root.appendChild(createStartOverButton());
+}
+
+// A recipe with an "+ Add" button that adds a serving and re-renders Nutrition.
+function suggestionRow(recipe: Recipe, stats?: HTMLElement, testid?: string): HTMLDivElement {
+    return h('div', { class: 'suggestion-row' },
+        h('div', { class: 'suggestion-info' }, h('span', { class: 'suggestion-name', text: recipe.name }), stats),
+        h('button', {
+            class: 'suggestion-add-btn', text: '+ Add', testid,
+            on: {
+                click: () => {
+                    state.selectedRecipeIds.push(recipe.id);
+                    renderNutritionScreen();
+                },
+            },
+        }, srOnly(recipe.name)),
+    );
 }
 
 function renderNutritionAddRecipeList(): void {
@@ -2274,40 +2008,11 @@ function renderNutritionAddRecipeList(): void {
     const MAX_SHOWN = 8;
     const shown     = matched.slice(0, MAX_SHOWN);
 
-    shown.forEach((recipe) => {
-        const row = document.createElement('div');
-        row.className = 'suggestion-row';
-
-        const info = document.createElement('div');
-        info.className = 'suggestion-info';
-        const name = document.createElement('span');
-        name.className   = 'suggestion-name';
-        name.textContent = recipe.name;
-        info.appendChild(name);
-
-        const addBtn = document.createElement('button');
-        addBtn.className   = 'suggestion-add-btn';
-        addBtn.textContent = '+ Add';
-        addBtn.addEventListener('click', () => {
-            state.selectedRecipeIds.push(recipe.id);
-            renderNutritionScreen();
-        });
-
-        row.appendChild(info);
-        row.appendChild(addBtn);
-        root.appendChild(row);
-    });
-
+    root.append(...shown.map(recipe => suggestionRow(recipe)));
     if (matched.length > shown.length) {
-        const hint = document.createElement('div');
-        hint.className   = 'suggestion-more-hint';
-        hint.textContent = `+${matched.length - shown.length} more - refine your search`;
-        root.appendChild(hint);
+        root.appendChild(h('div', { class: 'suggestion-more-hint', text: `+${matched.length - shown.length} more - refine your search` }));
     } else if (matched.length === 0) {
-        const empty = document.createElement('p');
-        empty.className   = 'empty';
-        empty.textContent = 'No matching recipes.';
-        root.appendChild(empty);
+        root.appendChild(h('p', { class: 'empty', text: 'No matching recipes.' }));
     }
 }
 
@@ -2353,52 +2058,20 @@ function getAdhocCatalog(): { key: string; name: string; sample: Ingredient }[] 
 }
 
 function renderAddIngredientScreen(): void {
-    const root = getElement<HTMLDivElement>('app');
-    clear(root);
-
-    const heading = document.createElement('h1');
-    heading.textContent = 'Add an ingredient';
-    root.appendChild(heading);
-
-    const sub = document.createElement('p');
-    sub.className   = 'adhoc-sub';
-    sub.textContent = 'Pick an ingredient to add to your shopping list and nutrition totals.';
-    root.appendChild(sub);
-
-    const searchLabel = document.createElement('label');
-    searchLabel.htmlFor = 'ingredient-search';
-    searchLabel.className = 'search-label';
-    searchLabel.textContent = 'Search ingredients';
-    const searchInput = document.createElement('input');
-    searchInput.id          = 'ingredient-search';
-    searchInput.type        = 'search';
-    searchInput.placeholder = 'Ingredient name';
-    searchInput.value       = adhocSearchQuery;
-    searchInput.className   = 'search-input';
-    searchInput.autocomplete = 'off';
-    searchInput.setAttribute('data-testid', 'ingredient-search');
-    searchInput.addEventListener('input', () => {
-        adhocSearchQuery = searchInput.value;
-        renderAdhocList();
-    });
-    root.append(searchLabel, searchInput);
-
-    const list = document.createElement('div');
-    list.id = 'adhoc-list';
-    root.appendChild(list);
-
-    const detail = document.createElement('div');
-    detail.id        = 'adhoc-detail';
-    detail.className = 'adhoc-detail';
-    root.appendChild(detail);
-
-    const backBtn = createButton('← Back', () => {
-        resetAdhoc();
-        navigateTo(adhocReturnScreen);
-    });
-    backBtn.className = 'start-over-btn';
-    root.appendChild(backBtn);
-
+    const root = screen('Add an ingredient');
+    root.append(
+        h('p', { class: 'adhoc-sub', text: 'Pick an ingredient to add to your shopping list and nutrition totals.' }),
+        ...searchField('ingredient-search', 'Search ingredients', 'Ingredient name', adhocSearchQuery, (value) => {
+            adhocSearchQuery = value;
+            renderAdhocList();
+        }),
+        h('div', { id: 'adhoc-list' }),
+        h('div', { id: 'adhoc-detail', class: 'adhoc-detail' }),
+        backButton('← Back', () => {
+            resetAdhoc();
+            navigateTo(adhocReturnScreen);
+        }),
+    );
     renderAdhocList();
     renderAdhocDetail();
 }
@@ -2412,28 +2085,22 @@ function renderAdhocList(): void {
     const matched = q ? all.filter(c => c.name.toLowerCase().includes(q)) : all;
 
     if (matched.length === 0) {
-        const empty = document.createElement('p');
-        empty.className   = 'empty';
-        empty.textContent = 'No matching ingredients.';
-        root.appendChild(empty);
+        root.appendChild(h('p', { class: 'empty', text: 'No matching ingredients.' }));
         return;
     }
 
-    matched.forEach(({ key, name }) => {
-        const btn = document.createElement('button');
-        btn.className   = 'adhoc-item';
-        btn.textContent = name;
-        if (adhocSelectedKey === key) btn.classList.add('selected');
-        btn.addEventListener('click', () => {
-            adhocSelectedKey = key;
-            const sample  = all.find(c => c.key === key)!.sample;
-            adhocQuantity = 1;
-            adhocUnitName = pickDefaultUnit(sample).name;
-            renderAdhocList();
-            renderAdhocDetail();
-        });
-        root.appendChild(btn);
-    });
+    root.append(...matched.map(({ key, name, sample }) => h('button', {
+        class: adhocSelectedKey === key ? 'adhoc-item selected' : 'adhoc-item', text: name,
+        on: {
+            click: () => {
+                adhocSelectedKey = key;
+                adhocQuantity = 1;
+                adhocUnitName = pickDefaultUnit(sample).name;
+                renderAdhocList();
+                renderAdhocDetail();
+            },
+        },
+    })));
 }
 
 function renderAdhocDetail(): void {
@@ -2444,47 +2111,34 @@ function renderAdhocDetail(): void {
     const catalogEntry = getAdhocCatalog().find(c => c.key === adhocSelectedKey);
     if (!catalogEntry) return;
 
-    const label = document.createElement('div');
-    label.className   = 'adhoc-detail-label';
-    label.textContent = `How much ${catalogEntry.name}?`;
-    root.appendChild(label);
-
-    const qtyInput = document.createElement('input');
-    qtyInput.type      = 'number';
-    qtyInput.min       = '0';
-    qtyInput.step      = '0.25';
-    qtyInput.value     = String(adhocQuantity);
-    qtyInput.className = 'adhoc-qty';
-    qtyInput.addEventListener('input', () => {
-        const v = parseFloat(qtyInput.value);
-        adhocQuantity = isNaN(v) ? 0 : v;
-    });
-    root.appendChild(qtyInput);
-
-    const unitSelect = document.createElement('select');
-    unitSelect.className = 'adhoc-unit';
-    for (const unit of Object.values(u)) {
-        const opt = document.createElement('option');
-        opt.value       = unit.name;
-        opt.textContent = unit.name || '(none)';
-        if (unit.name === adhocUnitName) opt.selected = true;
-        unitSelect.appendChild(opt);
-    }
-    unitSelect.addEventListener('change', () => { adhocUnitName = unitSelect.value; });
-    root.appendChild(unitSelect);
-
-    const confirmBtn = createButton('Add to list', () => {
-        const factory  = (i as any)[adhocSelectedKey!] as (q?: number, u?: Unit) => Ingredient;
-        const unit     = Object.values(u).find(uu => uu.name === adhocUnitName) ?? u.unit;
-        const fresh    = factory(adhocQuantity, unit);
-        const recipe   = createAdhocRecipe(fresh);
-        registerRecipe(recipe);
-        state.selectedRecipeIds.push(recipe.id);
-        resetAdhoc();
-        navigateTo(adhocReturnScreen);
-    });
-    confirmBtn.className = 'adhoc-confirm';
-    root.appendChild(confirmBtn);
+    root.append(
+        h('div', { class: 'adhoc-detail-label', text: `How much ${catalogEntry.name}?` }),
+        h('input', {
+            type: 'number', min: '0', step: '0.25', value: String(adhocQuantity), class: 'adhoc-qty',
+            on: {
+                input: (ev) => {
+                    const v = parseFloat((ev.target as HTMLInputElement).value);
+                    adhocQuantity = isNaN(v) ? 0 : v;
+                },
+            },
+        }),
+        h('select', { class: 'adhoc-unit', on: { change: (ev) => { adhocUnitName = (ev.target as HTMLSelectElement).value; } } },
+            ...Object.values(u).map(unit => h('option', { value: unit.name, text: unit.name || '(none)', selected: unit.name === adhocUnitName }))),
+        h('button', {
+            class: 'adhoc-confirm', text: 'Add to list',
+            on: {
+                click: () => {
+                    const factory  = (i as any)[adhocSelectedKey!] as (q?: number, u?: Unit) => Ingredient;
+                    const unit     = Object.values(u).find(uu => uu.name === adhocUnitName) ?? u.unit;
+                    const recipe   = createAdhocRecipe(factory(adhocQuantity, unit));
+                    registerRecipe(recipe);
+                    state.selectedRecipeIds.push(recipe.id);
+                    resetAdhoc();
+                    navigateTo(adhocReturnScreen);
+                },
+            },
+        }),
+    );
 }
 
 // ============================================================
@@ -2499,12 +2153,7 @@ function formatElapsed(seconds: number): string {
 
 
 function renderCookingScreen(): void {
-    const root = getElement<HTMLDivElement>('app');
-    clear(root);
-
-    const heading = document.createElement('h1');
-    heading.textContent = 'Cooking';
-    root.appendChild(heading);
+    const root = screen('Cooking');
 
     if (state.cookingStartedAt === null) state.cookingStartedAt = Date.now();
 
@@ -2514,12 +2163,12 @@ function renderCookingScreen(): void {
     if (selected.length > 1) {
         const totalSecs      = selected.reduce((s, r) => s + recipeCookSeconds(r), 0);
         const hardcodedTotal = selected.reduce((s, r) => s + (r.estimatedMinutes ? r.estimatedMinutes * 60 : 0), 0);
-        const banner = document.createElement('div');
-        banner.className   = 'cook-time-banner';
-        banner.textContent = hardcodedTotal > 0
-            ? `Total: ${formatCookTime(hardcodedTotal)} goal (${formatCookTime(totalSecs)} calculated)`
-            : `Total cook time: ${formatCookTime(totalSecs)}`;
-        root.appendChild(banner);
+        root.appendChild(h('div', {
+            class: 'cook-time-banner',
+            text: hardcodedTotal > 0
+                ? `Total: ${formatCookTime(hardcodedTotal)} goal (${formatCookTime(totalSecs)} calculated)`
+                : `Total cook time: ${formatCookTime(totalSecs)}`,
+        }));
     }
 
     let lastRecipeId: string | undefined;
@@ -2534,14 +2183,7 @@ function renderCookingScreen(): void {
             lastRecipeId = step.recipeId;
             const recipe = state.recipes.get(step.recipeId);
             if (recipe) {
-                const header = document.createElement('div');
-                header.className = 'recipe-title-row';
-
-                const title = document.createElement('h2');
-                title.textContent = recipe.name;
-
-                const badge = document.createElement('span');
-                badge.className = 'cook-time-badge';
+                const badge = h('span', { class: 'cook-time-badge' });
 
                 const calculatedSecs = recipeCookSeconds(recipe);
                 const calculatedText = formatCookTime(calculatedSecs);
@@ -2557,11 +2199,8 @@ function renderCookingScreen(): void {
                 updateBadge();
                 badgeUpdaters.push(updateBadge);
 
-                header.appendChild(title);
-                header.appendChild(badge);
-                header.appendChild(createSoundTestPanel());
-                header.appendChild(createCopyButton(recipe.id));
-                root.appendChild(header);
+                root.appendChild(h('div', { class: 'recipe-title-row' },
+                    h('h2', { text: recipe.name }), badge, createSoundTestPanel(), createCopyButton(recipe.id)));
             }
         }
 
@@ -2601,46 +2240,24 @@ function renderCookingScreen(): void {
 // lighter box. `inline` puts a single step's text straight into the body.
 function notesBox(kind: 'info' | 'prep', steps: Step[], inline = false): HTMLDetailsElement {
     const prefix = kind === 'info' ? 'info-step' : 'prep-info';
-    const box = document.createElement('details');
-    box.className = kind === 'info' ? 'panel info-step' : 'prep-info-note';
-
-    const summary = document.createElement('summary');
-    summary.className = `${prefix}-header`;
-    const caret = document.createElement('span');
-    caret.className = `${prefix}-caret`;
-    summary.appendChild(caret);
-    if (kind === 'info') {
-        const label = document.createElement('span');
-        label.className   = 'info-step-label';
-        label.textContent = 'Notes';
-        summary.appendChild(label);
-    } else {
-        summary.append(' Notes');
-    }
-
-    const body = document.createElement('div');
-    body.className = `${prefix}-body`;
+    const body = h('div', { class: `${prefix}-body` });
     steps.forEach(step => {
-        let line: HTMLElement = body;
-        if (!inline) {
-            line = document.createElement('div');
-            line.className = kind === 'info' ? 'info-step-note' : 'prep-info-line';
-            body.appendChild(line);
-        }
+        const line = inline ? body : body.appendChild(h('div', { class: kind === 'info' ? 'info-step-note' : 'prep-info-line' }));
         line.append(step.text);
-
         if (kind === 'info' && step.linkRecipeId) {
-            const targetRecipe = state.recipes.get(step.linkRecipeId);
-            const link = document.createElement('a');
-            link.className   = 'info-step-link';
-            link.href        = getRecipeURL(step.linkRecipeId);
-            link.textContent = `→ ${targetRecipe?.name ?? 'Open recipe'}`;
-            line.appendChild(link);
+            line.appendChild(h('a', {
+                class: 'info-step-link', href: getRecipeURL(step.linkRecipeId),
+                text: `→ ${state.recipes.get(step.linkRecipeId)?.name ?? 'Open recipe'}`,
+            }));
         }
     });
 
-    box.append(summary, body);
-    return box;
+    return h('details', { class: kind === 'info' ? 'panel info-step' : 'prep-info-note' },
+        h('summary', { class: `${prefix}-header` },
+            h('span', { class: `${prefix}-caret` }),
+            kind === 'info' ? h('span', { class: 'info-step-label', text: 'Notes' }) : ' Notes'),
+        body,
+    );
 }
 
 // ============================================================
@@ -2667,10 +2284,7 @@ function applyLock(panel: HTMLElement, step: Step): void {
         (!startWhenIds || startWhenIds.length === 0 || startWhenIds.every(isStarted));
 
     panel.classList.add('step-locked');
-    const pill = document.createElement('div');
-    pill.className   = 'waiting-pill';
-    pill.textContent = '⏳ waiting…';
-    panel.appendChild(pill);
+    const pill = panel.appendChild(h('div', { class: 'waiting-pill', text: '⏳ waiting…' }));
 
     const unlock = () => {
         if (!isUnlocked()) return;
@@ -2691,19 +2305,12 @@ function applyLock(panel: HTMLElement, step: Step): void {
 // ============================================================
 
 function renderStep(step: Step, onDone?: () => void): HTMLElement {
-    const panel = createPanel();
-    panel.id    = `step-${step.id}`;
+    const panel = h('div', { class: 'panel', id: `step-${step.id}` });
 
     if (step.children && step.children.length > 0) {
         panel.classList.add('container-step');
-        const header = document.createElement('div');
-        header.className   = 'container-header';
-        header.textContent = step.text;
-        panel.appendChild(header);
-
-        const childWrap = document.createElement('div');
-        childWrap.className = 'container-children';
-        panel.appendChild(childWrap);
+        const childWrap = h('div', { class: 'container-children' });
+        panel.append(h('div', { class: 'container-header', text: step.text }), childWrap);
 
         const checkDone = () => {
             // A child is "done" when it's been tapped (done-child) or, for a timer/gate
@@ -2729,17 +2336,14 @@ function renderStep(step: Step, onDone?: () => void): HTMLElement {
 
     if (step.type === 'timer' && step.durationSeconds) {
         const secs = step.durationSeconds;
-        const h = Math.floor(secs / 3600);
-        const m = Math.floor((secs % 3600) / 60);
-        const s = secs % 60;
+        const hrs  = Math.floor(secs / 3600);
+        const mins = Math.floor((secs % 3600) / 60);
+        const rest = secs % 60;
         const parts = [];
-        if (h) parts.push(`${h}h`);
-        if (m) parts.push(`${m}m`);
-        if (s || parts.length === 0) parts.push(`${s}s`);
-        const badge = document.createElement('span');
-        badge.className = 'timer-duration-badge';
-        badge.textContent = parts.join(' ');
-        panel.appendChild(badge);
+        if (hrs) parts.push(`${hrs}h`);
+        if (mins) parts.push(`${mins}m`);
+        if (rest || parts.length === 0) parts.push(`${rest}s`);
+        panel.appendChild(h('span', { class: 'timer-duration-badge', text: parts.join(' ') }));
     }
 
     if (step.type === 'timer') {
@@ -2825,7 +2429,7 @@ function skipTimer(step: Step, panel: HTMLElement, onDone?: () => void): void {
 // ============================================================
 
 function createStartOverButton(): HTMLButtonElement {
-    const btn = createButton('↩ Start Over', () => {
+    return backButton('↩ Start Over', () => {
         state.timers.forEach((id) => window.clearInterval(id));
         state.timers.clear();
         releaseWakeLockIfIdle();
@@ -2854,8 +2458,6 @@ function createStartOverButton(): HTMLButtonElement {
         }
         navigateTo('select');
     });
-    btn.className = 'start-over-btn';
-    return btn;
 }
 
 // ============================================================
@@ -2974,45 +2576,24 @@ function renderGateQuestion(step: Step, panel: HTMLElement, onDone?: () => void)
     panel.classList.remove('timer');
     panel.textContent = '';
 
-    const question = document.createElement('div');
-    question.className   = 'gate-question';
-    question.textContent = step.text;
-    panel.appendChild(question);
-
     const runCount = state.gateRunCounts.get(step.id) ?? 0;
-    if (runCount > 0) {
-        const runCountLabel = document.createElement('div');
-        runCountLabel.className   = 'gate-run-count';
-        runCountLabel.textContent = `Checked ${runCount}×`;
-        panel.appendChild(runCountLabel);
-    }
-
-    const buttonRow = document.createElement('div');
-    buttonRow.className = 'gate-button-row';
-
-    const yesBtn = document.createElement('button');
-    yesBtn.type        = 'button';
-    yesBtn.className   = 'gate-yes-btn';
-    yesBtn.textContent = 'Yes';
-    yesBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (panel.classList.contains('step-locked')) return;
-        completeTimer(step, panel, onDone);
+    const answer = (cls: string, text: string, onClick: () => void) => h('button', {
+        class: cls, text,
+        on: {
+            click: (e) => {
+                e.stopPropagation();
+                if (!panel.classList.contains('step-locked')) onClick();
+            },
+        },
     });
-
-    const noBtn = document.createElement('button');
-    noBtn.type        = 'button';
-    noBtn.className   = 'gate-no-btn';
-    noBtn.textContent = 'No';
-    noBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (panel.classList.contains('step-locked')) return;
-        startGateRetryTimer(step, panel, onDone);
-    });
-
-    buttonRow.appendChild(yesBtn);
-    buttonRow.appendChild(noBtn);
-    panel.appendChild(buttonRow);
+    panel.append(
+        h('div', { class: 'gate-question', text: step.text }),
+        ...(runCount > 0 ? [h('div', { class: 'gate-run-count', text: `Checked ${runCount}×` })] : []),
+        h('div', { class: 'gate-button-row' },
+            answer('gate-yes-btn', 'Yes', () => completeTimer(step, panel, onDone)),
+            answer('gate-no-btn', 'No', () => startGateRetryTimer(step, panel, onDone)),
+        ),
+    );
 }
 
 function startGateRetryTimer(step: Step, panel: HTMLElement, onDone?: () => void): void {
@@ -3057,11 +2638,9 @@ let soundBlockedBanner: HTMLElement | null = null;
 
 function showSoundBlockedBanner(): void {
     if (soundBlockedBanner) return;
-    const banner = document.createElement('div');
-    banner.className   = 'sound-blocked-banner';
-    banner.textContent = '🔇 Alarm sound was blocked by the browser - tap anywhere to enable it';
-    document.body.appendChild(banner);
-    soundBlockedBanner = banner;
+    soundBlockedBanner = document.body.appendChild(h('div', {
+        class: 'sound-blocked-banner', text: '🔇 Alarm sound was blocked by the browser - tap anywhere to enable it',
+    }));
 }
 
 function hideSoundBlockedBanner(): void {
@@ -3076,12 +2655,7 @@ function hideSoundBlockedBanner(): void {
 function showSoundErrorOnPanel(panel: HTMLElement, err: unknown): void {
     if (!panel.isConnected) return;
     const message = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
-    let errEl = panel.querySelector<HTMLElement>('.sound-error');
-    if (!errEl) {
-        errEl = document.createElement('div');
-        errEl.className = 'sound-error';
-        panel.appendChild(errEl);
-    }
+    const errEl = panel.querySelector<HTMLElement>('.sound-error') ?? panel.appendChild(h('div', { class: 'sound-error' }));
     errEl.textContent = `🔇 sound failed: ${message}`;
 }
 
@@ -3122,24 +2696,15 @@ function startAlarm(step: Step, panel: HTMLElement, dueAt: number, onAcknowledge
 
     const dueAtLabel = formatClockTime(dueAt);
 
-    const label = document.createElement('div');
-    label.className   = 'ringing-label';
-    label.textContent = `⏰ ${step.text} - time's up!`;
-    panel.appendChild(label);
-
-    const countdown = document.createElement('div');
-    countdown.className = 'ringing-countdown';
-    panel.appendChild(countdown);
-
-    const stopBtn = document.createElement('button');
-    stopBtn.type        = 'button';
-    stopBtn.className   = 'stop-alarm-btn';
-    stopBtn.textContent = 'Stop Alarm';
-    stopBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        acknowledgeAlarm(step.id);
-    });
-    panel.appendChild(stopBtn);
+    const countdown = h('div', { class: 'ringing-countdown' });
+    panel.append(
+        h('div', { class: 'ringing-label', text: `⏰ ${step.text} - time's up!` }),
+        countdown,
+        h('button', {
+            class: 'stop-alarm-btn', text: 'Stop Alarm',
+            on: { click: (e) => { e.stopPropagation(); acknowledgeAlarm(step.id); } },
+        }),
+    );
 
     activeAlarms.set(step.id, { panel, onAcknowledge });
 
@@ -3227,8 +2792,6 @@ function createSoundTestPanel(): HTMLElement {
     return panel;
 }
 
-
-
 // ============================================================
 // URL ROUTING
 // ============================================================
@@ -3243,12 +2806,7 @@ function getRecipeIdFromURL(): string | null {
 // ============================================================
 
 function renderPrepScreen(): void {
-    const root = getElement<HTMLDivElement>('app');
-    clear(root);
-
-    const heading = document.createElement('h1');
-    heading.textContent = 'Prep';
-    root.appendChild(heading);
+    const root = screen('Prep');
 
     let anyFound = false;
     getSelectedRecipes().filter(r => !r.adhoc).forEach(recipe => {
@@ -3257,47 +2815,24 @@ function renderPrepScreen(): void {
         if (prepSteps.length === 0) return;
         anyFound = true;
 
-        const title = document.createElement('div');
-        title.className = 'prep-recipe-title';
-        title.textContent = recipe.name + (count > 1 ? ` ×${count}` : '');
-        root.appendChild(title);
+        root.appendChild(h('div', { class: 'prep-recipe-title', text: recipe.name + (count > 1 ? ` ×${count}` : '') }));
 
         const infoSteps = [...walkSteps(recipe.steps)].filter(s => s.type === 'info');
         if (infoSteps.length > 0) root.appendChild(notesBox('prep', infoSteps));
 
         prepSteps.forEach(step => {
-            const card = createPanel();
-            card.className += ' prep-step';
-
-            const text = document.createElement('span');
-            text.textContent = step.text;
-            card.appendChild(text);
-
-            if (step.ingredients && step.ingredients.length > 0) {
-                const ingList = document.createElement('div');
-                ingList.className = 'prep-step-ingredients';
-                ingList.textContent = step.ingredients.map(i => formatIngredient(i)).join(', ');
-                card.appendChild(ingList);
-            }
-
-            card.addEventListener('click', () => {
-                card.classList.toggle('prep-done');
-            });
-
+            const card = h('div', { class: 'panel prep-step', on: { click: () => card.classList.toggle('prep-done') } },
+                h('span', { text: step.text }),
+                step.ingredients && step.ingredients.length > 0 && h('div', {
+                    class: 'prep-step-ingredients', text: step.ingredients.map(i => formatIngredient(i)).join(', '),
+                }),
+            );
             root.appendChild(card);
         });
     });
 
-    if (!anyFound) {
-        const empty = document.createElement('p');
-        empty.textContent = 'No prep steps in the selected recipes.';
-        empty.className = 'muted-note';
-        root.appendChild(empty);
-    }
-
-    const backBtn = createButton('← Back', () => navigateTo('select'));
-    backBtn.className = 'start-over-btn';
-    root.appendChild(backBtn);
+    if (!anyFound) root.appendChild(h('p', { text: 'No prep steps in the selected recipes.', class: 'muted-note' }));
+    root.appendChild(backButton('← Back', () => navigateTo('select')));
 }
 
 // ============================================================
@@ -3382,117 +2917,87 @@ export function schedulePlan(cfg: PlanConfig, recipes: { recipe: Recipe; count: 
 }
 
 function renderPlanScreen(): void {
-    const root = getElement<HTMLDivElement>('app');
-    clear(root);
+    const root = screen('Day Planner');
     let cfg = loadPlanConfig();
 
-    const heading = document.createElement('h1');
-    heading.textContent = 'Day Planner';
-    root.appendChild(heading);
-
     // ── Config panel ──────────────────────────────────────────
-    const configPanel = document.createElement('div');
-    configPanel.className = 'plan-config-panel';
-
-    const configTitle = document.createElement('div');
-    configTitle.className = 'plan-section-title';
-    configTitle.textContent = 'Time Blocks';
-    configPanel.appendChild(configTitle);
-
-    const blockList = document.createElement('div');
-    blockList.className = 'plan-block-list';
-    configPanel.appendChild(blockList);
+    const blockList = h('div', { class: 'plan-block-list' });
 
     function renderBlocks() {
         clear(blockList);
         cfg.blocks.forEach((block, idx) => {
-            const row = document.createElement('div');
-            row.className = 'plan-block-row';
+            // A visually hidden label for a block's input.
+            const hiddenLabel = (forId: string, text: string) => h('label', { htmlFor: forId, class: 'visually-hidden', text });
 
             // A labelled time input bound to this block's start or end.
             const timeField = (edge: 'start' | 'end'): [HTMLLabelElement, HTMLInputElement] => {
-                const input = document.createElement('input');
-                input.type = 'time'; input.id = `block-${idx}-${edge}`; input.value = block[edge]; input.className = 'plan-time-input';
-                input.required = true;
-                const label = document.createElement('label');
-                label.htmlFor = input.id;
-                label.className = 'visually-hidden';
-                label.textContent = `Block ${idx + 1} ${edge}`;
-                input.addEventListener('change', () => {
-                    if (!isHhmm(input.value)) { input.value = cfg.blocks[idx][edge]; return; }
-                    cfg.blocks[idx][edge] = input.value; savePlanConfig(cfg); scheduleAndRender();
+                const input = h('input', {
+                    type: 'time', id: `block-${idx}-${edge}`, value: block[edge], class: 'plan-time-input', required: true,
+                    on: {
+                        change: () => {
+                            if (!isHhmm(input.value)) { input.value = cfg.blocks[idx][edge]; return; }
+                            cfg.blocks[idx][edge] = input.value; savePlanConfig(cfg); scheduleAndRender();
+                        },
+                    },
                 });
-                return [label, input];
+                return [hiddenLabel(input.id, `Block ${idx + 1} ${edge}`), input];
             };
 
-            const sep = document.createElement('span');
-            sep.textContent = '→'; sep.className = 'plan-block-sep';
-            sep.setAttribute('aria-hidden', 'true');
+            const typeSelect = h('select', {
+                class: 'plan-type-select', id: `block-${idx}-type`,
+                on: { change: () => { cfg.blocks[idx].type = typeSelect.value as PlanBlock['type']; savePlanConfig(cfg); scheduleAndRender(); } },
+            }, ...[['home', '🏠 Home'], ['portable', '🎒 Portable'], ['away', '🏢 Away']].map(([value, text]) =>
+                h('option', { value, text, selected: value === block.type })));
 
-            const typeSelect = document.createElement('select');
-            typeSelect.className = 'plan-type-select';
-            typeSelect.id = `block-${idx}-type`;
-            const typeLabel = document.createElement('label');
-            typeLabel.htmlFor = typeSelect.id;
-            typeLabel.className = 'visually-hidden';
-            typeLabel.textContent = `Block ${idx + 1} place`;
-            [['home', '🏠 Home'], ['portable', '🎒 Portable'], ['away', '🏢 Away']].forEach(([val, label]) => {
-                const opt = document.createElement('option');
-                opt.value = val; opt.textContent = label;
-                if (val === block.type) opt.selected = true;
-                typeSelect.appendChild(opt);
-            });
-            typeSelect.addEventListener('change', () => { cfg.blocks[idx].type = typeSelect.value as PlanBlock['type']; savePlanConfig(cfg); scheduleAndRender(); });
-
-            const delBtn = document.createElement('button');
-            delBtn.type = 'button';
-            delBtn.textContent = '×'; delBtn.className = 'plan-block-del';
-            hiddenText(delBtn, `Remove block ${idx + 1}`);
-            delBtn.addEventListener('click', () => { cfg.blocks.splice(idx, 1); savePlanConfig(cfg); renderBlocks(); scheduleAndRender(); });
-
-            row.append(...timeField('start'), sep, ...timeField('end'), typeLabel, typeSelect, delBtn);
-            blockList.appendChild(row);
+            blockList.appendChild(h('div', { class: 'plan-block-row' },
+                ...timeField('start'),
+                h('span', { text: '→', class: 'plan-block-sep', attrs: { 'aria-hidden': 'true' } }),
+                ...timeField('end'),
+                hiddenLabel(typeSelect.id, `Block ${idx + 1} place`),
+                typeSelect,
+                h('button', {
+                    text: '×', class: 'plan-block-del',
+                    on: { click: () => { cfg.blocks.splice(idx, 1); savePlanConfig(cfg); renderBlocks(); scheduleAndRender(); } },
+                }, srOnly(`Remove block ${idx + 1}`)),
+            ));
         });
 
-        const addBtn = document.createElement('button');
-        addBtn.type = 'button';
-        addBtn.textContent = '+ Add Block'; addBtn.className = 'plan-add-block-btn';
-        addBtn.setAttribute('data-testid', 'add-plan-block');
-        addBtn.addEventListener('click', () => {
-            const last = cfg.blocks[cfg.blocks.length - 1];
-            const newStart = last ? last.end : '07:00';
-            const [h, m] = newStart.split(':').map(Number);
-            const newEnd = `${String(Math.min(h + 1, 23)).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-            cfg.blocks.push({ id: String(Date.now()), start: newStart, end: newEnd, type: 'home' });
-            savePlanConfig(cfg); renderBlocks(); scheduleAndRender();
-        });
-        blockList.appendChild(addBtn);
+        blockList.appendChild(h('button', {
+            text: '+ Add Block', class: 'plan-add-block-btn', testid: 'add-plan-block',
+            on: {
+                click: () => {
+                    const last = cfg.blocks[cfg.blocks.length - 1];
+                    const newStart = last ? last.end : '07:00';
+                    const [hr, m] = newStart.split(':').map(Number);
+                    const newEnd = `${String(Math.min(hr + 1, 23)).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+                    cfg.blocks.push({ id: String(Date.now()), start: newStart, end: newEnd, type: 'home' });
+                    savePlanConfig(cfg); renderBlocks(); scheduleAndRender();
+                },
+            },
+        }));
     }
 
-    const cutoffRow = document.createElement('div');
-    cutoffRow.className = 'plan-cutoff-row';
-    const cutoffLabel = document.createElement('label');
-    cutoffLabel.htmlFor = 'calorie-cutoff';
-    cutoffLabel.textContent = '🎯 Calorie cutoff (eat before):';
-    cutoffLabel.className = 'plan-cutoff-label';
-    const cutoffIn = document.createElement('input');
-    cutoffIn.type = 'time'; cutoffIn.id = 'calorie-cutoff'; cutoffIn.value = cfg.caloriesCutoff; cutoffIn.className = 'plan-time-input';
-    cutoffIn.setAttribute('data-testid', 'calorie-cutoff');
-    cutoffIn.addEventListener('change', () => {
-        if (!isHhmm(cutoffIn.value)) { cutoffIn.value = cfg.caloriesCutoff; return; }
-        cfg.caloriesCutoff = cutoffIn.value; savePlanConfig(cfg); scheduleAndRender();
+    const cutoffIn = h('input', {
+        type: 'time', id: 'calorie-cutoff', value: cfg.caloriesCutoff, class: 'plan-time-input', testid: 'calorie-cutoff',
+        on: {
+            change: () => {
+                if (!isHhmm(cutoffIn.value)) { cutoffIn.value = cfg.caloriesCutoff; return; }
+                cfg.caloriesCutoff = cutoffIn.value; savePlanConfig(cfg); scheduleAndRender();
+            },
+        },
     });
-    cutoffRow.appendChild(cutoffLabel); cutoffRow.appendChild(cutoffIn);
-    configPanel.appendChild(cutoffRow);
-    root.appendChild(configPanel);
+    root.appendChild(h('div', { class: 'plan-config-panel' },
+        h('div', { class: 'plan-section-title', text: 'Time Blocks' }),
+        blockList,
+        h('div', { class: 'plan-cutoff-row' },
+            h('label', { htmlFor: 'calorie-cutoff', text: '🎯 Calorie cutoff (eat before):', class: 'plan-cutoff-label' }),
+            cutoffIn,
+        ),
+    ));
 
     // ── Schedule output ───────────────────────────────────────
-    const scheduleTitle = document.createElement('div');
-    scheduleTitle.className = 'plan-section-title plan-section-spaced';
-    root.appendChild(scheduleTitle);
-
-    const scheduleOut = document.createElement('div');
-    root.appendChild(scheduleOut);
+    const scheduleTitle = root.appendChild(h('div', { class: 'plan-section-title plan-section-spaced' }));
+    const scheduleOut = root.appendChild(h('div'));
 
     function scheduleAndRender() {
         clear(scheduleOut);
@@ -3502,10 +3007,7 @@ function renderPlanScreen(): void {
         });
 
         if (deduped.length === 0) {
-            const empty = document.createElement('p');
-            empty.textContent = 'No recipes selected.';
-            empty.className = 'muted-note';
-            scheduleOut.appendChild(empty);
+            scheduleOut.appendChild(h('p', { text: 'No recipes selected.', class: 'muted-note' }));
             return;
         }
 
@@ -3513,70 +3015,44 @@ function renderPlanScreen(): void {
 
         const { scheduled, unscheduled } = schedulePlan(cfg, deduped);
 
-        scheduled.forEach(({ recipe, count, startMin, blockType, afterCutoff }) => {
-            const card = document.createElement('div');
-            card.className = 'plan-slot' + (afterCutoff ? ' plan-slot-late' : '');
-
-            const timeEl = document.createElement('span');
-            timeEl.className = 'plan-slot-time';
-            timeEl.textContent = fromMinutes(startMin);
-
-            const nameEl = document.createElement('span');
-            nameEl.className = 'plan-slot-name';
-            nameEl.textContent = recipe.name + (count > 1 ? ` ×${count}` : '');
-
+        scheduled.forEach(({ recipe, count, startMin, afterCutoff }) => {
             const meta: string[] = [];
             if (recipe.planMinutes) meta.push(`${recipe.planMinutes} min`);
             if (recipe.portable) meta.push('portable');
             if (afterCutoff) meta.push('⚠ after cutoff');
 
-            const metaEl = document.createElement('span');
-            metaEl.className = 'plan-slot-meta';
-            metaEl.textContent = meta.join(' · ');
-
-            card.appendChild(timeEl); card.appendChild(nameEl); card.appendChild(metaEl);
-            scheduleOut.appendChild(card);
+            scheduleOut.appendChild(h('div', { class: 'plan-slot' + (afterCutoff ? ' plan-slot-late' : '') },
+                h('span', { class: 'plan-slot-time', text: fromMinutes(startMin) }),
+                h('span', { class: 'plan-slot-name', text: recipe.name + (count > 1 ? ` ×${count}` : '') }),
+                h('span', { class: 'plan-slot-meta', text: meta.join(' · ') }),
+            ));
         });
 
         if (unscheduled.length > 0) {
-            const warn = document.createElement('div');
-            warn.className = 'plan-unscheduled';
-            warn.textContent = '⚠ No available slot: ' + unscheduled.map(x => x.recipe.name).join(', ');
-            scheduleOut.appendChild(warn);
+            scheduleOut.appendChild(h('div', { class: 'plan-unscheduled', text: '⚠ No available slot: ' + unscheduled.map(x => x.recipe.name).join(', ') }));
         }
 
         const noPlan = deduped.filter(x => !x.recipe.planMinutes);
         if (noPlan.length > 0) {
-            const note = document.createElement('div');
-            note.className = 'plan-no-duration';
-            note.textContent = 'No duration set (won\'t block time): ' + noPlan.map(x => x.recipe.name).join(', ');
-            scheduleOut.appendChild(note);
+            scheduleOut.appendChild(h('div', { class: 'plan-no-duration', text: 'No duration set (won\'t block time): ' + noPlan.map(x => x.recipe.name).join(', ') }));
         }
 
         const batchPrep = deduped.filter(x => x.recipe.prepMinutes);
         if (batchPrep.length > 0) {
-            const batchTitle = document.createElement('div');
-            batchTitle.className = 'plan-section-title plan-section-spaced';
-            batchTitle.textContent = '🥘 Batch Prep (cook ahead)';
-            scheduleOut.appendChild(batchTitle);
-
+            scheduleOut.appendChild(h('div', { class: 'plan-section-title plan-section-spaced', text: '🥘 Batch Prep (cook ahead)' }));
             batchPrep.forEach(({ recipe }) => {
-                const row = document.createElement('div');
-                row.className = 'plan-batch-row';
-                const mins = recipe.prepMinutes!;
                 const days = recipe.perishableDays;
-                row.textContent = `${recipe.name} - ${mins} min cook time` + (days ? ` · keeps ${days} day${days > 1 ? 's' : ''} in fridge` : '');
-                scheduleOut.appendChild(row);
+                scheduleOut.appendChild(h('div', {
+                    class: 'plan-batch-row',
+                    text: `${recipe.name} - ${recipe.prepMinutes!} min cook time` + (days ? ` · keeps ${days} day${days > 1 ? 's' : ''} in fridge` : ''),
+                }));
             });
         }
     }
 
     renderBlocks();
     scheduleAndRender();
-
-    const backBtn = createButton('← Back', () => navigateTo('select'));
-    backBtn.className = 'start-over-btn';
-    root.appendChild(backBtn);
+    root.appendChild(backButton('← Back', () => navigateTo('select')));
 }
 
 // ============================================================
@@ -4128,9 +3604,9 @@ details[open] > summary :is(.info-step-caret, .prep-info-caret)::before { conten
 // BUILD INFO
 // ============================================================
 
-// Replaced with the real compile timestamp by scripts/validate-recipes.js's postbuild
-// step, right after `tsc` emits dist/file.js. Left as-is (and reported as "dev build")
-// when running straight from source, e.g. under `vite`.
+// Replaced with the real compile timestamp by scripts/stamp-build-time.js, right after
+// `tsc` emits dist/file.js. Left as-is (and reported as "dev build")
+// when the stamp step hasn't run.
 const BUILD_TIME = '__BUILD_TIME__';
 
 function formatBuildTime(): string {
@@ -4140,10 +3616,7 @@ function formatBuildTime(): string {
 }
 
 function appendBuildFooter(root: HTMLElement): void {
-    const footer = document.createElement('div');
-    footer.className   = 'build-footer';
-    footer.textContent = `Last compiled: ${formatBuildTime()}`;
-    root.appendChild(footer);
+    root.appendChild(h('div', { class: 'build-footer', text: `Last compiled: ${formatBuildTime()}` }));
 }
 
 // ============================================================
