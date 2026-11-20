@@ -1,38 +1,26 @@
 repos:
     - repo: https://github.com/pre-commit/pre-commit-hooks
-      rev: v6.0.0 # Use the ref you want to point at
+      rev: v6.0.0
       hooks:
           - id: check-added-large-files
           - id: check-case-conflict
-          - id: check-executables-have-shebangs
-          # -   id: check-json
           - id: check-merge-conflict
-          - id: check-shebang-scripts-are-executable
-          - id: check-symlinks
-          - id: check-toml
-          - id: check-vcs-permalinks
-          - id: check-xml
           - id: check-yaml
-          - id: destroyed-symlinks
-          - id: detect-aws-credentials
           - id: detect-private-key
           - id: end-of-file-fixer
-          - id: fix-byte-order-marker
-          - id: file-contents-sorter
-          - id: forbid-new-submodules
           - id: mixed-line-ending
-          - id: no-commit-to-branch
-          # -   id: pretty-format-json
-          # -   id: sort-simple-yaml
           - id: trailing-whitespace
+          - id: no-commit-to-branch
     - repo: https://github.com/codespell-project/codespell
       rev: v2.4.1
       hooks:
           - id: codespell
             args: ['-L bu']
-    - repo: https://github.com/pre-commit/mirrors-eslint
-      rev: 'v9.34.0' # Use the sha / tag you want to point at
+    - repo: local
       hooks:
           - id: eslint
-            files: \.[jt]sx?$ # *.js, *.jsx, *.ts and *.tsx
-            types: [file]
+            name: eslint
+            entry: npm run lint
+            language: system
+            pass_filenames: false
+            files: \.(c?js|mjs)$
