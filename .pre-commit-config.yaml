@@ -1,3 +1,5 @@
+# Vendored agent guides and archived recipes are left as-is.
+exclude: ^(\.agents|archived)/
 repos:
     - repo: https://github.com/pre-commit/pre-commit-hooks
       rev: v6.0.0
@@ -15,7 +17,8 @@ repos:
       rev: v2.4.1
       hooks:
           - id: codespell
-            args: ['-L bu']
+            args: ['-L bu,steams']
+            exclude: ^package-lock\.json$
     - repo: local
       hooks:
           - id: eslint
