@@ -58,6 +58,13 @@ async function snap(page, name) {
     const html = await page.evaluate(() => {
         const clone = document.body.cloneNode(true);
         clone.querySelectorAll('.build-footer').forEach((el) => { el.textContent = 'BUILD'; });
+        // Attribute order is not behavior: sort it so refactors that set props in a
+        // different order compare equal.
+        for (const el of [clone, ...clone.querySelectorAll('*')]) {
+            const attrs = [...el.attributes].map((a) => [a.name, a.value]).sort(([a], [b]) => a.localeCompare(b));
+            for (const [name] of attrs) el.removeAttribute(name);
+            for (const [name, value] of attrs) el.setAttribute(name, value);
+        }
         return clone.outerHTML.replace(/>\s+</g, '><').replace(/adhoc:([a-z-]+):\d+-\d+/g, 'adhoc:$1:ID');
     });
     writeFileSync(join(out, `${name}.html`), html + '\n');
