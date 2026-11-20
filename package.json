@@ -5,10 +5,9 @@
     "scripts": {
         "build": "tsc",
         "postbuild": "node scripts/validate-recipes.js",
-        "dev": "vite",
         "start": "node scripts/serve.js",
         "pretest": "npm run build",
-        "test": "node --experimental-detect-module --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test tests/*.test.mjs",
+        "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test tests/*.test.mjs",
         "lint": "eslint .",
         "audit-amazon": "node scripts/audit-products.js",
         "snapshot": "node tests/snapshot.mjs"
@@ -23,12 +22,11 @@
         "url": "https://github.com/clickthisnick/recipes/issues"
     },
     "homepage": "https://github.com/clickthisnick/recipes#readme",
-    "dependencies": {
-        "typescript": "^5.9.3"
-    },
     "devDependencies": {
+        "@eslint/js": "^9.39.5",
         "eslint": "^9.39.5",
+        "globals": "^17.14.0",
         "playwright": "^1.65.1",
-        "vite": "^8.3.8"
+        "typescript": "^5.9.3"
     }
 }

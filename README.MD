@@ -12,7 +12,7 @@ npm test
 npm run lint
 ```
 
-`npm run dev` starts Vite for work on `src/file.ts`. The recipe app is [dist/main.html](http://localhost:3000/dist/main.html). Open a single recipe with `?recipe=`, for example `dist/main.html?recipe=blueprint-smoothie`.
+The recipe app is [dist/main.html](http://localhost:3000/dist/main.html). Open a single recipe with `?recipe=`, for example `dist/main.html?recipe=blueprint-smoothie`.
 
 `npm run audit-amazon` checks Amazon prices. It needs Chrome already listening on the debugging port described in `scripts/audit-products.js`. It does not run in CI.
 

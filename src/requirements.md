@@ -672,7 +672,7 @@ The script also stamps the real compile timestamp into the freshly-built `dist/f
 ---
 
 ## Build Info
-The Select screen shows a small "Last compiled: {date}" footer at the bottom of the recipe list (part of the normal scrollable content, not the fixed action bar). `src/file.ts` declares a `BUILD_TIME` placeholder constant (`'__BUILD_TIME__'`); the `validate-recipes.js` postbuild step rewrites it in `dist/file.js` with the real compile timestamp (see [Validation Script](#validation-script-scriptsvalidate-recipesjs)). Running straight from source (e.g. under `vite`, without a `tsc` build) leaves the placeholder in place, which renders as `"dev build"` instead of a date.
+The Select screen shows a small "Last compiled: {date}" footer at the bottom of the recipe list (part of the normal scrollable content, not the fixed action bar). `src/file.ts` declares a `BUILD_TIME` placeholder constant (`'__BUILD_TIME__'`); the `validate-recipes.js` postbuild step rewrites it in `dist/file.js` with the real compile timestamp (see [Validation Script](#validation-script-scriptsvalidate-recipesjs)). Running without a `tsc` build leaves the placeholder in place, which renders as `"dev build"` instead of a date.
 
 ---
 

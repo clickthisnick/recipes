@@ -21,4 +21,4 @@ npm run build
 npm start
 ```
 
-Open http://localhost:3000/ . The recipe app is http://localhost:3000/dist/main.html . `npm test` runs the checks. `npm run dev` starts Vite.
+Open http://localhost:3000/ . The recipe app is http://localhost:3000/dist/main.html . `npm test` runs the checks.
