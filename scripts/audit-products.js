@@ -1,8 +1,8 @@
 'use strict';
 
-// ── Audit every product in src/file.ts against its live page ──────────────────
+// ── Audit every product in src/file.js against its live page ──────────────────
 //
-// For each product object in src/file.ts (currently only listings whose `link`
+// For each product object in src/file.js (currently only listings whose `link`
 // points at amazon.com are supported), this attaches to an already-running
 // Chrome and checks:
 //
@@ -29,7 +29,7 @@
 //   node scripts/audit-products.js
 //   DELAY_MS=8000 LIMIT=5 FILTER=blueprint node scripts/audit-products.js
 //
-// Passing one or more raw URLs instead skips the file.ts diffing entirely and just prints
+// Passing one or more raw URLs instead skips the file.js diffing entirely and just prints
 // what's on each page — for pulling in a brand-new ingredient's price/nutrition by hand:
 //   node scripts/audit-products.js <url> [<url> ...]
 //
@@ -48,10 +48,11 @@
 
 const fs = require('fs');
 const path = require('path');
-const ts = require('typescript');
+// TypeScript 7's package has no stable parser API yet, so parse with TypeScript 5.
+const ts = require('typescript5');
 const { chromium } = require('playwright');
 
-const FILE_PATH = path.resolve(__dirname, '../src/file.ts');
+const FILE_PATH = path.resolve(__dirname, '../src/file.js');
 const REPORT_PATH = path.resolve(__dirname, 'audit-report.md');
 const CDP_URL = process.env.CDP_URL || 'http://localhost:9222';
 const DELAY_MS = Number(process.env.DELAY_MS || 5000);
@@ -62,7 +63,7 @@ function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// ── Extract every supported product listing from src/file.ts (currently Amazon links only) ──
+// ── Extract every supported product listing from src/file.js (currently Amazon links only) ──
 
 function getStringLiteral(node) {
     return node && ts.isStringLiteral(node) ? node.text : undefined;
@@ -258,7 +259,7 @@ function extractAmazonListings(sourceFile) {
     return results;
 }
 
-// Compares scraped macros against whichever nutrition entry file.ts records for this product
+// Compares scraped macros against whichever nutrition entry file.js records for this product
 // (or its ingredient, per the resolution order captured in `nutrition`). With exactly one
 // recorded unit entry (the common case) it's used directly; with several, only compares when
 // the scraped serving unit confidently matches one of them — otherwise stays silent rather
@@ -407,7 +408,7 @@ function buildReportMarkdown(state) {
         lines.push('## OK');
         lines.push('');
         for (const r of ok) {
-            lines.push(`- \`${r.product.ingredientKey ?? '?'}\` — ${r.product.brand ?? '?'} — [file.ts:${r.product.line}](../src/file.ts#L${r.product.line}) · ${r.product.link}`);
+            lines.push(`- \`${r.product.ingredientKey ?? '?'}\` — ${r.product.brand ?? '?'} — [file.js:${r.product.line}](../src/file.js#L${r.product.line}) · ${r.product.link}`);
         }
         lines.push('');
     }
@@ -420,7 +421,7 @@ function renderResultSection(r) {
     const lines = [];
     const title = `${product.ingredientKey ?? '?'} — ${product.brand ?? '?'}${product.variant ? ` (${product.variant})` : ''}`;
     lines.push(`### ${title}`);
-    lines.push(`[file.ts:${product.line}](../src/file.ts#L${product.line}) · ${product.link}`);
+    lines.push(`[file.js:${product.line}](../src/file.js#L${product.line}) · ${product.link}`);
     lines.push('');
 
     if (r.priceDiff) {
@@ -457,7 +458,7 @@ function writeReport(state) {
 // ── Main ────────────────────────────────────────────────────────────────────
 
 // Ad-hoc lookup mode: raw URLs passed as CLI args are scraped and printed directly,
-// bypassing the file.ts diff pipeline entirely — for a brand-new ingredient not in the file yet.
+// bypassing the file.js diff pipeline entirely — for a brand-new ingredient not in the file yet.
 async function lookupUrls(urls) {
     const browser = await chromium.connectOverCDP(CDP_URL);
     const context = browser.contexts()[0] ?? (await browser.newContext());

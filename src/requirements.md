@@ -1,7 +1,7 @@
 # Recipe Cooking Assistant — Requirements
 
 ## Overview
-A single-file TypeScript app that lets a user select recipes, view a shopping list, review nutrition, and walk through cooking steps interactively. It runs in the browser with no frameworks.
+A single-file JavaScript app (types in JSDoc comments, checked by `tsc --noEmit`) that lets a user select recipes, view a shopping list, review nutrition, and walk through cooking steps interactively. It runs in the browser with no frameworks.
 
 ---
 
@@ -470,13 +470,13 @@ Each `Equipment` instance tracks its current `contents: Ingredient[]`, updated b
 ```
 transfer() from 'panko pan' to 'panko bowl': 'Panko Bread Crumbs' is not in panko pan. Contents: [empty]
 ```
-This is caught by `validate-recipes.ts` before serving.
+This is caught by `scripts/validate-recipes.js` (run by `npm test`) before serving.
 
 ---
 
 ## Recipe Authoring Pattern
 
-All recipes use an **imperative IIFE** pattern. This is required (not optional) — it ensures consistent style and allows side-effect calls like `rename()` between steps without TypeScript errors:
+All recipes use an **imperative IIFE** pattern. This is required (not optional) — it ensures consistent style and allows side-effect calls like `rename()` between steps without type errors:
 
 ```ts
 createRecipe(
@@ -552,7 +552,7 @@ For display/cost purposes, the shopping screen renders one row per `(product, li
 Subscribe & Save eligibility is recorded as a boolean per tier (5/10/15%) rather than a hardcoded dollar price — `subscribeAndSavePercent()` picks the highest eligible tier, and the S&S price is always computed live as `listing.price × (1 − percent/100)`, so it can never go stale independently of the base price. The Shopping screen only shows an S&S price when `listing.store === stores.amazon` — Whole Foods and other retailers don't offer Subscribe & Save even for an identical item.
 
 ### Nutrition is required
-Every ingredient must resolve to real nutrition data — there's no "missing" path. `ingredientFactory`'s TypeScript signature enforces this via two overloads: either the ingredient itself carries a `nutrition` label (for a true single product, regardless of how many retailers/listings sell it), or every entry in its `products` array does (for genuine multi-SKU categories, where one generic number would misrepresent whichever variant isn't picked). Passing neither is a compile error. `simpleIngredients()`'s bulk-declare helper is subject to the same rule — each entry must supply its own `nutrition`.
+Every ingredient must resolve to real nutrition data — there's no "missing" path. `ingredientFactory`'s JSDoc signature enforces this via two `@overload`s: either the ingredient itself carries a `nutrition` label (for a true single product, regardless of how many retailers/listings sell it), or every entry in its `products` array does (for genuine multi-SKU categories, where one generic number would misrepresent whichever variant isn't picked). Passing neither is a type error in `npm run typecheck`. `simpleIngredients()`'s bulk-declare helper is subject to the same rule — each entry must supply its own `nutrition`.
 
 ### Brand selection model
 - The default brand is the first entry in the factory's `products` (or the one named by `defaultBrand`, e.g. `defaultBrand: 'Blueprint'`), so every call to the factory is pre-pointed at that brand
@@ -610,7 +610,7 @@ Named constants for Amazon, Amazon Fresh, Whole Foods — used as the `store` fi
 ---
 
 ## Styling
-Dark theme (`#111` background, `#f0f0f0` text). Large touch-friendly cards (font-size 22px, padding 20px). Styles live in `src/app.css`, linked from `dist/main.html` (colors shared through `--fg`, `--muted` and `--ok` custom properties).
+Dark theme (`#111` background, `#f0f0f0` text). Large touch-friendly cards (font-size 22px, padding 20px). Styles live in `src/app.css`, linked from `main.html` (colors shared through `--fg`, `--muted` and `--ok` custom properties).
 
 Key visual states:
 - Selected recipe: green background
@@ -658,7 +658,7 @@ Timer/gate countdowns compute a fixed target end timestamp (`Date.now() + durati
 ---
 
 ## Validation Script (`scripts/validate-recipes.js`)
-Runs automatically as the `postbuild` step after `tsc` (`npm run build`). Checks:
+Runs as `npm run validate`, and automatically before `npm test` right after the `tsc --noEmit` typecheck. Checks:
 1. **`unlockAudioContext()` primes the real alarm element** — regression guard for a real production bug (see [Audio](#audio)): fails the build if `unlockAudioContext()`'s body creates a separate `new Audio(...)` instead of calling `audio.play()` directly on the shared alarm element, or if that call is removed entirely. Fails the build.
 2. **Consecutive `.add()` calls** on the same equipment variable with no step between them — should be consolidated into one `.add()`. Fails the build.
 3. **Redundant nutrition entries** — flags an ingredient whose `nutrition` label has entries for both units of a declared `conversions` pair (or two entries with identical values, implying an unstated `factor: 1`), since the conversion system already derives one from the other. Fails the build.
@@ -670,13 +670,13 @@ Runs automatically as the `postbuild` step after `tsc` (`npm run build`). Checks
 ---
 
 ## Build Info
-The Select screen shows a small "Last compiled: {date}" footer at the bottom of the recipe list (part of the normal scrollable content, not the fixed action bar). `src/file.ts` declares a `BUILD_TIME` placeholder constant (`'__BUILD_TIME__'`); the `validate-recipes.js` postbuild step rewrites it in `dist/file.js` with the real compile timestamp (see [Validation Script](#validation-script-scriptsvalidate-recipesjs)). Running without a `tsc` build leaves the placeholder in place, which renders as `"dev build"` instead of a date.
+The Select screen shows a small "Last compiled: {date}" footer at the bottom of the recipe list (part of the normal scrollable content, not the fixed action bar). There is no build step, so the date is `document.lastModified`: the `Last-Modified` header the server sends for `main.html`. GitHub Pages sets it to the time the site was last deployed. If the browser can't parse it, the footer shows `"dev build"` instead of a date.
 
 ---
 
 ## Touch & Zoom Behavior
 Since this is a kitchen app typically used one-handed or with messy hands, pinch/double-tap zoom is suppressed:
-- The viewport meta tag (`dist/main.html`) sets `maximum-scale=1.0, user-scalable=no`
+- The viewport meta tag (`main.html`) sets `maximum-scale=1.0, user-scalable=no`
 - `html, body { touch-action: pan-x pan-y; }` blocks pinch-zoom gestures at the CSS level while still allowing normal scrolling
 - A `gesturestart` listener (feature-detected, WebKit-only) calls `preventDefault()` to cover iOS Safari's non-standard pinch gesture events, which aren't fully covered by `touch-action` alone
 
