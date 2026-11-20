@@ -1276,26 +1276,6 @@ function getRecipeURL(recipeId: string): string {
     return `${baseURL}?recipe=${recipeId}`;
 }
 
-function copyToClipboard(text: string): Promise<void> {
-    const legacy = (): void => {
-        const textarea = document.createElement('textarea');
-        textarea.value = text;
-        textarea.setAttribute('readonly', '');
-        textarea.style.position = 'fixed';
-        textarea.style.left = '-9999px';
-        document.body.appendChild(textarea);
-        textarea.select();
-        let ok = false;
-        try { ok = document.execCommand('copy'); } catch { ok = false; }
-        document.body.removeChild(textarea);
-        if (!ok) throw new Error('Copy failed');
-    };
-    if (navigator.clipboard?.writeText) {
-        return navigator.clipboard.writeText(text).catch(() => { legacy(); });
-    }
-    return Promise.resolve().then(legacy);
-}
-
 function createCopyButton(recipeId: string): HTMLButtonElement {
     const recipeName = state.recipes.get(recipeId)?.name ?? recipeId;
     const restingLabel = `Copy link to ${recipeName}`;
@@ -1305,25 +1285,23 @@ function createCopyButton(recipeId: string): HTMLButtonElement {
     btn.textContent = 'Copy';
     btn.setAttribute('aria-label', restingLabel);
     btn.setAttribute('data-testid', `copy-${recipeId}`);
+    // Show the result for 1.5s, then go back to "Copy".
+    const flash = (text: string, label: string): void => {
+        btn.textContent = text;
+        btn.setAttribute('aria-label', label);
+        announce(label);
+        setTimeout(() => {
+            btn.textContent = 'Copy';
+            btn.setAttribute('aria-label', restingLabel);
+        }, 1500);
+    };
     btn.addEventListener('click', (ev) => {
         ev.stopPropagation();
-        copyToClipboard(getRecipeURL(recipeId)).then(() => {
-            btn.textContent = 'Copied';
-            btn.setAttribute('aria-label', `Copied link to ${recipeName}`);
-            announce(`Copied link to ${recipeName}`);
-            setTimeout(() => {
-                btn.textContent = 'Copy';
-                btn.setAttribute('aria-label', restingLabel);
-            }, 1500);
-        }).catch(() => {
-            btn.textContent = 'Copy failed';
-            btn.setAttribute('aria-label', `Copy failed for ${recipeName}`);
-            announce(`Copy failed for ${recipeName}`);
-            setTimeout(() => {
-                btn.textContent = 'Copy';
-                btn.setAttribute('aria-label', restingLabel);
-            }, 1500);
-        });
+        // Wrapped so a missing Clipboard API (plain-http LAN address) also reads "Copy failed".
+        Promise.resolve().then(() => navigator.clipboard.writeText(getRecipeURL(recipeId))).then(
+            () => flash('Copied', `Copied link to ${recipeName}`),
+            () => flash('Copy failed', `Copy failed for ${recipeName}`),
+        );
     });
     return btn;
 }

@@ -67,7 +67,7 @@
             <label for="custom-food-json">Food JSON</label>
             <textarea id="custom-food-json" readonly data-testid="custom-food-json"></textarea>
         </div>
-        <button type="button" id="copy-custom-food" data-testid="copy-custom-food" command="--copy" commandfor="custom-food-json">
+        <button type="button" id="copy-custom-food" data-testid="copy-custom-food">
             Copy JSON<span class="visually-hidden"> for the custom food</span>
         </button>
         <p id="copy-status" class="status" role="status"></p>
@@ -330,15 +330,7 @@
             }
             copyTimer = window.setTimeout(() => { copyStatus.textContent = ''; }, 2000);
         }
-        if ('CommandEvent' in window) {
-            document.addEventListener('command', (event) => {
-                if (event.command !== '--copy' || event.target !== jsonBox) return;
-                event.preventDefault();
-                copyJson();
-            }, true);
-        } else {
-            copyButton.addEventListener('click', () => copyJson());
-        }
+        copyButton.addEventListener('click', copyJson);
 
         function selectedSummary() {
             return Object.entries(selectedFoods).map(([key, quantity]) => ({
