@@ -515,7 +515,7 @@ The display name (`name`) is generic — "Macadamia Nut Milk", not "Milkadamia" 
 
 Optional metadata:
 - `products` — an array of `Product` entries; each is a specific SKU (brand + variant), with its own size/nutrition and one or more `listings` (where it can be bought)
-- `defaultBrand` — the brand string of the selected product. Its label drives nutrition; it's marked as the pick (`✓`) on the shopping list. If unset, the first product is used
+- `defaultBrand` — the brand string of the selected product. Its label drives nutrition; it's marked as the pick (`✓`) on the shopping list. If unset, the first product is used, so only set it when the pick isn't the first product
 - `nutrition` — an ingredient-level label, used for brand-independent items like produce (celery, banana). Ignored when a selected product carries its own `nutrition`
 - `perishableDays`, `isMeatProduct`
 - `requiresDateLabel` — if `true`, automatically adds an instruction child step to any `.add()` call using this ingredient, asking the user to write today's date on the bottle with a Sharpie (useful for tracking expiration)
@@ -555,7 +555,7 @@ Subscribe & Save eligibility is recorded as a boolean per tier (5/10/15%) rather
 Every ingredient must resolve to real nutrition data — there's no "missing" path. `ingredientFactory`'s TypeScript signature enforces this via two overloads: either the ingredient itself carries a `nutrition` label (for a true single product, regardless of how many retailers/listings sell it), or every entry in its `products` array does (for genuine multi-SKU categories, where one generic number would misrepresent whichever variant isn't picked). Passing neither is a compile error. `simpleIngredients()`'s bulk-declare helper is subject to the same rule — each entry must supply its own `nutrition`.
 
 ### Brand selection model
-- The default brand is set on the ingredient factory (`defaultBrand: 'Milkadamia'`), so every call to `i.macadamiaNutMilk()` is pre-pointed at that brand
+- The default brand is the first entry in the factory's `products` (or the one named by `defaultBrand`, e.g. `defaultBrand: 'Blueprint'`), so every call to the factory is pre-pointed at that brand
 - A recipe can override per use by setting `products`/`defaultBrand` on the returned ingredient instance — defaults are per ingredient, swappable per recipe
 - Resolution for nutrition: selected product's `nutrition` → ingredient's own `nutrition` → flagged `missing`/`uncomputable` as before
 - Nutrition is **never** blended across brands — one brand is in the dish, so one label is used
