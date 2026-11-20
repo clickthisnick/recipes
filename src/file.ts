@@ -2562,6 +2562,7 @@ function renderCookingScreen(): void {
     }
 
     let lastRecipeId: string | undefined;
+    const badgeUpdaters: (() => void)[] = [];
 
     // Every step renders in its natural recipe order, whether locked or not - a locked
     // step just looks/behaves locked in place (see applyLock). Nothing ever moves once
@@ -2593,17 +2594,7 @@ function renderCookingScreen(): void {
                     badge.textContent = `${estimateDisplay} · actual ${formatElapsed(secs)}`;
                 };
                 updateBadge();
-
-                if (state.cookingElapsedInterval !== null) window.clearInterval(state.cookingElapsedInterval);
-                state.cookingElapsedInterval = window.setInterval(() => {
-                    const hasSteps = document.querySelector(`#app .panel:not(.completed):not(.skipped)`);
-                    if (!hasSteps) {
-                        window.clearInterval(state.cookingElapsedInterval!);
-                        state.cookingElapsedInterval = null;
-                        return;
-                    }
-                    updateBadge();
-                }, 1000);
+                badgeUpdaters.push(updateBadge);
 
                 header.appendChild(title);
                 header.appendChild(badge);
@@ -2629,6 +2620,17 @@ function renderCookingScreen(): void {
 
         root.appendChild(renderStep(step));
     }
+
+    // One ticker keeps every recipe's "actual" elapsed time current until no step is left.
+    if (state.cookingElapsedInterval !== null) window.clearInterval(state.cookingElapsedInterval);
+    state.cookingElapsedInterval = window.setInterval(() => {
+        if (!document.querySelector('#app .panel:not(.completed):not(.skipped)')) {
+            window.clearInterval(state.cookingElapsedInterval!);
+            state.cookingElapsedInterval = null;
+            return;
+        }
+        badgeUpdaters.forEach(update => update());
+    }, 1000);
 
     root.appendChild(createStartOverButton());
 }
@@ -2692,17 +2694,12 @@ function applyLock(panel: HTMLElement, step: Step): void {
     const appEl = document.getElementById('app');
     if (!appEl) return;
 
-    const isStarted = (id: number): boolean => {
+    const stepMatches = (id: number, selector: string): boolean => {
         const el = document.getElementById(`step-${id}`);
-        if (!el) return true;
-        return el.classList.contains('timer') || el.classList.contains('ringing') ||
-               el.classList.contains('completed') || el.classList.contains('skipped') ||
-               el.classList.contains('done-child');
+        return !el || el.matches(selector);
     };
-    const isFinished = (id: number): boolean => {
-        const el = document.getElementById(`step-${id}`);
-        return !el || el.classList.contains('completed') || el.classList.contains('skipped') || el.classList.contains('ringing');
-    };
+    const isStarted  = (id: number) => stepMatches(id, '.timer, .ringing, .completed, .skipped, .done-child');
+    const isFinished = (id: number) => stepMatches(id, '.completed, .skipped, .ringing');
 
     const isUnlocked = () =>
         (!waitForIds || waitForIds.length === 0 || waitForIds.every(isFinished)) &&
@@ -2785,38 +2782,14 @@ function renderStep(step: Step, onDone?: () => void): HTMLElement {
     }
 
     if (step.type === 'timer') {
-        let clickCount = 0;
-        let clickTimer = 0;
-        panel.addEventListener('click', () => {
-            if (panel.classList.contains('step-locked')) return;
-            if (panel.classList.contains('completed') || panel.classList.contains('skipped')) return;
-            // While ringing, the document-wide click listener (see startAlarm) handles
-            // dismissal - just make sure this handler doesn't restart the timer.
-            if (panel.classList.contains('ringing')) return;
-            if (!state.timers.has(step.id)) { startTimer(step, panel, onDone); return; }
-            clickCount++;
-            window.clearTimeout(clickTimer);
-            if (clickCount >= 3) { clickCount = 0; skipTimer(step, panel, onDone); return; }
-            clickTimer = window.setTimeout(() => { clickCount = 0; }, 600);
-        });
+        onTimerTaps(panel, step, () => startTimer(step, panel, onDone), () => skipTimer(step, panel, onDone));
         applyLock(panel, step);
         return panel;
     }
 
     if (step.type === 'gate') {
-        let clickCount = 0;
-        let clickTimer = 0;
-        panel.addEventListener('click', () => {
-            if (panel.classList.contains('step-locked')) return;
-            if (panel.classList.contains('completed') || panel.classList.contains('skipped')) return;
-            // While ringing, the document-wide click listener (see startAlarm) handles dismissal.
-            if (panel.classList.contains('ringing')) return;
-            if (!state.timers.has(step.id)) return; // awaiting a Yes/No answer, not a countdown
-            clickCount++;
-            window.clearTimeout(clickTimer);
-            if (clickCount >= 3) { clickCount = 0; skipGateRetryTimer(step, panel, onDone); return; }
-            clickTimer = window.setTimeout(() => { clickCount = 0; }, 600);
-        });
+        // No countdown yet means it is waiting for a Yes/No answer, so a plain tap does nothing.
+        onTimerTaps(panel, step, () => {}, () => skipGateRetryTimer(step, panel, onDone));
         applyLock(panel, step);
         renderGateQuestion(step, panel, onDone);
         return panel;
@@ -2856,14 +2829,33 @@ function completeTimer(step: Step, panel: HTMLElement, onDone?: () => void, dueA
     onDone?.();
 }
 
-function skipTimer(step: Step, panel: HTMLElement, onDone?: () => void): void {
+// Taps on a timer or gate panel. With no countdown running a tap calls `first`; three quick
+// taps during a countdown call `skip`. Locked and finished panels ignore taps, and so does a
+// ringing one (the document-wide click listener in startAlarm dismisses it instead).
+function onTimerTaps(panel: HTMLElement, step: Step, first: () => void, skip: () => void): void {
+    let clickCount = 0;
+    let clickTimer = 0;
+    panel.addEventListener('click', () => {
+        if (panel.matches('.step-locked, .completed, .skipped, .ringing')) return;
+        if (!state.timers.has(step.id)) { first(); return; }
+        clickCount++;
+        window.clearTimeout(clickTimer);
+        if (clickCount >= 3) { clickCount = 0; skip(); return; }
+        clickTimer = window.setTimeout(() => { clickCount = 0; }, 600);
+    });
+}
+
+function stopCountdown(step: Step, panel: HTMLElement): void {
     const intervalId = state.timers.get(step.id);
     if (intervalId !== undefined) { window.clearInterval(intervalId); state.timers.delete(step.id); }
     releaseWakeLockIfIdle();
     panel.classList.remove('timer');
+}
+
+function skipTimer(step: Step, panel: HTMLElement, onDone?: () => void): void {
+    stopCountdown(step, panel);
     panel.classList.add('skipped');
-    const skippedAt = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    panel.textContent = `⏭ ${step.text} - skipped at ${skippedAt}`;
+    panel.textContent = `⏭ ${step.text} - skipped at ${formatClockTime(Date.now())}`;
     onDone?.();
 }
 
@@ -2989,10 +2981,7 @@ function runCountdown(
         const ss = String(remaining % 60).padStart(2, '0');
         panel.textContent = formatLabel(mm, ss, dueAtLabel);
         if (Date.now() >= endAt) {
-            window.clearInterval(intervalId);
-            state.timers.delete(step.id);
-            releaseWakeLockIfIdle();
-            panel.classList.remove('timer');
+            stopCountdown(step, panel);
             onComplete(endAt);
         }
     }, 1000);
@@ -3079,10 +3068,7 @@ function startGateRetryTimer(step: Step, panel: HTMLElement, onDone?: () => void
 }
 
 function skipGateRetryTimer(step: Step, panel: HTMLElement, onDone?: () => void): void {
-    const intervalId = state.timers.get(step.id);
-    if (intervalId !== undefined) { window.clearInterval(intervalId); state.timers.delete(step.id); }
-    releaseWakeLockIfIdle();
-    panel.classList.remove('timer');
+    stopCountdown(step, panel);
     renderGateQuestion(step, panel, onDone);
 }
 
