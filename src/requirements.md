@@ -610,7 +610,7 @@ Named constants for Amazon, Amazon Fresh, Whole Foods — used as the `store` fi
 ---
 
 ## Styling
-Dark theme (`#111` background, `#f0f0f0` text). Large touch-friendly cards (font-size 22px, padding 20px). All styles injected as a `<style>` tag at bootstrap time — no external CSS file.
+Dark theme (`#111` background, `#f0f0f0` text). Large touch-friendly cards (font-size 22px, padding 20px). Styles live in `src/app.css`, linked from `dist/main.html` (colors shared through `--fg`, `--muted` and `--ok` custom properties).
 
 Key visual states:
 - Selected recipe: green background
@@ -844,6 +844,6 @@ Recipes without `planMinutes` are listed under "No duration set (won't block tim
 ---
 
 ## Bootstrap
-The app mounts on `DOMContentLoaded`, injects styles, renders `<div id="app">`, and calls `render()`. All state lives in a single `state` object. Plan config is persisted in `localStorage` (`recipe-plan-config`); all other state resets on page load.
+The app mounts on `DOMContentLoaded`, renders `<div id="app">`, and calls `render()`. All state lives in a single `state` object. Plan config is persisted in `localStorage` (`recipe-plan-config`); all other state resets on page load.
 
 When the app boots, it checks for a `?recipe=recipe-id` URL parameter. If found and the recipe exists, it auto-selects that recipe, unlocks the audio context, and jumps directly to the Cooking screen.

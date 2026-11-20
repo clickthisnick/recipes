@@ -5,7 +5,7 @@ This is a personal recipes project. Keep all recipe and product data, plus code,
 ## Scope
 
 - Canonical source: `src/file.ts`. Read and edit here.
-- `dist/` is generated build output. Out of scope: do not read or edit it.
+- `dist/` is generated build output. Out of scope: do not read or edit it. `dist/main.html` is the small app shell that loads `dist/file.js` and `src/app.css` (the app's styles).
 - `archived/` is dead code. Out of scope.
 - `src/requirements.md` is reference/spec documentation, not source of truth.
 - `node_modules/` and `dist/` are never inspected.
