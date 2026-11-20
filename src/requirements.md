@@ -669,6 +669,11 @@ Runs automatically as the `postbuild` step after `tsc` (`npm run build`). Checks
 
 ---
 
+## Build Info
+The Select screen shows a small "Last compiled: {date}" footer at the bottom of the recipe list (part of the normal scrollable content, not the fixed action bar). `src/file.ts` declares a `BUILD_TIME` placeholder constant (`'__BUILD_TIME__'`); the `validate-recipes.js` postbuild step rewrites it in `dist/file.js` with the real compile timestamp (see [Validation Script](#validation-script-scriptsvalidate-recipesjs)). Running without a `tsc` build leaves the placeholder in place, which renders as `"dev build"` instead of a date.
+
+---
+
 ## Touch & Zoom Behavior
 Since this is a kitchen app typically used one-handed or with messy hands, pinch/double-tap zoom is suppressed:
 - The viewport meta tag (`dist/main.html`) sets `maximum-scale=1.0, user-scalable=no`
