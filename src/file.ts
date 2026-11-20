@@ -2682,7 +2682,7 @@ function renderCookingScreen(): void {
                 idx++;
                 group.push(state.cookingPlanSteps[idx]);
             }
-            root.appendChild(renderInfoGroup(group));
+            root.appendChild(notesBox('info', group));
             continue;
         }
 
@@ -2692,53 +2692,51 @@ function renderCookingScreen(): void {
     root.appendChild(createStartOverButton());
 }
 
-function renderInfoGroup(steps: Step[]): HTMLElement {
-    const panel = document.createElement('div');
-    panel.className = 'panel info-step info-step-collapsed';
+// A collapsed "Notes" box. Native <details> opens and closes it; CSS swaps the caret.
+// Info notes are a panel with one line per step plus recipe links; prep notes are a
+// lighter box. `inline` puts a single step's text straight into the body.
+function notesBox(kind: 'info' | 'prep', steps: Step[], inline = false): HTMLDetailsElement {
+    const prefix = kind === 'info' ? 'info-step' : 'prep-info';
+    const box = document.createElement('details');
+    box.className = kind === 'info' ? 'panel info-step' : 'prep-info-note';
 
-    const header = document.createElement('div');
-    header.className = 'info-step-header';
-
+    const summary = document.createElement('summary');
+    summary.className = `${prefix}-header`;
     const caret = document.createElement('span');
-    caret.className   = 'info-step-caret';
-    caret.textContent = '▸';
-
-    const label = document.createElement('span');
-    label.className   = 'info-step-label';
-    label.textContent = 'Notes';
-
-    header.appendChild(caret);
-    header.appendChild(label);
+    caret.className = `${prefix}-caret`;
+    summary.appendChild(caret);
+    if (kind === 'info') {
+        const label = document.createElement('span');
+        label.className   = 'info-step-label';
+        label.textContent = 'Notes';
+        summary.appendChild(label);
+    } else {
+        summary.append(' Notes');
+    }
 
     const body = document.createElement('div');
-    body.className = 'info-step-body';
-
+    body.className = `${prefix}-body`;
     steps.forEach(step => {
-        const line = document.createElement('div');
-        line.className = 'info-step-note';
-        line.textContent = step.text;
-        body.appendChild(line);
+        let line: HTMLElement = body;
+        if (!inline) {
+            line = document.createElement('div');
+            line.className = kind === 'info' ? 'info-step-note' : 'prep-info-line';
+            body.appendChild(line);
+        }
+        line.append(step.text);
 
-        if (step.linkRecipeId) {
+        if (kind === 'info' && step.linkRecipeId) {
             const targetRecipe = state.recipes.get(step.linkRecipeId);
             const link = document.createElement('a');
             link.className   = 'info-step-link';
             link.href        = getRecipeURL(step.linkRecipeId);
             link.textContent = `→ ${targetRecipe?.name ?? 'Open recipe'}`;
-            link.addEventListener('click', (ev) => ev.stopPropagation());
             line.appendChild(link);
         }
     });
 
-    panel.appendChild(header);
-    panel.appendChild(body);
-
-    header.addEventListener('click', () => {
-        const collapsed = panel.classList.toggle('info-step-collapsed');
-        caret.textContent = collapsed ? '▸' : '▾';
-    });
-
-    return panel;
+    box.append(summary, body);
+    return box;
 }
 
 // ============================================================
@@ -2884,46 +2882,9 @@ function renderStep(step: Step, onDone?: () => void): HTMLElement {
     }
 
     if (step.type === 'info') {
-        panel.textContent = '';
-        panel.className = 'panel info-step info-step-collapsed';
-
-        const header = document.createElement('div');
-        header.className = 'info-step-header';
-
-        const caret = document.createElement('span');
-        caret.className   = 'info-step-caret';
-        caret.textContent = '▸';
-
-        const label = document.createElement('span');
-        label.className   = 'info-step-label';
-        label.textContent = 'Notes';
-
-        header.appendChild(caret);
-        header.appendChild(label);
-
-        const body = document.createElement('div');
-        body.className   = 'info-step-body';
-        body.textContent = step.text;
-
-        if (step.linkRecipeId) {
-            const targetRecipe = state.recipes.get(step.linkRecipeId);
-            const link = document.createElement('a');
-            link.className   = 'info-step-link';
-            link.href        = getRecipeURL(step.linkRecipeId);
-            link.textContent = `→ ${targetRecipe?.name ?? 'Open recipe'}`;
-            link.addEventListener('click', (ev) => ev.stopPropagation());
-            body.appendChild(link);
-        }
-
-        panel.appendChild(header);
-        panel.appendChild(body);
-
-        header.addEventListener('click', () => {
-            const collapsed = panel.classList.toggle('info-step-collapsed');
-            caret.textContent = collapsed ? '▸' : '▾';
-        });
-
-        return panel;
+        const box = notesBox('info', [step], true);
+        box.id = panel.id;
+        return box;
     }
 
     panel.addEventListener('click', () => {
@@ -3432,34 +3393,7 @@ function renderPrepScreen(): void {
         root.appendChild(title);
 
         const infoSteps = collectInfoSteps(recipe.steps);
-        if (infoSteps.length > 0) {
-            const note = document.createElement('div');
-            note.className = 'prep-info-note prep-info-collapsed';
-
-            const noteHeader = document.createElement('div');
-            noteHeader.className = 'prep-info-header';
-            const noteCaret = document.createElement('span');
-            noteCaret.textContent = '▸';
-            noteHeader.appendChild(noteCaret);
-            noteHeader.appendChild(document.createTextNode(' Notes'));
-            noteHeader.addEventListener('click', () => {
-                const collapsed = note.classList.toggle('prep-info-collapsed');
-                noteCaret.textContent = collapsed ? '▸' : '▾';
-            });
-
-            const noteBody = document.createElement('div');
-            noteBody.className = 'prep-info-body';
-            infoSteps.forEach(step => {
-                const line = document.createElement('div');
-                line.className = 'prep-info-line';
-                line.textContent = step.text;
-                noteBody.appendChild(line);
-            });
-
-            note.appendChild(noteHeader);
-            note.appendChild(noteBody);
-            root.appendChild(note);
-        }
+        if (infoSteps.length > 0) root.appendChild(notesBox('prep', infoSteps));
 
         prepSteps.forEach(step => {
             const card = createPanel();
@@ -4058,7 +3992,6 @@ h1, h2 { margin-top: 0; font-size: 28px; }
 .prep-info-note { border: 1px dashed #374151; border-radius: 10px; padding: 10px 14px; margin: 0 0 8px; }
 .prep-info-header { display: flex; align-items: center; gap: 6px; cursor: pointer; color: #6b7280; font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; user-select: none; }
 .prep-info-body { margin-top: 8px; font-size: 16px; color: #d1d5db; }
-.prep-info-collapsed .prep-info-body { display: none; }
 .prep-info-line { padding: 8px 0; }
 .prep-info-line:first-child { padding-top: 0; }
 .prep-info-line:not(:first-child) { border-top: 1px dashed #374151; }
@@ -4066,13 +3999,16 @@ h1, h2 { margin-top: 0; font-size: 28px; }
 .info-step { cursor: default !important; border-color: #2a2a2a; background: #111827; }
 .info-step-header { display: flex; align-items: center; gap: 8px; cursor: pointer; color: #6b7280; font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; user-select: none; }
 .info-step-caret { font-size: 11px; }
+summary { list-style: none; }
+summary::-webkit-details-marker { display: none; }
+:is(.info-step-caret, .prep-info-caret)::before { content: '▸'; }
+details[open] > summary :is(.info-step-caret, .prep-info-caret)::before { content: '▾'; }
 .info-step-body { margin-top: 12px; font-size: 18px; color: #d1d5db; }
 .info-step-note { padding: 10px 0; }
 .info-step-note:first-child { padding-top: 0; }
 .info-step-note:not(:first-child) { border-top: 1px dashed #2a2a2a; }
 .info-step-link { display: block; margin-top: 10px; color: #60a5fa; font-size: 17px; text-decoration: none; }
 .info-step-link:hover { text-decoration: underline; }
-.info-step-collapsed .info-step-body { display: none; }
 
 #recipe-list { padding-bottom: 120px; }
 .build-footer { margin-top: 24px; text-align: center; font-size: 12px; color: #666; }
