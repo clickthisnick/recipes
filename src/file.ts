@@ -3979,7 +3979,7 @@ export const i = {
 
     longevityProtein: ingredientFactory('Longevity Protein', {
         products: [{
-            brand: 'Blueprint', variant: 'Chocolate (30 servings)', listings: [{ store: stores.amazon, price: 94, link: 'https://www.amazon.com/Blueprint-Bryan-Johnson-Longevity-Protein/dp/B0DNGJRLQF' }], 
+            brand: 'Blueprint', variant: 'Chocolate (30 servings)', listings: [{ store: stores.amazon, price: 94, link: 'https://www.amazon.com/Blueprint-Bryan-Johnson-Longevity-Protein/dp/B0DNGJRLQF' }],
             size: 30, sizeUnit: u.unit,
             nutrition: {
                 [u.unit.name]: { servings: 1, servingSize: 1, calories: 200, fat: 5, saturatedFat: 0.5, transFat: 0, cholesterol: 0, carbs: 13, sodium: 200, sugar: 0, protein: 26, fiber: 1 },
