@@ -769,18 +769,21 @@ export const e = {
 // RECIPE REGISTRATION
 // ============================================================
 
-function collectIngredientsWithLabel(steps: Step[]): Ingredient[] {
-    const collected = new Map<Ingredient, Ingredient>();
-    function walkSteps(steps: Step[]): void {
-        for (const step of steps) {
-            for (const ing of (step.ingredients ?? [])) {
-                if (ing.requiresDateLabel && !collected.has(ing)) collected.set(ing, ing);
-            }
-            if (step.children) walkSteps(step.children);
-        }
+// Every step, parent before its children, in recipe order.
+export function* walkSteps(steps: Step[]): Generator<Step> {
+    for (const step of steps) {
+        yield step;
+        if (step.children) yield* walkSteps(step.children);
     }
-    walkSteps(steps);
-    return [...collected.values()];
+}
+
+// Distinct ingredients used anywhere in these steps, in first-use order.
+function stepIngredients(steps: Step[]): Set<Ingredient> {
+    return new Set([...walkSteps(steps)].flatMap(step => step.ingredients ?? []));
+}
+
+function collectIngredientsWithLabel(steps: Step[]): Ingredient[] {
+    return [...stepIngredients(steps)].filter(ing => ing.requiresDateLabel);
 }
 
 function findLastStepIndexForIngredient(steps: Step[], targetIng: Ingredient): number {
@@ -986,15 +989,7 @@ function buildShoppingList(): Ingredient[] {
     const combined = new Map<string, Ingredient>();
     getSelectedRecipes().forEach((recipe) => {
         const servings = getServings(recipe.id);
-        const distinct = new Set<Ingredient>();
-        const walk = (steps: Step[]) => {
-            for (const step of steps) {
-                for (const ing of step.ingredients ?? []) distinct.add(ing);
-                if (step.children) walk(step.children);
-            }
-        };
-        walk(recipe.steps);
-        for (const ingredient of distinct) {
+        for (const ingredient of stepIngredients(recipe.steps)) {
             if (isComposite(ingredient)) continue;
             const key      = `${ingredient.name}-${ingredient.unit?.name ?? ''}`;
             const addQty   = (ingredient.quantity ?? 0) * servings;
@@ -1226,16 +1221,7 @@ interface RecipeNutrition {
 }
 
 function recipeNutrition(recipe: Recipe): RecipeNutrition {
-    const seen = new Set<Ingredient>();
-    const walk = (steps: Step[]) => {
-        for (const step of steps) {
-            for (const ing of step.ingredients ?? []) seen.add(ing);
-            if (step.children) walk(step.children);
-        }
-    };
-    walk(recipe.steps);
-
-    const breakdown = [...seen]
+    const breakdown = [...stepIngredients(recipe.steps)]
         .filter(ing => !isComposite(ing))
         .map(ing => ({ ing, result: ingredientNutrition(ing), costResult: ingredientCost(ing) }));
 
@@ -1645,11 +1631,7 @@ function updateActionButtons(): void {
     actions.appendChild(planBtn);
 
     const selectedRecipes = getSelectedRecipes();
-    const hasPrep = selectedRecipes.some(r =>
-        r.steps.some(function walk(s: Step): boolean {
-            return !!s.prep || (s.children?.some(walk) ?? false);
-        })
-    );
+    const hasPrep = selectedRecipes.some(r => [...walkSteps(r.steps)].some(s => s.prep));
     if (hasPrep) {
         const prepBtn = createButton('🔪 Prep', () => navigateTo('prep'));
         prepBtn.className = 'action-btn action-btn-prep';
@@ -3362,28 +3344,10 @@ function renderPrepScreen(): void {
     heading.textContent = 'Prep';
     root.appendChild(heading);
 
-    function collectPrepSteps(steps: Step[]): Step[] {
-        const out: Step[] = [];
-        for (const s of steps) {
-            if (s.prep) out.push(s);
-            if (s.children) out.push(...collectPrepSteps(s.children));
-        }
-        return out;
-    }
-
-    function collectInfoSteps(steps: Step[]): Step[] {
-        const out: Step[] = [];
-        for (const s of steps) {
-            if (s.type === 'info') out.push(s);
-            if (s.children) out.push(...collectInfoSteps(s.children));
-        }
-        return out;
-    }
-
     let anyFound = false;
     getSelectedRecipes().filter(r => !r.adhoc).forEach(recipe => {
         const count = state.selectedRecipeIds.filter(id => id === recipe.id).length;
-        const prepSteps = collectPrepSteps(recipe.steps);
+        const prepSteps = [...walkSteps(recipe.steps)].filter(s => s.prep);
         if (prepSteps.length === 0) return;
         anyFound = true;
 
@@ -3392,7 +3356,7 @@ function renderPrepScreen(): void {
         title.textContent = recipe.name + (count > 1 ? ` ×${count}` : '');
         root.appendChild(title);
 
-        const infoSteps = collectInfoSteps(recipe.steps);
+        const infoSteps = [...walkSteps(recipe.steps)].filter(s => s.type === 'info');
         if (infoSteps.length > 0) root.appendChild(notesBox('prep', infoSteps));
 
         prepSteps.forEach(step => {
