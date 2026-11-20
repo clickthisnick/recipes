@@ -104,8 +104,8 @@ caption {
 .band { background: rgb(186, 225, 248); color: #000; }
 .band-warm { background: rgb(248, 247, 186); color: #000; }
 
-tr.completed { background: green; color: #fff; }
-tr.completed a { color: #fff; }
+tr:has(input:checked) { background: green; color: #fff; }
+tr:has(input:checked) a { color: #fff; }
 
 .tabs {
     display: flex;

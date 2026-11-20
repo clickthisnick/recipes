@@ -13,7 +13,7 @@
         <p>Today: <time id="today"></time></p>
         <p id="expiration-status" class="status visually-hidden" role="status" aria-live="polite"></p>
         <div class="table-wrap" tabindex="0" role="region" aria-labelledby="expiration-caption">
-            <table class="stack">
+            <table>
                 <caption id="expiration-caption">Days until these items expire</caption>
                 <thead>
                     <tr>
@@ -26,28 +26,28 @@
                 <tbody>
                     <tr>
                         <th scope="row">Mushrooms</th>
-                        <td data-label="Days to expire">3</td>
-                        <td data-label="Expiration date" data-expiration-days="3"></td>
-                        <td data-label="Used"><input id="used-mushrooms" data-testid="used-mushrooms" type="checkbox" data-used="Mushrooms"> <label for="used-mushrooms">Used<span class="visually-hidden"> Mushrooms</span></label></td>
+                        <td>3</td>
+                        <td data-expiration-days="3"></td>
+                        <td><input id="used-mushrooms" data-testid="used-mushrooms" type="checkbox"> <label for="used-mushrooms">Used<span class="visually-hidden"> Mushrooms</span></label></td>
                     </tr>
                     <tr>
                         <th scope="row">Sausage</th>
-                        <td data-label="Days to expire">3</td>
-                        <td data-label="Expiration date" data-expiration-days="3"></td>
-                        <td data-label="Used"><input id="used-sausage" data-testid="used-sausage" type="checkbox" data-used="Sausage"> <label for="used-sausage">Used<span class="visually-hidden"> Sausage</span></label></td>
+                        <td>3</td>
+                        <td data-expiration-days="3"></td>
+                        <td><input id="used-sausage" data-testid="used-sausage" type="checkbox"> <label for="used-sausage">Used<span class="visually-hidden"> Sausage</span></label></td>
                     </tr>
                     <tr>
                         <th scope="row">Carrot</th>
-                        <td data-label="Days to expire">7</td>
-                        <td data-label="Expiration date" data-expiration-days="7"></td>
-                        <td data-label="Used"><input id="used-carrot" data-testid="used-carrot" type="checkbox" data-used="Carrot"> <label for="used-carrot">Used<span class="visually-hidden"> Carrot</span></label></td>
+                        <td>7</td>
+                        <td data-expiration-days="7"></td>
+                        <td><input id="used-carrot" data-testid="used-carrot" type="checkbox"> <label for="used-carrot">Used<span class="visually-hidden"> Carrot</span></label></td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </main>
     <script type="module">
-        import { addCalendarDays, formatUsDate, isoDate } from './src/site-logic.js';
+        import { addCalendarDays, bindRowCheckboxes, formatUsDate, isoDate } from './src/site-logic.js';
 
         const today = new Date();
         const todayEl = document.getElementById('today');
@@ -56,19 +56,10 @@
 
         for (const cell of document.querySelectorAll('[data-expiration-days]')) {
             const days = Number(cell.getAttribute('data-expiration-days'));
-            const when = addCalendarDays(today, days);
-            cell.textContent = formatUsDate(when);
-            cell.dateTime = isoDate(when);
+            cell.textContent = formatUsDate(addCalendarDays(today, days));
         }
 
-        const status = document.getElementById('expiration-status');
-        for (const box of document.querySelectorAll('[data-used]')) {
-            box.addEventListener('change', () => {
-                box.closest('tr').classList.toggle('completed', box.checked);
-                const name = box.getAttribute('data-used');
-                status.textContent = box.checked ? name + ' marked used' : name + ' marked still in the fridge';
-            });
-        }
+        bindRowCheckboxes(document.getElementById('expiration-status'), 'marked used', 'marked still in the fridge');
     </script>
 </body>
 </html>
