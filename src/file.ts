@@ -847,15 +847,14 @@ function createAdhocRecipe(ingredient: Ingredient): Recipe {
 }
 
 export function getSelectedRecipes(): Recipe[] {
-    const seen = new Set<string>();
-    const out: Recipe[] = [];
-    for (const id of state.selectedRecipeIds) {
-        if (seen.has(id)) continue;
-        seen.add(id);
-        const r = state.recipes.get(id);
-        if (r) out.push(r);
-    }
-    return out;
+    return [...new Set(state.selectedRecipeIds)].flatMap(id => state.recipes.get(id) ?? []);
+}
+
+// How many times each id appears, in first-appearance order.
+function countBy(ids: string[]): Map<string, number> {
+    const counts = new Map<string, number>();
+    for (const id of ids) counts.set(id, (counts.get(id) ?? 0) + 1);
+    return counts;
 }
 
 export function getServings(recipeId: string): number {
@@ -1363,14 +1362,12 @@ function renderSelectScreen(): void {
 
     const hasHiddenRecipes = [...state.recipes.values()].some(r => r.hidden);
     if (hasHiddenRecipes) {
-        const toggleBtn = createButton(
-            state.showHidden ? 'Hide hidden recipes' : 'Show hidden recipes',
-            () => {
-                setShowHidden(!state.showHidden);
-                renderRecipeList();
-                toggleBtn.textContent = state.showHidden ? 'Hide hidden recipes' : 'Show hidden recipes';
-            }
-        );
+        const toggleLabel = () => state.showHidden ? 'Hide hidden recipes' : 'Show hidden recipes';
+        const toggleBtn = createButton(toggleLabel(), () => {
+            setShowHidden(!state.showHidden);
+            renderRecipeList();
+            toggleBtn.textContent = toggleLabel();
+        });
         toggleBtn.className = 'show-hidden-toggle';
         root.appendChild(toggleBtn);
     }
@@ -1384,8 +1381,7 @@ function renderSelectScreen(): void {
     actions.className = 'actions';
     root.appendChild(actions);
 
-    renderRecipeList();
-    updateActionButtons();
+    refreshSelect();
 }
 
 function renderRecipeList(): void {
@@ -1421,9 +1417,7 @@ function renderRecipeList(): void {
 
             const sub = document.createElement('span');
             sub.className   = 'bundle-sub';
-            const counts = new Map<string, number>();
-            for (const id of bundle.recipeIds) counts.set(id, (counts.get(id) ?? 0) + 1);
-            sub.textContent = [...counts.entries()]
+            sub.textContent = [...countBy(bundle.recipeIds)]
                 .map(([id, count]) => {
                     const name = state.recipes.get(id)?.name ?? id;
                     return count > 1 ? `${name} ×${count}` : name;
@@ -1434,8 +1428,7 @@ function renderRecipeList(): void {
             btn.addEventListener('click', () => {
                 for (const id of bundle.recipeIds) state.selectedRecipeIds.push(id);
                 unlockAudioContext();
-                renderRecipeList();
-                updateActionButtons();
+                refreshSelect();
             });
 
             row.appendChild(btn);
@@ -1466,7 +1459,7 @@ function renderRecipeList(): void {
             const btn     = document.createElement('button');
             btn.type = 'button';
             btn.className = 'recipe-btn';
-            const count   = state.selectedRecipeIds.filter(id => id === recipe.id).length;
+            const count   = getServings(recipe.id);
             btn.classList.toggle('selected', count > 0);
 
             const nameSpan = document.createElement('span');
@@ -1489,10 +1482,9 @@ function renderRecipeList(): void {
             btn.addEventListener('click', () => {
                 state.selectedRecipeIds.push(recipe.id);
                 unlockAudioContext();
-                const servings = state.selectedRecipeIds.filter(id => id === recipe.id).length;
+                const servings = getServings(recipe.id);
                 announce(`Added a serving of ${recipe.name}. ${servings} selected.`);
-                renderRecipeList();
-                updateActionButtons();
+                refreshSelect();
             });
 
             const minusBtn = document.createElement('button');
@@ -1506,10 +1498,9 @@ function renderRecipeList(): void {
                 ev.stopPropagation();
                 const idx = state.selectedRecipeIds.lastIndexOf(recipe.id);
                 if (idx !== -1) state.selectedRecipeIds.splice(idx, 1);
-                const servings = state.selectedRecipeIds.filter(id => id === recipe.id).length;
+                const servings = getServings(recipe.id);
                 announce(`Removed a serving of ${recipe.name}. ${servings} selected.`);
-                renderRecipeList();
-                updateActionButtons();
+                refreshSelect();
             });
 
             row.appendChild(btn);
@@ -1524,8 +1515,7 @@ function renderRecipeList(): void {
                     ev.stopPropagation();
                     state.selectedRecipeIds = state.selectedRecipeIds.filter(id => id !== recipe.id);
                     state.recipes.delete(recipe.id);
-                    renderRecipeList();
-                    updateActionButtons();
+                    refreshSelect();
                 });
                 row.appendChild(removeBtn);
             } else {
@@ -1536,6 +1526,11 @@ function renderRecipeList(): void {
     });
 
     appendAddIngredientButton(root);
+}
+
+function refreshSelect(): void {
+    renderRecipeList();
+    updateActionButtons();
 }
 
 function appendAddIngredientButton(root: HTMLElement): void {
@@ -1556,37 +1551,23 @@ function updateActionButtons(): void {
     clear(actions);
     if (state.selectedRecipeIds.length === 0) return;
 
-    const shopBtn = createButton('🛒 Go Shopping', () => navigateTo('shopping'));
-    shopBtn.className = 'action-btn';
-    shopBtn.setAttribute('data-testid', 'go-shopping');
-
-    const nutritionBtn = createButton('📊 Nutrition', () => navigateTo('nutrition'));
-    nutritionBtn.className = 'action-btn action-btn-nutrition';
-    nutritionBtn.setAttribute('data-testid', 'open-nutrition');
-
-    const planBtn = createButton('📅 Plan', () => navigateTo('plan'));
-    planBtn.className = 'action-btn action-btn-plan';
-    planBtn.setAttribute('data-testid', 'open-plan');
-
-    actions.appendChild(shopBtn);
-    actions.appendChild(nutritionBtn);
-    actions.appendChild(planBtn);
-
     const selectedRecipes = getSelectedRecipes();
-    const hasPrep = selectedRecipes.some(r => [...walkSteps(r.steps)].some(s => s.prep));
-    if (hasPrep) {
-        const prepBtn = createButton('🔪 Prep', () => navigateTo('prep'));
-        prepBtn.className = 'action-btn action-btn-prep';
-        prepBtn.setAttribute('data-testid', 'open-prep');
-        actions.appendChild(prepBtn);
-    }
-
+    const hasPrep     = selectedRecipes.some(r => [...walkSteps(r.steps)].some(s => s.prep));
     const hasCookable = selectedRecipes.some(r => !r.adhoc);
-    if (hasCookable) {
-        const cookBtn = createButton('🍳 Start Cooking', () => navigateTo('cooking'));
-        cookBtn.className = 'action-btn';
-        cookBtn.setAttribute('data-testid', 'start-cooking');
-        actions.appendChild(cookBtn);
+    // Order matters: .action-btn:first-child / :last-child pick the blue and green colors.
+    const buttons: [label: string, screen: Screen, className: string, testid: string, show: boolean][] = [
+        ['🛒 Go Shopping',   'shopping',  'action-btn',                      'go-shopping',   true],
+        ['📊 Nutrition',     'nutrition', 'action-btn action-btn-nutrition', 'open-nutrition', true],
+        ['📅 Plan',          'plan',      'action-btn action-btn-plan',      'open-plan',      true],
+        ['🔪 Prep',          'prep',      'action-btn action-btn-prep',      'open-prep',      hasPrep],
+        ['🍳 Start Cooking', 'cooking',   'action-btn',                      'start-cooking',  hasCookable],
+    ];
+    for (const [label, screen, className, testid, show] of buttons) {
+        if (!show) continue;
+        const btn = createButton(label, () => navigateTo(screen));
+        btn.className = className;
+        btn.setAttribute('data-testid', testid);
+        actions.appendChild(btn);
     }
 }
 
@@ -3272,7 +3253,7 @@ function renderPrepScreen(): void {
 
     let anyFound = false;
     getSelectedRecipes().filter(r => !r.adhoc).forEach(recipe => {
-        const count = state.selectedRecipeIds.filter(id => id === recipe.id).length;
+        const count = getServings(recipe.id);
         const prepSteps = [...walkSteps(recipe.steps)].filter(s => s.prep);
         if (prepSteps.length === 0) return;
         anyFound = true;
@@ -3526,14 +3507,10 @@ function renderPlanScreen(): void {
     function scheduleAndRender() {
         clear(scheduleOut);
         const selectedRecipes = getSelectedRecipes().filter(r => !r.adhoc);
-        const deduped: { recipe: Recipe; count: number }[] = [];
-        const seen = new Set<string>();
-        for (const id of state.selectedRecipeIds) {
-            const r = state.recipes.get(id);
-            if (!r || r.adhoc) continue;
-            if (seen.has(id)) { const e = deduped.find(x => x.recipe.id === id); if (e) e.count++; }
-            else { seen.add(id); deduped.push({ recipe: r, count: 1 }); }
-        }
+        const deduped = [...countBy(state.selectedRecipeIds)].flatMap(([id, count]) => {
+            const recipe = state.recipes.get(id);
+            return recipe && !recipe.adhoc ? [{ recipe, count }] : [];
+        });
 
         if (deduped.length === 0) {
             const empty = document.createElement('p');
