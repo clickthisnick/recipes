@@ -34,6 +34,7 @@ module.exports = [
                 history: 'readonly',
                 HTMLElement: 'readonly',
                 WeakSet: 'readonly',
+                HTMLMediaElement: 'readonly',
             },
         },
         rules: {
