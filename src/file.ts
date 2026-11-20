@@ -15,22 +15,12 @@ export interface Unit {
     plural?: string;
 }
 
+const NUTRIENT_KEYS = ['calories', 'fat', 'saturatedFat', 'transFat', 'cholesterol', 'carbs', 'sodium', 'sugar', 'protein', 'fiber'] as const;
+type NutritionTotals = Record<typeof NUTRIENT_KEYS[number], number>;
+
 // A nutrition label, keyed by unit name (e.g. 'cup', 'tsp'). Values are per
 // serving; servingSize is in the keyed unit.
-export type NutritionLabel = Record<string, {
-    servings: number;
-    servingSize: number;
-    calories: number;
-    fat: number;
-    saturatedFat: number;
-    transFat: number;
-    cholesterol: number;
-    carbs: number;
-    sodium: number;
-    sugar: number;
-    protein: number;
-    fiber: number;
-}>;
+export type NutritionLabel = Record<string, { servings: number; servingSize: number } & NutritionTotals>;
 
 // Amazon's Subscribe & Save auto-delivery discount, expressed as eligibility for each
 // percent tier rather than a hardcoded price - the discounted price is always a percent
@@ -1053,8 +1043,6 @@ function inventoryKey(ingredient: Ingredient, byPackage: boolean): string {
 // NUTRITION + COST
 // ============================================================
 
-interface NutritionTotals { calories: number; fat: number; saturatedFat: number; transFat: number; cholesterol: number; carbs: number; sodium: number; sugar: number; protein: number; fiber: number; }
-
 type NutritionResult =
     | { status: 'ok'; totals: NutritionTotals; brand?: string }
     | { status: 'missing' }
@@ -1065,33 +1053,11 @@ type CostResult =
     | { status: 'missing' }
     | { status: 'uncomputable'; reason: string };
 
-const emptyTotals = (): NutritionTotals => ({ calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 });
-
-const addTotals = (a: NutritionTotals, b: NutritionTotals): NutritionTotals => ({
-    calories:     a.calories     + b.calories,
-    fat:          a.fat          + b.fat,
-    saturatedFat: a.saturatedFat + b.saturatedFat,
-    transFat:     a.transFat     + b.transFat,
-    cholesterol:  a.cholesterol  + b.cholesterol,
-    carbs:        a.carbs        + b.carbs,
-    sodium:       a.sodium       + b.sodium,
-    sugar:        a.sugar        + b.sugar,
-    protein:      a.protein      + b.protein,
-    fiber:        a.fiber        + b.fiber,
-});
-
-const scaleTotals = (t: NutritionTotals, n: number): NutritionTotals => ({
-    calories:     t.calories     * n,
-    fat:          t.fat          * n,
-    saturatedFat: t.saturatedFat * n,
-    transFat:     t.transFat     * n,
-    cholesterol:  t.cholesterol  * n,
-    carbs:        t.carbs        * n,
-    sodium:       t.sodium       * n,
-    sugar:        t.sugar        * n,
-    protein:      t.protein      * n,
-    fiber:        t.fiber        * n,
-});
+const mapTotals = (fn: (key: keyof NutritionTotals) => number): NutritionTotals =>
+    Object.fromEntries(NUTRIENT_KEYS.map(key => [key, fn(key)])) as NutritionTotals;
+const emptyTotals = (): NutritionTotals => mapTotals(() => 0);
+const addTotals   = (a: NutritionTotals, b: NutritionTotals): NutritionTotals => mapTotals(key => a[key] + b[key]);
+const scaleTotals = (t: NutritionTotals, n: number): NutritionTotals => mapTotals(key => t[key] * n);
 
 function isComposite(ing: Ingredient): boolean {
     return Array.isArray((ing as any)._constituents);
@@ -1156,18 +1122,7 @@ function ingredientNutrition(ing: Ingredient): NutritionResult {
     return {
         status: 'ok',
         brand,
-        totals: {
-            calories:     (facts.calories     ?? 0) * servingsUsed,
-            fat:          (facts.fat          ?? 0) * servingsUsed,
-            saturatedFat: (facts.saturatedFat ?? 0) * servingsUsed,
-            transFat:     (facts.transFat     ?? 0) * servingsUsed,
-            cholesterol:  (facts.cholesterol  ?? 0) * servingsUsed,
-            carbs:        (facts.carbs        ?? 0) * servingsUsed,
-            sodium:       (facts.sodium       ?? 0) * servingsUsed,
-            sugar:        (facts.sugar        ?? 0) * servingsUsed,
-            protein:      (facts.protein      ?? 0) * servingsUsed,
-            fiber:        (facts.fiber        ?? 0) * servingsUsed,
-        },
+        totals: mapTotals(key => (facts[key] ?? 0) * servingsUsed),
     };
 }
 
@@ -1258,6 +1213,12 @@ function formatTotals(t: NutritionTotals, cost?: number): string {
            `${Math.round(t.cholesterol)} mg chol · ` +
            `${Math.round(t.carbs)} g carbs · ` +
            `${Math.round(t.fiber)} g fiber · ${Math.round(t.sugar)} g sugar · ${Math.round(t.sodium)} mg sodium`;
+}
+
+// Nutrition line when any ingredient has data, else just the cost, else a placeholder.
+function totalsText(covered: number, totals: NutritionTotals, hasCost: boolean, cost: number): string {
+    if (covered > 0) return formatTotals(totals, hasCost ? cost : undefined);
+    return hasCost ? `$${cost.toFixed(2)}` : '- no computable data';
 }
 
 function coverageLabel(covered: number, total: number, flagged: number): string {
@@ -1834,16 +1795,26 @@ function renderMacroTargetsPanel(grand: NutritionTotals): HTMLElement {
     const macroPct = (grams: number | null): string =>
         grams !== null && totalMacroG > 0 ? ` / ${Math.round((grams / totalMacroG) * 100)}%` : '';
 
-    const rows: { label: string; key: keyof typeof macroTargets; actual: number | null; unit: string; indent?: boolean; cap?: boolean; calPct?: string; macroPct?: string }[] = [
-        { label: 'Calories',    key: 'calories',    actual: grand.calories    > 0 ? Math.round(grand.calories)           : null, unit: 'kcal' },
-        { label: 'Protein',     key: 'protein',     actual: grand.protein     > 0 ? Math.round(grand.protein)            : null, unit: 'g', calPct: pct(grand.protein     > 0 ? grand.protein     : null, 4), macroPct: macroPct(grand.protein > 0 ? grand.protein : null) },
-        { label: 'Fat',         key: 'fat',         actual: grand.fat         > 0 ? Math.round(grand.fat)                : null, unit: 'g', calPct: pct(grand.fat         > 0 ? grand.fat         : null, 9), macroPct: macroPct(grand.fat     > 0 ? grand.fat     : null) },
-        { label: '↳ Sat Fat',   key: 'saturatedFat', actual: grand.saturatedFat > 0 ? Math.round(grand.saturatedFat * 10) / 10 : null, unit: 'g', indent: true, cap: true, calPct: pct(grand.saturatedFat > 0 ? grand.saturatedFat : null, 9) },
-        { label: '↳ Trans Fat', key: 'transFat',    actual: grand.transFat    > 0 ? Math.round(grand.transFat * 10) / 10 : null, unit: 'g', indent: true, cap: true, calPct: pct(grand.transFat    > 0 ? grand.transFat    : null, 9) },
-        { label: 'Carbs',       key: 'carbs',       actual: grand.carbs       > 0 ? Math.round(grand.carbs)              : null, unit: 'g', calPct: pct(grand.carbs       > 0 ? grand.carbs       : null, 4), macroPct: macroPct(grand.carbs   > 0 ? grand.carbs   : null) },
-        { label: 'Fiber',       key: 'fiber',       actual: grand.fiber       > 0 ? Math.round(grand.fiber)              : null, unit: 'g' },
-        { label: 'Sodium',      key: 'sodium',      actual: grand.sodium      > 0 ? Math.round(grand.sodium)             : null, unit: 'mg', cap: true },
+    const round1 = (v: number): number => Math.round(v * 10) / 10;
+    const rowDefs: { label: string; key: keyof typeof macroTargets; unit: string; round?: (v: number) => number; calsPerGram?: number; macro?: boolean; indent?: boolean; cap?: boolean }[] = [
+        { label: 'Calories',    key: 'calories',     unit: 'kcal' },
+        { label: 'Protein',     key: 'protein',      unit: 'g',  calsPerGram: 4, macro: true },
+        { label: 'Fat',         key: 'fat',          unit: 'g',  calsPerGram: 9, macro: true },
+        { label: '↳ Sat Fat',   key: 'saturatedFat', unit: 'g',  calsPerGram: 9, round: round1, indent: true, cap: true },
+        { label: '↳ Trans Fat', key: 'transFat',     unit: 'g',  calsPerGram: 9, round: round1, indent: true, cap: true },
+        { label: 'Carbs',       key: 'carbs',        unit: 'g',  calsPerGram: 4, macro: true },
+        { label: 'Fiber',       key: 'fiber',        unit: 'g' },
+        { label: 'Sodium',      key: 'sodium',       unit: 'mg', cap: true },
     ];
+    const rows = rowDefs.map((def) => {
+        const grams = grand[def.key] > 0 ? grand[def.key] : null;
+        return {
+            ...def,
+            actual:   grams === null ? null : (def.round ?? Math.round)(grams),
+            calPct:   def.calsPerGram ? pct(grams, def.calsPerGram) : undefined,
+            macroPct: def.macro ? macroPct(grams) : undefined,
+        };
+    });
 
     rows.forEach(({ label, key, actual, unit, indent, cap, calPct, macroPct }) => {
         const row = document.createElement('div');
@@ -2029,13 +2000,7 @@ function renderNutritionScreen(): void {
 
     const totalValue = document.createElement('div');
     totalValue.className = 'nutrition-values';
-    if (gCovered > 0) {
-        totalValue.textContent = formatTotals(grand, hasCostData ? grandCost : undefined);
-    } else if (hasCostData) {
-        totalValue.textContent = `$${grandCost.toFixed(2)}`;
-    } else {
-        totalValue.textContent = '- no computable data';
-    }
+    totalValue.textContent = totalsText(gCovered, grand, hasCostData, grandCost);
     totalCard.appendChild(totalValue);
 
     // 30-day cost projection
@@ -2107,13 +2072,7 @@ function renderNutritionScreen(): void {
 
         const sub = document.createElement('span');
         sub.className = 'nutrition-recipe-sub';
-        if (nutrition.covered > 0) {
-            sub.textContent = formatTotals(sectionTotals, recipeHasCostData ? sectionCost : undefined);
-        } else if (recipeHasCostData) {
-            sub.textContent = `$${sectionCost.toFixed(2)}`;
-        } else {
-            sub.textContent = '- no computable data';
-        }
+        sub.textContent = totalsText(nutrition.covered, sectionTotals, recipeHasCostData, sectionCost);
 
         const servingControls = document.createElement('div');
         servingControls.className = 'nutrition-serving-controls';
