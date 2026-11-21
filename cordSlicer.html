@@ -35,21 +35,12 @@
         </div>
     </main>
     <script type="module">
-        import { registerAgentTools } from './src/site-logic.js';
-        registerAgentTools([{
-            name: 'read-slice-amounts',
-            description: 'Read the cord slicer slice counts shown on this chart.',
-            inputSchema: { type: 'object', properties: {} },
-            execute() {
-                return {
-                    rows: [...document.querySelectorAll('tbody tr')].map((row) => ({
-                        item: row.querySelector('th')?.textContent ?? '',
-                        slices: row.querySelector('td')?.textContent ?? '',
-                    })).filter((row) => row.slices),
-                };
-            },
-            annotations: { readOnlyHint: true },
-        }]);
+        import { readTableTool, registerAgentTools } from './src/site-logic.js';
+        registerAgentTools([readTableTool(
+            'read-slice-amounts',
+            'Read the cord slicer slice counts shown on this chart.',
+            { row: 'tbody tr', require: 'slices', columns: { item: { selector: 'th' }, slices: { selector: 'td' } } },
+        )]);
     </script>
 </body>
 </html>

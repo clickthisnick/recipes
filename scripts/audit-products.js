@@ -2,8 +2,7 @@
 
 // ── Audit every product in src/file.js against its live page ──────────────────
 //
-// For each product object in src/file.js (currently only listings whose `link`
-// points at amazon.com are supported), this attaches to an already-running
+// For each Amazon listing on an ingredient in src/file.js, this attaches to an already-running
 // Chrome and checks:
 //
 //   - base price:        file's `price` vs. what the page shows now
@@ -48,8 +47,6 @@
 
 const fs = require('fs');
 const path = require('path');
-// TypeScript 7's package has no stable parser API yet, so parse with TypeScript 5.
-const ts = require('typescript5');
 const { chromium } = require('playwright');
 
 const FILE_PATH = path.resolve(__dirname, '../src/file.js');
@@ -59,211 +56,62 @@ const DELAY_MS = Number(process.env.DELAY_MS || 5000);
 const LIMIT = process.env.LIMIT ? Number(process.env.LIMIT) : undefined;
 const FILTER = process.env.FILTER;
 
+// Listings come from the live ingredient catalogue, not a source parse.
+async function loadAmazonListings(source) {
+    const { i } = await import('../src/file.js');
+    const sourceLines = source.split('\n');
+    const products = [];
+    let cursor = 0;
+    for (const [ingredientKey, factory] of Object.entries(i)) {
+        if (typeof factory !== 'function') continue;
+        const sample = factory();
+        const ingredientNutrition = sample.nutrition;
+        for (const product of sample.products ?? []) {
+            const productNutrition = product.nutrition;
+            const nutrition = productNutrition && Object.keys(productNutrition).length > 0
+                ? productNutrition
+                : ingredientNutrition;
+            for (const listing of product.listings ?? []) {
+                const link = listing.link;
+                if (!link || !link.includes('amazon.com')) continue;
+                const idx = source.indexOf(link, cursor);
+                const line = idx >= 0 ? source.slice(0, idx).split('\n').length : undefined;
+                if (idx >= 0) cursor = idx + link.length;
+                let priceLine = line;
+                if (line) {
+                    const from = Math.max(0, line - 4);
+                    const to = Math.min(sourceLines.length, line + 3);
+                    for (let i = from; i < to; i++) {
+                        if (/price:\s*[0-9.]+/.test(sourceLines[i])) {
+                            priceLine = i + 1;
+                            break;
+                        }
+                    }
+                }
+                products.push({
+                    ingredientKey,
+                    brand: product.brand,
+                    variant: product.variant,
+                    store: listing.store,
+                    link,
+                    price: listing.price,
+                    size: product.size,
+                    sizeUnit: product.sizeUnit && product.sizeUnit.name,
+                    nutrition,
+                    discount: listing.discount ?? {},
+                    line,
+                    priceLine,
+                });
+            }
+        }
+    }
+    return products;
+}
+
 function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// ── Extract every supported product listing from src/file.js (currently Amazon links only) ──
-
-function getStringLiteral(node) {
-    return node && ts.isStringLiteral(node) ? node.text : undefined;
-}
-
-function getNumberLiteral(node) {
-    return node && ts.isNumericLiteral(node) ? Number(node.text) : undefined;
-}
-
-function getPropName(node) {
-    // `u.ounce` / `stores.amazon` -> 'ounce' / 'amazon'
-    return node && ts.isPropertyAccessExpression(node) ? node.name.text : undefined;
-}
-
-function getBoolLiteral(node) {
-    if (!node) return undefined;
-    if (node.kind === ts.SyntaxKind.TrueKeyword) return true;
-    if (node.kind === ts.SyntaxKind.FalseKeyword) return false;
-    return undefined;
-}
-
-function findEnclosingIngredientCall(node) {
-    let current = node.parent;
-    while (current) {
-        if (ts.isCallExpression(current) && ts.isIdentifier(current.expression) && current.expression.text === 'ingredientFactory') {
-            return current;
-        }
-        current = current.parent;
-    }
-    return undefined;
-}
-
-function findEnclosingIngredientKey(node) {
-    const call = findEnclosingIngredientCall(node);
-    if (call && call.parent && ts.isPropertyAssignment(call.parent)) {
-        const keyNode = call.parent.name;
-        return ts.isIdentifier(keyNode) ? keyNode.text : keyNode.getText();
-    }
-    return undefined;
-}
-
-function getObjectProp(objNode, propName) {
-    if (!objNode || !ts.isObjectLiteralExpression(objNode)) return undefined;
-    const prop = objNode.properties.find((p) => ts.isPropertyAssignment(p) && ts.isIdentifier(p.name) && p.name.text === propName);
-    return prop ? prop.initializer : undefined;
-}
-
-// `export const u = { ounce: { name: 'ounce', ... }, fluidOunce: { name: 'fl oz', ... }, ... }`
-// Some unit keys' `.name` differs from the object key itself (fluidOunce -> 'fl oz', gram ->
-// 'g'), so nutrition-object keys (`[u.fluidOunce.name]`) can't be resolved by identifier text
-// alone — this walks the real `u` declaration once to build identifier -> name-string.
-function extractUnitNameMap(sourceFile) {
-    const map = {};
-    function visit(node) {
-        if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.name.text === 'u' && node.initializer && ts.isObjectLiteralExpression(node.initializer)) {
-            for (const prop of node.initializer.properties) {
-                if (ts.isPropertyAssignment(prop) && ts.isIdentifier(prop.name) && ts.isObjectLiteralExpression(prop.initializer)) {
-                    const nameNode = getObjectProp(prop.initializer, 'name');
-                    const nameText = getStringLiteral(nameNode);
-                    if (nameText !== undefined) map[prop.name.text] = nameText;
-                }
-            }
-        }
-        ts.forEachChild(node, visit);
-    }
-    visit(sourceFile);
-    return map;
-}
-
-// Resolves a nutrition object's computed property key, e.g. `u.fluidOunce.name`, to the
-// runtime string it evaluates to ('fl oz'), via the identifier -> name-string map above.
-function resolveNutritionKey(exprNode, unitNameMap) {
-    if (
-        exprNode &&
-        ts.isPropertyAccessExpression(exprNode) &&
-        exprNode.name.text === 'name' &&
-        ts.isPropertyAccessExpression(exprNode.expression) &&
-        ts.isIdentifier(exprNode.expression.expression) &&
-        exprNode.expression.expression.text === 'u'
-    ) {
-        return unitNameMap[exprNode.expression.name.text];
-    }
-    return undefined;
-}
-
-function extractNutritionMap(objNode, unitNameMap) {
-    const map = {};
-    if (!objNode || !ts.isObjectLiteralExpression(objNode)) return map;
-    for (const prop of objNode.properties) {
-        if (!ts.isPropertyAssignment(prop)) continue;
-        let key;
-        if (ts.isComputedPropertyName(prop.name)) {
-            key = resolveNutritionKey(prop.name.expression, unitNameMap);
-        } else if (ts.isStringLiteral(prop.name)) {
-            key = prop.name.text;
-        } else if (ts.isIdentifier(prop.name)) {
-            key = prop.name.text;
-        }
-        if (!key || !ts.isObjectLiteralExpression(prop.initializer)) continue;
-        const fields = {};
-        for (const fp of prop.initializer.properties) {
-            if (ts.isPropertyAssignment(fp) && ts.isIdentifier(fp.name)) {
-                fields[fp.name.text] = getNumberLiteral(fp.initializer);
-            }
-        }
-        map[key] = fields;
-    }
-    return map;
-}
-
-function extractDiscount(discountNode) {
-    const discount = {};
-    if (discountNode && ts.isObjectLiteralExpression(discountNode)) {
-        for (const dp of discountNode.properties) {
-            if (ts.isPropertyAssignment(dp) && ts.isIdentifier(dp.name)) {
-                discount[dp.name.text] = getBoolLiteral(dp.initializer);
-            }
-        }
-    }
-    return discount;
-}
-
-// Each result is one (product, listing) pair, matching how the app itself resolves a
-// row to display/price — a Product (brand/variant/size/nutrition) can have several
-// Listings (store/link/price/discount), one per retailer it's sold through.
-function extractAmazonListings(sourceFile) {
-    const results = [];
-    const unitNameMap = extractUnitNameMap(sourceFile);
-
-    function visit(node) {
-        if (
-            ts.isObjectLiteralExpression(node) &&
-            node.parent && ts.isArrayLiteralExpression(node.parent) &&
-            node.parent.parent && ts.isPropertyAssignment(node.parent.parent) &&
-            ts.isIdentifier(node.parent.parent.name) && node.parent.parent.name.text === 'products'
-        ) {
-            const props = {};
-            for (const prop of node.properties) {
-                if (ts.isPropertyAssignment(prop) && ts.isIdentifier(prop.name)) props[prop.name.text] = prop.initializer;
-            }
-
-            const listingsNode = props.listings;
-            if (listingsNode && ts.isArrayLiteralExpression(listingsNode)) {
-                // Resolution order matches the app's own documented rule (requirements.md):
-                // a product's own `nutrition` wins if present, else the ingredient's shared one.
-                const productNutrition = extractNutritionMap(props.nutrition, unitNameMap);
-                const ingredientCall = findEnclosingIngredientCall(node);
-                const ingredientNutritionNode = getObjectProp(ingredientCall?.arguments[1], 'nutrition');
-                const ingredientNutrition = extractNutritionMap(ingredientNutritionNode, unitNameMap);
-                const nutrition = Object.keys(productNutrition).length > 0 ? productNutrition : ingredientNutrition;
-                const ingredientKey = findEnclosingIngredientKey(node);
-                const brand = getStringLiteral(props.brand);
-                const variant = getStringLiteral(props.variant);
-                const size = getNumberLiteral(props.size);
-                const sizeUnit = getPropName(props.sizeUnit);
-
-                for (const listingEl of listingsNode.elements) {
-                    if (!ts.isObjectLiteralExpression(listingEl)) continue;
-                    const listingProps = {};
-                    const listingPropNodes = {};
-                    for (const lp of listingEl.properties) {
-                        if (ts.isPropertyAssignment(lp) && ts.isIdentifier(lp.name)) {
-                            listingProps[lp.name.text] = lp.initializer;
-                            listingPropNodes[lp.name.text] = lp;
-                        }
-                    }
-                    const link = getStringLiteral(listingProps.link);
-                    if (!link || !link.includes('amazon.com')) continue;
-
-                    results.push({
-                        ingredientKey,
-                        brand,
-                        variant,
-                        store: getPropName(listingProps.store),
-                        link,
-                        price: getNumberLiteral(listingProps.price),
-                        size,
-                        sizeUnit,
-                        nutrition,
-                        discount: extractDiscount(listingProps.discount),
-                        line: sourceFile.getLineAndCharacterOfPosition(node.getStart()).line + 1,
-                        priceLine: listingPropNodes.price
-                            ? sourceFile.getLineAndCharacterOfPosition(listingPropNodes.price.getStart()).line + 1
-                            : undefined,
-                    });
-                }
-            }
-        }
-        ts.forEachChild(node, visit);
-    }
-
-    visit(sourceFile);
-    return results;
-}
-
-// Compares scraped macros against whichever nutrition entry file.js records for this product
-// (or its ingredient, per the resolution order captured in `nutrition`). With exactly one
-// recorded unit entry (the common case) it's used directly; with several, only compares when
-// the scraped serving unit confidently matches one of them — otherwise stays silent rather
-// than risk comparing the wrong serving size against the wrong unit.
 function computeNutritionDiff(product, scraped) {
     if (!scraped) return undefined;
     const entries = Object.entries(product.nutrition ?? {});
@@ -486,8 +334,8 @@ async function main() {
 
     const source = fs.readFileSync(FILE_PATH, 'utf8');
     const sourceLines = source.split('\n');
-    const sourceFile = ts.createSourceFile(FILE_PATH, source, ts.ScriptTarget.Latest, true);
-    let products = extractAmazonListings(sourceFile);
+    const { stores } = await import('../src/file.js');
+    let products = await loadAmazonListings(source);
 
     if (FILTER) {
         const needle = FILTER.toLowerCase();
@@ -544,7 +392,7 @@ async function main() {
         // delivery location — with no address set on this profile, the scraped price is
         // essentially a random nearby store's price, not specific enough to compare against
         // the recorded value. Skip the price check entirely for these rather than flag noise.
-        if (product.store === 'wholeFoods') {
+        if (product.store === stores.wholeFoods) {
             // no-op — price intentionally not checked
         } else if (scraped.price === undefined) {
             notes.push('could not read price from page (layout changed / out of stock?)');
@@ -559,7 +407,7 @@ async function main() {
 
         const tier = expectedTier(product.discount);
         if (tier !== undefined) {
-            if (product.store !== 'amazon') {
+            if (product.store !== stores.amazon) {
                 notes.push(`recorded subscribeAndSave${tier} but store is not Amazon — S&S wouldn't apply here`);
             }
             const base = scraped.price ?? product.price;

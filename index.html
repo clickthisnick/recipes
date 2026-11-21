@@ -35,21 +35,12 @@
         </nav>
     </main>
     <script type="module">
-        import { registerAgentTools } from './src/site-logic.js';
-        registerAgentTools([{
-            name: 'list-kitchen-tools',
-            description: 'List the kitchen tools linked from this home page.',
-            inputSchema: { type: 'object', properties: {} },
-            execute() {
-                return {
-                    tools: [...document.querySelectorAll('nav a')].map((link) => ({
-                        name: link.textContent,
-                        href: link.getAttribute('href'),
-                    })),
-                };
-            },
-            annotations: { readOnlyHint: true },
-        }]);
+        import { readTableTool, registerAgentTools } from './src/site-logic.js';
+        registerAgentTools([readTableTool(
+            'list-kitchen-tools',
+            'List the kitchen tools linked from this home page.',
+            { row: 'nav a', resultKey: 'tools', columns: { name: {}, href: { attr: 'href' } } },
+        )]);
     </script>
 </body>
 </html>

@@ -1,0 +1,40 @@
+I'm going to paste Amazon product page content. Please add or update an ingredient entry in src/file.js.
+
+The file uses this pattern. A product is the physical item. A listing is one place to buy it:
+
+  someIngredient: ingredientFactory('Display Name', {
+      products: [{
+          brand: 'BrandName',
+          variant: 'Variant description',
+          size: 16,
+          sizeUnit: u.ounce,
+          organic: true,
+          nutrition: {
+              [u.ounce.name]: { servings: 16, servingSize: 1, calories: 100, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 50, sugar: 5, protein: 3, fiber: 2 },
+          },
+          listings: [{
+              store: stores.amazon,
+              link: 'https://www.amazon.com/dp/B0DQLSW6FB',
+              price: 12.99,
+              discount: { subscribeAndSave15: true },
+          }],
+      }],
+  }),
+
+Key rules:
+- For Amazon links, strip everything after the ASIN — use https://www.amazon.com/dp/ASIN (e.g. https://www.amazon.com/dp/B0DQLSW6FB). Do not include query strings, referral tags, or the product title slug.
+- Put store, link, price, and discount on a listing, not on the product. One product can have several listings.
+- Store is stores.amazon for Amazon, stores.wholeFoods for Whole Foods, stores.amazonFresh for Amazon Fresh.
+- sizeUnit uses u.ounce / u.pound / u.gram / u.cup / u.fluidOunce / u.unit / u.tbsp / u.tsp.
+- Nutrition is keyed by the serving size unit (e.g. u.cup.name, u.tbsp.name, u.ounce.name, u.unit.name).
+- servingSize is the number of that unit per serving (usually 1); servings is servings per container.
+- Include every nutrition field the label shows. Always include fiber — read it from the label if shown; estimate from USDA data if not.
+- If the ingredient already exists in the i = { ... } block, add a listing (same SKU, another store) or a product (a different SKU) instead of creating a duplicate ingredient.
+- The first product is the default pick. Only add defaultBrand: 'OtherBrand' when a later product should be the pick.
+- Add organic: true on the product if it is organic.
+- The ingredient key should be camelCase.
+- If the same SKU is sold at more than one store, add a listing for each store on that one product. Do not copy the product.
+- Subscribe & Save is a boolean tier, not a dollar amount: discount: { subscribeAndSave5: true }, { subscribeAndSave10: true }, or { subscribeAndSave15: true }. Omit discount when the page shows no Subscribe & Save price. The app computes the dollar price from the tier and the current listing price.
+- For Whole Foods entries, use the same Amazon product link (https://www.amazon.com/dp/ASIN) — do not fabricate a separate Whole Foods URL. Whole Foods listings do not get a Subscribe & Save discount.
+
+Here is the Amazon page content:

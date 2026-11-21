@@ -1,3 +1,5 @@
+import { registerAgentTools } from './webmcp.js';
+
 // ============================================================
 // RECIPE SYSTEM
 // Single-file architecture optimized for readability and AI context
@@ -1159,16 +1161,30 @@ export function getServings(recipeId) {
     return state.selectedRecipeIds.filter(id => id === recipeId).length;
 }
 
+/**
+ * Recipes matching a name query, in catalog order.
+ * An empty query lists the catalog and hides hidden recipes unless "Show hidden"
+ * is on. A non-empty query also matches hidden recipes by name, same as the
+ * Select search box. Ad-hoc recipes are included unless includeAdhoc is false.
+ * @param {string} query
+ * @param {{ includeAdhoc?: boolean }} [opts]
+ * @returns {Recipe[]}
+ */
+function searchRecipes(query, opts = {}) {
+    const includeAdhoc = opts.includeAdhoc !== false;
+    const q = query.toLowerCase();
+    return [...state.recipes.values()].filter((recipe) => {
+        if (!includeAdhoc && recipe.adhoc) return false;
+        if (q) return recipe.name.toLowerCase().includes(q);
+        return !recipe.hidden || state.showHidden;
+    });
+}
+
 /** @returns {Recipe[]} */
 function getFilteredRecipes() {
-    const q   = state.searchQuery.toLowerCase();
-    const all = [...state.recipes.values()];
     // Hidden recipes are excluded from the unfiltered list, but still turn up
     // when the user searches by name, or once "Show hidden" has been toggled on.
-    const matched = q
-        ? all.filter((r) => r.name.toLowerCase().includes(q))
-        : all.filter((r) => !r.hidden || state.showHidden);
-    return matched.sort((a, b) => {
+    return searchRecipes(state.searchQuery).sort((a, b) => {
         const aAdhoc = a.adhoc ? 0 : 1;
         const bAdhoc = b.adhoc ? 0 : 1;
         if (aAdhoc !== bAdhoc) return aAdhoc - bAdhoc;
@@ -1187,12 +1203,7 @@ function getFilteredRecipes() {
  * @returns {Recipe[]}
  */
 function getNutritionAddableRecipes(query) {
-    const q   = query.toLowerCase().trim();
-    const all = [...state.recipes.values()].filter((r) => !r.adhoc);
-    const matched = q
-        ? all.filter((r) => r.name.toLowerCase().includes(q))
-        : all.filter((r) => !r.hidden || state.showHidden);
-    return matched.sort((a, b) => a.name.localeCompare(b.name));
+    return searchRecipes(query.trim(), { includeAdhoc: false }).sort((a, b) => a.name.localeCompare(b.name));
 }
 
 // ============================================================
@@ -1749,6 +1760,11 @@ function backButton(label, onClick) {
 }
 
 /** @param {string} recipeId */
+function addServing(recipeId) {
+    state.selectedRecipeIds.push(recipeId);
+}
+
+/** @param {string} recipeId */
 function removeServing(recipeId) {
     const idx = state.selectedRecipeIds.lastIndexOf(recipeId);
     if (idx !== -1) state.selectedRecipeIds.splice(idx, 1);
@@ -1884,7 +1900,7 @@ function renderRecipeList() {
                     class: 'bundle-btn', testid: `bundle-${bundle.id}`, text: bundle.name,
                     on: {
                         click: () => {
-                            for (const id of bundle.recipeIds) state.selectedRecipeIds.push(id);
+                            for (const id of bundle.recipeIds) addServing(id);
                             unlockAudioContext();
                             refreshSelect();
                         },
@@ -1911,7 +1927,7 @@ function renderRecipeList() {
                 class: 'recipe-btn', testid: `recipe-${recipe.id}`,
                 on: {
                     click: () => {
-                        state.selectedRecipeIds.push(recipe.id);
+                        addServing(recipe.id);
                         unlockAudioContext();
                         announce(`Added a serving of ${recipe.name}. ${getServings(recipe.id)} selected.`);
                         refreshSelect();
@@ -2400,7 +2416,7 @@ function renderNutritionScreen() {
             h('div', { class: 'nutrition-serving-controls' },
                 headerButton('nutrition-serving-btn', '−', `Remove one serving of ${recipe.name}`, () => removeServing(recipe.id)),
                 h('span', { class: 'nutrition-serving-count', text: `×${servings}` }),
-                headerButton('nutrition-serving-btn', '+', `Add a serving of ${recipe.name}`, () => state.selectedRecipeIds.push(recipe.id)),
+                headerButton('nutrition-serving-btn', '+', `Add a serving of ${recipe.name}`, () => addServing(recipe.id)),
             ),
             headerButton('nutrition-eaten-btn', isRecipeExcluded ? '○' : '✓',
                 isRecipeExcluded ? `Include ${recipe.name} in totals` : `Exclude ${recipe.name} from totals`,
@@ -2520,7 +2536,7 @@ function suggestionRow(recipe, stats, testid) {
             class: 'suggestion-add-btn', text: '+ Add', testid,
             on: {
                 click: () => {
-                    state.selectedRecipeIds.push(recipe.id);
+                    addServing(recipe.id);
                     renderNutritionScreen();
                 },
             },
@@ -2670,7 +2686,7 @@ function renderAdhocDetail() {
                     const unit     = Object.values(u).find(uu => uu.name === adhocUnitName) ?? u.unit;
                     const recipe   = createAdhocRecipe(factory(adhocQuantity, unit));
                     registerRecipe(recipe);
-                    state.selectedRecipeIds.push(recipe.id);
+                    addServing(recipe.id);
                     resetAdhoc();
                     navigateTo(adhocReturnScreen);
                 },
@@ -3785,14 +3801,7 @@ function bootstrap() {
 const RECIPE_SCREENS = ['select', 'shopping', 'cooking', 'nutrition', 'add-ingredient', 'prep', 'plan'];
 
 function registerRecipeAgentTools() {
-    if (!('modelContext' in document)) return;
-    const doc = /** @type {Document & { modelContext?: { registerTool: (tool: object, options?: { signal: AbortSignal }) => Promise<unknown> | unknown } }} */ (document);
-    const modelContext = doc.modelContext;
-    if (!modelContext || typeof modelContext.registerTool !== 'function') return;
-    const controller = new AbortController();
-    const recipes = () => [...state.recipes.values()].filter(recipe => !recipe.hidden || state.showHidden);
-
-    const tools = [
+    registerAgentTools([
         {
             name: 'search-recipes',
             description: 'Find recipes by name. Use when choosing what to cook.',
@@ -3802,10 +3811,9 @@ function registerRecipeAgentTools() {
             },
             /** @param {any} input */
             execute(input) {
-                const query = typeof input?.query === 'string' ? input.query.trim().toLowerCase() : '';
+                const query = typeof input?.query === 'string' ? input.query.trim() : '';
                 return {
-                    recipes: recipes()
-                        .filter(recipe => !query || recipe.name.toLowerCase().includes(query))
+                    recipes: searchRecipes(query)
                         .slice(0, 20)
                         .map(recipe => ({ id: recipe.id, name: recipe.name, group: recipe.group ?? '' })),
                 };
@@ -3817,11 +3825,10 @@ function registerRecipeAgentTools() {
             description: 'Read how many servings are currently selected.',
             inputSchema: { type: 'object', properties: {} },
             execute() {
-                /** @type {Map<string, number>} */
-                const counts = new Map();
-                for (const id of state.selectedRecipeIds) counts.set(id, (counts.get(id) ?? 0) + 1);
                 return {
-                    selected: [...counts].map(([id, servings]) => ({ id, name: state.recipes.get(id)?.name ?? id, servings })),
+                    selected: [...countBy(state.selectedRecipeIds)].map(([id, servings]) => ({
+                        id, name: state.recipes.get(id)?.name ?? id, servings,
+                    })),
                 };
             },
             annotations: { readOnlyHint: true },
@@ -3838,10 +3845,9 @@ function registerRecipeAgentTools() {
             execute(input) {
                 const recipe = typeof input?.recipeId === 'string' ? state.recipes.get(input.recipeId) : undefined;
                 if (!recipe) return { error: 'Unknown recipe id. Call search-recipes first.' };
-                state.selectedRecipeIds.push(recipe.id);
+                addServing(recipe.id);
                 render();
-                const servings = state.selectedRecipeIds.filter(id => id === recipe.id).length;
-                return { recipeId: recipe.id, name: recipe.name, servings };
+                return { recipeId: recipe.id, name: recipe.name, servings: getServings(recipe.id) };
             },
             annotations: { readOnlyHint: false },
         },
@@ -3856,12 +3862,10 @@ function registerRecipeAgentTools() {
             /** @param {any} input */
             execute(input) {
                 if (typeof input?.recipeId !== 'string') return { error: 'Pass a recipe id.' };
-                const idx = state.selectedRecipeIds.lastIndexOf(input.recipeId);
-                if (idx === -1) return { error: 'That recipe has no selected servings.' };
-                state.selectedRecipeIds.splice(idx, 1);
+                if (getServings(input.recipeId) === 0) return { error: 'That recipe has no selected servings.' };
+                removeServing(input.recipeId);
                 render();
-                const servings = state.selectedRecipeIds.filter(id => id === input.recipeId).length;
-                return { recipeId: input.recipeId, servings };
+                return { recipeId: input.recipeId, servings: getServings(input.recipeId) };
             },
             annotations: { readOnlyHint: false },
         },
@@ -3883,11 +3887,7 @@ function registerRecipeAgentTools() {
             },
             annotations: { readOnlyHint: false },
         },
-    ];
-    for (const tool of tools) {
-        Promise.resolve(modelContext.registerTool(tool, { signal: controller.signal })).catch(() => {});
-    }
-    window.addEventListener('pagehide', () => controller.abort(), { once: true });
+    ]);
 }
 
 // ============================================================

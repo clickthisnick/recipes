@@ -4,10 +4,12 @@ This is a personal recipes project. Keep all recipe and product data, plus code,
 
 ## Scope
 
-- Canonical source: `src/file.js`. Read and edit here. It is plain JavaScript that browsers run directly; types are JSDoc comments checked by `npm run typecheck` (`tsc --noEmit`). There is no build step and no `dist/`.
+- Canonical source: `src/file.js`. Read and edit here. It is plain JavaScript that browsers run directly; types are JSDoc comments checked by `npm run typecheck` (`tsc --noEmit`). There is no build step.
 - `main.html` is the small app shell that loads `src/file.js` and `src/app.css` (the app's styles).
+- `dist/main.html` is only a redirect to `../main.html`. It keeps the query string and hash so old `/dist/main.html?recipe=` links still open. Do not delete it and do not put a build back in `dist/`.
 - `archived/` is dead code. Out of scope.
 - `src/requirements.md` is reference/spec documentation, not source of truth.
+- Notes live in `docs/notes/`. The product-ingest prompt is `docs/prompts/ingest-product-prompt`.
 - `node_modules/` is never inspected.
 
 ## Modern Web Guidance

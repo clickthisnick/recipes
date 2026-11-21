@@ -43,21 +43,12 @@
         </div>
     </main>
     <script type="module">
-        import { registerAgentTools } from './src/site-logic.js';
-        registerAgentTools([{
-            name: 'read-meat-temperatures',
-            description: 'Read the doneness temperatures shown on this chart.',
-            inputSchema: { type: 'object', properties: {} },
-            execute() {
-                return {
-                    rows: [...document.querySelectorAll('tbody tr')].map((row) => ({
-                        meat: row.querySelector('th')?.textContent ?? '',
-                        temp: row.querySelector('td')?.textContent ?? '',
-                    })).filter((row) => row.temp),
-                };
-            },
-            annotations: { readOnlyHint: true },
-        }]);
+        import { readTableTool, registerAgentTools } from './src/site-logic.js';
+        registerAgentTools([readTableTool(
+            'read-meat-temperatures',
+            'Read the doneness temperatures shown on this chart.',
+            { row: 'tbody tr', require: 'temp', columns: { meat: { selector: 'th' }, temp: { selector: 'td' } } },
+        )]);
     </script>
 </body>
 </html>
