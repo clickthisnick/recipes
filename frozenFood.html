@@ -22,16 +22,12 @@
         </ul>
     </main>
     <script type="module">
-        import { registerAgentTools } from './src/site-logic.js';
-        registerAgentTools([{
-            name: 'read-freezer-notes',
-            description: 'Read the freezer portion notes on this page.',
-            inputSchema: { type: 'object', properties: {} },
-            execute() {
-                return { notes: [...document.querySelectorAll('main li')].map((item) => item.textContent) };
-            },
-            annotations: { readOnlyHint: true },
-        }]);
+        import { readTableTool, registerAgentTools } from './src/site-logic.js';
+        registerAgentTools([readTableTool(
+            'read-freezer-notes',
+            'Read the freezer portion notes on this page.',
+            { row: 'main li', text: true, resultKey: 'notes' },
+        )]);
     </script>
 </body>
 </html>

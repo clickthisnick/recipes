@@ -11,7 +11,7 @@ npm test         # typecheck src/file.js, validate recipes, run the tests
 npm run lint
 ```
 
-The recipe app is [main.html](http://localhost:3000/main.html). Open a single recipe with `?recipe=`, for example `main.html?recipe=blueprint-smoothie`.
+The recipe app is [main.html](http://localhost:3000/main.html). Open a single recipe with `?recipe=`, for example `main.html?recipe=blueprint-smoothie`. Old `dist/main.html` links redirect there and keep the query string.
 
 There is no build step. Browsers run `src/file.js` as written; its types live in JSDoc comments and `npm run typecheck` checks them with `tsc --noEmit`.
 
