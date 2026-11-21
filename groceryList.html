@@ -15,7 +15,7 @@
         <p>Expiration date: <time id="week-ahead"></time>. If an existing item will be past the expiration date, assume quantity is 0.</p>
         <p id="grocery-status" class="status visually-hidden" role="status" aria-live="polite"></p>
         <div class="table-wrap" tabindex="0" role="region" aria-labelledby="grocery-caption">
-            <table class="stack">
+            <table>
                 <caption id="grocery-caption">Weekly groceries</caption>
                 <thead>
                     <tr>
@@ -28,144 +28,144 @@
                 </thead>
                 <tbody id="grocery-rows">
                     <tr>
-                        <td data-label="Name">Almond Milk</td>
-                        <td data-label="Quantity">2</td>
-                        <td data-label="Link"><a href="https://www.amazon.com/365-Everyday-Value-Almondmilk-Unsweetened/dp/B074H6M4LN?fpw=fresh" target="_blank" rel="noopener noreferrer">Almond Milk</a></td>
-                        <td data-label="Price">1.99</td>
-                        <td data-label="Purchased"><input id="got-almond-milk" data-testid="got-almond-milk" type="checkbox"> <label for="got-almond-milk">Purchased<span class="visually-hidden"> Almond Milk</span></label></td>
+                        <td>Almond Milk</td>
+                        <td>2</td>
+                        <td><a href="https://www.amazon.com/365-Everyday-Value-Almondmilk-Unsweetened/dp/B074H6M4LN?fpw=fresh" target="_blank" rel="noopener noreferrer">Almond Milk</a></td>
+                        <td>1.99</td>
+                        <td><input id="got-almond-milk" data-testid="got-almond-milk" type="checkbox"> <label for="got-almond-milk">Purchased<span class="visually-hidden"> Almond Milk</span></label></td>
                     </tr>
                     <tr>
-                        <td data-label="Name">Plain Yogurt</td>
-                        <td data-label="Quantity">1</td>
-                        <td data-label="Link"><a href="https://www.amazon.com/gp/product/B074H64BYN?ppw=fresh" target="_blank" rel="noopener noreferrer">Plain Yogurt</a></td>
-                        <td data-label="Price">3.39</td>
-                        <td data-label="Purchased"><input id="got-plain-yogurt" type="checkbox"> <label for="got-plain-yogurt">Purchased<span class="visually-hidden"> Plain Yogurt</span></label></td>
+                        <td>Plain Yogurt</td>
+                        <td>1</td>
+                        <td><a href="https://www.amazon.com/gp/product/B074H64BYN?ppw=fresh" target="_blank" rel="noopener noreferrer">Plain Yogurt</a></td>
+                        <td>3.39</td>
+                        <td><input id="got-plain-yogurt" type="checkbox"> <label for="got-plain-yogurt">Purchased<span class="visually-hidden"> Plain Yogurt</span></label></td>
                     </tr>
                     <tr>
-                        <td data-label="Name">Frozen Cascade Farm Fruit Raspberry</td>
-                        <td data-label="Quantity">2</td>
-                        <td data-label="Link"><a href="https://www.amazon.com/Cascadian-Farm-Organic-Raspberries-Organically/dp/B06Y2GKMT9/?fpw=fresh" target="_blank" rel="noopener noreferrer">Frozen Cascade Farm Fruit Raspberry</a></td>
-                        <td data-label="Price">11.32</td>
-                        <td data-label="Purchased"><input id="got-raspberries" type="checkbox"> <label for="got-raspberries">Purchased<span class="visually-hidden"> Frozen Cascade Farm Fruit Raspberry</span></label></td>
+                        <td>Frozen Cascade Farm Fruit Raspberry</td>
+                        <td>2</td>
+                        <td><a href="https://www.amazon.com/Cascadian-Farm-Organic-Raspberries-Organically/dp/B06Y2GKMT9/?fpw=fresh" target="_blank" rel="noopener noreferrer">Frozen Cascade Farm Fruit Raspberry</a></td>
+                        <td>11.32</td>
+                        <td><input id="got-raspberries" type="checkbox"> <label for="got-raspberries">Purchased<span class="visually-hidden"> Frozen Cascade Farm Fruit Raspberry</span></label></td>
                     </tr>
                     <tr>
-                        <td data-label="Name">Chicken Breasts</td>
-                        <td data-label="Quantity">5</td>
-                        <td data-label="Link"><a href="https://www.amazon.com/gp/product/B00AR0ZZ62?ppw=fresh" target="_blank" rel="noopener noreferrer">Chicken Breasts</a></td>
-                        <td data-label="Price">5.66</td>
-                        <td data-label="Purchased"><input id="got-chicken" type="checkbox"> <label for="got-chicken">Purchased<span class="visually-hidden"> Chicken Breasts</span></label></td>
+                        <td>Chicken Breasts</td>
+                        <td>5</td>
+                        <td><a href="https://www.amazon.com/gp/product/B00AR0ZZ62?ppw=fresh" target="_blank" rel="noopener noreferrer">Chicken Breasts</a></td>
+                        <td>5.66</td>
+                        <td><input id="got-chicken" type="checkbox"> <label for="got-chicken">Purchased<span class="visually-hidden"> Chicken Breasts</span></label></td>
                     </tr>
                     <tr>
-                        <td data-label="Name">Spring Mix</td>
-                        <td data-label="Quantity">1</td>
-                        <td data-label="Link"><a href="https://www.amazon.com/365-Everyday-Value-Organic-Spring/dp/B074H7KKJT/?fpw=fresh" target="_blank" rel="noopener noreferrer">Spring Mix</a></td>
-                        <td data-label="Price">1.99</td>
-                        <td data-label="Purchased"><input id="got-spring-mix" type="checkbox"> <label for="got-spring-mix">Purchased<span class="visually-hidden"> Spring Mix</span></label></td>
+                        <td>Spring Mix</td>
+                        <td>1</td>
+                        <td><a href="https://www.amazon.com/365-Everyday-Value-Organic-Spring/dp/B074H7KKJT/?fpw=fresh" target="_blank" rel="noopener noreferrer">Spring Mix</a></td>
+                        <td>1.99</td>
+                        <td><input id="got-spring-mix" type="checkbox"> <label for="got-spring-mix">Purchased<span class="visually-hidden"> Spring Mix</span></label></td>
                     </tr>
                     <tr>
-                        <td data-label="Name">Unsalted Butter</td>
-                        <td data-label="Quantity">1</td>
-                        <td data-label="Link"><a href="https://www.amazon.com/gp/product/B074VDJ7KZ?ppw=fresh" target="_blank" rel="noopener noreferrer">Unsalted Butter</a></td>
-                        <td data-label="Price">3.49</td>
-                        <td data-label="Purchased"><input id="got-butter" type="checkbox"> <label for="got-butter">Purchased<span class="visually-hidden"> Unsalted Butter</span></label></td>
+                        <td>Unsalted Butter</td>
+                        <td>1</td>
+                        <td><a href="https://www.amazon.com/gp/product/B074VDJ7KZ?ppw=fresh" target="_blank" rel="noopener noreferrer">Unsalted Butter</a></td>
+                        <td>3.49</td>
+                        <td><input id="got-butter" type="checkbox"> <label for="got-butter">Purchased<span class="visually-hidden"> Unsalted Butter</span></label></td>
                     </tr>
                     <tr>
-                        <td data-label="Name">Eggs Whites</td>
-                        <td data-label="Quantity">2</td>
-                        <td data-label="Link"><a href="https://www.amazon.com/365-Everyday-Value-Organic-Whites/dp/B074H5M1PM?ppw=fresh" target="_blank" rel="noopener noreferrer">Eggs Whites</a></td>
-                        <td data-label="Price">4.99</td>
-                        <td data-label="Purchased"><input id="got-egg-whites" type="checkbox"> <label for="got-egg-whites">Purchased<span class="visually-hidden"> Eggs Whites</span></label></td>
+                        <td>Eggs Whites</td>
+                        <td>2</td>
+                        <td><a href="https://www.amazon.com/365-Everyday-Value-Organic-Whites/dp/B074H5M1PM?ppw=fresh" target="_blank" rel="noopener noreferrer">Eggs Whites</a></td>
+                        <td>4.99</td>
+                        <td><input id="got-egg-whites" type="checkbox"> <label for="got-egg-whites">Purchased<span class="visually-hidden"> Eggs Whites</span></label></td>
                     </tr>
                     <tr>
-                        <td data-label="Name">Dried Apricots</td>
-                        <td data-label="Quantity">2</td>
-                        <td data-label="Link"><a href="https://www.amazon.com/gp/product/B0014D2992?ppw=fresh" target="_blank" rel="noopener noreferrer">Dried Apricots</a></td>
-                        <td data-label="Price">4.29</td>
-                        <td data-label="Purchased"><input id="got-apricots" type="checkbox"> <label for="got-apricots">Purchased<span class="visually-hidden"> Dried Apricots</span></label></td>
+                        <td>Dried Apricots</td>
+                        <td>2</td>
+                        <td><a href="https://www.amazon.com/gp/product/B0014D2992?ppw=fresh" target="_blank" rel="noopener noreferrer">Dried Apricots</a></td>
+                        <td>4.29</td>
+                        <td><input id="got-apricots" type="checkbox"> <label for="got-apricots">Purchased<span class="visually-hidden"> Dried Apricots</span></label></td>
                     </tr>
                     <tr>
-                        <td data-label="Name">Briana Artichoke Dressing</td>
-                        <td data-label="Quantity">1</td>
-                        <td data-label="Link"><a href="https://www.amazon.com/Briannas-Real-French-Vinaigrette-Dressing/dp/B000WLGD4O?fpw=fresh" target="_blank" rel="noopener noreferrer">Briana Artichoke Dressing</a></td>
-                        <td data-label="Price">3.32</td>
-                        <td data-label="Purchased"><input id="got-dressing" type="checkbox"> <label for="got-dressing">Purchased<span class="visually-hidden"> Briana Artichoke Dressing</span></label></td>
+                        <td>Briana Artichoke Dressing</td>
+                        <td>1</td>
+                        <td><a href="https://www.amazon.com/Briannas-Real-French-Vinaigrette-Dressing/dp/B000WLGD4O?fpw=fresh" target="_blank" rel="noopener noreferrer">Briana Artichoke Dressing</a></td>
+                        <td>3.32</td>
+                        <td><input id="got-dressing" type="checkbox"> <label for="got-dressing">Purchased<span class="visually-hidden"> Briana Artichoke Dressing</span></label></td>
                     </tr>
                     <tr>
-                        <td data-label="Name">Almond Butter</td>
-                        <td data-label="Quantity">1</td>
-                        <td data-label="Link"><a href="https://www.amazon.com/365-Everyday-Value-Almond-Crunchy/dp/B074J76XG2?fpw=fresh" target="_blank" rel="noopener noreferrer">Almond Butter</a></td>
-                        <td data-label="Price">6.99</td>
-                        <td data-label="Purchased"><input id="got-almond-butter" type="checkbox"> <label for="got-almond-butter">Purchased<span class="visually-hidden"> Almond Butter</span></label></td>
+                        <td>Almond Butter</td>
+                        <td>1</td>
+                        <td><a href="https://www.amazon.com/365-Everyday-Value-Almond-Crunchy/dp/B074J76XG2?fpw=fresh" target="_blank" rel="noopener noreferrer">Almond Butter</a></td>
+                        <td>6.99</td>
+                        <td><input id="got-almond-butter" type="checkbox"> <label for="got-almond-butter">Purchased<span class="visually-hidden"> Almond Butter</span></label></td>
                     </tr>
                     <tr>
-                        <td data-label="Name">Monterey Jack Cheese</td>
-                        <td data-label="Quantity">1</td>
-                        <td data-label="Link"><a href="https://www.amazon.com/gp/product/B074HJ4V7C?ppw=fresh" target="_blank" rel="noopener noreferrer">Monterey Jack Cheese</a></td>
-                        <td data-label="Price">4.49</td>
-                        <td data-label="Purchased"><input id="got-cheese" type="checkbox"> <label for="got-cheese">Purchased<span class="visually-hidden"> Monterey Jack Cheese</span></label></td>
+                        <td>Monterey Jack Cheese</td>
+                        <td>1</td>
+                        <td><a href="https://www.amazon.com/gp/product/B074HJ4V7C?ppw=fresh" target="_blank" rel="noopener noreferrer">Monterey Jack Cheese</a></td>
+                        <td>4.49</td>
+                        <td><input id="got-cheese" type="checkbox"> <label for="got-cheese">Purchased<span class="visually-hidden"> Monterey Jack Cheese</span></label></td>
                     </tr>
                     <tr>
-                        <td data-label="Name">Dish Detergent</td>
-                        <td data-label="Quantity">1</td>
-                        <td data-label="Link"><a href="https://www.amazon.com/Seventh-Generation-Dishwasher-Detergent-Lemon/dp/B004JX7N2W?fpw=fresh" target="_blank" rel="noopener noreferrer">Dish Detergent</a></td>
-                        <td data-label="Price">4.99</td>
-                        <td data-label="Purchased"><input id="got-dish" type="checkbox"> <label for="got-dish">Purchased<span class="visually-hidden"> Dish Detergent</span></label></td>
+                        <td>Dish Detergent</td>
+                        <td>1</td>
+                        <td><a href="https://www.amazon.com/Seventh-Generation-Dishwasher-Detergent-Lemon/dp/B004JX7N2W?fpw=fresh" target="_blank" rel="noopener noreferrer">Dish Detergent</a></td>
+                        <td>4.99</td>
+                        <td><input id="got-dish" type="checkbox"> <label for="got-dish">Purchased<span class="visually-hidden"> Dish Detergent</span></label></td>
                     </tr>
                     <tr>
-                        <td data-label="Name">Wheat Squares</td>
-                        <td data-label="Quantity">1</td>
-                        <td data-label="Link"><a href="https://www.amazon.com/365-Everyday-Value-Sized-Squares/dp/B074H6M3Z5?fpw=fresh" target="_blank" rel="noopener noreferrer">Wheat Squares</a></td>
-                        <td data-label="Price">2.99</td>
-                        <td data-label="Purchased"><input id="got-wheat" type="checkbox"> <label for="got-wheat">Purchased<span class="visually-hidden"> Wheat Squares</span></label></td>
+                        <td>Wheat Squares</td>
+                        <td>1</td>
+                        <td><a href="https://www.amazon.com/365-Everyday-Value-Sized-Squares/dp/B074H6M3Z5?fpw=fresh" target="_blank" rel="noopener noreferrer">Wheat Squares</a></td>
+                        <td>2.99</td>
+                        <td><input id="got-wheat" type="checkbox"> <label for="got-wheat">Purchased<span class="visually-hidden"> Wheat Squares</span></label></td>
                     </tr>
                     <tr>
-                        <td data-label="Name">Kosher Salt</td>
-                        <td data-label="Quantity">1</td>
-                        <td data-label="Link"><a href="https://www.amazon.com/Morton-Coarse-Kosher-Salt-Ounce/dp/B000Q68WSA?fpw=fresh" target="_blank" rel="noopener noreferrer">Kosher Salt</a></td>
-                        <td data-label="Price">2.99</td>
-                        <td data-label="Purchased"><input id="got-salt" type="checkbox"> <label for="got-salt">Purchased<span class="visually-hidden"> Kosher Salt</span></label></td>
+                        <td>Kosher Salt</td>
+                        <td>1</td>
+                        <td><a href="https://www.amazon.com/Morton-Coarse-Kosher-Salt-Ounce/dp/B000Q68WSA?fpw=fresh" target="_blank" rel="noopener noreferrer">Kosher Salt</a></td>
+                        <td>2.99</td>
+                        <td><input id="got-salt" type="checkbox"> <label for="got-salt">Purchased<span class="visually-hidden"> Kosher Salt</span></label></td>
                     </tr>
                     <tr>
-                        <td data-label="Name">Olive Oil</td>
-                        <td data-label="Quantity">1</td>
-                        <td data-label="Link"><a href="https://www.amazon.com/Pompeian-Robust-Extra-Virgin-Olive/dp/B00ZLUF01I?fpw=fresh" target="_blank" rel="noopener noreferrer">Olive Oil</a></td>
-                        <td data-label="Price">10.17</td>
-                        <td data-label="Purchased"><input id="got-olive-oil" type="checkbox"> <label for="got-olive-oil">Purchased<span class="visually-hidden"> Olive Oil</span></label></td>
+                        <td>Olive Oil</td>
+                        <td>1</td>
+                        <td><a href="https://www.amazon.com/Pompeian-Robust-Extra-Virgin-Olive/dp/B00ZLUF01I?fpw=fresh" target="_blank" rel="noopener noreferrer">Olive Oil</a></td>
+                        <td>10.17</td>
+                        <td><input id="got-olive-oil" type="checkbox"> <label for="got-olive-oil">Purchased<span class="visually-hidden"> Olive Oil</span></label></td>
                     </tr>
                     <tr>
-                        <td data-label="Name">Laundry Detergent</td>
-                        <td data-label="Quantity">1</td>
-                        <td data-label="Link"><a href="https://www.amazon.com/Seventh-Generation-Laundry-Detergent-Concentrate/dp/B003X028NG?fpw=fresh" target="_blank" rel="noopener noreferrer">Laundry Detergent</a></td>
-                        <td data-label="Price">14.99</td>
-                        <td data-label="Purchased"><input id="got-laundry" type="checkbox"> <label for="got-laundry">Purchased<span class="visually-hidden"> Laundry Detergent</span></label></td>
+                        <td>Laundry Detergent</td>
+                        <td>1</td>
+                        <td><a href="https://www.amazon.com/Seventh-Generation-Laundry-Detergent-Concentrate/dp/B003X028NG?fpw=fresh" target="_blank" rel="noopener noreferrer">Laundry Detergent</a></td>
+                        <td>14.99</td>
+                        <td><input id="got-laundry" type="checkbox"> <label for="got-laundry">Purchased<span class="visually-hidden"> Laundry Detergent</span></label></td>
                     </tr>
                     <tr>
-                        <td data-label="Name">Raspberry Spread</td>
-                        <td data-label="Quantity">2</td>
-                        <td data-label="Link"><a href="https://www.amazon.com/365-Everyday-Value-Raspberry-Spread/dp/B074H5H17J?&fpw=fresh" target="_blank" rel="noopener noreferrer">Raspberry Spread</a></td>
-                        <td data-label="Price">2.99</td>
-                        <td data-label="Purchased"><input id="got-spread" type="checkbox"> <label for="got-spread">Purchased<span class="visually-hidden"> Raspberry Spread</span></label></td>
+                        <td>Raspberry Spread</td>
+                        <td>2</td>
+                        <td><a href="https://www.amazon.com/365-Everyday-Value-Raspberry-Spread/dp/B074H5H17J?&fpw=fresh" target="_blank" rel="noopener noreferrer">Raspberry Spread</a></td>
+                        <td>2.99</td>
+                        <td><input id="got-spread" type="checkbox"> <label for="got-spread">Purchased<span class="visually-hidden"> Raspberry Spread</span></label></td>
                     </tr>
                     <tr>
-                        <td data-label="Name">Wheat Flour</td>
-                        <td data-label="Quantity">1</td>
-                        <td data-label="Link"><a href="https://www.amazon.com/365-Everyday-Value-Organic-Whole/dp/B074VDMNDM/?fpw=fresh" target="_blank" rel="noopener noreferrer">Wheat Flour</a></td>
-                        <td data-label="Price">4.99</td>
-                        <td data-label="Purchased"><input id="got-flour" type="checkbox"> <label for="got-flour">Purchased<span class="visually-hidden"> Wheat Flour</span></label></td>
+                        <td>Wheat Flour</td>
+                        <td>1</td>
+                        <td><a href="https://www.amazon.com/365-Everyday-Value-Organic-Whole/dp/B074VDMNDM/?fpw=fresh" target="_blank" rel="noopener noreferrer">Wheat Flour</a></td>
+                        <td>4.99</td>
+                        <td><input id="got-flour" type="checkbox"> <label for="got-flour">Purchased<span class="visually-hidden"> Wheat Flour</span></label></td>
                     </tr>
                     <tr>
-                        <td data-label="Name">Organic Peppercorn</td>
-                        <td data-label="Quantity">1</td>
-                        <td data-label="Link">No link</td>
-                        <td data-label="Price">12.99</td>
-                        <td data-label="Purchased"><input id="got-peppercorn" type="checkbox"> <label for="got-peppercorn">Purchased<span class="visually-hidden"> Organic Peppercorn</span></label></td>
+                        <td>Organic Peppercorn</td>
+                        <td>1</td>
+                        <td>No link</td>
+                        <td>12.99</td>
+                        <td><input id="got-peppercorn" type="checkbox"> <label for="got-peppercorn">Purchased<span class="visually-hidden"> Organic Peppercorn</span></label></td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </main>
     <script type="module">
-        import { addCalendarDays, formatUsDate, isoDate, registerAgentTools } from './src/site-logic.js';
+        import { addCalendarDays, bindRowCheckboxes, formatUsDate, isoDate, registerAgentTools } from './src/site-logic.js';
 
         const today = new Date();
         const ahead = addCalendarDays(today, 7);
@@ -173,15 +173,7 @@
         week.textContent = formatUsDate(ahead);
         week.dateTime = isoDate(ahead);
 
-        const status = document.getElementById('grocery-status');
-        for (const box of document.querySelectorAll('#grocery-rows input[type="checkbox"]')) {
-            box.addEventListener('change', () => {
-                const row = box.closest('tr');
-                row.classList.toggle('completed', box.checked);
-                const name = row.querySelector('td').textContent;
-                status.textContent = box.checked ? `${name} marked purchased` : `${name} marked still needed`;
-            });
-        }
+        bindRowCheckboxes(document.getElementById('grocery-status'), 'marked purchased', 'marked still needed');
 
         function groceryItems() {
             return [...document.querySelectorAll('#grocery-rows tr')].map((row) => ({

@@ -7,46 +7,43 @@
 // TYPES
 // ============================================================
 
-export type StepType = 'instruction' | 'timer' | 'cleanup' | 'info' | 'gate';
-export type Screen   = 'select' | 'shopping' | 'cooking' | 'nutrition' | 'add-ingredient' | 'prep' | 'plan';
+/** @typedef {'instruction' | 'timer' | 'cleanup' | 'info' | 'gate'} StepType */
+/** @typedef {'select' | 'shopping' | 'cooking' | 'nutrition' | 'add-ingredient' | 'prep' | 'plan'} Screen */
 
-export interface Unit {
-    name: string;
-    plural?: string;
-}
+/**
+ * @typedef {Object} Unit
+ * @property {string} name
+ * @property {string} [plural]
+ */
 
-// A nutrition label, keyed by unit name (e.g. 'cup', 'tsp'). Values are per
-// serving; servingSize is in the keyed unit.
-export type NutritionLabel = Record<string, {
-    servings: number;
-    servingSize: number;
-    calories: number;
-    fat: number;
-    saturatedFat: number;
-    transFat: number;
-    cholesterol: number;
-    carbs: number;
-    sodium: number;
-    sugar: number;
-    protein: number;
-    fiber: number;
-}>;
+const NUTRIENT_KEYS = /** @type {const} */ (['calories', 'fat', 'saturatedFat', 'transFat', 'cholesterol', 'carbs', 'sodium', 'sugar', 'protein', 'fiber']);
+/** @typedef {Record<typeof NUTRIENT_KEYS[number], number>} NutritionTotals */
 
-// Amazon's Subscribe & Save auto-delivery discount, expressed as eligibility for each
-// percent tier rather than a hardcoded price - the discounted price is always a percent
-// off whatever this product's current price is, so it can't go stale as price changes.
-// Only applies when bought directly from Amazon (checked against product.store at the
-// call site); Whole Foods and other retailers don't offer it even for the same item.
-export interface Discount {
-    subscribeAndSave5?: boolean;
-    subscribeAndSave10?: boolean;
-    subscribeAndSave15?: boolean;
-    // Amazon's separate "5+ subscriptions in one delivery" bonus; value is the flat
-    // percent bonus, unrelated to the subscribeAndSave tiers above.
-    subscribe5Products?: number;
-}
+/**
+ * A nutrition label, keyed by unit name (e.g. 'cup', 'tsp'). Values are per
+ * serving; servingSize is in the keyed unit.
+ * @typedef {Record<string, { servings: number; servingSize: number } & NutritionTotals>} NutritionLabel
+ */
 
-export function subscribeAndSavePercent(discount?: Discount): number | undefined {
+/**
+ * Amazon's Subscribe & Save auto-delivery discount, expressed as eligibility for each
+ * percent tier rather than a hardcoded price - the discounted price is always a percent
+ * off whatever this product's current price is, so it can't go stale as price changes.
+ * Only applies when bought directly from Amazon (checked against product.store at the
+ * call site); Whole Foods and other retailers don't offer it even for the same item.
+ * @typedef {Object} Discount
+ * @property {boolean} [subscribeAndSave5]
+ * @property {boolean} [subscribeAndSave10]
+ * @property {boolean} [subscribeAndSave15]
+ * @property {number} [subscribe5Products] Amazon's separate "5+ subscriptions in one delivery" bonus; value is the flat
+ *     percent bonus, unrelated to the subscribeAndSave tiers above.
+ */
+
+/**
+ * @param {Discount} [discount]
+ * @returns {number | undefined}
+ */
+export function subscribeAndSavePercent(discount) {
     if (!discount) return undefined;
     if (discount.subscribeAndSave15) return 15;
     if (discount.subscribeAndSave10) return 10;
@@ -54,125 +51,138 @@ export function subscribeAndSavePercent(discount?: Discount): number | undefined
     return undefined;
 }
 
-// Where/how a Product can be bought - retailer-specific and non-exclusive: the same
-// physical product can have several of these (e.g. the same jar sold on Amazon AND on
-// the brand's own site, at different prices with different links). Nutrition/brand/size
-// stay on Product since those describe the item itself, not where you buy it.
-export interface Listing {
-    store?: string;
-    link?: string;
-    price?: number;
-    discount?: Discount;
-}
+/**
+ * Where/how a Product can be bought - retailer-specific and non-exclusive: the same
+ * physical product can have several of these (e.g. the same jar sold on Amazon AND on
+ * the brand's own site, at different prices with different links). Nutrition/brand/size
+ * stay on Product since those describe the item itself, not where you buy it.
+ * @typedef {Object} Listing
+ * @property {string} [store]
+ * @property {string} [link]
+ * @property {number} [price]
+ * @property {Discount} [discount]
+ */
 
-export interface Product {
-    brand: string;
-    variant?: string;
-    size?: number;
-    sizeUnit?: Unit;
-    organic?: boolean;
-    nutrition?: NutritionLabel;
-    listings?: Listing[];
-    // Most products are bought as a discrete, countable container (a can, a bag,
-    // a bunch) - size/sizeUnit describe that one container, so "have N of them"
-    // tracking on the shopping screen is on by default, labeled with this word
-    // when set (falls back to the generic "package" otherwise).
-    packageUnit?: Unit;
-    // Set for products priced per unit weight/volume with no real fixed-size
-    // container to count (e.g. cabbage sold loose per lb) - disables package
-    // tracking so the shopping screen falls back to entering the recipe unit
-    // (cups, lbs, ...) directly instead of a fake "package" count.
-    bulk?: boolean;
-}
+/**
+ * @typedef {Object} Product
+ * @property {string} brand
+ * @property {string} [variant]
+ * @property {number} [size]
+ * @property {Unit} [sizeUnit]
+ * @property {boolean} [organic]
+ * @property {NutritionLabel} [nutrition]
+ * @property {Listing[]} [listings]
+ * @property {Unit} [packageUnit] Most products are bought as a discrete, countable container (a can, a bag,
+ *     a bunch) - size/sizeUnit describe that one container, so "have N of them"
+ *     tracking on the shopping screen is on by default, labeled with this word
+ *     when set (falls back to the generic "package" otherwise).
+ * @property {boolean} [bulk] Set for products priced per unit weight/volume with no real fixed-size
+ *     container to count (e.g. cabbage sold loose per lb) - disables package
+ *     tracking so the shopping screen falls back to entering the recipe unit
+ *     (cups, lbs, ...) directly instead of a fake "package" count.
+ */
 
-// The listing (of the selected product) actually used for cost/price display - the
-// cheapest one, since that's what a shopper would realistically buy. Listings with no
-// price are ignored, and returns undefined only if none of them have a price at all.
-export function cheapestListing(product: Product): Listing | undefined {
-    return (product.listings ?? []).reduce<Listing | undefined>((cheapest, listing) => {
+/**
+ * The listing (of the selected product) actually used for cost/price display - the
+ * cheapest one, since that's what a shopper would realistically buy. Listings with no
+ * price are ignored, and returns undefined only if none of them have a price at all.
+ * @param {Product} product
+ * @returns {Listing | undefined}
+ */
+export function cheapestListing(product) {
+    return (product.listings ?? []).reduce((cheapest, listing) => {
         if (listing.price === undefined) return cheapest;
         if (cheapest === undefined || cheapest.price === undefined || listing.price < cheapest.price) return listing;
         return cheapest;
-    }, undefined);
+    }, /** @type {Listing | undefined} */ (undefined));
 }
 
-declare const __ingredient: unique symbol;
+/**
+ * Substance-specific unit conversions (e.g. volume → weight via density).
+ * Keyed by the "from" unit name; value is the target unit and multiplication factor.
+ * Used after physical CONVERSION_FACTORS fail, before declaring uncomputable.
+ * @typedef {Record<string, { to: Unit; factor: number }>} IngredientConversions
+ */
 
-// Substance-specific unit conversions (e.g. volume → weight via density).
-// Keyed by the "from" unit name; value is the target unit and multiplication factor.
-// Used after physical CONVERSION_FACTORS fail, before declaring uncomputable.
-export type IngredientConversions = Record<string, { to: Unit; factor: number }>;
+/**
+ * Made only by ingredient factories (the type-only `__ingredient` brand stops a plain
+ * object literal from passing as one).
+ * @typedef {{ readonly __ingredient: true } & IngredientFields} Ingredient
+ */
 
-export interface Ingredient {
-    readonly [__ingredient]: true;
-    name: string;
-    // Recipe ingredients must always be measured.  Keeping these required makes an
-    // unmeasured i.ingredient() call a TypeScript/build error instead of silently
-    // rendering as an ingredient with no amount.
-    quantity: number;
-    unit: Unit;
-    perishableDays?: number;
-    nutrition?: NutritionLabel;
-    products?: Product[];
-    defaultBrand?: string;
-    isMeatProduct?: boolean;
-    requiresDateLabel?: boolean;
-    conversions?: IngredientConversions;
-    // Pan temp at which this fat reaches its shimmer point.  Refined/high-smoke-point oils
-    // (e.g. avocado) shimmer hotter; delicate ones (e.g. extra-virgin olive oil)
-    // shimmer cooler.  Heat steps read this to time how long the oil needs in a hot pan.
-    shimmerAt?: number;
-    rename(newName: string): void;
-}
+/**
+ * @typedef {Object} IngredientFields
+ * @property {string} name
+ * @property {number} quantity Recipe ingredients must always be measured. Keeping these required makes an
+ *     unmeasured i.ingredient() call a type-check error instead of silently rendering as an
+ *     ingredient with no amount.
+ * @property {Unit} unit
+ * @property {number} [perishableDays]
+ * @property {NutritionLabel} [nutrition]
+ * @property {Product[]} [products]
+ * @property {string} [defaultBrand]
+ * @property {boolean} [isMeatProduct]
+ * @property {boolean} [requiresDateLabel]
+ * @property {IngredientConversions} [conversions]
+ * @property {number} [shimmerAt] Pan temp at which this fat reaches its shimmer point. Refined/high-smoke-point
+ *     oils (e.g. avocado) shimmer hotter; delicate ones (e.g. extra-virgin olive oil) shimmer
+ *     cooler. Heat steps read this to time how long the oil needs in a hot pan.
+ * @property {(newName: string) => void} rename
+ */
 
-export interface Step {
-    id: number;
-    type: StepType;
-    text: string;
-    durationSeconds?: number;
-    equipment?: string[];
-    ingredients?: Ingredient[];
-    children?: Step[];
-    recipeId?: string;
-    waitForIds?: number[];
-    startWhenIds?: number[];
-    prep?: boolean;
-    prepOnly?: boolean;
-    linkRecipeId?: string;  // info steps only: renders a clickable link to another recipe
-    waitFor(...steps: Step[]): this;
-    startWhen(...steps: Step[]): this;
-}
+/**
+ * @typedef {Object} Step
+ * @property {number} id
+ * @property {StepType} type
+ * @property {string} text
+ * @property {number} [durationSeconds]
+ * @property {string[]} [equipment]
+ * @property {Ingredient[]} [ingredients]
+ * @property {Step[]} [children]
+ * @property {string} [recipeId]
+ * @property {number[]} [waitForIds]
+ * @property {number[]} [startWhenIds]
+ * @property {boolean} [prep]
+ * @property {boolean} [prepOnly]
+ * @property {string} [linkRecipeId] info steps only: renders a clickable link to another recipe
+ * @property {(...steps: Step[]) => Step} waitFor
+ * @property {(...steps: Step[]) => Step} startWhen
+ */
 
-export interface Recipe {
-    id: string;
-    name: string;
-    group?: string;
-    steps: Step[];
-    estimatedMinutes?: number;
-    adhoc?: boolean;
-    portable?: boolean;       // can be eaten away from home (no cooking needed)
-    planMinutes?: number;     // eating time on the day (assumes prepped if applicable)
-    prepMinutes?: number;     // advance prep/cook time (can be done ahead of eating)
-    perishableDays?: number;  // days the prepped item keeps in the fridge
-    sortOrder?: number;       // overrides alphabetical sort among recipes that both define it
-    hidden?: boolean;         // excluded from the default recipe list; still reachable by search or "Show hidden"
-}
+/**
+ * @typedef {Object} Recipe
+ * @property {string} id
+ * @property {string} name
+ * @property {string} [group]
+ * @property {Step[]} steps
+ * @property {number} [estimatedMinutes]
+ * @property {boolean} [adhoc]
+ * @property {boolean} [portable] can be eaten away from home (no cooking needed)
+ * @property {number} [planMinutes] eating time on the day (assumes prepped if applicable)
+ * @property {number} [prepMinutes] advance prep/cook time (can be done ahead of eating)
+ * @property {number} [perishableDays] days the prepped item keeps in the fridge
+ * @property {number} [sortOrder] overrides alphabetical sort among recipes that both define it
+ * @property {boolean} [hidden] excluded from the default recipe list; still reachable by search or "Show hidden"
+ */
 
-export interface PlanBlock {
-    id: string;
-    start: string;  // "HH:MM" 24h
-    end: string;
-    type: 'home' | 'away' | 'portable';
-}
+/**
+ * @typedef {Object} PlanBlock
+ * @property {string} id
+ * @property {string} start "HH:MM" 24h
+ * @property {string} end
+ * @property {'home' | 'away' | 'portable'} type
+ */
 
-export interface PlanConfig {
-    blocks: PlanBlock[];
-    caloriesCutoff: string;  // "HH:MM" - prefer placing all eating before this time
-}
+/**
+ * @typedef {Object} PlanConfig
+ * @property {PlanBlock[]} blocks
+ * @property {string} caloriesCutoff "HH:MM" - prefer placing all eating before this time
+ */
 
 const PLAN_CONFIG_KEY = 'recipe-plan-config';
 
-const DEFAULT_PLAN_CONFIG: PlanConfig = {
+/** @type {PlanConfig} */
+const DEFAULT_PLAN_CONFIG = {
     blocks: [
         { id: 'b1', start: '07:00', end: '08:00', type: 'home' },
         { id: 'b2', start: '08:00', end: '12:00', type: 'away' },
@@ -183,22 +193,30 @@ const DEFAULT_PLAN_CONFIG: PlanConfig = {
     caloriesCutoff: '14:00',
 };
 
-export function isHhmm(value: unknown): value is string {
+/**
+ * @param {unknown} value
+ * @returns {value is string}
+ */
+export function isHhmm(value) {
     return typeof value === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
 }
 
-// Saved plans are untrusted (old builds, partial writes, private-mode exceptions).
-// Drop entries that would crash the planner, and keep a valid empty block list
-// when the user deleted every block on purpose.
-export function normalizePlanConfig(value: unknown): PlanConfig {
-    const fallback = JSON.parse(JSON.stringify(DEFAULT_PLAN_CONFIG)) as PlanConfig;
+/**
+ * Saved plans are untrusted (old builds, partial writes, private-mode exceptions).
+ * Drop entries that would crash the planner, and keep a valid empty block list
+ * when the user deleted every block on purpose.
+ * @param {unknown} value
+ * @returns {PlanConfig}
+ */
+export function normalizePlanConfig(value) {
+    const fallback = /** @type {PlanConfig} */ (JSON.parse(JSON.stringify(DEFAULT_PLAN_CONFIG)));
     if (!value || typeof value !== 'object' || Array.isArray(value)) return fallback;
-    const raw = value as { blocks?: unknown; caloriesCutoff?: unknown };
+    const raw = /** @type {{ blocks?: unknown; caloriesCutoff?: unknown }} */ (value);
     if (!Array.isArray(raw.blocks)) return fallback;
-    const seen = new Set<string>();
-    const blocks = raw.blocks.flatMap((block): PlanBlock[] => {
+    const seen = /** @type {Set<string>} */ (new Set());
+    const blocks = raw.blocks.flatMap(/** @returns {PlanBlock[]} */ (block) => {
         if (!block || typeof block !== 'object') return [];
-        const candidate = block as Partial<PlanBlock>;
+        const candidate = /** @type {Partial<PlanBlock>} */ (block);
         if (typeof candidate.id !== 'string' || !candidate.id || seen.has(candidate.id)) return [];
         if (!isHhmm(candidate.start) || !isHhmm(candidate.end)) return [];
         if (candidate.type !== 'home' && candidate.type !== 'away' && candidate.type !== 'portable') return [];
@@ -212,7 +230,11 @@ export function normalizePlanConfig(value: unknown): PlanConfig {
     };
 }
 
-function storageGet(key: string): string | null {
+/**
+ * @param {string} key
+ * @returns {string | null}
+ */
+function storageGet(key) {
     try {
         if (typeof localStorage === 'undefined') return null;
         return localStorage.getItem(key);
@@ -221,7 +243,11 @@ function storageGet(key: string): string | null {
     }
 }
 
-function storageSet(key: string, value: string): void {
+/**
+ * @param {string} key
+ * @param {string} value
+ */
+function storageSet(key, value) {
     try {
         if (typeof localStorage === 'undefined') return;
         localStorage.setItem(key, value);
@@ -230,7 +256,8 @@ function storageSet(key: string, value: string): void {
     }
 }
 
-function loadPlanConfig(): PlanConfig {
+/** @returns {PlanConfig} */
+function loadPlanConfig() {
     const raw = storageGet(PLAN_CONFIG_KEY);
     if (!raw) return normalizePlanConfig(undefined);
     try {
@@ -240,15 +267,17 @@ function loadPlanConfig(): PlanConfig {
     }
 }
 
-function savePlanConfig(cfg: PlanConfig): void {
+/** @param {PlanConfig} cfg */
+function savePlanConfig(cfg) {
     storageSet(PLAN_CONFIG_KEY, JSON.stringify(cfg));
 }
 
-export interface RecipeBundle {
-    id: string;
-    name: string;
-    recipeIds: string[];
-}
+/**
+ * @typedef {Object} RecipeBundle
+ * @property {string} id
+ * @property {string} name
+ * @property {string[]} recipeIds
+ */
 
 // ============================================================
 // GLOBAL STATE
@@ -257,36 +286,45 @@ export interface RecipeBundle {
 const SHOW_HIDDEN_RECIPES_KEY = 'recipe-show-hidden';
 
 const state = {
-    recipes:           new Map<string, Recipe>(),
-    bundles:           new Map<string, RecipeBundle>(),
-    selectedRecipeIds: [] as string[],
-    timers:            new Map<number, number>(),
-    ringingAlarms:     new Map<number, number>(),
-    gateRunCounts:     new Map<number, number>(),
-    screen:            'select' as Screen,
+    recipes:           /** @type {Map<string, Recipe>} */ (new Map()),
+    bundles:           /** @type {Map<string, RecipeBundle>} */ (new Map()),
+    selectedRecipeIds: /** @type {string[]} */ ([]),
+    timers:            /** @type {Map<number, number>} */ (new Map()),
+    ringingAlarms:     /** @type {Map<number, number>} */ (new Map()),
+    gateRunCounts:     /** @type {Map<number, number>} */ (new Map()),
+    screen:            /** @type {Screen} */ ('select'),
     searchQuery:       '',
-    cookingPlanSteps:  [] as Step[],
-    cookingStartedAt:  null as number | null,
-    cookingElapsedInterval: null as number | null,
+    cookingPlanSteps:  /** @type {Step[]} */ ([]),
+    cookingStartedAt:  /** @type {number | null} */ (null),
+    cookingElapsedInterval: /** @type {number | null} */ (null),
     audioUnlocked:     false,
     showHidden:        storageGet(SHOW_HIDDEN_RECIPES_KEY) === 'true',
 };
 
-function setShowHidden(value: boolean): void {
+/** @param {boolean} value */
+function setShowHidden(value) {
     state.showHidden = value;
     storageSet(SHOW_HIDDEN_RECIPES_KEY, String(value));
 }
 
 const macroTargets = { calories: 2550, protein: 147, fat: 114, saturatedFat: 20, transFat: 0, carbs: 234, sodium: 2300, fiber: 38 };
 
-const nutritionExclusions = new Map<string, Set<Ingredient>>();
+const nutritionExclusions = /** @type {Map<string, Set<Ingredient>>} */ (new Map());
 // Recipes explicitly deselected from nutrition totals. Absence = counted (selected by default).
-const nutritionRecipeExclusions = new Set<string>();
-const nutritionExpanded   = new Set<string>();
+const nutritionRecipeExclusions = /** @type {Set<string>} */ (new Set());
+const nutritionExpanded   = /** @type {Set<string>} */ (new Set());
 let nutritionAddRecipeQuery = '';
-function getNutritionExcluded(recipeId: string): Set<Ingredient> {
-    if (!nutritionExclusions.has(recipeId)) nutritionExclusions.set(recipeId, new Set());
-    return nutritionExclusions.get(recipeId)!;
+/**
+ * @param {string} recipeId
+ * @returns {Set<Ingredient>}
+ */
+function getNutritionExcluded(recipeId) {
+    let excluded = nutritionExclusions.get(recipeId);
+    if (!excluded) {
+        excluded = new Set();
+        nutritionExclusions.set(recipeId, excluded);
+    }
+    return excluded;
 }
 
 // ============================================================
@@ -294,16 +332,17 @@ function getNutritionExcluded(recipeId: string): Set<Ingredient> {
 // ============================================================
 
 let nextStepId = 1;
-function createId(): number { return nextStepId++; }
+/** @returns {number} */
+function createId() { return nextStepId++; }
 
 // ============================================================
 // TIME HELPERS
 // ============================================================
 
 export const time = {
-    seconds: (v: number): number => v,
-    minutes: (v: number): number => v * 60,
-    hours:   (v: number): number => v * 3600,
+    seconds: /** @param {number} v @returns {number} */ (v) => v,
+    minutes: /** @param {number} v @returns {number} */ (v) => v * 60,
+    hours:   /** @param {number} v @returns {number} */ (v) => v * 3600,
 };
 
 // ============================================================
@@ -335,7 +374,8 @@ export const u = {
 // UNIT CONVERSION
 // ============================================================
 
-const CONVERSION_FACTORS: Record<string, Record<string, number>> = {
+/** @type {Record<string, Record<string, number>>} */
+const CONVERSION_FACTORS = {
     // Volume cluster
     [u.tsp.name]:        { [u.tsp.name]: 1,    [u.tbsp.name]: 1/3,  [u.cup.name]: 1/48, [u.fluidOunce.name]: 1/6  },
     [u.tbsp.name]:       { [u.tsp.name]: 3,    [u.tbsp.name]: 1,    [u.cup.name]: 1/16, [u.fluidOunce.name]: 1/2  },
@@ -347,22 +387,36 @@ const CONVERSION_FACTORS: Record<string, Record<string, number>> = {
     [u.gram.name]:  { [u.ounce.name]: 1/28.3495, [u.pound.name]: 1/453.592,  [u.gram.name]: 1        },
 };
 
-export function convertUnits(quantity: number, from: string, to: string): number | null {
+/**
+ * @param {number} quantity
+ * @param {string} from
+ * @param {string} to
+ * @returns {number | null}
+ */
+export function convertUnits(quantity, from, to) {
     if (from === to) return quantity;
     const factor = CONVERSION_FACTORS[from]?.[to];
     if (factor === undefined) return null;
     return quantity * factor;
 }
 
-// Extends convertUnits with ingredient-specific density conversions (e.g. unit → cup → oz).
-// Recursively chains density hops until a physical conversion closes the gap, or returns null.
+/**
+ * Extends convertUnits with ingredient-specific density conversions (e.g. unit → cup → oz).
+ * Recursively chains density hops until a physical conversion closes the gap, or returns null.
+ * @param {number} quantity
+ * @param {string} from
+ * @param {string} to
+ * @param {IngredientConversions} [conversions]
+ * @param {Set<string>} [seen]
+ * @returns {number | null}
+ */
 export function convertWithDensity(
-    quantity: number,
-    from: string,
-    to: string,
-    conversions?: IngredientConversions,
-    seen: Set<string> = new Set()
-): number | null {
+    quantity,
+    from,
+    to,
+    conversions,
+    seen = new Set()
+) {
     const physical = convertUnits(quantity, from, to);
     if (physical !== null) return physical;
     if (!conversions || seen.has(from)) return null;
@@ -379,12 +433,22 @@ export function convertWithDensity(
 // FORMATTERS
 // ============================================================
 
-function pluralize(word: string, count: number): string {
+/**
+ * @param {string} word
+ * @param {number} count
+ * @returns {string}
+ */
+function pluralize(word, count) {
     return Math.abs(count) <= 1 ? word : `${word}s`;
 }
 
-function formatQuantity(quantity: number): string {
-    const fractions: Record<number, string> = {
+/**
+ * @param {number} quantity
+ * @returns {string}
+ */
+function formatQuantity(quantity) {
+    /** @type {Record<number, string>} */
+    const fractions = {
         0.125: '⅛', 0.167: '⅙', 0.25: '¼', 0.333: '⅓', 0.5: '½', 0.667: '⅔', 0.75: '¾',
     };
     const whole   = Math.floor(quantity);
@@ -396,7 +460,11 @@ function formatQuantity(quantity: number): string {
     return `${whole || ''}${fraction}`;
 }
 
-export function formatIngredient(ingredient: Ingredient): string {
+/**
+ * @param {Ingredient} ingredient
+ * @returns {string}
+ */
+export function formatIngredient(ingredient) {
     const { quantity, unit, name } = ingredient;
     if (!unit || !unit.name) return name;
     const amount = quantity ?? 0;
@@ -407,9 +475,14 @@ export function formatIngredient(ingredient: Ingredient): string {
     return `${formatQuantity(amount)} ${unitText} ${name}`;
 }
 
-// Same as formatIngredient but without the item name - used to describe an
-// arbitrary quantity (e.g. "how much is still needed") in an ingredient's unit.
-function formatQuantityUnit(quantity: number, unit?: Unit): string {
+/**
+ * Same as formatIngredient but without the item name - used to describe an
+ * arbitrary quantity (e.g. "how much is still needed") in an ingredient's unit.
+ * @param {number} quantity
+ * @param {Unit} [unit]
+ * @returns {string}
+ */
+function formatQuantityUnit(quantity, unit) {
     if (!unit || !unit.name) return formatQuantity(quantity);
     const unitText = Math.abs(quantity) <= 1 ? unit.name : (unit.plural || unit.name);
     return `${formatQuantity(quantity)} ${unitText}`;
@@ -419,15 +492,20 @@ function formatQuantityUnit(quantity: number, unit?: Unit): string {
 // STEP FACTORIES
 // ============================================================
 
-function createStep(input: Partial<Step> & { type: StepType; text: string }): Step {
-    const step: Step = { id: createId(), equipment: [], ingredients: [], children: [], ...input } as any;
-    (step as any).waitFor = function(...steps: Step[]): Step {
+/**
+ * @param {Partial<Step> & { type: StepType; text: string }} input
+ * @returns {Step}
+ */
+function createStep(input) {
+    /** @type {Step} */
+    const step = /** @type {any} */ ({ id: createId(), equipment: [], ingredients: [], children: [], ...input });
+    (/** @type {any} */ (step)).waitFor = /** @param {...Step} steps @returns {Step} */ function(...steps) {
         for (const dep of steps) {
             step.waitForIds = [...(step.waitForIds ?? []), dep.id];
         }
         return step;
     };
-    (step as any).startWhen = function(...steps: Step[]): Step {
+    (/** @type {any} */ (step)).startWhen = /** @param {...Step} steps @returns {Step} */ function(...steps) {
         for (const dep of steps) {
             step.startWhenIds = [...(step.startWhenIds ?? []), dep.id];
         }
@@ -436,40 +514,85 @@ function createStep(input: Partial<Step> & { type: StepType; text: string }): St
     return step;
 }
 
-export function instruction(text: string, opts: Partial<Step> = {}): Step {
+/**
+ * @param {string} text
+ * @param {Partial<Step>} [opts]
+ * @returns {Step}
+ */
+export function instruction(text, opts = {}) {
     return createStep({ type: 'instruction', text, ...opts });
 }
 
-export function prep(text: string, opts: Partial<Step> = {}): Step {
+/**
+ * @param {string} text
+ * @param {Partial<Step>} [opts]
+ * @returns {Step}
+ */
+export function prep(text, opts = {}) {
     return createStep({ type: 'instruction', text, prep: true, ...opts });
 }
 
-export function prepOnly(text: string, opts: Partial<Step> = {}): Step {
+/**
+ * @param {string} text
+ * @param {Partial<Step>} [opts]
+ * @returns {Step}
+ */
+export function prepOnly(text, opts = {}) {
     return createStep({ type: 'instruction', text, prep: true, prepOnly: true, ...opts });
 }
 
+/**
+ * @param {string} label
+ * @param {number} durationSeconds
+ * @param {Partial<Step>} [opts]
+ * @returns {Step}
+ */
 export function timerStep(
-    label: string,
-    durationSeconds: number,
-    opts: Partial<Step> = {}
-): Step {
+    label,
+    durationSeconds,
+    opts = {}
+) {
     return createStep({ type: 'timer', text: label, durationSeconds, ...opts });
 }
 
+/**
+ * @param {number} amount
+ * @param {'s' | 'm' | 'h'} unit
+ * @returns {number}
+ */
+const toSeconds = (amount, unit) =>
+    ({ s: time.seconds, m: time.minutes, h: time.hours })[unit](amount);
+
 export const Timer = {
-    set: (amount: number, unit: 's' | 'm' | 'h', label: string, opts: Partial<Step> = {}): Step => {
-        const seconds = unit === 's' ? amount : unit === 'm' ? amount * 60 : amount * 3600;
-        return createStep({ type: 'timer', text: label, durationSeconds: seconds, ...opts });
+    /**
+     * @param {number} amount
+     * @param {'s' | 'm' | 'h'} unit
+     * @param {string} label
+     * @param {Partial<Step>} [opts]
+     * @returns {Step}
+     */
+    set: (amount, unit, label, opts = {}) => {
+        return createStep({ type: 'timer', text: label, durationSeconds: toSeconds(amount, unit), ...opts });
     },
-    // Asks `question` immediately. "No" cooks for `retryAmount retryUnit` (with an alarm at
-    // the end) and re-asks; "Yes" completes the step. Loops until answered "Yes".
-    gate: (question: string, retryAmount: number, retryUnit: 's' | 'm' | 'h', opts: Partial<Step> = {}): Step => {
-        const seconds = retryUnit === 's' ? retryAmount : retryUnit === 'm' ? retryAmount * 60 : retryAmount * 3600;
-        return createStep({ type: 'gate', text: question, durationSeconds: seconds, ...opts });
+    /**
+     * Asks `question` immediately. "No" cooks for `retryAmount retryUnit` (with an alarm at
+     * the end) and re-asks; "Yes" completes the step. Loops until answered "Yes".
+     * @param {string} question
+     * @param {number} retryAmount
+     * @param {'s' | 'm' | 'h'} retryUnit
+     * @param {Partial<Step>} [opts]
+     * @returns {Step}
+     */
+    gate: (question, retryAmount, retryUnit, opts = {}) => {
+        return createStep({ type: 'gate', text: question, durationSeconds: toSeconds(retryAmount, retryUnit), ...opts });
     },
 };
 
-export function cleanup(equipmentName: string): Step {
+/**
+ * @param {string} equipmentName
+ * @returns {Step}
+ */
+export function cleanup(equipmentName) {
     return createStep({
         type: 'cleanup',
         text: `Clean and put away ${equipmentName}`,
@@ -477,14 +600,24 @@ export function cleanup(equipmentName: string): Step {
     });
 }
 
-export function info(text: string, opts: Partial<Step> = {}): Step {
+/**
+ * @param {string} text
+ * @param {Partial<Step>} [opts]
+ * @returns {Step}
+ */
+export function info(text, opts = {}) {
     return createStep({ type: 'info', text, ...opts });
 }
 
+/**
+ * @param {Ingredient[]} ingredients
+ * @param {Record<string, string>} [customTexts]
+ * @returns {Step[]}
+ */
 export function generateCleanupLabels(
-    ingredients: Ingredient[],
-    customTexts?: Record<string, string>
-): Step[] {
+    ingredients,
+    customTexts
+) {
     return ingredients
         .filter(ing => ing.requiresDateLabel)
         .map(ing => instruction(
@@ -497,49 +630,88 @@ export function generateCleanupLabels(
 // ============================================================
 
 class Equipment {
-    constructor(public type: string, public label?: string) {}
+    /**
+     * @param {string} type
+     * @param {string} [label]
+     */
+    constructor(type, label) {
+        this.type = type;
+        this.label = label;
+    }
 
-    get name(): string { return this.label ?? this.type; }
+    /** @returns {string} */
+    get name() { return this.label ?? this.type; }
 
-    private contents: Ingredient[] = [];
-    private nestedVessels: Equipment[] = [];
-    private _result: Ingredient | null = null;
+    /**
+     * @private
+     * @type {Ingredient[]}
+     */
+    contents = [];
+    /**
+     * @private
+     * @type {Equipment[]}
+     */
+    nestedVessels = [];
+    /**
+     * @private
+     * @type {Ingredient | null}
+     */
+    _result = null;
 
-    get result(): Ingredient {
+    /** @returns {Ingredient} */
+    get result() {
         if (!this._result) throw new Error(`${this.name}.result accessed before any mix() or combine() call`);
         return this._result;
     }
 
-    getContents(): Ingredient[] {
+    /** @returns {Ingredient[]} */
+    getContents() {
         return [
             ...this.contents,
             ...this.nestedVessels.flatMap(v => v.getContents()),
         ];
     }
 
-    private getAllEquipment(): string[] {
+    /**
+     * @private
+     * @returns {string[]}
+     */
+    getAllEquipment() {
         return [
             this.name,
             ...this.nestedVessels.flatMap(v => [v.name, ...v.nestedVessels.map(n => n.name)]),
         ];
     }
 
-    // The target temp this vessel was last preheated to.  Later steps (e.g. addOil +
-    // heatUp) read it so the heat-up wait reflects how hot the pan already is.
-    // Pan overrides preheat with the NuWave induction timings. Other equipment keeps
-    // the 15-minute default below.
-    protected _targetTemp: number | undefined;
+    /**
+     * The target temp this vessel was last preheated to. Later steps (e.g. addOil +
+     * heatUp) read it so the heat-up wait reflects how hot the pan already is.
+     * Pan overrides preheat with the NuWave induction timings. Other equipment keeps
+     * the 15-minute default below.
+     * @protected
+     * @type {number | undefined}
+     */
+    _targetTemp;
 
-    get targetTemp(): number | undefined { return this._targetTemp; }
+    /** @returns {number | undefined} */
+    get targetTemp() { return this._targetTemp; }
 
-    preheat(temperature: number): Step {
+    /**
+     * @param {number} temperature
+     * @returns {Step}
+     */
+    preheat(temperature) {
         this._targetTemp = temperature;
         return timerStep(`Preheat ${this.name} to ${temperature}°`, time.minutes(15), {
             equipment: [this.name],
         });
     }
 
-    setTemp(temperature: number): Step {
+    /**
+     * @param {number} temperature
+     * @returns {Step}
+     */
+    setTemp(temperature) {
         this._targetTemp = temperature;
         return createStep({
             type: 'instruction',
@@ -552,7 +724,12 @@ class Equipment {
     // steps can reference it,but gives oils a dedicated verb on Equipment: e.g.
     // `pan.addOil(oil)`` then `pan.heatUp()` reads the pan's temp to time the wait..
 
-    addOil(oil: Ingredient, note?: string): Step {
+    /**
+     * @param {Ingredient} oil
+     * @param {string} [note]
+     * @returns {Step}
+     */
+    addOil(oil, note) {
         this.contents.push(oil);
         const single = createStep({
             type: 'instruction',
@@ -569,7 +746,14 @@ class Equipment {
         });
     }
 
-    cook(label: string, durationSeconds: number, temperature?: number, extraEquipment: Equipment[] = []): Step {
+    /**
+     * @param {string} label
+     * @param {number} durationSeconds
+     * @param {number} [temperature]
+     * @param {Equipment[]} [extraEquipment]
+     * @returns {Step}
+     */
+    cook(label, durationSeconds, temperature, extraEquipment = []) {
         const text = temperature !== undefined ? `${label} (${temperature}°)` : label;
         const allEquipment   = [...this.getAllEquipment(), ...extraEquipment.map(eq => eq.name)];
         const allIngredients = [...this.getContents(), ...extraEquipment.flatMap(eq => eq.getContents())];
@@ -579,7 +763,12 @@ class Equipment {
         });
     }
 
-    add(ingredients: (Ingredient | [Ingredient, string])[], note?: string): Step {
+    /**
+     * @param {(Ingredient | [Ingredient, string])[]} ingredients
+     * @param {string} [note]
+     * @returns {Step}
+     */
+    add(ingredients, note) {
         const allIngredients = ingredients.map(e => Array.isArray(e) ? e[0] : e);
         this.contents.push(...allIngredients);
         const children = ingredients.map((entry) => {
@@ -602,7 +791,12 @@ class Equipment {
         });
     }
 
-    transfer(target: Equipment, ingredients: Ingredient[]): Step {
+    /**
+     * @param {Equipment} target
+     * @param {Ingredient[]} ingredients
+     * @returns {Step}
+     */
+    transfer(target, ingredients) {
         for (const ing of ingredients) {
             const idx = this.contents.findIndex(c => c.name === ing.name);
             if (idx === -1) {
@@ -624,7 +818,12 @@ class Equipment {
         });
     }
 
-    broil(label: string, durationSeconds: number): Step {
+    /**
+     * @param {string} label
+     * @param {number} durationSeconds
+     * @returns {Step}
+     */
+    broil(label, durationSeconds) {
         const allEquipment   = this.getAllEquipment();
         const allIngredients = this.getContents();
         return timerStep(`Broil - ${label}`, durationSeconds, {
@@ -633,7 +832,11 @@ class Equipment {
         });
     }
 
-    slice(ingredient: Ingredient): Step {
+    /**
+     * @param {Ingredient} ingredient
+     * @returns {Step}
+     */
+    slice(ingredient) {
         return createStep({
             type: 'instruction',
             text: `Slice ${ingredient.name}`,
@@ -642,7 +845,12 @@ class Equipment {
         });
     }
 
-    spray(ingredient: Ingredient, opts: { heatUp?: boolean } = {}): Step[] {
+    /**
+     * @param {Ingredient} ingredient
+     * @param {{ heatUp?: boolean }} [opts]
+     * @returns {Step[]}
+     */
+    spray(ingredient, opts = {}) {
         const sprayStep = createStep({
             type: 'instruction',
             text: `Spray ${ingredient.name} on ${this.name}`,
@@ -656,11 +864,16 @@ class Equipment {
         return [sprayStep, this.heatUp(ingredient)];
     }
 
-    // Heats oil on this pan up to its shimmer point before food goes in.  A real countdown
-    // timer, not a passive instruction -the point is the delay.  How long depends on how hot
-    // the pan already is (its preheat target)and on the oil:a hotter pan shimmers faster,
-    // and an oil with a lower shimmerAt reaches shimmer sooner than a high-temp one..
-    heatUp(oil?: Ingredient, overrideSeconds?: number): Step {
+    /**
+     * Heats oil on this pan up to its shimmer point before food goes in.  A real countdown
+     * timer, not a passive instruction -the point is the delay.  How long depends on how hot
+     * the pan already is (its preheat target)and on the oil:a hotter pan shimmers faster,
+     * and an oil with a lower shimmerAt reaches shimmer sooner than a high-temp one..
+     * @param {Ingredient} [oil]
+     * @param {number} [overrideSeconds]
+     * @returns {Step}
+     */
+    heatUp(oil, overrideSeconds) {
         const target = this.targetTemp ?? 325;
         const shimmerAt = oil ? (oil.shimmerAt ?? 300) : 300;
         const delta = Math.max(Math.min(target - shimmerAt, 150), 20);
@@ -675,7 +888,8 @@ class Equipment {
         );
     }
 
-    flip(): Step {
+    /** @returns {Step} */
+    flip() {
         return createStep({
             type: 'instruction',
             text: `Flip contents of ${this.name}`,
@@ -684,7 +898,14 @@ class Equipment {
         });
     }
 
-    place(vessel: Equipment, label?: string, durationSeconds?: number, temperature?: number): Step {
+    /**
+     * @param {Equipment} vessel
+     * @param {string} [label]
+     * @param {number} [durationSeconds]
+     * @param {number} [temperature]
+     * @returns {Step}
+     */
+    place(vessel, label, durationSeconds, temperature) {
         this.nestedVessels.push(vessel);
         const allEquipment   = [this.name, vessel.name];
         const allIngredients = vessel.getContents();
@@ -703,31 +924,43 @@ class Equipment {
         });
     }
 
-    stir(): Step { return instruction(`Stir ${this.name}`, { equipment: [this.name] }); }
+    /** @returns {Step} */
+    stir() { return instruction(`Stir ${this.name}`, { equipment: [this.name] }); }
 
-    mix(resultName?: string): Step {
+    /**
+     * @param {string} [resultName]
+     * @returns {Step}
+     */
+    mix(resultName) {
         const allContents = this.getContents();
         if (resultName) {
-            const produced: any = { name: resultName, quantity: 1, unit: u.none };
-            produced.rename = (newName: string) => { produced.name = newName; };
+            /** @type {any} */
+            const produced = { name: resultName, quantity: 1, unit: u.none };
+            produced.rename = /** @param {string} newName */ (newName) => { produced.name = newName; };
             produced._constituents = allContents;
-            this.contents = [produced as Ingredient];
-            this._result  = produced as Ingredient;
+            this.contents = [/** @type {Ingredient} */ (produced)];
+            this._result  = /** @type {Ingredient} */ (produced);
         }
         return instruction(`Mix ${this.name}`, { equipment: [this.name], ingredients: allContents });
     }
 
-    combine(ingredients: Ingredient[], note?: string): Step {
+    /**
+     * @param {Ingredient[]} ingredients
+     * @param {string} [note]
+     * @returns {Step}
+     */
+    combine(ingredients, note) {
         const allConstituents = [...this.getContents(), ...ingredients];
-        const produced: any = {
+        /** @type {any} */
+        const produced = {
             name: ingredients.map(i => i.name).join(' + '),
             quantity: ingredients[0]?.quantity ?? 1,
             unit: ingredients[0]?.unit ?? u.none,
             _constituents: allConstituents,
         };
-        produced.rename = (newName: string) => { produced.name = newName; };
-        this.contents = [produced as Ingredient];
-        this._result  = produced as Ingredient;
+        produced.rename = /** @param {string} newName */ (newName) => { produced.name = newName; };
+        this.contents = [/** @type {Ingredient} */ (produced)];
+        this._result  = /** @type {Ingredient} */ (produced);
         return createStep({
             type: 'instruction',
             text: `Combine ${ingredients.map(i => i.name).join(', ')} in ${this.name}${note ? ` - ${note}` : ''}`,
@@ -742,9 +975,14 @@ class Equipment {
 // without changing preheat timings. Instances stay separate so contents and the
 // preheat target do not leak between recipes.
 class Pan extends Equipment {
-    constructor(label?: string) { super('Nuwave pan', label); }
+    /** @param {string} [label] */
+    constructor(label) { super('Nuwave pan', label); }
 
-    preheat(temperature: number): Step {
+    /**
+     * @param {number} temperature
+     * @returns {Step}
+     */
+    preheat(temperature) {
         this._targetTemp = temperature;
         const duration = temperature <= 350 ? time.seconds(45) : time.minutes(2);
         return timerStep(`Preheat ${this.name} to ${temperature}°`, duration, { equipment: [this.name] });
@@ -752,42 +990,62 @@ class Pan extends Equipment {
 }
 
 export const e = {
-    bowl:         (label?: string) => new Equipment('bowl',          label),
-    pan:          (label?: string) => new Pan(label),
-    pot:          (label?: string) => new Equipment('pot',           label),
-    oven:         (label?: string) => new Equipment('oven',          label),
-    toasterOven:  (label?: string) => new Equipment('toaster oven',  label),
-    instantPot:   (label?: string) => new Equipment('instant pot',   label),
-    microwave:    (label?: string) => new Equipment('microwave',     label),
-    bulletMixer:  (label?: string) => new Equipment('bullet mixer',  label),
-    knife:        (label?: string) => new Equipment('knife',         label),
-    cuttingBoard: (label?: string) => new Equipment('cutting board', label),
-    colander:     (label?: string) => new Equipment('colander',      label),
-    platter:      (label?: string) => new Equipment('platter',       label),
-    kettle:       (label?: string) => new Equipment('tea kettle',    label),
-    glass:        (label?: string) => new Equipment('glass',         label),
-    siliconeBag:  (label?: string) => new Equipment('silicone bag',  label),
+    bowl:         /** @param {string} [label] */ (label) => new Equipment('bowl',          label),
+    pan:          /** @param {string} [label] */ (label) => new Pan(label),
+    pot:          /** @param {string} [label] */ (label) => new Equipment('pot',           label),
+    oven:         /** @param {string} [label] */ (label) => new Equipment('oven',          label),
+    toasterOven:  /** @param {string} [label] */ (label) => new Equipment('toaster oven',  label),
+    instantPot:   /** @param {string} [label] */ (label) => new Equipment('instant pot',   label),
+    microwave:    /** @param {string} [label] */ (label) => new Equipment('microwave',     label),
+    bulletMixer:  /** @param {string} [label] */ (label) => new Equipment('bullet mixer',  label),
+    knife:        /** @param {string} [label] */ (label) => new Equipment('knife',         label),
+    cuttingBoard: /** @param {string} [label] */ (label) => new Equipment('cutting board', label),
+    colander:     /** @param {string} [label] */ (label) => new Equipment('colander',      label),
+    platter:      /** @param {string} [label] */ (label) => new Equipment('platter',       label),
+    kettle:       /** @param {string} [label] */ (label) => new Equipment('tea kettle',    label),
+    glass:        /** @param {string} [label] */ (label) => new Equipment('glass',         label),
+    siliconeBag:  /** @param {string} [label] */ (label) => new Equipment('silicone bag',  label),
 };
 
 // ============================================================
 // RECIPE REGISTRATION
 // ============================================================
 
-function collectIngredientsWithLabel(steps: Step[]): Ingredient[] {
-    const collected = new Map<Ingredient, Ingredient>();
-    function walkSteps(steps: Step[]): void {
-        for (const step of steps) {
-            for (const ing of (step.ingredients ?? [])) {
-                if (ing.requiresDateLabel && !collected.has(ing)) collected.set(ing, ing);
-            }
-            if (step.children) walkSteps(step.children);
-        }
+/**
+ * Every step, parent before its children, in recipe order.
+ * @param {Step[]} steps
+ * @returns {Generator<Step>}
+ */
+export function* walkSteps(steps) {
+    for (const step of steps) {
+        yield step;
+        if (step.children) yield* walkSteps(step.children);
     }
-    walkSteps(steps);
-    return [...collected.values()];
 }
 
-function findLastStepIndexForIngredient(steps: Step[], targetIng: Ingredient): number {
+/**
+ * Distinct ingredients used anywhere in these steps, in first-use order.
+ * @param {Step[]} steps
+ * @returns {Set<Ingredient>}
+ */
+function stepIngredients(steps) {
+    return new Set([...walkSteps(steps)].flatMap(step => step.ingredients ?? []));
+}
+
+/**
+ * @param {Step[]} steps
+ * @returns {Ingredient[]}
+ */
+function collectIngredientsWithLabel(steps) {
+    return [...stepIngredients(steps)].filter(ing => ing.requiresDateLabel);
+}
+
+/**
+ * @param {Step[]} steps
+ * @param {Ingredient} targetIng
+ * @returns {number}
+ */
+function findLastStepIndexForIngredient(steps, targetIng) {
     let lastIndex = -1;
     for (let i = 0; i < steps.length; i++) {
         const step = steps[i];
@@ -802,16 +1060,25 @@ function findLastStepIndexForIngredient(steps: Step[], targetIng: Ingredient): n
     return lastIndex;
 }
 
+/**
+ * @param {string} id
+ * @param {string} name
+ * @param {Step[]} steps
+ * @param {string} [group]
+ * @param {number} [estimatedMinutes]
+ * @returns {Recipe}
+ */
 export function createRecipe(
-    id: string,
-    name: string,
-    steps: Step[],
-    group?: string,
-    estimatedMinutes?: number
-): Recipe {
+    id,
+    name,
+    steps,
+    group,
+    estimatedMinutes
+) {
     steps.forEach(s => { s.recipeId = id; });
     const ingredientsToLabel = collectIngredientsWithLabel(steps);
-    const stepsToInsert: { index: number; step: Step }[] = [];
+    /** @type {{ index: number; step: Step }[]} */
+    const stepsToInsert = [];
     for (const ing of ingredientsToLabel) {
         const lastIndex = findLastStepIndexForIngredient(steps, ing);
         if (lastIndex !== -1) {
@@ -824,19 +1091,30 @@ export function createRecipe(
     return { id, name, steps, group, estimatedMinutes };
 }
 
-export function registerRecipe(recipe: Recipe): void {
+/** @param {Recipe} recipe */
+export function registerRecipe(recipe) {
     state.recipes.set(recipe.id, recipe);
 }
 
-function withPlan(recipe: Recipe, opts: { planMinutes?: number; portable?: boolean; prepMinutes?: number; perishableDays?: number; sortOrder?: number; hidden?: boolean }): Recipe {
+/**
+ * @param {Recipe} recipe
+ * @param {{ planMinutes?: number; portable?: boolean; prepMinutes?: number; perishableDays?: number; sortOrder?: number; hidden?: boolean }} opts
+ * @returns {Recipe}
+ */
+function withPlan(recipe, opts) {
     return Object.assign(recipe, opts);
 }
 
-export function registerGroup(group: string, recipes: Recipe[]): void {
+/**
+ * @param {string} group
+ * @param {Recipe[]} recipes
+ */
+export function registerGroup(group, recipes) {
     recipes.forEach((recipe) => registerRecipe({ ...recipe, group }));
 }
 
-export function registerBundle(bundle: RecipeBundle): void {
+/** @param {RecipeBundle} bundle */
+export function registerBundle(bundle) {
     state.bundles.set(bundle.id, bundle);
 }
 
@@ -846,30 +1124,43 @@ export function registerBundle(bundle: RecipeBundle): void {
 
 const ADHOC_GROUP = 'Custom additions';
 
-function createAdhocRecipe(ingredient: Ingredient): Recipe {
+/**
+ * @param {Ingredient} ingredient
+ * @returns {Recipe}
+ */
+function createAdhocRecipe(ingredient) {
     const id  = `adhoc:${ingredient.name.toLowerCase().replace(/\s+/g, '-')}:${Date.now()}-${Math.floor(Math.random() * 1e4)}`;
     const step = instruction(`Have ${formatIngredient(ingredient)} on hand`, { ingredients: [ingredient] });
     step.recipeId = id;
     return { id, name: formatIngredient(ingredient), group: ADHOC_GROUP, steps: [step], adhoc: true };
 }
 
-export function getSelectedRecipes(): Recipe[] {
-    const seen = new Set<string>();
-    const out: Recipe[] = [];
-    for (const id of state.selectedRecipeIds) {
-        if (seen.has(id)) continue;
-        seen.add(id);
-        const r = state.recipes.get(id);
-        if (r) out.push(r);
-    }
-    return out;
+/** @returns {Recipe[]} */
+export function getSelectedRecipes() {
+    return [...new Set(state.selectedRecipeIds)].flatMap(id => state.recipes.get(id) ?? []);
 }
 
-export function getServings(recipeId: string): number {
+/**
+ * How many times each id appears, in first-appearance order.
+ * @param {string[]} ids
+ * @returns {Map<string, number>}
+ */
+function countBy(ids) {
+    const counts = /** @type {Map<string, number>} */ (new Map());
+    for (const id of ids) counts.set(id, (counts.get(id) ?? 0) + 1);
+    return counts;
+}
+
+/**
+ * @param {string} recipeId
+ * @returns {number}
+ */
+export function getServings(recipeId) {
     return state.selectedRecipeIds.filter(id => id === recipeId).length;
 }
 
-function getFilteredRecipes(): Recipe[] {
+/** @returns {Recipe[]} */
+function getFilteredRecipes() {
     const q   = state.searchQuery.toLowerCase();
     const all = [...state.recipes.values()];
     // Hidden recipes are excluded from the unfiltered list, but still turn up
@@ -886,12 +1177,16 @@ function getFilteredRecipes(): Recipe[] {
     });
 }
 
-// Like getFilteredRecipes(), but keyed off its own search string rather than the Select
-// screen's `state.searchQuery` - used by the Nutrition screen's "Add a recipe" search so
-// typing there doesn't clobber (or get clobbered by) whatever's typed on Select. Ad-hoc
-// recipes are excluded: they're synthetic one-offs created by the ingredient picker, not
-// reusable catalog entries to search for.
-function getNutritionAddableRecipes(query: string): Recipe[] {
+/**
+ * Like getFilteredRecipes(), but keyed off its own search string rather than the Select
+ * screen's `state.searchQuery` - used by the Nutrition screen's "Add a recipe" search so
+ * typing there doesn't clobber (or get clobbered by) whatever's typed on Select. Ad-hoc
+ * recipes are excluded: they're synthetic one-offs created by the ingredient picker, not
+ * reusable catalog entries to search for.
+ * @param {string} query
+ * @returns {Recipe[]}
+ */
+function getNutritionAddableRecipes(query) {
     const q   = query.toLowerCase().trim();
     const all = [...state.recipes.values()].filter((r) => !r.adhoc);
     const matched = q
@@ -904,10 +1199,19 @@ function getNutritionAddableRecipes(query: string): Recipe[] {
 // COOK TIME
 // ============================================================
 
-function recipeCookSeconds(recipe: Recipe): number {
-    const releaseAt = new Map<string, number>();
-    function claimKeysForStep(step: Step): string[] {
-        const keys: string[] = [];
+/**
+ * @param {Recipe} recipe
+ * @returns {number}
+ */
+function recipeCookSeconds(recipe) {
+    const releaseAt = /** @type {Map<string, number>} */ (new Map());
+    /**
+     * @param {Step} step
+     * @returns {string[]}
+     */
+    function claimKeysForStep(step) {
+        /** @type {string[]} */
+        const keys = [];
         for (const eq of (step.equipment ?? [])) keys.push(`eq::${eq}`);
         for (const ing of (step.ingredients ?? [])) keys.push(`ing::${ing.name}`);
         return keys;
@@ -925,7 +1229,11 @@ function recipeCookSeconds(recipe: Recipe): number {
     return totalTime;
 }
 
-function formatCookTime(seconds: number): string {
+/**
+ * @param {number} seconds
+ * @returns {string}
+ */
+function formatCookTime(seconds) {
     const totalMinutes = Math.ceil(seconds / 60);
     if (totalMinutes < 60) return `${totalMinutes} min`;
     const hrs  = Math.floor(totalMinutes / 60);
@@ -937,21 +1245,35 @@ function formatCookTime(seconds: number): string {
 // COOKING PLAN
 // ============================================================
 
-function buildCookingPlan(recipes: Recipe[]): Step[] {
+/**
+ * @param {Recipe[]} recipes
+ * @returns {Step[]}
+ */
+function buildCookingPlan(recipes) {
     const steps = recipes.flatMap(r => r.steps.filter(s => !s.prepOnly));
-    const manualWaits = new Map<number, number[]>();
-    const manualStartWhens = new Map<number, number[]>();
+    const manualWaits = /** @type {Map<number, number[]>} */ (new Map());
+    const manualStartWhens = /** @type {Map<number, number[]>} */ (new Map());
     steps.forEach(s => {
         if (s.waitForIds && s.waitForIds.length > 0) manualWaits.set(s.id, [...s.waitForIds]);
         s.waitForIds = undefined;
         if (s.startWhenIds && s.startWhenIds.length > 0) manualStartWhens.set(s.id, [...s.startWhenIds]);
         s.startWhenIds = undefined;
     });
-    const equipClaims: Map<string, number>     = new Map();
-    const ingClaims:   Map<Ingredient, number> = new Map();
-    const claimableIng = (ing: Ingredient): boolean => ing.name !== 'Water';
-    function getBlockingIds(step: Step): number[] {
-        const blocking = new Set<number>();
+    /** @type {Map<string, number>} */
+    const equipClaims     = new Map();
+    /** @type {Map<Ingredient, number>} */
+    const ingClaims = new Map();
+    /**
+     * @param {Ingredient} ing
+     * @returns {boolean}
+     */
+    const claimableIng = (ing) => ing.name !== 'Water';
+    /**
+     * @param {Step} step
+     * @returns {number[]}
+     */
+    function getBlockingIds(step) {
+        const blocking = /** @type {Set<number>} */ (new Set());
         for (const eq of (step.equipment ?? [])) {
             const id = equipClaims.get(`${step.recipeId}::eq::${eq}`);
             if (id !== undefined) blocking.add(id);
@@ -963,7 +1285,8 @@ function buildCookingPlan(recipes: Recipe[]): Step[] {
         }
         return [...blocking];
     }
-    function setClaims(step: Step): void {
+    /** @param {Step} step */
+    function setClaims(step) {
         for (const eq of (step.equipment ?? [])) equipClaims.set(`${step.recipeId}::eq::${eq}`, step.id);
         for (const ing of (step.ingredients ?? [])) {
             if (!claimableIng(ing)) continue;
@@ -971,10 +1294,10 @@ function buildCookingPlan(recipes: Recipe[]): Step[] {
         }
     }
     for (const step of steps) {
-        const startWhen = new Set<number>();
+        const startWhen = /** @type {Set<number>} */ (new Set());
         for (const id of (manualStartWhens.get(step.id) ?? [])) startWhen.add(id);
         if (startWhen.size > 0) step.startWhenIds = [...startWhen];
-        const waitFor = new Set<number>();
+        const waitFor = /** @type {Set<number>} */ (new Set());
         for (const id of (manualWaits.get(step.id) ?? [])) waitFor.add(id);
         for (const id of getBlockingIds(step)) waitFor.add(id);
         if (waitFor.size > 0) step.waitForIds = [...waitFor];
@@ -987,27 +1310,20 @@ function buildCookingPlan(recipes: Recipe[]): Step[] {
 // SHOPPING LIST
 // ============================================================
 
-function buildShoppingList(): Ingredient[] {
-    const combined = new Map<string, Ingredient>();
+/** @returns {Ingredient[]} */
+function buildShoppingList() {
+    const combined = /** @type {Map<string, Ingredient>} */ (new Map());
     getSelectedRecipes().forEach((recipe) => {
         const servings = getServings(recipe.id);
-        const distinct = new Set<Ingredient>();
-        const walk = (steps: Step[]) => {
-            for (const step of steps) {
-                for (const ing of step.ingredients ?? []) distinct.add(ing);
-                if (step.children) walk(step.children);
-            }
-        };
-        walk(recipe.steps);
-        for (const ingredient of distinct) {
+        for (const ingredient of stepIngredients(recipe.steps)) {
             if (isComposite(ingredient)) continue;
             const key      = `${ingredient.name}-${ingredient.unit?.name ?? ''}`;
             const addQty   = (ingredient.quantity ?? 0) * servings;
             const existing = combined.get(key);
             if (!existing) {
-                combined.set(key, { ...ingredient, quantity: addQty } as Ingredient);
+                combined.set(key, /** @type {Ingredient} */ ({ ...ingredient, quantity: addQty }));
             } else {
-                (existing as any).quantity = (existing.quantity ?? 0) + addQty;
+                (/** @type {any} */ (existing)).quantity = (existing.quantity ?? 0) + addQty;
             }
         }
     });
@@ -1022,16 +1338,22 @@ function buildShoppingList(): Ingredient[] {
 // which recipes are selected. Persisted in localStorage so it survives reloads.
 const INVENTORY_KEY = 'recipe-inventory';
 
-export function normalizeInventory(value: unknown): Record<string, number> {
+/**
+ * @param {unknown} value
+ * @returns {Record<string, number>}
+ */
+export function normalizeInventory(value) {
     if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
-    const inventory: Record<string, number> = {};
+    /** @type {Record<string, number>} */
+    const inventory = {};
     for (const [key, amount] of Object.entries(value)) {
         if (typeof amount === 'number' && Number.isFinite(amount)) inventory[key] = amount;
     }
     return inventory;
 }
 
-function loadInventory(): Record<string, number> {
+/** @returns {Record<string, number>} */
+function loadInventory() {
     const raw = storageGet(INVENTORY_KEY);
     if (!raw) return {};
     try {
@@ -1041,15 +1363,21 @@ function loadInventory(): Record<string, number> {
     }
 }
 
-function saveInventory(inventory: Record<string, number>): void {
+/** @param {Record<string, number>} inventory */
+function saveInventory(inventory) {
     storageSet(INVENTORY_KEY, JSON.stringify(inventory));
 }
 
-// Same key shape buildShoppingList() combines on, so "have" quantities line up
-// with combined shopping-list quantities regardless of which recipes contributed them.
-// byPackage gets its own key suffix so a value entered as "packages" is never
-// misread as raw recipe-unit quantity (or vice versa) if the tracking mode changes.
-function inventoryKey(ingredient: Ingredient, byPackage: boolean): string {
+/**
+ * Same key shape buildShoppingList() combines on, so "have" quantities line up
+ * with combined shopping-list quantities regardless of which recipes contributed them.
+ * byPackage gets its own key suffix so a value entered as "packages" is never
+ * misread as raw recipe-unit quantity (or vice versa) if the tracking mode changes.
+ * @param {Ingredient} ingredient
+ * @param {boolean} byPackage
+ * @returns {string}
+ */
+function inventoryKey(ingredient, byPackage) {
     const base = `${ingredient.name}-${ingredient.unit?.name ?? ''}`;
     return byPackage ? `${base}::pkg` : base;
 }
@@ -1058,66 +1386,76 @@ function inventoryKey(ingredient: Ingredient, byPackage: boolean): string {
 // NUTRITION + COST
 // ============================================================
 
-interface NutritionTotals { calories: number; fat: number; saturatedFat: number; transFat: number; cholesterol: number; carbs: number; sodium: number; sugar: number; protein: number; fiber: number; }
+/**
+ * @typedef {{ status: 'ok'; totals: NutritionTotals; brand?: string }
+ *     | { status: 'missing' }
+ *     | { status: 'uncomputable'; reason: string }} NutritionResult
+ */
 
-type NutritionResult =
-    | { status: 'ok'; totals: NutritionTotals; brand?: string }
-    | { status: 'missing' }
-    | { status: 'uncomputable'; reason: string };
+/**
+ * @typedef {{ status: 'ok'; cost: number; brand?: string }
+ *     | { status: 'missing' }
+ *     | { status: 'uncomputable'; reason: string }} CostResult
+ */
 
-type CostResult =
-    | { status: 'ok'; cost: number; brand?: string }
-    | { status: 'missing' }
-    | { status: 'uncomputable'; reason: string };
+/**
+ * @param {(key: keyof NutritionTotals) => number} fn
+ * @returns {NutritionTotals}
+ */
+const mapTotals = (fn) =>
+    /** @type {NutritionTotals} */ (Object.fromEntries(NUTRIENT_KEYS.map(key => [key, fn(key)])));
+/** @returns {NutritionTotals} */
+const emptyTotals = () => mapTotals(() => 0);
+/**
+ * @param {NutritionTotals} a
+ * @param {NutritionTotals} b
+ * @returns {NutritionTotals}
+ */
+const addTotals   = (a, b) => mapTotals(key => a[key] + b[key]);
+/**
+ * @param {NutritionTotals} t
+ * @param {number} n
+ * @returns {NutritionTotals}
+ */
+const scaleTotals = (t, n) => mapTotals(key => t[key] * n);
 
-const emptyTotals = (): NutritionTotals => ({ calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 });
-
-const addTotals = (a: NutritionTotals, b: NutritionTotals): NutritionTotals => ({
-    calories:     a.calories     + b.calories,
-    fat:          a.fat          + b.fat,
-    saturatedFat: a.saturatedFat + b.saturatedFat,
-    transFat:     a.transFat     + b.transFat,
-    cholesterol:  a.cholesterol  + b.cholesterol,
-    carbs:        a.carbs        + b.carbs,
-    sodium:       a.sodium       + b.sodium,
-    sugar:        a.sugar        + b.sugar,
-    protein:      a.protein      + b.protein,
-    fiber:        a.fiber        + b.fiber,
-});
-
-const scaleTotals = (t: NutritionTotals, n: number): NutritionTotals => ({
-    calories:     t.calories     * n,
-    fat:          t.fat          * n,
-    saturatedFat: t.saturatedFat * n,
-    transFat:     t.transFat     * n,
-    cholesterol:  t.cholesterol  * n,
-    carbs:        t.carbs        * n,
-    sodium:       t.sodium       * n,
-    sugar:        t.sugar        * n,
-    protein:      t.protein      * n,
-    fiber:        t.fiber        * n,
-});
-
-function isComposite(ing: Ingredient): boolean {
-    return Array.isArray((ing as any)._constituents);
+/**
+ * @param {Ingredient} ing
+ * @returns {boolean}
+ */
+function isComposite(ing) {
+    return Array.isArray((/** @type {any} */ (ing))._constituents);
 }
 
-function selectedProduct(ing: Ingredient): Product | undefined {
+/**
+ * @param {Ingredient} ing
+ * @returns {Product | undefined}
+ */
+function selectedProduct(ing) {
     const ps = ing.products ?? [];
     if (ps.length === 0) return undefined;
     return ps.find(p => p.brand === ing.defaultBrand) ?? ps[0];
 }
 
-function nutritionSource(ing: Ingredient): { label?: NutritionLabel; brand?: string } {
+/**
+ * @param {Ingredient} ing
+ * @returns {{ label?: NutritionLabel; brand?: string }}
+ */
+function nutritionSource(ing) {
     const product = selectedProduct(ing);
     if (product?.nutrition) return { label: product.nutrition, brand: product.brand };
     return { label: ing.nutrition };
 }
 
+/**
+ * @param {Ingredient} ing
+ * @param {NutritionLabel} label
+ * @returns {{ facts: NutritionLabel[string]; convertedQty: number; matchedUnit: string } | null}
+ */
 function resolveNutritionFacts(
-    ing: Ingredient,
-    label: NutritionLabel
-): { facts: NutritionLabel[string]; convertedQty: number; matchedUnit: string } | null {
+    ing,
+    label
+) {
     const recipeUnit = ing.unit?.name ?? '';
     const qty        = ing.quantity ?? 0;
 
@@ -1137,7 +1475,11 @@ function resolveNutritionFacts(
     return null;
 }
 
-function ingredientNutrition(ing: Ingredient): NutritionResult {
+/**
+ * @param {Ingredient} ing
+ * @returns {NutritionResult}
+ */
+function ingredientNutrition(ing) {
     const { label, brand } = nutritionSource(ing);
     if (!label || Object.keys(label).length === 0) return { status: 'missing' };
     if (!ing.unit || !ing.unit.name) {
@@ -1161,22 +1503,15 @@ function ingredientNutrition(ing: Ingredient): NutritionResult {
     return {
         status: 'ok',
         brand,
-        totals: {
-            calories:     (facts.calories     ?? 0) * servingsUsed,
-            fat:          (facts.fat          ?? 0) * servingsUsed,
-            saturatedFat: (facts.saturatedFat ?? 0) * servingsUsed,
-            transFat:     (facts.transFat     ?? 0) * servingsUsed,
-            cholesterol:  (facts.cholesterol  ?? 0) * servingsUsed,
-            carbs:        (facts.carbs        ?? 0) * servingsUsed,
-            sodium:       (facts.sodium       ?? 0) * servingsUsed,
-            sugar:        (facts.sugar        ?? 0) * servingsUsed,
-            protein:      (facts.protein      ?? 0) * servingsUsed,
-            fiber:        (facts.fiber        ?? 0) * servingsUsed,
-        },
+        totals: mapTotals(key => (facts[key] ?? 0) * servingsUsed),
     };
 }
 
-function ingredientCost(ing: Ingredient): CostResult {
+/**
+ * @param {Ingredient} ing
+ * @returns {CostResult}
+ */
+function ingredientCost(ing) {
     const product = selectedProduct(ing);
     if (!product) return { status: 'missing' };
     const listing = cheapestListing(product);
@@ -1206,10 +1541,15 @@ function ingredientCost(ing: Ingredient): CostResult {
     };
 }
 
-// How many recipe-unit quantities (e.g. cups) a single package (e.g. a 13.4oz can)
-// contains - the inverse of the recipeUnit → packageUnit conversion used above, derived
-// from the same physical/density conversion data rather than a separately entered figure.
-function unitsPerPackage(ing: Ingredient, product: Product): number | null {
+/**
+ * How many recipe-unit quantities (e.g. cups) a single package (e.g. a 13.4oz can)
+ * contains - the inverse of the recipeUnit → packageUnit conversion used above, derived
+ * from the same physical/density conversion data rather than a separately entered figure.
+ * @param {Ingredient} ing
+ * @param {Product} product
+ * @returns {number | null}
+ */
+function unitsPerPackage(ing, product) {
     const recipeUnit = ing.unit?.name;
     if (!recipeUnit || product.size === undefined || !product.sizeUnit) return null;
     const packageUnit = product.sizeUnit.name;
@@ -1219,28 +1559,24 @@ function unitsPerPackage(ing: Ingredient, product: Product): number | null {
     return product.size / packageUnitsPerRecipeUnit;
 }
 
-interface RecipeNutrition {
-    totals:       NutritionTotals;
-    cost:         number;         // sum of ok ingredient costs (unscaled - multiply by servings)
-    covered:      number;
-    missing:      number;
-    uncomputable: number;
-    costMissing:  number;         // ingredients with no price data (missing or uncomputable)
-    total:        number;
-    breakdown:    { ing: Ingredient; result: NutritionResult; costResult: CostResult }[];
-}
+/**
+ * @typedef {Object} RecipeNutrition
+ * @property {NutritionTotals} totals
+ * @property {number} cost sum of ok ingredient costs (unscaled - multiply by servings)
+ * @property {number} covered
+ * @property {number} missing
+ * @property {number} uncomputable
+ * @property {number} costMissing ingredients with no price data (missing or uncomputable)
+ * @property {number} total
+ * @property {{ ing: Ingredient; result: NutritionResult; costResult: CostResult }[]} breakdown
+ */
 
-function recipeNutrition(recipe: Recipe): RecipeNutrition {
-    const seen = new Set<Ingredient>();
-    const walk = (steps: Step[]) => {
-        for (const step of steps) {
-            for (const ing of step.ingredients ?? []) seen.add(ing);
-            if (step.children) walk(step.children);
-        }
-    };
-    walk(recipe.steps);
-
-    const breakdown = [...seen]
+/**
+ * @param {Recipe} recipe
+ * @returns {RecipeNutrition}
+ */
+function recipeNutrition(recipe) {
+    const breakdown = [...stepIngredients(recipe.steps)]
         .filter(ing => !isComposite(ing))
         .map(ing => ({ ing, result: ingredientNutrition(ing), costResult: ingredientCost(ing) }));
 
@@ -1265,7 +1601,12 @@ function recipeNutrition(recipe: Recipe): RecipeNutrition {
     };
 }
 
-function formatTotals(t: NutritionTotals, cost?: number): string {
+/**
+ * @param {NutritionTotals} t
+ * @param {number} [cost]
+ * @returns {string}
+ */
+function formatTotals(t, cost) {
     const costStr = cost !== undefined ? `$${cost.toFixed(2)} · ` : '';
     return `${costStr}${Math.round(t.calories)} cal · ${Math.round(t.protein)} g protein · ` +
            `${Math.round(t.fat)} g fat (${Math.round(t.saturatedFat)} sat${t.transFat > 0 ? ` / ${Math.round(t.transFat)} trans` : ''}) · ` +
@@ -1274,7 +1615,26 @@ function formatTotals(t: NutritionTotals, cost?: number): string {
            `${Math.round(t.fiber)} g fiber · ${Math.round(t.sugar)} g sugar · ${Math.round(t.sodium)} mg sodium`;
 }
 
-function coverageLabel(covered: number, total: number, flagged: number): string {
+/**
+ * Nutrition line when any ingredient has data, else just the cost, else a placeholder.
+ * @param {number} covered
+ * @param {NutritionTotals} totals
+ * @param {boolean} hasCost
+ * @param {number} cost
+ * @returns {string}
+ */
+function totalsText(covered, totals, hasCost, cost) {
+    if (covered > 0) return formatTotals(totals, hasCost ? cost : undefined);
+    return hasCost ? `$${cost.toFixed(2)}` : '- no computable data';
+}
+
+/**
+ * @param {number} covered
+ * @param {number} total
+ * @param {number} flagged
+ * @returns {string}
+ */
+function coverageLabel(covered, total, flagged) {
     if (total === 0) return 'No ingredients';
     if (flagged === 0) return `All ${total} ingredients have data`;
     return `${covered} of ${total} ingredients have data · ${flagged} flagged`;
@@ -1284,99 +1644,162 @@ function coverageLabel(covered: number, total: number, flagged: number): string 
 // DOM HELPERS
 // ============================================================
 
-function getElement<T extends HTMLElement>(id: string): T {
+/**
+ * @param {string} id
+ * @returns {HTMLElement}
+ */
+function getElement(id) {
     const el = document.getElementById(id);
     if (!el) throw new Error(`Missing element: ${id}`);
-    return el as T;
+    return el;
 }
 
-function clear(el: HTMLElement): void { el.innerHTML = ''; }
+/** @param {HTMLElement} el */
+function clear(el) { el.innerHTML = ''; }
 
-function createButton(label: string, onClick: () => void): HTMLButtonElement {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.textContent = label;
-    btn.addEventListener('click', onClick);
-    return btn;
+/** @typedef {Node | string | null | undefined | false} Child */
+/**
+ * @typedef {{
+ *     class?: string;
+ *     text?: string;
+ *     testid?: string;
+ *     attrs?: Record<string, string>;
+ *     on?: { [K in keyof HTMLElementEventMap]?: (ev: HTMLElementEventMap[K]) => void };
+ *     [prop: string]: unknown;
+ * }} Props Any other key is a DOM property: id, type, value, htmlFor, href, min...
+ */
+
+/**
+ * Build an element in one call: h('span', { class: 'badge', text: '×2' }, child, ...).
+ * Buttons default to type="button".
+ * @template {keyof HTMLElementTagNameMap} K
+ * @param {K} tag
+ * @param {Props} [props]
+ * @param {...Child} children
+ * @returns {HTMLElementTagNameMap[K]}
+ */
+function h(tag, props = {}, ...children) {
+    const el = document.createElement(tag);
+    const { class: className, text, testid, attrs, on, ...rest } = props;
+    if (el instanceof HTMLButtonElement) el.type = 'button';
+    Object.assign(el, rest);
+    if (className) el.className = className;
+    if (text !== undefined) el.textContent = text;
+    if (testid) el.setAttribute('data-testid', testid);
+    for (const [name, value] of Object.entries(attrs ?? {})) el.setAttribute(name, value);
+    for (const [type, listener] of Object.entries(on ?? {})) el.addEventListener(type, /** @type {EventListener} */ (listener));
+    el.append(...children.filter(/** @returns {child is Node | string} */ (child) => child !== null && child !== undefined && child !== false));
+    return el;
 }
 
-function hiddenText(parent: HTMLElement, text: string): void {
-    const span = document.createElement('span');
-    span.className = 'visually-hidden';
-    span.textContent = ` ${text}`;
-    parent.appendChild(span);
+/**
+ * Extra words for screen readers only, e.g. which recipe a "−" button belongs to.
+ * @param {string} text
+ * @returns {HTMLSpanElement}
+ */
+function srOnly(text) {
+    return h('span', { class: 'visually-hidden', text: ` ${text}` });
 }
 
-function announce(message: string): void {
+/** @param {string} message */
+function announce(message) {
     const region = document.getElementById('status-live');
     if (!region) return;
     region.textContent = '';
     window.setTimeout(() => { region.textContent = message; }, 50);
 }
 
-function createPanel(): HTMLDivElement {
-    const panel = document.createElement('div');
-    panel.className = 'panel';
-    return panel;
+/**
+ * Clear #app and give the screen its heading.
+ * @param {string} title
+ * @returns {HTMLElement}
+ */
+function screen(title) {
+    const root = getElement('app');
+    clear(root);
+    root.appendChild(h('h1', { text: title }));
+    return root;
+}
+
+/**
+ * @param {string} id
+ * @param {string} label
+ * @param {string} placeholder
+ * @param {string} value
+ * @param {(value: string) => void} onInput
+ * @returns {[HTMLLabelElement, HTMLInputElement]}
+ */
+function searchField(id, label, placeholder, value, onInput) {
+    return [
+        h('label', { htmlFor: id, class: 'search-label', text: label }),
+        h('input', {
+            id, type: 'search', placeholder, value, class: 'search-input', autocomplete: 'off', testid: id,
+            on: { input: (ev) => onInput((/** @type {HTMLInputElement} */ (ev.target)).value) },
+        }),
+    ];
+}
+
+/**
+ * @param {string} label
+ * @param {() => void} onClick
+ * @returns {HTMLButtonElement}
+ */
+function backButton(label, onClick) {
+    return h('button', { class: 'start-over-btn', text: label, on: { click: onClick } });
+}
+
+/** @param {string} recipeId */
+function removeServing(recipeId) {
+    const idx = state.selectedRecipeIds.lastIndexOf(recipeId);
+    if (idx !== -1) state.selectedRecipeIds.splice(idx, 1);
 }
 
 // ============================================================
 // COPY TO CLIPBOARD
 // ============================================================
 
-function getRecipeURL(recipeId: string): string {
+/**
+ * @param {string} recipeId
+ * @returns {string}
+ */
+function getRecipeURL(recipeId) {
     const baseURL = window.location.origin + window.location.pathname;
     return `${baseURL}?recipe=${recipeId}`;
 }
 
-function copyToClipboard(text: string): Promise<void> {
-    const legacy = (): void => {
-        const textarea = document.createElement('textarea');
-        textarea.value = text;
-        textarea.setAttribute('readonly', '');
-        textarea.style.position = 'fixed';
-        textarea.style.left = '-9999px';
-        document.body.appendChild(textarea);
-        textarea.select();
-        let ok = false;
-        try { ok = document.execCommand('copy'); } catch { ok = false; }
-        document.body.removeChild(textarea);
-        if (!ok) throw new Error('Copy failed');
-    };
-    if (navigator.clipboard?.writeText) {
-        return navigator.clipboard.writeText(text).catch(() => { legacy(); });
-    }
-    return Promise.resolve().then(legacy);
-}
-
-function createCopyButton(recipeId: string): HTMLButtonElement {
+/**
+ * @param {string} recipeId
+ * @returns {HTMLButtonElement}
+ */
+function createCopyButton(recipeId) {
     const recipeName = state.recipes.get(recipeId)?.name ?? recipeId;
     const restingLabel = `Copy link to ${recipeName}`;
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'copy-link-btn';
-    btn.textContent = 'Copy';
-    btn.setAttribute('aria-label', restingLabel);
-    btn.setAttribute('data-testid', `copy-${recipeId}`);
-    btn.addEventListener('click', (ev) => {
-        ev.stopPropagation();
-        copyToClipboard(getRecipeURL(recipeId)).then(() => {
-            btn.textContent = 'Copied';
-            btn.setAttribute('aria-label', `Copied link to ${recipeName}`);
-            announce(`Copied link to ${recipeName}`);
-            setTimeout(() => {
-                btn.textContent = 'Copy';
-                btn.setAttribute('aria-label', restingLabel);
-            }, 1500);
-        }).catch(() => {
-            btn.textContent = 'Copy failed';
-            btn.setAttribute('aria-label', `Copy failed for ${recipeName}`);
-            announce(`Copy failed for ${recipeName}`);
-            setTimeout(() => {
-                btn.textContent = 'Copy';
-                btn.setAttribute('aria-label', restingLabel);
-            }, 1500);
-        });
+    /**
+     * Show the result for 1.5s, then go back to "Copy".
+     * @param {string} text
+     * @param {string} label
+     */
+    const flash = (text, label) => {
+        btn.textContent = text;
+        btn.setAttribute('aria-label', label);
+        announce(label);
+        setTimeout(() => {
+            btn.textContent = 'Copy';
+            btn.setAttribute('aria-label', restingLabel);
+        }, 1500);
+    };
+    const btn = h('button', {
+        class: 'copy-link-btn', text: 'Copy', attrs: { 'aria-label': restingLabel }, testid: `copy-${recipeId}`,
+        on: {
+            click: (ev) => {
+                ev.stopPropagation();
+                // Wrapped so a missing Clipboard API (plain-http LAN address) also reads "Copy failed".
+                Promise.resolve().then(() => navigator.clipboard.writeText(getRecipeURL(recipeId))).then(
+                    () => flash('Copied', `Copied link to ${recipeName}`),
+                    () => flash('Copy failed', `Copy failed for ${recipeName}`),
+                );
+            },
+        },
     });
     return btn;
 }
@@ -1385,7 +1808,7 @@ function createCopyButton(recipeId: string): HTMLButtonElement {
 // AUDIO UNLOCK
 // ============================================================
 
-function unlockAudioContext(): void {
+function unlockAudioContext() {
     if (state.audioUnlocked) return;
     state.audioUnlocked = true;
     // Prime the *actual* alarm element with a direct, gesture-triggered play(), not a
@@ -1408,264 +1831,175 @@ function unlockAudioContext(): void {
 // SCREEN: SELECT
 // ============================================================
 
-function renderSelectScreen(): void {
-    const root = getElement<HTMLDivElement>('app');
-    clear(root);
-
-    const heading = document.createElement('h1');
-    heading.textContent = 'Recipes';
-    root.appendChild(heading);
-
-    const search = document.createElement('search');
-    const searchLabel = document.createElement('label');
-    searchLabel.htmlFor = 'recipe-search';
-    searchLabel.className = 'search-label';
-    searchLabel.textContent = 'Search recipes';
-    const searchInput = document.createElement('input');
-    searchInput.id          = 'recipe-search';
-    searchInput.type        = 'search';
-    searchInput.placeholder = 'Recipe name';
-    searchInput.value       = state.searchQuery;
-    searchInput.className   = 'search-input';
-    searchInput.autocomplete = 'off';
-    searchInput.setAttribute('data-testid', 'recipe-search');
-    searchInput.addEventListener('input', () => {
-        state.searchQuery = searchInput.value;
+function renderSelectScreen() {
+    const root = screen('Recipes');
+    root.appendChild(h('search', {}, ...searchField('recipe-search', 'Search recipes', 'Recipe name', state.searchQuery, (value) => {
+        state.searchQuery = value;
         renderRecipeList();
-    });
-    search.append(searchLabel, searchInput);
-    root.appendChild(search);
+    })));
 
-    const hasHiddenRecipes = [...state.recipes.values()].some(r => r.hidden);
-    if (hasHiddenRecipes) {
-        const toggleBtn = createButton(
-            state.showHidden ? 'Hide hidden recipes' : 'Show hidden recipes',
-            () => {
-                setShowHidden(!state.showHidden);
-                renderRecipeList();
-                toggleBtn.textContent = state.showHidden ? 'Hide hidden recipes' : 'Show hidden recipes';
-            }
-        );
-        toggleBtn.className = 'show-hidden-toggle';
+    if ([...state.recipes.values()].some(r => r.hidden)) {
+        const toggleLabel = () => state.showHidden ? 'Hide hidden recipes' : 'Show hidden recipes';
+        const toggleBtn = h('button', {
+            class: 'show-hidden-toggle', text: toggleLabel(),
+            on: {
+                click: () => {
+                    setShowHidden(!state.showHidden);
+                    renderRecipeList();
+                    toggleBtn.textContent = toggleLabel();
+                },
+            },
+        });
         root.appendChild(toggleBtn);
     }
 
-    const recipeList = document.createElement('div');
-    recipeList.id = 'recipe-list';
-    root.appendChild(recipeList);
-
-    const actions = document.createElement('div');
-    actions.id        = 'actions';
-    actions.className = 'actions';
-    root.appendChild(actions);
-
-    renderRecipeList();
-    updateActionButtons();
+    root.append(h('div', { id: 'recipe-list' }), h('div', { id: 'actions', class: 'actions' }));
+    refreshSelect();
 }
 
-function renderRecipeList(): void {
-    const root = getElement<HTMLDivElement>('recipe-list');
+function renderRecipeList() {
+    const root = getElement('recipe-list');
     clear(root);
 
     const recipes = getFilteredRecipes();
 
     if (recipes.length === 0) {
-        const empty = document.createElement('p');
-        empty.textContent = 'No recipes found.';
-        empty.className   = 'empty';
-        root.appendChild(empty);
+        root.appendChild(h('p', { text: 'No recipes found.', class: 'empty' }));
         appendAddIngredientButton(root);
+        appendBuildFooter(root);
         return;
     }
 
     if (state.bundles.size > 0 && !state.searchQuery) {
-        const bundleHeading = document.createElement('h2');
-        bundleHeading.textContent = 'Bundles';
-        bundleHeading.className   = 'group-heading';
-        root.appendChild(bundleHeading);
-
+        root.appendChild(h('h2', { text: 'Bundles', class: 'group-heading' }));
         state.bundles.forEach((bundle) => {
-            const row = document.createElement('div');
-            row.className = 'bundle-row';
-
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className   = 'bundle-btn';
-            btn.setAttribute('data-testid', `bundle-${bundle.id}`);
-            btn.textContent = bundle.name;
-
-            const sub = document.createElement('span');
-            sub.className   = 'bundle-sub';
-            const counts = new Map<string, number>();
-            for (const id of bundle.recipeIds) counts.set(id, (counts.get(id) ?? 0) + 1);
-            sub.textContent = [...counts.entries()]
+            const names = [...countBy(bundle.recipeIds)]
                 .map(([id, count]) => {
                     const name = state.recipes.get(id)?.name ?? id;
                     return count > 1 ? `${name} ×${count}` : name;
                 })
                 .join(' · ');
-
-            btn.appendChild(sub);
-            btn.addEventListener('click', () => {
-                for (const id of bundle.recipeIds) state.selectedRecipeIds.push(id);
-                unlockAudioContext();
-                renderRecipeList();
-                updateActionButtons();
-            });
-
-            row.appendChild(btn);
-            root.appendChild(row);
+            root.appendChild(h('div', { class: 'bundle-row' },
+                h('button', {
+                    class: 'bundle-btn', testid: `bundle-${bundle.id}`, text: bundle.name,
+                    on: {
+                        click: () => {
+                            for (const id of bundle.recipeIds) state.selectedRecipeIds.push(id);
+                            unlockAudioContext();
+                            refreshSelect();
+                        },
+                    },
+                }, h('span', { class: 'bundle-sub', text: names })),
+            ));
         });
     }
 
-    const groups = new Map<string, Recipe[]>();
+    const groups = /** @type {Map<string, Recipe[]>} */ (new Map());
     recipes.forEach((recipe) => {
         const key = recipe.group ?? '';
-        if (!groups.has(key)) groups.set(key, []);
-        groups.get(key)!.push(recipe);
+        const group = groups.get(key);
+        if (group) group.push(recipe);
+        else groups.set(key, [recipe]);
     });
 
     groups.forEach((groupRecipes, groupName) => {
-        if (groupName) {
-            const heading = document.createElement('h2');
-            heading.textContent = groupName;
-            heading.className   = 'group-heading';
-            root.appendChild(heading);
-        }
+        if (groupName) root.appendChild(h('h2', { text: groupName, class: 'group-heading' }));
 
         groupRecipes.forEach((recipe) => {
-            const row = document.createElement('div');
-            row.className = 'recipe-row';
-
-
-            const btn     = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'recipe-btn';
-            const count   = state.selectedRecipeIds.filter(id => id === recipe.id).length;
+            const count = getServings(recipe.id);
+            const btn = h('button', {
+                class: 'recipe-btn', testid: `recipe-${recipe.id}`,
+                on: {
+                    click: () => {
+                        state.selectedRecipeIds.push(recipe.id);
+                        unlockAudioContext();
+                        announce(`Added a serving of ${recipe.name}. ${getServings(recipe.id)} selected.`);
+                        refreshSelect();
+                    },
+                },
+            },
+                h('span', { text: recipe.name }),
+                recipe.hidden && h('span', { class: 'hidden-badge', text: 'hidden' }),
+                count > 1 && h('span', { class: 'count-badge', text: `×${count}` }),
+            );
             btn.classList.toggle('selected', count > 0);
 
-            const nameSpan = document.createElement('span');
-            nameSpan.textContent = recipe.name;
-            btn.appendChild(nameSpan);
-            if (recipe.hidden) {
-                const hiddenBadge = document.createElement('span');
-                hiddenBadge.className   = 'hidden-badge';
-                hiddenBadge.textContent = 'hidden';
-                btn.appendChild(hiddenBadge);
-            }
-            if (count > 1) {
-                const badge = document.createElement('span');
-                badge.className   = 'count-badge';
-                badge.textContent = `×${count}`;
-                btn.appendChild(badge);
-            }
-
-            btn.setAttribute('data-testid', `recipe-${recipe.id}`);
-            btn.addEventListener('click', () => {
-                state.selectedRecipeIds.push(recipe.id);
-                unlockAudioContext();
-                const servings = state.selectedRecipeIds.filter(id => id === recipe.id).length;
-                announce(`Added a serving of ${recipe.name}. ${servings} selected.`);
-                renderRecipeList();
-                updateActionButtons();
-            });
-
-            const minusBtn = document.createElement('button');
-            minusBtn.type = 'button';
-            minusBtn.className        = 'count-minus-btn';
-            minusBtn.textContent      = '−';
-            minusBtn.setAttribute('data-testid', `remove-serving-${recipe.id}`);
-            hiddenText(minusBtn, `Remove one serving of ${recipe.name}`);
+            const minusBtn = h('button', {
+                class: 'count-minus-btn', text: '−', testid: `remove-serving-${recipe.id}`,
+                on: {
+                    click: (ev) => {
+                        ev.stopPropagation();
+                        removeServing(recipe.id);
+                        announce(`Removed a serving of ${recipe.name}. ${getServings(recipe.id)} selected.`);
+                        refreshSelect();
+                    },
+                },
+            }, srOnly(`Remove one serving of ${recipe.name}`));
             minusBtn.style.visibility = count > 0 ? 'visible' : 'hidden';
-            minusBtn.addEventListener('click', (ev) => {
-                ev.stopPropagation();
-                const idx = state.selectedRecipeIds.lastIndexOf(recipe.id);
-                if (idx !== -1) state.selectedRecipeIds.splice(idx, 1);
-                const servings = state.selectedRecipeIds.filter(id => id === recipe.id).length;
-                announce(`Removed a serving of ${recipe.name}. ${servings} selected.`);
-                renderRecipeList();
-                updateActionButtons();
-            });
 
-            row.appendChild(btn);
-            row.appendChild(minusBtn);
-            if (recipe.adhoc) {
-                const removeBtn = document.createElement('button');
-                removeBtn.type = 'button';
-                removeBtn.className   = 'adhoc-remove-btn';
-                removeBtn.textContent = '×';
-                hiddenText(removeBtn, `Remove ${recipe.name}`);
-                removeBtn.addEventListener('click', (ev) => {
-                    ev.stopPropagation();
-                    state.selectedRecipeIds = state.selectedRecipeIds.filter(id => id !== recipe.id);
-                    state.recipes.delete(recipe.id);
-                    renderRecipeList();
-                    updateActionButtons();
-                });
-                row.appendChild(removeBtn);
-            } else {
-                row.appendChild(createCopyButton(recipe.id));
-            }
-            root.appendChild(row);
+            const lastBtn = recipe.adhoc
+                ? h('button', {
+                    class: 'adhoc-remove-btn', text: '×',
+                    on: {
+                        click: (ev) => {
+                            ev.stopPropagation();
+                            state.selectedRecipeIds = state.selectedRecipeIds.filter(id => id !== recipe.id);
+                            state.recipes.delete(recipe.id);
+                            refreshSelect();
+                        },
+                    },
+                }, srOnly(`Remove ${recipe.name}`))
+                : createCopyButton(recipe.id);
+            root.appendChild(h('div', { class: 'recipe-row' }, btn, minusBtn, lastBtn));
         });
     });
 
     appendAddIngredientButton(root);
+    appendBuildFooter(root);
 }
 
-function appendAddIngredientButton(root: HTMLElement): void {
-    const addRow = document.createElement('div');
-    addRow.className = 'add-ingredient-row';
-    const addBtn = createButton('+ Add an ingredient', () => {
-        adhocReturnScreen = state.screen;
-        navigateTo('add-ingredient');
-    });
-    addBtn.className = 'add-ingredient-btn';
-    addBtn.setAttribute('data-testid', 'add-ingredient');
-    addRow.appendChild(addBtn);
-    root.appendChild(addRow);
+function refreshSelect() {
+    renderRecipeList();
+    updateActionButtons();
 }
 
-function updateActionButtons(): void {
-    const actions = getElement<HTMLDivElement>('actions');
+/** @param {HTMLElement} root */
+function appendAddIngredientButton(root) {
+    root.appendChild(h('div', { class: 'add-ingredient-row' },
+        h('button', {
+            class: 'add-ingredient-btn', testid: 'add-ingredient', text: '+ Add an ingredient',
+            on: {
+                click: () => {
+                    adhocReturnScreen = state.screen;
+                    navigateTo('add-ingredient');
+                },
+            },
+        }),
+    ));
+}
+
+function updateActionButtons() {
+    const actions = getElement('actions');
     clear(actions);
     if (state.selectedRecipeIds.length === 0) return;
 
-    const shopBtn = createButton('🛒 Go Shopping', () => navigateTo('shopping'));
-    shopBtn.className = 'action-btn';
-    shopBtn.setAttribute('data-testid', 'go-shopping');
-
-    const nutritionBtn = createButton('📊 Nutrition', () => navigateTo('nutrition'));
-    nutritionBtn.className = 'action-btn action-btn-nutrition';
-    nutritionBtn.setAttribute('data-testid', 'open-nutrition');
-
-    const planBtn = createButton('📅 Plan', () => navigateTo('plan'));
-    planBtn.className = 'action-btn action-btn-plan';
-    planBtn.setAttribute('data-testid', 'open-plan');
-
-    actions.appendChild(shopBtn);
-    actions.appendChild(nutritionBtn);
-    actions.appendChild(planBtn);
-
     const selectedRecipes = getSelectedRecipes();
-    const hasPrep = selectedRecipes.some(r =>
-        r.steps.some(function walk(s: Step): boolean {
-            return !!s.prep || (s.children?.some(walk) ?? false);
-        })
-    );
-    if (hasPrep) {
-        const prepBtn = createButton('🔪 Prep', () => navigateTo('prep'));
-        prepBtn.className = 'action-btn action-btn-prep';
-        prepBtn.setAttribute('data-testid', 'open-prep');
-        actions.appendChild(prepBtn);
-    }
-
+    const hasPrep     = selectedRecipes.some(r => [...walkSteps(r.steps)].some(s => s.prep));
     const hasCookable = selectedRecipes.some(r => !r.adhoc);
-    if (hasCookable) {
-        const cookBtn = createButton('🍳 Start Cooking', () => navigateTo('cooking'));
-        cookBtn.className = 'action-btn';
-        cookBtn.setAttribute('data-testid', 'start-cooking');
-        actions.appendChild(cookBtn);
+    /**
+     * Order matters: .action-btn:first-child / :last-child pick the blue and green colors.
+     * @type {[label: string, screen: Screen, className: string, testid: string, show: boolean][]}
+     */
+    const buttons = [
+        ['🛒 Go Shopping',   'shopping',  'action-btn',                      'go-shopping',   true],
+        ['📊 Nutrition',     'nutrition', 'action-btn action-btn-nutrition', 'open-nutrition', true],
+        ['📅 Plan',          'plan',      'action-btn action-btn-plan',      'open-plan',      true],
+        ['🔪 Prep',          'prep',      'action-btn action-btn-prep',      'open-prep',      hasPrep],
+        ['🍳 Start Cooking', 'cooking',   'action-btn',                      'start-cooking',  hasCookable],
+    ];
+    for (const [label, screen, className, testid, show] of buttons) {
+        if (!show) continue;
+        actions.appendChild(h('button', { class: className, testid, text: label, on: { click: () => navigateTo(screen) } }));
     }
 }
 
@@ -1673,22 +2007,12 @@ function updateActionButtons(): void {
 // SCREEN: SHOPPING
 // ============================================================
 
-function renderShoppingScreen(): void {
-    const root = getElement<HTMLDivElement>('app');
-    clear(root);
-
-    const heading = document.createElement('h1');
-    heading.textContent = 'Shopping List';
-    root.appendChild(heading);
-
+function renderShoppingScreen() {
+    const root = screen('Shopping List');
     const inventory = loadInventory();
 
     buildShoppingList().forEach((ingredient) => {
-        const panel = createPanel();
-
-        const label = document.createElement('span');
-        label.textContent = formatIngredient(ingredient);
-        panel.appendChild(label);
+        const panel = h('div', { class: 'panel' }, h('span', { text: formatIngredient(ingredient) }));
 
         const required    = ingredient.quantity ?? 0;
         const product      = selectedProduct(ingredient);
@@ -1701,45 +2025,20 @@ function renderShoppingScreen(): void {
         const trackByPackage = perPackage !== null && perPackage > 0;
         const key = inventoryKey(ingredient, trackByPackage);
 
-        const packageWord = (count: number): string => {
-            const unit = packageUnit as Unit;
+        /**
+         * @param {number} count
+         * @returns {string}
+         */
+        const packageWord = (count) => {
+            const unit = /** @type {Unit} */ (packageUnit);
             return count === 1 ? unit.name : (unit.plural || pluralize(unit.name, count));
         };
 
-        const invRow = document.createElement('div');
-        invRow.className = 'inventory-row';
-
         const haveId = `have-${key.replace(/[^a-z0-9]+/gi, '-')}`;
-        const haveLabel = document.createElement('label');
-        haveLabel.className   = 'inventory-have-label';
-        haveLabel.htmlFor     = haveId;
-        haveLabel.textContent = trackByPackage ? `Have (${packageWord(2)}):` : 'Have:';
-        invRow.appendChild(haveLabel);
-
-        const haveInput = document.createElement('input');
-        haveInput.id        = haveId;
-        haveInput.type      = 'number';
-        haveInput.min       = '0';
-        haveInput.step      = 'any';
-        haveInput.className = 'inventory-have-input';
-        haveInput.placeholder = '0';
-        haveInput.autocomplete = 'off';
-        haveInput.value = inventory[key] ? String(inventory[key]) : '';
-        invRow.appendChild(haveInput);
-
-        const neededEl = document.createElement('span');
-        neededEl.className = 'inventory-needed';
-        invRow.appendChild(neededEl);
-
-        if (trackByPackage) {
-            const hint = document.createElement('span');
-            hint.className   = 'inventory-package-hint';
-            hint.textContent = `1 ${packageWord(1)} ≈ ${formatQuantityUnit(perPackage as number, ingredient.unit)}${product?.variant ? ` (${product.variant})` : ''}`;
-            invRow.appendChild(hint);
-        }
-
-        const updateNeeded = (have: number) => {
-            const haveInRecipeUnits = trackByPackage ? have * (perPackage as number) : have;
+        const neededEl = h('span', { class: 'inventory-needed' });
+        /** @param {number} have */
+        const updateNeeded = (have) => {
+            const haveInRecipeUnits = trackByPackage ? have * (/** @type {number} */ (perPackage)) : have;
             const needed = Math.max(0, required - haveInRecipeUnits);
             if (needed <= 0 && required > 0) {
                 neededEl.textContent = '✓ have enough';
@@ -1747,7 +2046,7 @@ function renderShoppingScreen(): void {
             } else {
                 let text = `Need ${formatQuantityUnit(needed, ingredient.unit)} more`;
                 if (trackByPackage) {
-                    const packagesNeeded = Math.ceil(needed / (perPackage as number));
+                    const packagesNeeded = Math.ceil(needed / (/** @type {number} */ (perPackage)));
                     if (packagesNeeded > 0) text += ` (~${packagesNeeded} more ${packageWord(packagesNeeded)})`;
                 }
                 neededEl.textContent = text;
@@ -1756,63 +2055,75 @@ function renderShoppingScreen(): void {
         };
         updateNeeded(inventory[key] ?? 0);
 
-        haveInput.addEventListener('click', (ev) => ev.stopPropagation());
-        haveInput.addEventListener('input', () => {
-            const v = parseFloat(haveInput.value);
-            const have = isNaN(v) || v < 0 ? 0 : v;
-            if (have > 0) inventory[key] = have;
-            else delete inventory[key];
-            saveInventory(inventory);
-            updateNeeded(have);
+        const haveInput = h('input', {
+            id: haveId, type: 'number', min: '0', step: 'any', class: 'inventory-have-input', placeholder: '0', autocomplete: 'off',
+            value: inventory[key] ? String(inventory[key]) : '',
+            on: {
+                click: (ev) => ev.stopPropagation(),
+                input: () => {
+                    const v = parseFloat(haveInput.value);
+                    const have = isNaN(v) || v < 0 ? 0 : v;
+                    if (have > 0) inventory[key] = have;
+                    else delete inventory[key];
+                    saveInventory(inventory);
+                    updateNeeded(have);
+                },
+            },
         });
 
-        panel.appendChild(invRow);
+        panel.appendChild(h('div', { class: 'inventory-row' },
+            h('label', { class: 'inventory-have-label', htmlFor: haveId, text: trackByPackage ? `Have (${packageWord(2)}):` : 'Have:' }),
+            haveInput,
+            neededEl,
+            trackByPackage && h('span', {
+                class: 'inventory-package-hint',
+                text: `1 ${packageWord(1)} ≈ ${formatQuantityUnit(/** @type {number} */ (perPackage), ingredient.unit)}${product?.variant ? ` (${product.variant})` : ''}`,
+            }),
+        ));
 
         const products = ingredient.products ?? [];
         // One row per (product, listing) pair - a single product can have several listings
         // (e.g. the same item sold on Amazon and on the brand's own site at different prices).
         const pairs = products.flatMap((product) => (product.listings ?? []).map((listing) => ({ product, listing })));
         if (pairs.length > 0) {
-            const links = document.createElement('div');
-            links.className = 'purchase-links';
             const chosenProduct = selectedProduct(ingredient);
             const chosenListing = chosenProduct ? cheapestListing(chosenProduct) : undefined;
-            const sorted = [...pairs].sort((a, b) => {
-                const aPpu = a.listing.price !== undefined && a.product.size !== undefined ? a.listing.price / a.product.size : Infinity;
-                const bPpu = b.listing.price !== undefined && b.product.size !== undefined ? b.listing.price / b.product.size : Infinity;
-                return aPpu - bPpu;
-            });
-            sorted.forEach(({ product, listing }) => {
-                const a    = document.createElement('a');
-                a.href     = listing.link ?? '#';
-                a.target   = '_blank';
-                a.className = 'purchase-link';
+            /**
+             * @param {number | undefined} price
+             * @param {number | undefined} size
+             * @returns {number}
+             */
+            const perUnit = (price, size) =>
+                price !== undefined && size !== undefined ? price / size : Infinity;
+            const sorted = [...pairs].sort((a, b) => perUnit(a.listing.price, a.product.size) - perUnit(b.listing.price, b.product.size));
+            panel.appendChild(h('div', { class: 'purchase-links' }, ...sorted.map(({ product, listing }) => {
                 const isChosen = product === chosenProduct && listing === chosenListing;
-                if (isChosen) a.classList.add('default-product');
+                const unitName = product.sizeUnit?.name ?? 'unit';
                 const variant = product.variant ? ` ${product.variant}` : '';
                 const where   = listing.store ? ` · ${listing.store}` : '';
                 const pkg     = listing.price !== undefined && product.size !== undefined
                     ? ` - $${listing.price} / ${product.size} ${product.sizeUnit?.name ?? ''}`.trimEnd()
                     : '';
                 const ppu     = listing.price !== undefined && product.size !== undefined
-                    ? ` ($${(listing.price / product.size).toFixed(2)}/${product.sizeUnit?.name ?? 'unit'})`
+                    ? ` ($${(listing.price / product.size).toFixed(2)}/${unitName})`
                     : '';
                 const sasPercent = listing.store === stores.amazon ? subscribeAndSavePercent(listing.discount) : undefined;
                 const sasPrice   = sasPercent !== undefined && listing.price !== undefined
                     ? listing.price * (1 - sasPercent / 100) : undefined;
                 const sasPpu  = sasPrice !== undefined && product.size !== undefined
-                    ? ` ($${(sasPrice / product.size).toFixed(2)}/${product.sizeUnit?.name ?? 'unit'})` : '';
+                    ? ` ($${(sasPrice / product.size).toFixed(2)}/${unitName})` : '';
                 const sas     = sasPrice !== undefined
                     ? ` · S&S ${sasPercent}% $${sasPrice.toFixed(2)}${sasPpu}` : '';
                 const pick    = isChosen ? ' ✓' : '';
-                a.textContent = `${product.brand}${variant}${where}${pkg}${ppu}${sas}${pick}`;
-                links.appendChild(a);
-            });
-            panel.appendChild(links);
+                return h('a', {
+                    href: listing.link ?? '#', target: '_blank', class: isChosen ? 'purchase-link default-product' : 'purchase-link',
+                    text: `${product.brand}${variant}${where}${pkg}${ppu}${sas}${pick}`,
+                });
+            })));
         }
 
         panel.addEventListener('click', (ev) => {
-            const tag = (ev.target as HTMLElement).tagName;
+            const tag = (/** @type {HTMLElement} */ (ev.target)).tagName;
             if (tag === 'A' || tag === 'INPUT' || tag === 'LABEL') return;
             panel.classList.toggle('completed');
         });
@@ -1826,98 +2137,95 @@ function renderShoppingScreen(): void {
 // MACRO TARGETS PANEL
 // ============================================================
 
-function renderMacroTargetsPanel(grand: NutritionTotals): HTMLElement {
-    const panel = createPanel();
-    panel.className = 'panel macro-targets';
-
-    const title = document.createElement('div');
-    title.className   = 'macro-targets-title';
-    title.textContent = 'Daily Targets';
-    panel.appendChild(title);
-
-    const header = document.createElement('div');
-    header.className = 'macro-row macro-header';
-    ['', 'Target', 'Eaten', 'Remaining'].forEach(text => {
-        const cell = document.createElement('span');
-        cell.textContent = text;
-        header.appendChild(cell);
-    });
-    panel.appendChild(header);
+/**
+ * @param {NutritionTotals} grand
+ * @returns {HTMLElement}
+ */
+function renderMacroTargetsPanel(grand) {
+    const panel = h('div', { class: 'panel macro-targets' },
+        h('div', { class: 'macro-targets-title', text: 'Daily Targets' }),
+        h('div', { class: 'macro-row macro-header' }, ...['', 'Target', 'Eaten', 'Remaining'].map(text => h('span', { text }))),
+    );
 
     const totalCals = grand.calories > 0 ? grand.calories : null;
-    const pct = (grams: number | null, calsPerGram: number): string =>
+    /**
+     * @param {number | null} grams
+     * @param {number} calsPerGram
+     * @returns {string}
+     */
+    const pct = (grams, calsPerGram) =>
         grams !== null && totalCals ? ` (${Math.round((grams * calsPerGram / totalCals) * 100)}%)` : '';
 
     const totalMacroG = grand.protein + grand.fat + grand.carbs;
-    const macroPct = (grams: number | null): string =>
+    /**
+     * @param {number | null} grams
+     * @returns {string}
+     */
+    const macroPct = (grams) =>
         grams !== null && totalMacroG > 0 ? ` / ${Math.round((grams / totalMacroG) * 100)}%` : '';
 
-    const rows: { label: string; key: keyof typeof macroTargets; actual: number | null; unit: string; indent?: boolean; cap?: boolean; calPct?: string; macroPct?: string }[] = [
-        { label: 'Calories',    key: 'calories',    actual: grand.calories    > 0 ? Math.round(grand.calories)           : null, unit: 'kcal' },
-        { label: 'Protein',     key: 'protein',     actual: grand.protein     > 0 ? Math.round(grand.protein)            : null, unit: 'g', calPct: pct(grand.protein     > 0 ? grand.protein     : null, 4), macroPct: macroPct(grand.protein > 0 ? grand.protein : null) },
-        { label: 'Fat',         key: 'fat',         actual: grand.fat         > 0 ? Math.round(grand.fat)                : null, unit: 'g', calPct: pct(grand.fat         > 0 ? grand.fat         : null, 9), macroPct: macroPct(grand.fat     > 0 ? grand.fat     : null) },
-        { label: '↳ Sat Fat',   key: 'saturatedFat', actual: grand.saturatedFat > 0 ? Math.round(grand.saturatedFat * 10) / 10 : null, unit: 'g', indent: true, cap: true, calPct: pct(grand.saturatedFat > 0 ? grand.saturatedFat : null, 9) },
-        { label: '↳ Trans Fat', key: 'transFat',    actual: grand.transFat    > 0 ? Math.round(grand.transFat * 10) / 10 : null, unit: 'g', indent: true, cap: true, calPct: pct(grand.transFat    > 0 ? grand.transFat    : null, 9) },
-        { label: 'Carbs',       key: 'carbs',       actual: grand.carbs       > 0 ? Math.round(grand.carbs)              : null, unit: 'g', calPct: pct(grand.carbs       > 0 ? grand.carbs       : null, 4), macroPct: macroPct(grand.carbs   > 0 ? grand.carbs   : null) },
-        { label: 'Fiber',       key: 'fiber',       actual: grand.fiber       > 0 ? Math.round(grand.fiber)              : null, unit: 'g' },
-        { label: 'Sodium',      key: 'sodium',      actual: grand.sodium      > 0 ? Math.round(grand.sodium)             : null, unit: 'mg', cap: true },
+    /**
+     * @param {number} v
+     * @returns {number}
+     */
+    const round1 = (v) => Math.round(v * 10) / 10;
+    /** @type {{ label: string; key: keyof typeof macroTargets; unit: string; round?: (v: number) => number; calsPerGram?: number; macro?: boolean; indent?: boolean; cap?: boolean }[]} */
+    const rowDefs = [
+        { label: 'Calories',    key: 'calories',     unit: 'kcal' },
+        { label: 'Protein',     key: 'protein',      unit: 'g',  calsPerGram: 4, macro: true },
+        { label: 'Fat',         key: 'fat',          unit: 'g',  calsPerGram: 9, macro: true },
+        { label: '↳ Sat Fat',   key: 'saturatedFat', unit: 'g',  calsPerGram: 9, round: round1, indent: true, cap: true },
+        { label: '↳ Trans Fat', key: 'transFat',     unit: 'g',  calsPerGram: 9, round: round1, indent: true, cap: true },
+        { label: 'Carbs',       key: 'carbs',        unit: 'g',  calsPerGram: 4, macro: true },
+        { label: 'Fiber',       key: 'fiber',        unit: 'g' },
+        { label: 'Sodium',      key: 'sodium',       unit: 'mg', cap: true },
     ];
+    const rows = rowDefs.map((def) => {
+        const grams = grand[def.key] > 0 ? grand[def.key] : null;
+        return {
+            ...def,
+            actual:   grams === null ? null : (def.round ?? Math.round)(grams),
+            calPct:   def.calsPerGram ? pct(grams, def.calsPerGram) : undefined,
+            macroPct: def.macro ? macroPct(grams) : undefined,
+        };
+    });
 
     rows.forEach(({ label, key, actual, unit, indent, cap, calPct, macroPct }) => {
-        const row = document.createElement('div');
-        row.className = 'macro-row' + (indent ? ' macro-row-indent' : '');
-
-        const labelEl = document.createElement('span');
-        labelEl.className   = 'macro-label' + (indent ? ' macro-label-sub' : '');
-        labelEl.textContent = label;
-        row.appendChild(labelEl);
-
-        const inputWrap = document.createElement('span');
-        inputWrap.className = 'macro-target-wrap';
-        const input = document.createElement('input');
-        input.type      = 'number';
-        input.min       = '0';
-        input.className = 'macro-target-input';
-        input.value     = String(macroTargets[key]);
-        const unitLabel = document.createElement('span');
-        unitLabel.className   = 'macro-unit-label';
-        unitLabel.textContent = unit;
-        inputWrap.appendChild(input);
-        inputWrap.appendChild(unitLabel);
-        row.appendChild(inputWrap);
-
-        const actualEl = document.createElement('span');
-        actualEl.className   = 'macro-actual';
-        actualEl.textContent = actual !== null ? `${actual} ${unit}${calPct ?? ''}${macroPct ?? ''}` : '-';
-        row.appendChild(actualEl);
-
         const initRemaining = actual !== null ? macroTargets[key] - actual : null;
-        const remainClass = (rem: number | null) => {
+        /** @param {number | null} rem */
+        const remainClass = (rem) => {
             if (rem === null) return 'macro-remaining';
             if (cap) return rem < 0 ? 'macro-remaining over' : rem === 0 ? 'macro-remaining met' : 'macro-remaining';
             return rem <= 0 ? 'macro-remaining met' : 'macro-remaining';
         };
-        const remainText = (rem: number | null) => {
+        /** @param {number | null} rem */
+        const remainText = (rem) => {
             if (rem === null) return '-';
             if (cap) return rem < 0 ? `${Math.round(-rem)} ${unit} over` : rem === 0 ? '✓ at limit' : `${Math.round(rem)} ${unit} left`;
             return rem > 0 ? `${Math.round(rem)} ${unit}` : '✓ met';
         };
-        const remainEl = document.createElement('span');
-        remainEl.className   = remainClass(initRemaining);
-        remainEl.textContent = remainText(initRemaining);
-        row.appendChild(remainEl);
-
-        input.addEventListener('change', () => {
-            const v = parseFloat(input.value);
-            if (!isNaN(v) && v > 0) {
-                macroTargets[key] = v;
-                const newRemaining = actual !== null ? v - actual : null;
-                remainEl.textContent = remainText(newRemaining);
-                remainEl.className   = remainClass(newRemaining);
-            }
+        const remainEl = h('span', { class: remainClass(initRemaining), text: remainText(initRemaining) });
+        const input = h('input', {
+            type: 'number', min: '0', class: 'macro-target-input', value: String(macroTargets[key]),
+            on: {
+                change: () => {
+                    const v = parseFloat(input.value);
+                    if (!isNaN(v) && v > 0) {
+                        macroTargets[key] = v;
+                        const newRemaining = actual !== null ? v - actual : null;
+                        remainEl.textContent = remainText(newRemaining);
+                        remainEl.className   = remainClass(newRemaining);
+                    }
+                },
+            },
         });
 
-        panel.appendChild(row);
+        panel.appendChild(h('div', { class: 'macro-row' + (indent ? ' macro-row-indent' : '') },
+            h('span', { class: 'macro-label' + (indent ? ' macro-label-sub' : ''), text: label }),
+            h('span', { class: 'macro-target-wrap' }, input, h('span', { class: 'macro-unit-label', text: unit })),
+            h('span', { class: 'macro-actual', text: actual !== null ? `${actual} ${unit}${calPct ?? ''}${macroPct ?? ''}` : '-' }),
+            remainEl,
+        ));
     });
 
     return panel;
@@ -1927,9 +2235,18 @@ function renderMacroTargetsPanel(grand: NutritionTotals): HTMLElement {
 // RECIPE SUGGESTIONS
 // ============================================================
 
-interface SuggestedRecipe { recipe: Recipe; score: number; totals: NutritionTotals; }
+/**
+ * @typedef {Object} SuggestedRecipe
+ * @property {Recipe} recipe
+ * @property {number} score
+ * @property {NutritionTotals} totals
+ */
 
-function buildRecipeSuggestions(grand: NutritionTotals): SuggestedRecipe[] {
+/**
+ * @param {NutritionTotals} grand
+ * @returns {SuggestedRecipe[]}
+ */
+function buildRecipeSuggestions(grand) {
     const remCals = macroTargets.calories - grand.calories;
     if (remCals < 50) return [];  // nearly full - no suggestions needed
 
@@ -1940,7 +2257,8 @@ function buildRecipeSuggestions(grand: NutritionTotals): SuggestedRecipe[] {
         carbs:    Math.max(0, macroTargets.carbs   - grand.carbs),
     };
 
-    const results: SuggestedRecipe[] = [];
+    /** @type {SuggestedRecipe[]} */
+    const results = [];
 
     for (const recipe of state.recipes.values()) {
         if (recipe.adhoc) continue;
@@ -1981,22 +2299,12 @@ function buildRecipeSuggestions(grand: NutritionTotals): SuggestedRecipe[] {
 // SCREEN: NUTRITION
 // ============================================================
 
-function renderNutritionScreen(): void {
-    const root = getElement<HTMLDivElement>('app');
-    clear(root);
-
-    const heading = document.createElement('h1');
-    heading.textContent = 'Nutrition';
-    root.appendChild(heading);
-
+function renderNutritionScreen() {
+    const root = screen('Nutrition');
     const recipes = getSelectedRecipes();
 
     if (recipes.length === 0) {
-        const empty = document.createElement('p');
-        empty.className   = 'empty';
-        empty.textContent = 'No recipes selected.';
-        root.appendChild(empty);
-        root.appendChild(createStartOverButton());
+        root.append(h('p', { class: 'empty', text: 'No recipes selected.' }), createStartOverButton());
         return;
     }
 
@@ -2031,385 +2339,208 @@ function renderNutritionScreen(): void {
     const grandServings = perRecipe.reduce((a, p) => a + p.servings, 0);
     const hasCostData   = gTotal > gCostMissing;
 
-    const totalCard = createPanel();
-    totalCard.className = 'panel nutrition-total';
-
-    const totalTitle = document.createElement('div');
-    totalTitle.className = 'nutrition-total-title';
-    if (recipes.length === 1 && perRecipe[0].servings === 1) {
-        totalTitle.textContent = recipes[0].name;
-    } else if (recipes.length === 1) {
-        totalTitle.textContent = `${recipes[0].name} ×${perRecipe[0].servings}`;
-    } else {
-        totalTitle.textContent = `All selected recipes (${grandServings} serving${grandServings === 1 ? '' : 's'})`;
-    }
-    totalCard.appendChild(totalTitle);
-
-    const totalValue = document.createElement('div');
-    totalValue.className = 'nutrition-values';
-    if (gCovered > 0) {
-        totalValue.textContent = formatTotals(grand, hasCostData ? grandCost : undefined);
-    } else if (hasCostData) {
-        totalValue.textContent = `$${grandCost.toFixed(2)}`;
-    } else {
-        totalValue.textContent = '- no computable data';
-    }
-    totalCard.appendChild(totalValue);
-
-    // 30-day cost projection
-    if (hasCostData) {
-        const monthly = document.createElement('div');
-        monthly.className   = 'nutrition-monthly-cost';
-        monthly.textContent = `$${(grandCost * 30).toFixed(2)} / 30 days`;
-        totalCard.appendChild(monthly);
-    }
-
-    // Partial cost warning
-    if (gCostMissing > 0 && hasCostData) {
-        const costNote = document.createElement('div');
-        costNote.className   = 'nutrition-cost-note';
-        costNote.textContent = `⚠ cost is partial - ${gCostMissing} ingredient${gCostMissing === 1 ? '' : 's'} missing price data`;
-        totalCard.appendChild(costNote);
-    }
-
-    const totalCoverage = document.createElement('div');
-    totalCoverage.className   = 'nutrition-coverage' + (gFlagged > 0 ? ' flagged' : '');
-    totalCoverage.textContent = (gFlagged > 0 ? '⚠ ' : '') + coverageLabel(gCovered, gTotal, gFlagged);
-    totalCard.appendChild(totalCoverage);
-
-    root.appendChild(totalCard);
+    const totalTitle = recipes.length > 1
+        ? `All selected recipes (${grandServings} serving${grandServings === 1 ? '' : 's'})`
+        : perRecipe[0].servings === 1 ? recipes[0].name : `${recipes[0].name} ×${perRecipe[0].servings}`;
+    root.appendChild(h('div', { class: 'panel nutrition-total' },
+        h('div', { class: 'nutrition-total-title', text: totalTitle }),
+        h('div', { class: 'nutrition-values', text: totalsText(gCovered, grand, hasCostData, grandCost) }),
+        // 30-day cost projection
+        hasCostData && h('div', { class: 'nutrition-monthly-cost', text: `$${(grandCost * 30).toFixed(2)} / 30 days` }),
+        gCostMissing > 0 && hasCostData && h('div', {
+            class: 'nutrition-cost-note',
+            text: `⚠ cost is partial - ${gCostMissing} ingredient${gCostMissing === 1 ? '' : 's'} missing price data`,
+        }),
+        h('div', {
+            class: 'nutrition-coverage' + (gFlagged > 0 ? ' flagged' : ''),
+            text: (gFlagged > 0 ? '⚠ ' : '') + coverageLabel(gCovered, gTotal, gFlagged),
+        }),
+    ));
     root.appendChild(renderMacroTargetsPanel(grand));
 
-    // ── Bulk select/unselect ─────────────────────────────────
-    const bulkActions = document.createElement('div');
-    bulkActions.className = 'nutrition-bulk-actions';
-
-    const selectAllBtn = createButton('Select All', () => {
-        recipes.forEach(r => nutritionRecipeExclusions.delete(r.id));
-        renderNutritionScreen();
+    /**
+     * ── Bulk select/unselect ─────────────────────────────────
+     * @param {string} text
+     * @param {(id: string) => void} apply
+     */
+    const bulkButton = (text, apply) => h('button', {
+        class: 'nutrition-bulk-btn', text,
+        on: { click: () => { recipes.forEach(r => apply(r.id)); renderNutritionScreen(); } },
     });
-    selectAllBtn.className = 'nutrition-bulk-btn';
+    root.appendChild(h('div', { class: 'nutrition-bulk-actions' },
+        bulkButton('Select All', id => nutritionRecipeExclusions.delete(id)),
+        bulkButton('Unselect All', id => nutritionRecipeExclusions.add(id)),
+    ));
 
-    const unselectAllBtn = createButton('Unselect All', () => {
-        recipes.forEach(r => nutritionRecipeExclusions.add(r.id));
-        renderNutritionScreen();
-    });
-    unselectAllBtn.className = 'nutrition-bulk-btn';
-
-    bulkActions.appendChild(selectAllBtn);
-    bulkActions.appendChild(unselectAllBtn);
-    root.appendChild(bulkActions);
+    /**
+     * Header buttons re-render the screen; stopPropagation keeps the header from toggling first.
+     * @param {string} cls
+     * @param {string} text
+     * @param {string} hidden
+     * @param {() => void} onClick
+     */
+    const headerButton = (cls, text, hidden, onClick) => h('button', {
+        class: cls, text,
+        on: { click: (ev) => { ev.stopPropagation(); onClick(); renderNutritionScreen(); } },
+    }, srOnly(hidden));
 
     // ── Per recipe (expandable) ──────────────────────────────
     perRecipeEff.forEach(({ recipe, servings, nutrition, excluded, effTotals, effCost }) => {
-        const section = createPanel();
-        section.className = 'panel nutrition-recipe';
-        if (nutritionRecipeExclusions.has(recipe.id)) section.classList.add('nutrition-recipe-excluded');
-        else section.classList.add('nutrition-recipe-eaten');
-
+        const isRecipeExcluded  = nutritionRecipeExclusions.has(recipe.id);
         const flaggedCount      = nutrition.missing + nutrition.uncomputable;
         const sectionTotals     = scaleTotals(effTotals, servings);
         const sectionCost       = effCost * servings;
         const recipeHasCostData = nutrition.total > nutrition.costMissing;
+        const isExpanded        = nutritionExpanded.has(recipe.id);
 
-        const header = document.createElement('div');
-        header.className = 'nutrition-recipe-header';
+        const caret = h('span', { class: 'nutrition-caret', text: isExpanded ? '▾' : '▸' });
+        const header = h('div', { class: 'nutrition-recipe-header' },
+            caret,
+            h('span', { class: 'nutrition-recipe-name', text: servings > 1 ? `${recipe.name} ×${servings}` : recipe.name }),
+            h('div', { class: 'nutrition-serving-controls' },
+                headerButton('nutrition-serving-btn', '−', `Remove one serving of ${recipe.name}`, () => removeServing(recipe.id)),
+                h('span', { class: 'nutrition-serving-count', text: `×${servings}` }),
+                headerButton('nutrition-serving-btn', '+', `Add a serving of ${recipe.name}`, () => state.selectedRecipeIds.push(recipe.id)),
+            ),
+            headerButton('nutrition-eaten-btn', isRecipeExcluded ? '○' : '✓',
+                isRecipeExcluded ? `Include ${recipe.name} in totals` : `Exclude ${recipe.name} from totals`,
+                () => {
+                    if (isRecipeExcluded) nutritionRecipeExclusions.delete(recipe.id);
+                    else nutritionRecipeExclusions.add(recipe.id);
+                }),
+            h('span', { class: 'nutrition-recipe-sub', text: totalsText(nutrition.covered, sectionTotals, recipeHasCostData, sectionCost) }),
+        );
 
-        const caret = document.createElement('span');
-        caret.className   = 'nutrition-caret';
-        caret.textContent = nutritionExpanded.has(recipe.id) ? '▾' : '▸';
-
-        const name = document.createElement('span');
-        name.className   = 'nutrition-recipe-name';
-        name.textContent = servings > 1 ? `${recipe.name} ×${servings}` : recipe.name;
-
-        const sub = document.createElement('span');
-        sub.className = 'nutrition-recipe-sub';
-        if (nutrition.covered > 0) {
-            sub.textContent = formatTotals(sectionTotals, recipeHasCostData ? sectionCost : undefined);
-        } else if (recipeHasCostData) {
-            sub.textContent = `$${sectionCost.toFixed(2)}`;
-        } else {
-            sub.textContent = '- no computable data';
-        }
-
-        const servingControls = document.createElement('div');
-        servingControls.className = 'nutrition-serving-controls';
-
-        const minusBtn = document.createElement('button');
-        minusBtn.type = 'button';
-        minusBtn.className   = 'nutrition-serving-btn';
-        minusBtn.textContent = '−';
-        hiddenText(minusBtn, `Remove one serving of ${recipe.name}`);
-        minusBtn.addEventListener('click', (ev) => {
-            ev.stopPropagation();
-            const idx = state.selectedRecipeIds.lastIndexOf(recipe.id);
-            if (idx !== -1) state.selectedRecipeIds.splice(idx, 1);
-            renderNutritionScreen();
-        });
-
-        const countLabel = document.createElement('span');
-        countLabel.className   = 'nutrition-serving-count';
-        countLabel.textContent = `×${servings}`;
-
-        const plusBtn = document.createElement('button');
-        plusBtn.type = 'button';
-        plusBtn.className   = 'nutrition-serving-btn';
-        plusBtn.textContent = '+';
-        hiddenText(plusBtn, `Add a serving of ${recipe.name}`);
-        plusBtn.addEventListener('click', (ev) => {
-            ev.stopPropagation();
-            state.selectedRecipeIds.push(recipe.id);
-            renderNutritionScreen();
-        });
-
-        servingControls.appendChild(minusBtn);
-        servingControls.appendChild(countLabel);
-        servingControls.appendChild(plusBtn);
-
-        const isRecipeExcluded = nutritionRecipeExclusions.has(recipe.id);
-        const eatenBtn = document.createElement('button');
-        eatenBtn.type = 'button';
-        eatenBtn.className   = 'nutrition-eaten-btn';
-        eatenBtn.textContent = isRecipeExcluded ? '○' : '✓';
-        hiddenText(eatenBtn, isRecipeExcluded ? `Include ${recipe.name} in totals` : `Exclude ${recipe.name} from totals`);
-        eatenBtn.addEventListener('click', (ev) => {
-            ev.stopPropagation();
-            if (isRecipeExcluded) nutritionRecipeExclusions.delete(recipe.id);
-            else nutritionRecipeExclusions.add(recipe.id);
-            renderNutritionScreen();
-        });
-
-        header.appendChild(caret);
-        header.appendChild(name);
-        header.appendChild(servingControls);
-        header.appendChild(eatenBtn);
-        header.appendChild(sub);
-        section.appendChild(header);
-
-        const cov = document.createElement('div');
-        cov.className   = 'nutrition-coverage' + (flaggedCount > 0 ? ' flagged' : '');
-        const costNote  = nutrition.costMissing > 0
-            ? ` · ⚠ ${nutrition.costMissing} missing price`
-            : '';
-        cov.textContent = (flaggedCount > 0 ? '⚠ ' : '') +
-            coverageLabel(nutrition.covered, nutrition.total, flaggedCount) + costNote;
-        section.appendChild(cov);
+        const costNote = nutrition.costMissing > 0 ? ` · ⚠ ${nutrition.costMissing} missing price` : '';
 
         // Per-ingredient breakdown
-        const list = document.createElement('div');
-        const isExpanded = nutritionExpanded.has(recipe.id);
-        list.className = 'nutrition-ingredients' + (isExpanded ? '' : ' collapsed');
-
-        nutrition.breakdown.forEach(({ ing, result, costResult }) => {
-            const isExcluded = excluded.has(ing);
-            const row = document.createElement('div');
-            row.className = 'nutrition-ingredient-row';
-            if (isExcluded) row.classList.add('nutrition-ingredient-excluded');
-
-            const toggleBtn = document.createElement('button');
-            toggleBtn.type = 'button';
-            toggleBtn.className   = 'nutrition-ingredient-toggle';
-            toggleBtn.textContent = isExcluded ? '+' : '−';
-            hiddenText(toggleBtn, isExcluded ? `Include ${ing.name} in totals` : `Exclude ${ing.name} from totals`);
-            toggleBtn.addEventListener('click', () => {
-                if (isExcluded) excluded.delete(ing); else excluded.add(ing);
-                renderNutritionScreen();
-            });
-            row.appendChild(toggleBtn);
-
-            const ingName = document.createElement('span');
-            ingName.className   = 'nutrition-ingredient-name';
-            const scaledIng     = { ...ing, quantity: (ing.quantity ?? 0) * servings };
-            ingName.textContent = formatIngredient(scaledIng as Ingredient);
-            row.appendChild(ingName);
-
-            const detail = document.createElement('span');
-            if (isExcluded) {
-                detail.className   = 'nutrition-ingredient-value';
-                detail.textContent = '- excluded';
-            } else if (result.status === 'ok') {
-                detail.className = 'nutrition-ingredient-value';
-                const costSuffix = costResult.status === 'ok'
-                    ? ` · $${(costResult.cost * servings).toFixed(2)}`
-                    : '';
-                detail.textContent = formatTotals(scaleTotals(result.totals, servings)) + costSuffix;
-            } else if (result.status === 'missing') {
-                row.classList.add('flagged');
-                detail.className   = 'nutrition-flag';
-                detail.textContent = '⚠ no nutrition data';
-            } else {
-                row.classList.add('flagged');
-                detail.className   = 'nutrition-flag';
-                detail.textContent = "⚠ can't compute";
-                detail.title       = result.reason;
-            }
-            row.appendChild(detail);
-
-            if (!isExcluded && result.status === 'uncomputable') {
-                const reason = document.createElement('div');
-                reason.className   = 'nutrition-flag-reason';
-                reason.textContent = result.reason;
-                row.appendChild(reason);
-            }
-
-            if (!isExcluded && result.status === 'ok' && costResult.status !== 'ok') {
-                const costFlag = document.createElement('div');
-                costFlag.className = 'nutrition-cost-flag';
-                costFlag.textContent = costResult.status === 'missing'
-                    ? '⚠ no price data'
-                    : `⚠ cost can't compute - ${(costResult as { reason: string }).reason}`;
-                row.appendChild(costFlag);
-            }
-
-            if (!isExcluded && result.status === 'ok' && result.brand) {
+        const list = h('div', { class: 'nutrition-ingredients' + (isExpanded ? '' : ' collapsed') },
+            ...nutrition.breakdown.map(({ ing, result, costResult }) => {
+                const isExcluded = excluded.has(ing);
+                const scaledIng  = { ...ing, quantity: (ing.quantity ?? 0) * servings };
+                const flagged    = !isExcluded && result.status !== 'ok';
+                const detail = isExcluded
+                    ? h('span', { class: 'nutrition-ingredient-value', text: '- excluded' })
+                    : result.status === 'ok'
+                        ? h('span', {
+                            class: 'nutrition-ingredient-value',
+                            text: formatTotals(scaleTotals(result.totals, servings)) +
+                                (costResult.status === 'ok' ? ` · $${(costResult.cost * servings).toFixed(2)}` : ''),
+                        })
+                        : result.status === 'missing'
+                            ? h('span', { class: 'nutrition-flag', text: '⚠ no nutrition data' })
+                            : h('span', { class: 'nutrition-flag', text: "⚠ can't compute", title: result.reason });
                 const product = selectedProduct(ing);
-                const variant = product?.variant ? ` · ${product.variant}` : '';
-                const via = document.createElement('div');
-                via.className   = 'nutrition-provenance';
-                via.textContent = `via ${result.brand}${variant}`;
-                row.appendChild(via);
-            }
-
-            list.appendChild(row);
-        });
-
-        section.appendChild(list);
+                return h('div', { class: 'nutrition-ingredient-row' + (isExcluded ? ' nutrition-ingredient-excluded' : flagged ? ' flagged' : '') },
+                    h('button', {
+                        class: 'nutrition-ingredient-toggle', text: isExcluded ? '+' : '−',
+                        on: {
+                            click: () => {
+                                if (isExcluded) excluded.delete(ing); else excluded.add(ing);
+                                renderNutritionScreen();
+                            },
+                        },
+                    }, srOnly(isExcluded ? `Include ${ing.name} in totals` : `Exclude ${ing.name} from totals`)),
+                    h('span', { class: 'nutrition-ingredient-name', text: formatIngredient(/** @type {Ingredient} */ (scaledIng)) }),
+                    detail,
+                    !isExcluded && result.status === 'uncomputable' && h('div', { class: 'nutrition-flag-reason', text: result.reason }),
+                    !isExcluded && result.status === 'ok' && costResult.status !== 'ok' && h('div', {
+                        class: 'nutrition-cost-flag',
+                        text: costResult.status === 'missing'
+                            ? '⚠ no price data'
+                            : `⚠ cost can't compute - ${(/** @type {{ reason: string }} */ (costResult)).reason}`,
+                    }),
+                    !isExcluded && result.status === 'ok' && result.brand && h('div', {
+                        class: 'nutrition-provenance',
+                        text: `via ${result.brand}${product?.variant ? ` · ${product.variant}` : ''}`,
+                    }),
+                );
+            }),
+        );
 
         header.addEventListener('click', (ev) => {
-            if ((ev.target as HTMLElement).closest('.nutrition-serving-controls')) return;
-            if ((ev.target as HTMLElement).closest('.nutrition-eaten-btn')) return;
+            if ((/** @type {HTMLElement} */ (ev.target)).closest('.nutrition-serving-controls')) return;
+            if ((/** @type {HTMLElement} */ (ev.target)).closest('.nutrition-eaten-btn')) return;
             const collapsed = list.classList.toggle('collapsed');
             caret.textContent = collapsed ? '▸' : '▾';
             if (collapsed) nutritionExpanded.delete(recipe.id);
             else nutritionExpanded.add(recipe.id);
         });
 
-        root.appendChild(section);
+        root.appendChild(h('div', { class: 'panel nutrition-recipe ' + (isRecipeExcluded ? 'nutrition-recipe-excluded' : 'nutrition-recipe-eaten') },
+            header,
+            h('div', {
+                class: 'nutrition-coverage' + (flaggedCount > 0 ? ' flagged' : ''),
+                text: (flaggedCount > 0 ? '⚠ ' : '') + coverageLabel(nutrition.covered, nutrition.total, flaggedCount) + costNote,
+            }),
+            list,
+        ));
     });
 
     // ── Recipe suggestions ────────────────────────────────────
     const suggestions = buildRecipeSuggestions(grand);
     if (suggestions.length > 0) {
-        const suggestPanel = createPanel();
-        suggestPanel.className = 'panel nutrition-suggestions';
-
-        const suggestTitle = document.createElement('div');
-        suggestTitle.className   = 'nutrition-suggestions-title';
-        suggestTitle.textContent = 'Suggested to fill your gap';
-        suggestPanel.appendChild(suggestTitle);
-
-        suggestions.forEach(({ recipe, score, totals }) => {
-            const row = document.createElement('div');
-            row.className = 'suggestion-row';
-
-            const info = document.createElement('div');
-            info.className = 'suggestion-info';
-
-            const name = document.createElement('span');
-            name.className   = 'suggestion-name';
-            name.textContent = recipe.name;
-            info.appendChild(name);
-
-            const stats = document.createElement('span');
-            stats.className   = 'suggestion-stats';
-            stats.textContent = `${Math.round(totals.calories)} cal · ${Math.round(totals.protein)}g protein · ${Math.round(score * 100)}% match`;
-            info.appendChild(stats);
-
-            const addBtn = document.createElement('button');
-            addBtn.type = 'button';
-            addBtn.className   = 'suggestion-add-btn';
-            addBtn.textContent = '+ Add';
-            hiddenText(addBtn, recipe.name);
-            addBtn.setAttribute('data-testid', `suggest-${recipe.id}`);
-            addBtn.addEventListener('click', () => {
-                state.selectedRecipeIds.push(recipe.id);
-                renderNutritionScreen();
-            });
-
-            row.appendChild(info);
-            row.appendChild(addBtn);
-            suggestPanel.appendChild(row);
-        });
-
-        root.appendChild(suggestPanel);
+        root.appendChild(h('div', { class: 'panel nutrition-suggestions' },
+            h('div', { class: 'nutrition-suggestions-title', text: 'Suggested to fill your gap' }),
+            ...suggestions.map(({ recipe, score, totals }) => suggestionRow(recipe,
+                h('span', {
+                    class: 'suggestion-stats',
+                    text: `${Math.round(totals.calories)} cal · ${Math.round(totals.protein)}g protein · ${Math.round(score * 100)}% match`,
+                }),
+                `suggest-${recipe.id}`)),
+        ));
     }
 
     // ── Add more, without leaving this screen ──────────────────
-    const addMoreHeading = document.createElement('h2');
-    addMoreHeading.textContent = 'Add more';
-    addMoreHeading.className   = 'group-heading';
-    root.appendChild(addMoreHeading);
-
-    const addRecipeLabel = document.createElement('label');
-    addRecipeLabel.htmlFor = 'nutrition-recipe-search';
-    addRecipeLabel.className = 'search-label';
-    addRecipeLabel.textContent = 'Search recipes to add';
-    const addRecipeSearch = document.createElement('input');
-    addRecipeSearch.id          = 'nutrition-recipe-search';
-    addRecipeSearch.type        = 'search';
-    addRecipeSearch.placeholder = 'Recipe name';
-    addRecipeSearch.value       = nutritionAddRecipeQuery;
-    addRecipeSearch.className   = 'search-input';
-    addRecipeSearch.autocomplete = 'off';
-    addRecipeSearch.setAttribute('data-testid', 'nutrition-recipe-search');
-    addRecipeSearch.addEventListener('input', () => {
-        nutritionAddRecipeQuery = addRecipeSearch.value;
-        renderNutritionAddRecipeList();
-    });
-    root.append(addRecipeLabel, addRecipeSearch);
-
-    const addRecipeList = document.createElement('div');
-    addRecipeList.id = 'nutrition-add-recipe-list';
-    root.appendChild(addRecipeList);
+    root.append(
+        h('h2', { text: 'Add more', class: 'group-heading' }),
+        ...searchField('nutrition-recipe-search', 'Search recipes to add', 'Recipe name', nutritionAddRecipeQuery, (value) => {
+            nutritionAddRecipeQuery = value;
+            renderNutritionAddRecipeList();
+        }),
+        h('div', { id: 'nutrition-add-recipe-list' }),
+    );
     renderNutritionAddRecipeList();
 
     appendAddIngredientButton(root);
     root.appendChild(createStartOverButton());
 }
 
-function renderNutritionAddRecipeList(): void {
-    const root = getElement<HTMLDivElement>('nutrition-add-recipe-list');
+/**
+ * A recipe with an "+ Add" button that adds a serving and re-renders Nutrition.
+ * @param {Recipe} recipe
+ * @param {HTMLElement} [stats]
+ * @param {string} [testid]
+ * @returns {HTMLDivElement}
+ */
+function suggestionRow(recipe, stats, testid) {
+    return h('div', { class: 'suggestion-row' },
+        h('div', { class: 'suggestion-info' }, h('span', { class: 'suggestion-name', text: recipe.name }), stats),
+        h('button', {
+            class: 'suggestion-add-btn', text: '+ Add', testid,
+            on: {
+                click: () => {
+                    state.selectedRecipeIds.push(recipe.id);
+                    renderNutritionScreen();
+                },
+            },
+        }, srOnly(recipe.name)),
+    );
+}
+
+function renderNutritionAddRecipeList() {
+    const root = getElement('nutrition-add-recipe-list');
     clear(root);
 
     const matched   = getNutritionAddableRecipes(nutritionAddRecipeQuery);
     const MAX_SHOWN = 8;
     const shown     = matched.slice(0, MAX_SHOWN);
 
-    shown.forEach((recipe) => {
-        const row = document.createElement('div');
-        row.className = 'suggestion-row';
-
-        const info = document.createElement('div');
-        info.className = 'suggestion-info';
-        const name = document.createElement('span');
-        name.className   = 'suggestion-name';
-        name.textContent = recipe.name;
-        info.appendChild(name);
-
-        const addBtn = document.createElement('button');
-        addBtn.className   = 'suggestion-add-btn';
-        addBtn.textContent = '+ Add';
-        addBtn.addEventListener('click', () => {
-            state.selectedRecipeIds.push(recipe.id);
-            renderNutritionScreen();
-        });
-
-        row.appendChild(info);
-        row.appendChild(addBtn);
-        root.appendChild(row);
-    });
-
+    root.append(...shown.map(recipe => suggestionRow(recipe)));
     if (matched.length > shown.length) {
-        const hint = document.createElement('div');
-        hint.className   = 'suggestion-more-hint';
-        hint.textContent = `+${matched.length - shown.length} more - refine your search`;
-        root.appendChild(hint);
+        root.appendChild(h('div', { class: 'suggestion-more-hint', text: `+${matched.length - shown.length} more - refine your search` }));
     } else if (matched.length === 0) {
-        const empty = document.createElement('p');
-        empty.className   = 'empty';
-        empty.textContent = 'No matching recipes.';
-        root.appendChild(empty);
+        root.appendChild(h('p', { class: 'empty', text: 'No matching recipes.' }));
     }
 }
 
@@ -2418,15 +2549,30 @@ function renderNutritionAddRecipeList(): void {
 // ============================================================
 
 let adhocSearchQuery = '';
-let adhocSelectedKey: string | null = null;
+/** @type {string | null} */
+let adhocSelectedKey = null;
 let adhocQuantity   = 1;
 let adhocUnitName   = '';
-// Which screen opened the ingredient picker (Select or Nutrition) - Back/Add to list return
-// here instead of always landing on Select, so adding from Nutrition doesn't strand the user
-// somewhere they didn't ask to go.
-let adhocReturnScreen: Screen = 'select';
+/**
+ * Which screen opened the ingredient picker (Select or Nutrition) - Back/Add to list return
+ * here instead of always landing on Select, so adding from Nutrition doesn't strand the user
+ * somewhere they didn't ask to go.
+ * @type {Screen}
+ */
+let adhocReturnScreen = 'select';
 
-function pickDefaultUnit(ing: Ingredient): Unit {
+function resetAdhoc() {
+    adhocSearchQuery = '';
+    adhocSelectedKey = null;
+    adhocQuantity    = 1;
+    adhocUnitName    = '';
+}
+
+/**
+ * @param {Ingredient} ing
+ * @returns {Unit}
+ */
+function pickDefaultUnit(ing) {
     const productUnits = ing.products?.[0]?.nutrition && Object.keys(ing.products[0].nutrition);
     const ownUnits     = ing.nutrition && Object.keys(ing.nutrition);
     const hint = productUnits?.[0] ?? ownUnits?.[0];
@@ -2437,72 +2583,39 @@ function pickDefaultUnit(ing: Ingredient): Unit {
     return u.unit;
 }
 
-let adhocCatalog: { key: string; name: string; sample: Ingredient }[] | null = null;
-function getAdhocCatalog(): { key: string; name: string; sample: Ingredient }[] {
+/** @type {{ key: string; name: string; sample: Ingredient }[] | null} */
+let adhocCatalog = null;
+/** @returns {{ key: string; name: string; sample: Ingredient }[]} */
+function getAdhocCatalog() {
     if (adhocCatalog) return adhocCatalog;
     adhocCatalog = Object.entries(i).map(([key, factory]) => {
-        const sample = (factory as (q?: number, u?: Unit) => Ingredient)();
+        const sample = (/** @type {(q?: number, u?: Unit) => Ingredient} */ (factory))();
         return { key, name: sample.name, sample };
     }).sort((a, b) => a.name.localeCompare(b.name));
     return adhocCatalog;
 }
 
-function renderAddIngredientScreen(): void {
-    const root = getElement<HTMLDivElement>('app');
-    clear(root);
-
-    const heading = document.createElement('h1');
-    heading.textContent = 'Add an ingredient';
-    root.appendChild(heading);
-
-    const sub = document.createElement('p');
-    sub.className   = 'adhoc-sub';
-    sub.textContent = 'Pick an ingredient to add to your shopping list and nutrition totals.';
-    root.appendChild(sub);
-
-    const searchLabel = document.createElement('label');
-    searchLabel.htmlFor = 'ingredient-search';
-    searchLabel.className = 'search-label';
-    searchLabel.textContent = 'Search ingredients';
-    const searchInput = document.createElement('input');
-    searchInput.id          = 'ingredient-search';
-    searchInput.type        = 'search';
-    searchInput.placeholder = 'Ingredient name';
-    searchInput.value       = adhocSearchQuery;
-    searchInput.className   = 'search-input';
-    searchInput.autocomplete = 'off';
-    searchInput.setAttribute('data-testid', 'ingredient-search');
-    searchInput.addEventListener('input', () => {
-        adhocSearchQuery = searchInput.value;
-        renderAdhocList();
-    });
-    root.append(searchLabel, searchInput);
-
-    const list = document.createElement('div');
-    list.id = 'adhoc-list';
-    root.appendChild(list);
-
-    const detail = document.createElement('div');
-    detail.id        = 'adhoc-detail';
-    detail.className = 'adhoc-detail';
-    root.appendChild(detail);
-
-    const backBtn = createButton('← Back', () => {
-        adhocSearchQuery = '';
-        adhocSelectedKey = null;
-        adhocQuantity    = 1;
-        adhocUnitName    = '';
-        navigateTo(adhocReturnScreen);
-    });
-    backBtn.className = 'start-over-btn';
-    root.appendChild(backBtn);
-
+function renderAddIngredientScreen() {
+    const root = screen('Add an ingredient');
+    root.append(
+        h('p', { class: 'adhoc-sub', text: 'Pick an ingredient to add to your shopping list and nutrition totals.' }),
+        ...searchField('ingredient-search', 'Search ingredients', 'Ingredient name', adhocSearchQuery, (value) => {
+            adhocSearchQuery = value;
+            renderAdhocList();
+        }),
+        h('div', { id: 'adhoc-list' }),
+        h('div', { id: 'adhoc-detail', class: 'adhoc-detail' }),
+        backButton('← Back', () => {
+            resetAdhoc();
+            navigateTo(adhocReturnScreen);
+        }),
+    );
     renderAdhocList();
     renderAdhocDetail();
 }
 
-function renderAdhocList(): void {
-    const root = getElement<HTMLDivElement>('adhoc-list');
+function renderAdhocList() {
+    const root = getElement('adhoc-list');
     clear(root);
 
     const q   = adhocSearchQuery.toLowerCase().trim();
@@ -2510,102 +2623,79 @@ function renderAdhocList(): void {
     const matched = q ? all.filter(c => c.name.toLowerCase().includes(q)) : all;
 
     if (matched.length === 0) {
-        const empty = document.createElement('p');
-        empty.className   = 'empty';
-        empty.textContent = 'No matching ingredients.';
-        root.appendChild(empty);
+        root.appendChild(h('p', { class: 'empty', text: 'No matching ingredients.' }));
         return;
     }
 
-    matched.forEach(({ key, name }) => {
-        const btn = document.createElement('button');
-        btn.className   = 'adhoc-item';
-        btn.textContent = name;
-        if (adhocSelectedKey === key) btn.classList.add('selected');
-        btn.addEventListener('click', () => {
-            adhocSelectedKey = key;
-            const sample  = all.find(c => c.key === key)!.sample;
-            adhocQuantity = 1;
-            adhocUnitName = pickDefaultUnit(sample).name;
-            renderAdhocList();
-            renderAdhocDetail();
-        });
-        root.appendChild(btn);
-    });
+    root.append(...matched.map(({ key, name, sample }) => h('button', {
+        class: adhocSelectedKey === key ? 'adhoc-item selected' : 'adhoc-item', text: name,
+        on: {
+            click: () => {
+                adhocSelectedKey = key;
+                adhocQuantity = 1;
+                adhocUnitName = pickDefaultUnit(sample).name;
+                renderAdhocList();
+                renderAdhocDetail();
+            },
+        },
+    })));
 }
 
-function renderAdhocDetail(): void {
-    const root = getElement<HTMLDivElement>('adhoc-detail');
+function renderAdhocDetail() {
+    const root = getElement('adhoc-detail');
     clear(root);
     if (!adhocSelectedKey) return;
 
     const catalogEntry = getAdhocCatalog().find(c => c.key === adhocSelectedKey);
     if (!catalogEntry) return;
 
-    const label = document.createElement('div');
-    label.className   = 'adhoc-detail-label';
-    label.textContent = `How much ${catalogEntry.name}?`;
-    root.appendChild(label);
-
-    const qtyInput = document.createElement('input');
-    qtyInput.type      = 'number';
-    qtyInput.min       = '0';
-    qtyInput.step      = '0.25';
-    qtyInput.value     = String(adhocQuantity);
-    qtyInput.className = 'adhoc-qty';
-    qtyInput.addEventListener('input', () => {
-        const v = parseFloat(qtyInput.value);
-        adhocQuantity = isNaN(v) ? 0 : v;
-    });
-    root.appendChild(qtyInput);
-
-    const unitSelect = document.createElement('select');
-    unitSelect.className = 'adhoc-unit';
-    for (const unit of Object.values(u)) {
-        const opt = document.createElement('option');
-        opt.value       = unit.name;
-        opt.textContent = unit.name || '(none)';
-        if (unit.name === adhocUnitName) opt.selected = true;
-        unitSelect.appendChild(opt);
-    }
-    unitSelect.addEventListener('change', () => { adhocUnitName = unitSelect.value; });
-    root.appendChild(unitSelect);
-
-    const confirmBtn = createButton('Add to list', () => {
-        const factory  = (i as any)[adhocSelectedKey!] as (q?: number, u?: Unit) => Ingredient;
-        const unit     = Object.values(u).find(uu => uu.name === adhocUnitName) ?? u.unit;
-        const fresh    = factory(adhocQuantity, unit);
-        const recipe   = createAdhocRecipe(fresh);
-        registerRecipe(recipe);
-        state.selectedRecipeIds.push(recipe.id);
-        adhocSearchQuery = '';
-        adhocSelectedKey = null;
-        adhocQuantity    = 1;
-        adhocUnitName    = '';
-        navigateTo(adhocReturnScreen);
-    });
-    confirmBtn.className = 'adhoc-confirm';
-    root.appendChild(confirmBtn);
+    root.append(
+        h('div', { class: 'adhoc-detail-label', text: `How much ${catalogEntry.name}?` }),
+        h('input', {
+            type: 'number', min: '0', step: '0.25', value: String(adhocQuantity), class: 'adhoc-qty',
+            on: {
+                input: (ev) => {
+                    const v = parseFloat((/** @type {HTMLInputElement} */ (ev.target)).value);
+                    adhocQuantity = isNaN(v) ? 0 : v;
+                },
+            },
+        }),
+        h('select', { class: 'adhoc-unit', on: { change: (ev) => { adhocUnitName = (/** @type {HTMLSelectElement} */ (ev.target)).value; } } },
+            ...Object.values(u).map(unit => h('option', { value: unit.name, text: unit.name || '(none)', selected: unit.name === adhocUnitName }))),
+        h('button', {
+            class: 'adhoc-confirm', text: 'Add to list',
+            on: {
+                click: () => {
+                    const factory  = /** @type {(q?: number, u?: Unit) => Ingredient} */ ((/** @type {any} */ (i))[/** @type {string} */ (adhocSelectedKey)]);
+                    const unit     = Object.values(u).find(uu => uu.name === adhocUnitName) ?? u.unit;
+                    const recipe   = createAdhocRecipe(factory(adhocQuantity, unit));
+                    registerRecipe(recipe);
+                    state.selectedRecipeIds.push(recipe.id);
+                    resetAdhoc();
+                    navigateTo(adhocReturnScreen);
+                },
+            },
+        }),
+    );
 }
 
 // ============================================================
 // SCREEN: COOKING
 // ============================================================
 
-function formatElapsed(seconds: number): string {
+/**
+ * @param {number} seconds
+ * @returns {string}
+ */
+function formatElapsed(seconds) {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return m > 0 ? `${m}m ${String(s).padStart(2, '0')}s` : `${s}s`;
 }
 
 
-function renderCookingScreen(): void {
-    const root = getElement<HTMLDivElement>('app');
-    clear(root);
-
-    const heading = document.createElement('h1');
-    heading.textContent = 'Cooking';
-    root.appendChild(heading);
+function renderCookingScreen() {
+    const root = screen('Cooking');
 
     if (state.cookingStartedAt === null) state.cookingStartedAt = Date.now();
 
@@ -2615,15 +2705,18 @@ function renderCookingScreen(): void {
     if (selected.length > 1) {
         const totalSecs      = selected.reduce((s, r) => s + recipeCookSeconds(r), 0);
         const hardcodedTotal = selected.reduce((s, r) => s + (r.estimatedMinutes ? r.estimatedMinutes * 60 : 0), 0);
-        const banner = document.createElement('div');
-        banner.className   = 'cook-time-banner';
-        banner.textContent = hardcodedTotal > 0
-            ? `Total: ${formatCookTime(hardcodedTotal)} goal (${formatCookTime(totalSecs)} calculated)`
-            : `Total cook time: ${formatCookTime(totalSecs)}`;
-        root.appendChild(banner);
+        root.appendChild(h('div', {
+            class: 'cook-time-banner',
+            text: hardcodedTotal > 0
+                ? `Total: ${formatCookTime(hardcodedTotal)} goal (${formatCookTime(totalSecs)} calculated)`
+                : `Total cook time: ${formatCookTime(totalSecs)}`,
+        }));
     }
 
-    let lastRecipeId: string | undefined;
+    /** @type {string | undefined} */
+    let lastRecipeId;
+    /** @type {(() => void)[]} */
+    const badgeUpdaters = [];
 
     // Every step renders in its natural recipe order, whether locked or not - a locked
     // step just looks/behaves locked in place (see applyLock). Nothing ever moves once
@@ -2634,49 +2727,30 @@ function renderCookingScreen(): void {
             lastRecipeId = step.recipeId;
             const recipe = state.recipes.get(step.recipeId);
             if (recipe) {
-                const header = document.createElement('div');
-                header.className = 'recipe-title-row';
-
-                const title = document.createElement('h2');
-                title.textContent = recipe.name;
-
-                const badge = document.createElement('span');
-                badge.className = 'cook-time-badge';
+                const badge = h('span', { class: 'cook-time-badge' });
 
                 const calculatedSecs = recipeCookSeconds(recipe);
                 const calculatedText = formatCookTime(calculatedSecs);
                 const hardcodedText  = recipe.estimatedMinutes ? `${recipe.estimatedMinutes} min` : null;
 
                 const updateBadge = () => {
-                    const secs = Math.floor((Date.now() - state.cookingStartedAt!) / 1000);
+                    const secs = Math.floor((Date.now() - /** @type {number} */ (state.cookingStartedAt)) / 1000);
                     const estimateDisplay = hardcodedText
                         ? `estimated ${hardcodedText} (${calculatedText} calculated)`
                         : `estimated ${calculatedText}`;
                     badge.textContent = `${estimateDisplay} · actual ${formatElapsed(secs)}`;
                 };
                 updateBadge();
+                badgeUpdaters.push(updateBadge);
 
-                if (state.cookingElapsedInterval !== null) window.clearInterval(state.cookingElapsedInterval);
-                state.cookingElapsedInterval = window.setInterval(() => {
-                    const hasSteps = document.querySelector(`#app .panel:not(.completed):not(.skipped)`);
-                    if (!hasSteps) {
-                        window.clearInterval(state.cookingElapsedInterval!);
-                        state.cookingElapsedInterval = null;
-                        return;
-                    }
-                    updateBadge();
-                }, 1000);
-
-                header.appendChild(title);
-                header.appendChild(badge);
-                header.appendChild(createSoundTestPanel());
-                header.appendChild(createCopyButton(recipe.id));
-                root.appendChild(header);
+                root.appendChild(h('div', { class: 'recipe-title-row' },
+                    h('h2', { text: recipe.name }), badge, createSoundTestPanel(), createCopyButton(recipe.id)));
             }
         }
 
         if (step.type === 'info') {
-            const group: Step[] = [step];
+            /** @type {Step[]} */
+            const group = [step];
             while (
                 idx + 1 < state.cookingPlanSteps.length &&
                 state.cookingPlanSteps[idx + 1].type === 'info' &&
@@ -2685,70 +2759,66 @@ function renderCookingScreen(): void {
                 idx++;
                 group.push(state.cookingPlanSteps[idx]);
             }
-            root.appendChild(renderInfoGroup(group));
+            root.appendChild(notesBox('info', group));
             continue;
         }
 
         root.appendChild(renderStep(step));
     }
 
+    // One ticker keeps every recipe's "actual" elapsed time current until no step is left.
+    if (state.cookingElapsedInterval !== null) window.clearInterval(state.cookingElapsedInterval);
+    state.cookingElapsedInterval = window.setInterval(() => {
+        if (!document.querySelector('#app .panel:not(.completed):not(.skipped)')) {
+            window.clearInterval(state.cookingElapsedInterval ?? undefined);
+            state.cookingElapsedInterval = null;
+            return;
+        }
+        badgeUpdaters.forEach(update => update());
+    }, 1000);
+
     root.appendChild(createStartOverButton());
 }
 
-function renderInfoGroup(steps: Step[]): HTMLElement {
-    const panel = document.createElement('div');
-    panel.className = 'panel info-step info-step-collapsed';
-
-    const header = document.createElement('div');
-    header.className = 'info-step-header';
-
-    const caret = document.createElement('span');
-    caret.className   = 'info-step-caret';
-    caret.textContent = '▸';
-
-    const label = document.createElement('span');
-    label.className   = 'info-step-label';
-    label.textContent = 'Notes';
-
-    header.appendChild(caret);
-    header.appendChild(label);
-
-    const body = document.createElement('div');
-    body.className = 'info-step-body';
-
+/**
+ * A collapsed "Notes" box. Native <details> opens and closes it; CSS swaps the caret.
+ * Info notes are a panel with one line per step plus recipe links; prep notes are a
+ * lighter box. `inline` puts a single step's text straight into the body.
+ * @param {'info' | 'prep'} kind
+ * @param {Step[]} steps
+ * @returns {HTMLDetailsElement}
+ */
+function notesBox(kind, steps, inline = false) {
+    const prefix = kind === 'info' ? 'info-step' : 'prep-info';
+    const body = h('div', { class: `${prefix}-body` });
     steps.forEach(step => {
-        const line = document.createElement('div');
-        line.className = 'info-step-note';
-        line.textContent = step.text;
-        body.appendChild(line);
-
-        if (step.linkRecipeId) {
-            const targetRecipe = state.recipes.get(step.linkRecipeId);
-            const link = document.createElement('a');
-            link.className   = 'info-step-link';
-            link.href        = getRecipeURL(step.linkRecipeId);
-            link.textContent = `→ ${targetRecipe?.name ?? 'Open recipe'}`;
-            link.addEventListener('click', (ev) => ev.stopPropagation());
-            line.appendChild(link);
+        const line = inline ? body : body.appendChild(h('div', { class: kind === 'info' ? 'info-step-note' : 'prep-info-line' }));
+        line.append(step.text);
+        if (kind === 'info' && step.linkRecipeId) {
+            line.appendChild(h('a', {
+                class: 'info-step-link', href: getRecipeURL(step.linkRecipeId),
+                text: `→ ${state.recipes.get(step.linkRecipeId)?.name ?? 'Open recipe'}`,
+            }));
         }
     });
 
-    panel.appendChild(header);
-    panel.appendChild(body);
-
-    header.addEventListener('click', () => {
-        const collapsed = panel.classList.toggle('info-step-collapsed');
-        caret.textContent = collapsed ? '▸' : '▾';
-    });
-
-    return panel;
+    return h('details', { class: kind === 'info' ? 'panel info-step' : 'prep-info-note' },
+        h('summary', { class: `${prefix}-header` },
+            h('span', { class: `${prefix}-caret` }),
+            kind === 'info' ? h('span', { class: 'info-step-label', text: 'Notes' }) : ' Notes'),
+        body,
+    );
 }
 
 // ============================================================
 // STEP LOCKING
 // ============================================================
 
-function applyLock(panel: HTMLElement, step: Step): void {
+/**
+ * @param {HTMLElement} panel
+ * @param {Step} step
+ */
+function applyLock(panel, step) {
     const waitForIds = step.waitForIds;
     const startWhenIds = step.startWhenIds;
     if ((!waitForIds || waitForIds.length === 0) && (!startWhenIds || startWhenIds.length === 0)) return;
@@ -2756,27 +2826,26 @@ function applyLock(panel: HTMLElement, step: Step): void {
     const appEl = document.getElementById('app');
     if (!appEl) return;
 
-    const isStarted = (id: number): boolean => {
+    /**
+     * @param {number} id
+     * @param {string} selector
+     * @returns {boolean}
+     */
+    const stepMatches = (id, selector) => {
         const el = document.getElementById(`step-${id}`);
-        if (!el) return true;
-        return el.classList.contains('timer') || el.classList.contains('ringing') ||
-               el.classList.contains('completed') || el.classList.contains('skipped') ||
-               el.classList.contains('done-child');
+        return !el || el.matches(selector);
     };
-    const isFinished = (id: number): boolean => {
-        const el = document.getElementById(`step-${id}`);
-        return !el || el.classList.contains('completed') || el.classList.contains('skipped') || el.classList.contains('ringing');
-    };
+    /** @param {number} id */
+    const isStarted  = (id) => stepMatches(id, '.timer, .ringing, .completed, .skipped, .done-child');
+    /** @param {number} id */
+    const isFinished = (id) => stepMatches(id, '.completed, .skipped, .ringing');
 
     const isUnlocked = () =>
         (!waitForIds || waitForIds.length === 0 || waitForIds.every(isFinished)) &&
         (!startWhenIds || startWhenIds.length === 0 || startWhenIds.every(isStarted));
 
     panel.classList.add('step-locked');
-    const pill = document.createElement('div');
-    pill.className   = 'waiting-pill';
-    pill.textContent = '⏳ waiting…';
-    panel.appendChild(pill);
+    const pill = panel.appendChild(h('div', { class: 'waiting-pill', text: '⏳ waiting…' }));
 
     const unlock = () => {
         if (!isUnlocked()) return;
@@ -2796,20 +2865,18 @@ function applyLock(panel: HTMLElement, step: Step): void {
 // STEP RENDERING
 // ============================================================
 
-function renderStep(step: Step, onDone?: () => void): HTMLElement {
-    const panel = createPanel();
-    panel.id    = `step-${step.id}`;
+/**
+ * @param {Step} step
+ * @param {() => void} [onDone]
+ * @returns {HTMLElement}
+ */
+function renderStep(step, onDone) {
+    const panel = h('div', { class: 'panel', id: `step-${step.id}` });
 
     if (step.children && step.children.length > 0) {
         panel.classList.add('container-step');
-        const header = document.createElement('div');
-        header.className   = 'container-header';
-        header.textContent = step.text;
-        panel.appendChild(header);
-
-        const childWrap = document.createElement('div');
-        childWrap.className = 'container-children';
-        panel.appendChild(childWrap);
+        const childWrap = h('div', { class: 'container-children' });
+        panel.append(h('div', { class: 'container-header', text: step.text }), childWrap);
 
         const checkDone = () => {
             // A child is "done" when it's been tapped (done-child) or, for a timer/gate
@@ -2835,98 +2902,34 @@ function renderStep(step: Step, onDone?: () => void): HTMLElement {
 
     if (step.type === 'timer' && step.durationSeconds) {
         const secs = step.durationSeconds;
-        const h = Math.floor(secs / 3600);
-        const m = Math.floor((secs % 3600) / 60);
-        const s = secs % 60;
+        const hrs  = Math.floor(secs / 3600);
+        const mins = Math.floor((secs % 3600) / 60);
+        const rest = secs % 60;
         const parts = [];
-        if (h) parts.push(`${h}h`);
-        if (m) parts.push(`${m}m`);
-        if (s || parts.length === 0) parts.push(`${s}s`);
-        const badge = document.createElement('span');
-        badge.className = 'timer-duration-badge';
-        badge.textContent = parts.join(' ');
-        panel.appendChild(badge);
+        if (hrs) parts.push(`${hrs}h`);
+        if (mins) parts.push(`${mins}m`);
+        if (rest || parts.length === 0) parts.push(`${rest}s`);
+        panel.appendChild(h('span', { class: 'timer-duration-badge', text: parts.join(' ') }));
     }
 
     if (step.type === 'timer') {
-        let clickCount = 0;
-        let clickTimer = 0;
-        panel.addEventListener('click', () => {
-            if (panel.classList.contains('step-locked')) return;
-            if (panel.classList.contains('completed') || panel.classList.contains('skipped')) return;
-            // While ringing, the document-wide click listener (see startAlarm) handles
-            // dismissal - just make sure this handler doesn't restart the timer.
-            if (panel.classList.contains('ringing')) return;
-            if (!state.timers.has(step.id)) { startTimer(step, panel, onDone); return; }
-            clickCount++;
-            window.clearTimeout(clickTimer);
-            if (clickCount >= 3) { clickCount = 0; skipTimer(step, panel, onDone); return; }
-            clickTimer = window.setTimeout(() => { clickCount = 0; }, 600);
-        });
+        onTimerTaps(panel, step, () => startTimer(step, panel, onDone), () => skipTimer(step, panel, onDone));
         applyLock(panel, step);
         return panel;
     }
 
     if (step.type === 'gate') {
-        let clickCount = 0;
-        let clickTimer = 0;
-        panel.addEventListener('click', () => {
-            if (panel.classList.contains('step-locked')) return;
-            if (panel.classList.contains('completed') || panel.classList.contains('skipped')) return;
-            // While ringing, the document-wide click listener (see startAlarm) handles dismissal.
-            if (panel.classList.contains('ringing')) return;
-            if (!state.timers.has(step.id)) return; // awaiting a Yes/No answer, not a countdown
-            clickCount++;
-            window.clearTimeout(clickTimer);
-            if (clickCount >= 3) { clickCount = 0; skipGateRetryTimer(step, panel, onDone); return; }
-            clickTimer = window.setTimeout(() => { clickCount = 0; }, 600);
-        });
+        // No countdown yet means it is waiting for a Yes/No answer, so a plain tap does nothing.
+        onTimerTaps(panel, step, () => {}, () => skipGateRetryTimer(step, panel, onDone));
         applyLock(panel, step);
         renderGateQuestion(step, panel, onDone);
         return panel;
     }
 
     if (step.type === 'info') {
-        panel.textContent = '';
-        panel.className = 'panel info-step info-step-collapsed';
-
-        const header = document.createElement('div');
-        header.className = 'info-step-header';
-
-        const caret = document.createElement('span');
-        caret.className   = 'info-step-caret';
-        caret.textContent = '▸';
-
-        const label = document.createElement('span');
-        label.className   = 'info-step-label';
-        label.textContent = 'Notes';
-
-        header.appendChild(caret);
-        header.appendChild(label);
-
-        const body = document.createElement('div');
-        body.className   = 'info-step-body';
-        body.textContent = step.text;
-
-        if (step.linkRecipeId) {
-            const targetRecipe = state.recipes.get(step.linkRecipeId);
-            const link = document.createElement('a');
-            link.className   = 'info-step-link';
-            link.href        = getRecipeURL(step.linkRecipeId);
-            link.textContent = `→ ${targetRecipe?.name ?? 'Open recipe'}`;
-            link.addEventListener('click', (ev) => ev.stopPropagation());
-            body.appendChild(link);
-        }
-
-        panel.appendChild(header);
-        panel.appendChild(body);
-
-        header.addEventListener('click', () => {
-            const collapsed = panel.classList.toggle('info-step-collapsed');
-            caret.textContent = collapsed ? '▸' : '▾';
-        });
-
-        return panel;
+        const box = notesBox('info', [step], true);
+        box.id = panel.id;
+        return box;
     }
 
     panel.addEventListener('click', () => {
@@ -2940,10 +2943,16 @@ function renderStep(step: Step, onDone?: () => void): HTMLElement {
     return panel;
 }
 
-// `dueAt` - the timer's original deadline, if this completion followed a countdown (omitted
-// for a gate's immediate "Yes", which never ran one) - lets the card show not just when it
-// was acknowledged but how late that was, mirroring the overdue readout shown while ringing.
-function completeTimer(step: Step, panel: HTMLElement, onDone?: () => void, dueAt?: number): void {
+/**
+ * `dueAt` - the timer's original deadline, if this completion followed a countdown (omitted
+ * for a gate's immediate "Yes", which never ran one) - lets the card show not just when it
+ * was acknowledged but how late that was, mirroring the overdue readout shown while ringing.
+ * @param {Step} step
+ * @param {HTMLElement} panel
+ * @param {() => void} [onDone]
+ * @param {number} [dueAt]
+ */
+function completeTimer(step, panel, onDone, dueAt) {
     panel.classList.remove('timer');
     panel.classList.add('completed');
     const completedAtMs = Date.now();
@@ -2957,14 +2966,48 @@ function completeTimer(step: Step, panel: HTMLElement, onDone?: () => void, dueA
     onDone?.();
 }
 
-function skipTimer(step: Step, panel: HTMLElement, onDone?: () => void): void {
+/**
+ * Taps on a timer or gate panel. With no countdown running a tap calls `first`; three quick
+ * taps during a countdown call `skip`. Locked and finished panels ignore taps, and so does a
+ * ringing one (the document-wide click listener in startAlarm dismisses it instead).
+ * @param {HTMLElement} panel
+ * @param {Step} step
+ * @param {() => void} first
+ * @param {() => void} skip
+ */
+function onTimerTaps(panel, step, first, skip) {
+    let clickCount = 0;
+    let clickTimer = 0;
+    panel.addEventListener('click', () => {
+        if (panel.matches('.step-locked, .completed, .skipped, .ringing')) return;
+        if (!state.timers.has(step.id)) { first(); return; }
+        clickCount++;
+        window.clearTimeout(clickTimer);
+        if (clickCount >= 3) { clickCount = 0; skip(); return; }
+        clickTimer = window.setTimeout(() => { clickCount = 0; }, 600);
+    });
+}
+
+/**
+ * @param {Step} step
+ * @param {HTMLElement} panel
+ */
+function stopCountdown(step, panel) {
     const intervalId = state.timers.get(step.id);
     if (intervalId !== undefined) { window.clearInterval(intervalId); state.timers.delete(step.id); }
     releaseWakeLockIfIdle();
     panel.classList.remove('timer');
+}
+
+/**
+ * @param {Step} step
+ * @param {HTMLElement} panel
+ * @param {() => void} [onDone]
+ */
+function skipTimer(step, panel, onDone) {
+    stopCountdown(step, panel);
     panel.classList.add('skipped');
-    const skippedAt = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    panel.textContent = `⏭ ${step.text} - skipped at ${skippedAt}`;
+    panel.textContent = `⏭ ${step.text} - skipped at ${formatClockTime(Date.now())}`;
     onDone?.();
 }
 
@@ -2972,8 +3015,9 @@ function skipTimer(step: Step, panel: HTMLElement, onDone?: () => void): void {
 // START OVER
 // ============================================================
 
-function createStartOverButton(): HTMLButtonElement {
-    const btn = createButton('↩ Start Over', () => {
+/** @returns {HTMLButtonElement} */
+function createStartOverButton() {
+    return backButton('↩ Start Over', () => {
         state.timers.forEach((id) => window.clearInterval(id));
         state.timers.clear();
         releaseWakeLockIfIdle();
@@ -3002,15 +3046,14 @@ function createStartOverButton(): HTMLButtonElement {
         }
         navigateTo('select');
     });
-    btn.className = 'start-over-btn';
-    return btn;
 }
 
 // ============================================================
 // NAVIGATION
 // ============================================================
 
-const SCREEN_TITLES: Record<Screen, string> = {
+/** @type {Record<Screen, string>} */
+const SCREEN_TITLES = {
     select: 'Recipes',
     shopping: 'Shopping list | Recipes',
     cooking: 'Cooking | Recipes',
@@ -3020,7 +3063,8 @@ const SCREEN_TITLES: Record<Screen, string> = {
     plan: 'Day planner | Recipes',
 };
 
-function navigateTo(screen: Screen): void {
+/** @param {Screen} screen */
+function navigateTo(screen) {
     state.screen = screen;
     if (typeof document !== 'undefined') document.title = SCREEN_TITLES[screen];
     render();
@@ -3034,9 +3078,11 @@ function navigateTo(screen: Screen): void {
 // it, the screen sleeps mid-cook, the browser suspends the page's JS (including the
 // countdown's setInterval), and a long timer can silently fail to ring.
 
-let wakeLockSentinel: WakeLockSentinel | null = null;
+/** @type {WakeLockSentinel | null} */
+let wakeLockSentinel = null;
 
-async function acquireWakeLock(): Promise<void> {
+/** @returns {Promise<void>} */
+async function acquireWakeLock() {
     if (wakeLockSentinel || !('wakeLock' in navigator)) return;
     try {
         wakeLockSentinel = await navigator.wakeLock.request('screen');
@@ -3046,7 +3092,7 @@ async function acquireWakeLock(): Promise<void> {
     }
 }
 
-function releaseWakeLockIfIdle(): void {
+function releaseWakeLockIfIdle() {
     if (state.timers.size > 0) return;
     wakeLockSentinel?.release();
     wakeLockSentinel = null;
@@ -3065,21 +3111,32 @@ if (typeof document !== 'undefined') {
 // TIMERS
 // ============================================================
 
-// Ticks against an absolute deadline (rather than decrementing a counter once per tick) so
-// that a countdown suspended by the browser (backgrounded tab, locked screen) still fires
-// immediately once the page wakes back up, instead of needing to "catch up" one tick at a
-// time for however many seconds were left when it was suspended.
-function formatClockTime(ms: number): string {
+/**
+ * Ticks against an absolute deadline (rather than decrementing a counter once per tick) so
+ * that a countdown suspended by the browser (backgrounded tab, locked screen) still fires
+ * immediately once the page wakes back up, instead of needing to "catch up" one tick at a
+ * time for however many seconds were left when it was suspended.
+ * @param {number} ms
+ * @returns {string}
+ */
+function formatClockTime(ms) {
     return new Date(ms).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
+/**
+ * @param {Step} step
+ * @param {HTMLElement} panel
+ * @param {number} durationSeconds
+ * @param {(mm: string, ss: string, dueAtLabel: string) => string} formatLabel
+ * @param {(dueAt: number) => void} onComplete
+ */
 function runCountdown(
-    step: Step,
-    panel: HTMLElement,
-    durationSeconds: number,
-    formatLabel: (mm: string, ss: string, dueAtLabel: string) => string,
-    onComplete: (dueAt: number) => void
-): void {
+    step,
+    panel,
+    durationSeconds,
+    formatLabel,
+    onComplete
+) {
     const endAt = Date.now() + durationSeconds * 1000;
     const dueAtLabel = formatClockTime(endAt);
     panel.classList.add('timer');
@@ -3090,17 +3147,19 @@ function runCountdown(
         const ss = String(remaining % 60).padStart(2, '0');
         panel.textContent = formatLabel(mm, ss, dueAtLabel);
         if (Date.now() >= endAt) {
-            window.clearInterval(intervalId);
-            state.timers.delete(step.id);
-            releaseWakeLockIfIdle();
-            panel.classList.remove('timer');
+            stopCountdown(step, panel);
             onComplete(endAt);
         }
     }, 1000);
     state.timers.set(step.id, intervalId);
 }
 
-function startTimer(step: Step, panel: HTMLElement, onDone?: () => void): void {
+/**
+ * @param {Step} step
+ * @param {HTMLElement} panel
+ * @param {() => void} [onDone]
+ */
+function startTimer(step, panel, onDone) {
     if (!step.durationSeconds || state.timers.has(step.id)) return;
     runCountdown(
         step, panel, step.durationSeconds,
@@ -3121,52 +3180,46 @@ function startTimer(step: Step, panel: HTMLElement, onDone?: () => void): void {
 // GATE (check-then-loop) STEPS
 // ============================================================
 
-function renderGateQuestion(step: Step, panel: HTMLElement, onDone?: () => void): void {
+/**
+ * @param {Step} step
+ * @param {HTMLElement} panel
+ * @param {() => void} [onDone]
+ */
+function renderGateQuestion(step, panel, onDone) {
     panel.classList.remove('timer');
     panel.textContent = '';
 
-    const question = document.createElement('div');
-    question.className   = 'gate-question';
-    question.textContent = step.text;
-    panel.appendChild(question);
-
     const runCount = state.gateRunCounts.get(step.id) ?? 0;
-    if (runCount > 0) {
-        const runCountLabel = document.createElement('div');
-        runCountLabel.className   = 'gate-run-count';
-        runCountLabel.textContent = `Checked ${runCount}×`;
-        panel.appendChild(runCountLabel);
-    }
-
-    const buttonRow = document.createElement('div');
-    buttonRow.className = 'gate-button-row';
-
-    const yesBtn = document.createElement('button');
-    yesBtn.type        = 'button';
-    yesBtn.className   = 'gate-yes-btn';
-    yesBtn.textContent = 'Yes';
-    yesBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (panel.classList.contains('step-locked')) return;
-        completeTimer(step, panel, onDone);
+    /**
+     * @param {string} cls
+     * @param {string} text
+     * @param {() => void} onClick
+     */
+    const answer = (cls, text, onClick) => h('button', {
+        class: cls, text,
+        on: {
+            click: (e) => {
+                e.stopPropagation();
+                if (!panel.classList.contains('step-locked')) onClick();
+            },
+        },
     });
-
-    const noBtn = document.createElement('button');
-    noBtn.type        = 'button';
-    noBtn.className   = 'gate-no-btn';
-    noBtn.textContent = 'No';
-    noBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (panel.classList.contains('step-locked')) return;
-        startGateRetryTimer(step, panel, onDone);
-    });
-
-    buttonRow.appendChild(yesBtn);
-    buttonRow.appendChild(noBtn);
-    panel.appendChild(buttonRow);
+    panel.append(
+        h('div', { class: 'gate-question', text: step.text }),
+        ...(runCount > 0 ? [h('div', { class: 'gate-run-count', text: `Checked ${runCount}×` })] : []),
+        h('div', { class: 'gate-button-row' },
+            answer('gate-yes-btn', 'Yes', () => completeTimer(step, panel, onDone)),
+            answer('gate-no-btn', 'No', () => startGateRetryTimer(step, panel, onDone)),
+        ),
+    );
 }
 
-function startGateRetryTimer(step: Step, panel: HTMLElement, onDone?: () => void): void {
+/**
+ * @param {Step} step
+ * @param {HTMLElement} panel
+ * @param {() => void} [onDone]
+ */
+function startGateRetryTimer(step, panel, onDone) {
     if (!step.durationSeconds || state.timers.has(step.id)) return;
     state.gateRunCounts.set(step.id, (state.gateRunCounts.get(step.id) ?? 0) + 1);
     panel.textContent = '';
@@ -3179,11 +3232,13 @@ function startGateRetryTimer(step: Step, panel: HTMLElement, onDone?: () => void
     );
 }
 
-function skipGateRetryTimer(step: Step, panel: HTMLElement, onDone?: () => void): void {
-    const intervalId = state.timers.get(step.id);
-    if (intervalId !== undefined) { window.clearInterval(intervalId); state.timers.delete(step.id); }
-    releaseWakeLockIfIdle();
-    panel.classList.remove('timer');
+/**
+ * @param {Step} step
+ * @param {HTMLElement} panel
+ * @param {() => void} [onDone]
+ */
+function skipGateRetryTimer(step, panel, onDone) {
+    stopCountdown(step, panel);
     renderGateQuestion(step, panel, onDone);
 }
 
@@ -3191,55 +3246,57 @@ function skipGateRetryTimer(step: Step, panel: HTMLElement, onDone?: () => void)
 // AUDIO
 // ============================================================
 
-function createAlarmAudio(): HTMLAudioElement {
-    if (typeof Audio === 'function') return new Audio('../src/sounds/pager-beep.mp3');
-    return {
+/** @returns {HTMLAudioElement} */
+function createAlarmAudio() {
+    if (typeof Audio === 'function') return new Audio('src/sounds/pager-beep.mp3');
+    return /** @type {HTMLAudioElement} */ ({
         muted: false,
         loop: false,
         currentTime: 0,
         play: () => Promise.resolve(),
         pause: () => {},
-    } as HTMLAudioElement;
+    });
 }
 
 const audio = createAlarmAudio();
 
-// audio.play() can silently reject (e.g. autoplay blocked after the page has sat idle/
-// backgrounded for a while) - surface that visibly instead of only logging it, since a
-// failed alarm sound is otherwise indistinguishable from a timer that's still running.
-let soundBlockedBanner: HTMLElement | null = null;
+/**
+ * audio.play() can silently reject (e.g. autoplay blocked after the page has sat idle/
+ * backgrounded for a while) - surface that visibly instead of only logging it, since a
+ * failed alarm sound is otherwise indistinguishable from a timer that's still running.
+ * @type {HTMLElement | null}
+ */
+let soundBlockedBanner = null;
 
-function showSoundBlockedBanner(): void {
+function showSoundBlockedBanner() {
     if (soundBlockedBanner) return;
-    const banner = document.createElement('div');
-    banner.className   = 'sound-blocked-banner';
-    banner.textContent = '🔇 Alarm sound was blocked by the browser - tap anywhere to enable it';
-    document.body.appendChild(banner);
-    soundBlockedBanner = banner;
+    soundBlockedBanner = document.body.appendChild(h('div', {
+        class: 'sound-blocked-banner', text: '🔇 Alarm sound was blocked by the browser - tap anywhere to enable it',
+    }));
 }
 
-function hideSoundBlockedBanner(): void {
+function hideSoundBlockedBanner() {
     if (!soundBlockedBanner) return;
     soundBlockedBanner.remove();
     soundBlockedBanner = null;
 }
 
-// Attaches the specific error to the step that tried to ring, so it's visible without
-// opening devtools. Skipped if the panel's already been replaced/removed (e.g. the sound
-// test panel swaps itself out immediately after triggering the failed play()).
-function showSoundErrorOnPanel(panel: HTMLElement, err: unknown): void {
+/**
+ * Attaches the specific error to the step that tried to ring, so it's visible without
+ * opening devtools. Skipped if the panel's already been replaced/removed (e.g. the sound
+ * test panel swaps itself out immediately after triggering the failed play()).
+ * @param {HTMLElement} panel
+ * @param {unknown} err
+ */
+function showSoundErrorOnPanel(panel, err) {
     if (!panel.isConnected) return;
     const message = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
-    let errEl = panel.querySelector<HTMLElement>('.sound-error');
-    if (!errEl) {
-        errEl = document.createElement('div');
-        errEl.className = 'sound-error';
-        panel.appendChild(errEl);
-    }
+    const errEl = /** @type {HTMLElement | null} */ (panel.querySelector('.sound-error')) ?? panel.appendChild(h('div', { class: 'sound-error' }));
     errEl.textContent = `🔇 sound failed: ${message}`;
 }
 
-function playSound(panel?: HTMLElement): void {
+/** @param {HTMLElement} [panel] */
+function playSound(panel) {
     audio.currentTime = 0;
     audio.play().then(hideSoundBlockedBanner).catch((err) => {
         console.error(err);
@@ -3255,13 +3312,17 @@ const ALARM_WARNING_SECONDS = 30;
 
 // Steps whose alarm is currently ringing (countdown or continuous phase),
 // keyed by step id, so a click anywhere on the page can dismiss them.
-const activeAlarms = new Map<number, { panel: HTMLElement; onAcknowledge: () => void }>();
+const activeAlarms = /** @type {Map<number, { panel: HTMLElement; onAcknowledge: () => void }>} */ (new Map());
 // Steps currently in the continuous-loop phase - the shared `audio` element only
 // truly stops once none of them are ringing anymore.
-const continuousRingSteps = new Set<number>();
+const continuousRingSteps = /** @type {Set<number>} */ (new Set());
 
-// mm:ss for durations under an hour; h:mm:ss once overdue runs past 60 minutes.
-function formatOverdueDuration(totalSeconds: number): string {
+/**
+ * mm:ss for durations under an hour; h:mm:ss once overdue runs past 60 minutes.
+ * @param {number} totalSeconds
+ * @returns {string}
+ */
+function formatOverdueDuration(totalSeconds) {
     const h  = Math.floor(totalSeconds / 3600);
     const m  = Math.floor((totalSeconds % 3600) / 60);
     const s  = totalSeconds % 60;
@@ -3270,40 +3331,39 @@ function formatOverdueDuration(totalSeconds: number): string {
     return h > 0 ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
 }
 
-function startAlarm(step: Step, panel: HTMLElement, dueAt: number, onAcknowledge: () => void): void {
+/**
+ * @param {Step} step
+ * @param {HTMLElement} panel
+ * @param {number} dueAt
+ * @param {() => void} onAcknowledge
+ */
+function startAlarm(step, panel, dueAt, onAcknowledge) {
     panel.classList.add('ringing');
     panel.textContent = '';
 
     const dueAtLabel = formatClockTime(dueAt);
 
-    const label = document.createElement('div');
-    label.className   = 'ringing-label';
-    label.textContent = `⏰ ${step.text} - time's up!`;
-    panel.appendChild(label);
-
-    const countdown = document.createElement('div');
-    countdown.className = 'ringing-countdown';
-    panel.appendChild(countdown);
-
-    const stopBtn = document.createElement('button');
-    stopBtn.type        = 'button';
-    stopBtn.className   = 'stop-alarm-btn';
-    stopBtn.textContent = 'Stop Alarm';
-    stopBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        acknowledgeAlarm(step.id);
-    });
-    panel.appendChild(stopBtn);
+    const countdown = h('div', { class: 'ringing-countdown' });
+    panel.append(
+        h('div', { class: 'ringing-label', text: `⏰ ${step.text} - time's up!` }),
+        countdown,
+        h('button', {
+            class: 'stop-alarm-btn', text: 'Stop Alarm',
+            on: { click: (e) => { e.stopPropagation(); acknowledgeAlarm(step.id); } },
+        }),
+    );
 
     activeAlarms.set(step.id, { panel, onAcknowledge });
 
     let remaining = ALARM_WARNING_SECONDS;
     let ringingContinuously = false;
 
-    // Overdue keeps incrementing (based on the original deadline, not this alarm's start)
-    // for as long as the alarm is left ringing, so a user who steps away can see exactly
-    // how late they are when they come back - not just that they're late.
-    const updateDisplay = (): void => {
+    /**
+     * Overdue keeps incrementing (based on the original deadline, not this alarm's start)
+     * for as long as the alarm is left ringing, so a user who steps away can see exactly
+     * how late they are when they come back - not just that they're late.
+     */
+    const updateDisplay = () => {
         const overdue = Math.max(0, Math.round((Date.now() - dueAt) / 1000));
         const overdueLabel = `up at ${dueAtLabel} - overdue by ${formatOverdueDuration(overdue)}`;
         countdown.textContent = ringingContinuously
@@ -3327,13 +3387,15 @@ function startAlarm(step: Step, panel: HTMLElement, dueAt: number, onAcknowledge
     state.ringingAlarms.set(step.id, intervalId);
 }
 
-function startContinuousRing(stepId: number): void {
+/** @param {number} stepId */
+function startContinuousRing(stepId) {
     continuousRingSteps.add(stepId);
     audio.loop = true;
     playSound(activeAlarms.get(stepId)?.panel);
 }
 
-function stopContinuousRing(stepId: number): void {
+/** @param {number} stepId */
+function stopContinuousRing(stepId) {
     continuousRingSteps.delete(stepId);
     if (continuousRingSteps.size === 0) {
         audio.loop = false;
@@ -3342,7 +3404,8 @@ function stopContinuousRing(stepId: number): void {
     }
 }
 
-function stopAlarm(stepId: number): void {
+/** @param {number} stepId */
+function stopAlarm(stepId) {
     const intervalId = state.ringingAlarms.get(stepId);
     if (intervalId !== undefined) { window.clearInterval(intervalId); state.ringingAlarms.delete(stepId); }
     stopContinuousRing(stepId);
@@ -3353,7 +3416,8 @@ function stopAlarm(stepId: number): void {
     hideSoundBlockedBanner();
 }
 
-function acknowledgeAlarm(stepId: number): void {
+/** @param {number} stepId */
+function acknowledgeAlarm(stepId) {
     const alarm = activeAlarms.get(stepId);
     if (!alarm) return; // already acknowledged
     stopAlarm(stepId);
@@ -3374,20 +3438,20 @@ if (typeof document !== 'undefined') {
     });
 }
 
-function createSoundTestPanel(): HTMLElement {
+/** @returns {HTMLElement} */
+function createSoundTestPanel() {
     const step = timerStep('🔔 Sound Test', 1);
     const panel = renderStep(step, () => panel.replaceWith(createSoundTestPanel()));
     panel.classList.add('sound-check-btn');
     return panel;
 }
 
-
-
 // ============================================================
 // URL ROUTING
 // ============================================================
 
-function getRecipeIdFromURL(): string | null {
+/** @returns {string | null} */
+function getRecipeIdFromURL() {
     const params = new URLSearchParams(window.location.search);
     return params.get('recipe');
 }
@@ -3396,114 +3460,41 @@ function getRecipeIdFromURL(): string | null {
 // SCREEN: PREP
 // ============================================================
 
-function renderPrepScreen(): void {
-    const root = getElement<HTMLDivElement>('app');
-    clear(root);
-
-    const heading = document.createElement('h1');
-    heading.textContent = 'Prep';
-    root.appendChild(heading);
-
-    function collectPrepSteps(steps: Step[]): Step[] {
-        const out: Step[] = [];
-        for (const s of steps) {
-            if (s.prep) out.push(s);
-            if (s.children) out.push(...collectPrepSteps(s.children));
-        }
-        return out;
-    }
-
-    function collectInfoSteps(steps: Step[]): Step[] {
-        const out: Step[] = [];
-        for (const s of steps) {
-            if (s.type === 'info') out.push(s);
-            if (s.children) out.push(...collectInfoSteps(s.children));
-        }
-        return out;
-    }
+function renderPrepScreen() {
+    const root = screen('Prep');
 
     let anyFound = false;
     getSelectedRecipes().filter(r => !r.adhoc).forEach(recipe => {
-        const count = state.selectedRecipeIds.filter(id => id === recipe.id).length;
-        const prepSteps = collectPrepSteps(recipe.steps);
+        const count = getServings(recipe.id);
+        const prepSteps = [...walkSteps(recipe.steps)].filter(s => s.prep);
         if (prepSteps.length === 0) return;
         anyFound = true;
 
-        const title = document.createElement('div');
-        title.className = 'prep-recipe-title';
-        title.textContent = recipe.name + (count > 1 ? ` ×${count}` : '');
-        root.appendChild(title);
+        root.appendChild(h('div', { class: 'prep-recipe-title', text: recipe.name + (count > 1 ? ` ×${count}` : '') }));
 
-        const infoSteps = collectInfoSteps(recipe.steps);
-        if (infoSteps.length > 0) {
-            const note = document.createElement('div');
-            note.className = 'prep-info-note prep-info-collapsed';
-
-            const noteHeader = document.createElement('div');
-            noteHeader.className = 'prep-info-header';
-            const noteCaret = document.createElement('span');
-            noteCaret.textContent = '▸';
-            noteHeader.appendChild(noteCaret);
-            noteHeader.appendChild(document.createTextNode(' Notes'));
-            noteHeader.addEventListener('click', () => {
-                const collapsed = note.classList.toggle('prep-info-collapsed');
-                noteCaret.textContent = collapsed ? '▸' : '▾';
-            });
-
-            const noteBody = document.createElement('div');
-            noteBody.className = 'prep-info-body';
-            infoSteps.forEach(step => {
-                const line = document.createElement('div');
-                line.className = 'prep-info-line';
-                line.textContent = step.text;
-                noteBody.appendChild(line);
-            });
-
-            note.appendChild(noteHeader);
-            note.appendChild(noteBody);
-            root.appendChild(note);
-        }
+        const infoSteps = [...walkSteps(recipe.steps)].filter(s => s.type === 'info');
+        if (infoSteps.length > 0) root.appendChild(notesBox('prep', infoSteps));
 
         prepSteps.forEach(step => {
-            const card = createPanel();
-            card.className += ' prep-step';
-
-            const text = document.createElement('span');
-            text.textContent = step.text;
-            card.appendChild(text);
-
-            if (step.ingredients && step.ingredients.length > 0) {
-                const ingList = document.createElement('div');
-                ingList.className = 'prep-step-ingredients';
-                ingList.textContent = step.ingredients.map(i => formatIngredient(i)).join(', ');
-                card.appendChild(ingList);
-            }
-
-            card.addEventListener('click', () => {
-                card.classList.toggle('prep-done');
-            });
-
+            const card = h('div', { class: 'panel prep-step', on: { click: () => card.classList.toggle('prep-done') } },
+                h('span', { text: step.text }),
+                step.ingredients && step.ingredients.length > 0 && h('div', {
+                    class: 'prep-step-ingredients', text: step.ingredients.map(i => formatIngredient(i)).join(', '),
+                }),
+            );
             root.appendChild(card);
         });
     });
 
-    if (!anyFound) {
-        const empty = document.createElement('p');
-        empty.textContent = 'No prep steps in the selected recipes.';
-        empty.style.color = '#888';
-        root.appendChild(empty);
-    }
-
-    const backBtn = createButton('← Back', () => navigateTo('select'));
-    backBtn.className = 'start-over-btn';
-    root.appendChild(backBtn);
+    if (!anyFound) root.appendChild(h('p', { text: 'No prep steps in the selected recipes.', class: 'muted-note' }));
+    root.appendChild(backButton('← Back', () => navigateTo('select')));
 }
 
 // ============================================================
 // RENDER
 // ============================================================
 
-function render(): void {
+function render() {
     switch (state.screen) {
         case 'select':         return renderSelectScreen();
         case 'shopping':       return renderShoppingScreen();
@@ -3519,13 +3510,21 @@ function render(): void {
 // SCREEN: PLAN
 // ============================================================
 
-function toMinutes(hhmm: string): number {
+/**
+ * @param {string} hhmm
+ * @returns {number}
+ */
+function toMinutes(hhmm) {
     if (!isHhmm(hhmm)) return Number.NaN;
     const [h, m] = hhmm.split(':').map(Number);
     return h * 60 + m;
 }
 
-function fromMinutes(mins: number): string {
+/**
+ * @param {number} mins
+ * @returns {string}
+ */
+function fromMinutes(mins) {
     const h = Math.floor(mins / 60) % 24;
     const m = mins % 60;
     const ampm = h < 12 ? 'AM' : 'PM';
@@ -3533,26 +3532,34 @@ function fromMinutes(mins: number): string {
     return `${h12}:${String(m).padStart(2, '0')} ${ampm}`;
 }
 
-interface ScheduledItem {
-    recipe: Recipe;
-    count: number;
-    startMin: number;
-    blockType: 'home' | 'portable';
-    afterCutoff: boolean;
-}
+/**
+ * @typedef {Object} ScheduledItem
+ * @property {Recipe} recipe
+ * @property {number} count
+ * @property {number} startMin
+ * @property {'home' | 'portable'} blockType
+ * @property {boolean} afterCutoff
+ */
 
-export function schedulePlan(cfg: PlanConfig, recipes: { recipe: Recipe; count: number }[]): { scheduled: ScheduledItem[]; unscheduled: { recipe: Recipe; count: number }[] } {
+/**
+ * @param {PlanConfig} cfg
+ * @param {{ recipe: Recipe; count: number }[]} recipes
+ * @returns {{ scheduled: ScheduledItem[]; unscheduled: { recipe: Recipe; count: number }[] }}
+ */
+export function schedulePlan(cfg, recipes) {
     const cutoffParsed = toMinutes(cfg.caloriesCutoff);
     const cutoffMin = Number.isFinite(cutoffParsed) ? cutoffParsed : toMinutes(DEFAULT_PLAN_CONFIG.caloriesCutoff);
     const blocks = [...(cfg.blocks ?? [])]
         .filter(b => b.type !== 'away' && Number.isFinite(toMinutes(b.start)) && Number.isFinite(toMinutes(b.end)))
         .sort((a, b) => toMinutes(a.start) - toMinutes(b.start));
 
-    const cursors = new Map<string, number>();
+    const cursors = /** @type {Map<string, number>} */ (new Map());
     blocks.forEach(b => cursors.set(b.id, toMinutes(b.start)));
 
-    const scheduled: ScheduledItem[] = [];
-    const unscheduled: { recipe: Recipe; count: number }[] = [];
+    /** @type {ScheduledItem[]} */
+    const scheduled = [];
+    /** @type {{ recipe: Recipe; count: number }[]} */
+    const unscheduled = [];
 
     for (const { recipe, count } of recipes) {
         const dur = recipe.planMinutes ?? 0;
@@ -3562,7 +3569,7 @@ export function schedulePlan(cfg: PlanConfig, recipes: { recipe: Recipe; count: 
         let placed = false;
 
         for (const block of compatible) {
-            const cursor = cursors.get(block.id)!;
+            const cursor = /** @type {number} */ (cursors.get(block.id));
             const blockEnd = toMinutes(block.end);
             const startMin = cursor;
             if (startMin + dur <= blockEnd) {
@@ -3580,145 +3587,106 @@ export function schedulePlan(cfg: PlanConfig, recipes: { recipe: Recipe; count: 
     return { scheduled, unscheduled };
 }
 
-function renderPlanScreen(): void {
-    const root = getElement<HTMLDivElement>('app');
-    clear(root);
+function renderPlanScreen() {
+    const root = screen('Day Planner');
     let cfg = loadPlanConfig();
 
-    const heading = document.createElement('h1');
-    heading.textContent = 'Day Planner';
-    root.appendChild(heading);
-
     // ── Config panel ──────────────────────────────────────────
-    const configPanel = document.createElement('div');
-    configPanel.className = 'plan-config-panel';
-
-    const configTitle = document.createElement('div');
-    configTitle.className = 'plan-section-title';
-    configTitle.textContent = 'Time Blocks';
-    configPanel.appendChild(configTitle);
-
-    const blockList = document.createElement('div');
-    blockList.className = 'plan-block-list';
-    configPanel.appendChild(blockList);
+    const blockList = h('div', { class: 'plan-block-list' });
 
     function renderBlocks() {
         clear(blockList);
         cfg.blocks.forEach((block, idx) => {
-            const row = document.createElement('div');
-            row.className = 'plan-block-row';
+            /**
+             * A visually hidden label for a block's input.
+             * @param {string} forId
+             * @param {string} text
+             */
+            const hiddenLabel = (forId, text) => h('label', { htmlFor: forId, class: 'visually-hidden', text });
 
-            const startIn = document.createElement('input');
-            startIn.type = 'time'; startIn.id = `block-${idx}-start`; startIn.value = block.start; startIn.className = 'plan-time-input';
-            startIn.required = true;
-            const startLabel = document.createElement('label');
-            startLabel.htmlFor = startIn.id;
-            startLabel.className = 'visually-hidden';
-            startLabel.textContent = `Block ${idx + 1} start`;
-            startIn.addEventListener('change', () => {
-                if (!isHhmm(startIn.value)) { startIn.value = cfg.blocks[idx].start; return; }
-                cfg.blocks[idx].start = startIn.value; savePlanConfig(cfg); scheduleAndRender();
-            });
+            /**
+             * A labelled time input bound to this block's start or end.
+             * @param {'start' | 'end'} edge
+             * @returns {[HTMLLabelElement, HTMLInputElement]}
+             */
+            const timeField = (edge) => {
+                const input = h('input', {
+                    type: 'time', id: `block-${idx}-${edge}`, value: block[edge], class: 'plan-time-input', required: true,
+                    on: {
+                        change: () => {
+                            if (!isHhmm(input.value)) { input.value = cfg.blocks[idx][edge]; return; }
+                            cfg.blocks[idx][edge] = input.value; savePlanConfig(cfg); scheduleAndRender();
+                        },
+                    },
+                });
+                return [hiddenLabel(input.id, `Block ${idx + 1} ${edge}`), input];
+            };
 
-            const sep = document.createElement('span');
-            sep.textContent = '→'; sep.className = 'plan-block-sep';
-            sep.setAttribute('aria-hidden', 'true');
+            const typeSelect = h('select', {
+                class: 'plan-type-select', id: `block-${idx}-type`,
+                on: { change: () => { cfg.blocks[idx].type = /** @type {PlanBlock['type']} */ (typeSelect.value); savePlanConfig(cfg); scheduleAndRender(); } },
+            }, ...[['home', '🏠 Home'], ['portable', '🎒 Portable'], ['away', '🏢 Away']].map(([value, text]) =>
+                h('option', { value, text, selected: value === block.type })));
 
-            const endIn = document.createElement('input');
-            endIn.type = 'time'; endIn.id = `block-${idx}-end`; endIn.value = block.end; endIn.className = 'plan-time-input';
-            endIn.required = true;
-            const endLabel = document.createElement('label');
-            endLabel.htmlFor = endIn.id;
-            endLabel.className = 'visually-hidden';
-            endLabel.textContent = `Block ${idx + 1} end`;
-            endIn.addEventListener('change', () => {
-                if (!isHhmm(endIn.value)) { endIn.value = cfg.blocks[idx].end; return; }
-                cfg.blocks[idx].end = endIn.value; savePlanConfig(cfg); scheduleAndRender();
-            });
-
-            const typeSelect = document.createElement('select');
-            typeSelect.className = 'plan-type-select';
-            typeSelect.id = `block-${idx}-type`;
-            const typeLabel = document.createElement('label');
-            typeLabel.htmlFor = typeSelect.id;
-            typeLabel.className = 'visually-hidden';
-            typeLabel.textContent = `Block ${idx + 1} place`;
-            [['home', '🏠 Home'], ['portable', '🎒 Portable'], ['away', '🏢 Away']].forEach(([val, label]) => {
-                const opt = document.createElement('option');
-                opt.value = val; opt.textContent = label;
-                if (val === block.type) opt.selected = true;
-                typeSelect.appendChild(opt);
-            });
-            typeSelect.addEventListener('change', () => { cfg.blocks[idx].type = typeSelect.value as PlanBlock['type']; savePlanConfig(cfg); scheduleAndRender(); });
-
-            const delBtn = document.createElement('button');
-            delBtn.type = 'button';
-            delBtn.textContent = '×'; delBtn.className = 'plan-block-del';
-            hiddenText(delBtn, `Remove block ${idx + 1}`);
-            delBtn.addEventListener('click', () => { cfg.blocks.splice(idx, 1); savePlanConfig(cfg); renderBlocks(); scheduleAndRender(); });
-
-            row.append(startLabel, startIn, sep, endLabel, endIn, typeLabel, typeSelect, delBtn);
-            blockList.appendChild(row);
+            blockList.appendChild(h('div', { class: 'plan-block-row' },
+                ...timeField('start'),
+                h('span', { text: '→', class: 'plan-block-sep', attrs: { 'aria-hidden': 'true' } }),
+                ...timeField('end'),
+                hiddenLabel(typeSelect.id, `Block ${idx + 1} place`),
+                typeSelect,
+                h('button', {
+                    text: '×', class: 'plan-block-del',
+                    on: { click: () => { cfg.blocks.splice(idx, 1); savePlanConfig(cfg); renderBlocks(); scheduleAndRender(); } },
+                }, srOnly(`Remove block ${idx + 1}`)),
+            ));
         });
 
-        const addBtn = document.createElement('button');
-        addBtn.type = 'button';
-        addBtn.textContent = '+ Add Block'; addBtn.className = 'plan-add-block-btn';
-        addBtn.setAttribute('data-testid', 'add-plan-block');
-        addBtn.addEventListener('click', () => {
-            const last = cfg.blocks[cfg.blocks.length - 1];
-            const newStart = last ? last.end : '07:00';
-            const [h, m] = newStart.split(':').map(Number);
-            const newEnd = `${String(Math.min(h + 1, 23)).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-            cfg.blocks.push({ id: String(Date.now()), start: newStart, end: newEnd, type: 'home' });
-            savePlanConfig(cfg); renderBlocks(); scheduleAndRender();
-        });
-        blockList.appendChild(addBtn);
+        blockList.appendChild(h('button', {
+            text: '+ Add Block', class: 'plan-add-block-btn', testid: 'add-plan-block',
+            on: {
+                click: () => {
+                    const last = cfg.blocks[cfg.blocks.length - 1];
+                    const newStart = last ? last.end : '07:00';
+                    const [hr, m] = newStart.split(':').map(Number);
+                    const newEnd = `${String(Math.min(hr + 1, 23)).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+                    cfg.blocks.push({ id: String(Date.now()), start: newStart, end: newEnd, type: 'home' });
+                    savePlanConfig(cfg); renderBlocks(); scheduleAndRender();
+                },
+            },
+        }));
     }
 
-    const cutoffRow = document.createElement('div');
-    cutoffRow.className = 'plan-cutoff-row';
-    const cutoffLabel = document.createElement('label');
-    cutoffLabel.htmlFor = 'calorie-cutoff';
-    cutoffLabel.textContent = '🎯 Calorie cutoff (eat before):';
-    cutoffLabel.className = 'plan-cutoff-label';
-    const cutoffIn = document.createElement('input');
-    cutoffIn.type = 'time'; cutoffIn.id = 'calorie-cutoff'; cutoffIn.value = cfg.caloriesCutoff; cutoffIn.className = 'plan-time-input';
-    cutoffIn.setAttribute('data-testid', 'calorie-cutoff');
-    cutoffIn.addEventListener('change', () => {
-        if (!isHhmm(cutoffIn.value)) { cutoffIn.value = cfg.caloriesCutoff; return; }
-        cfg.caloriesCutoff = cutoffIn.value; savePlanConfig(cfg); scheduleAndRender();
+    const cutoffIn = h('input', {
+        type: 'time', id: 'calorie-cutoff', value: cfg.caloriesCutoff, class: 'plan-time-input', testid: 'calorie-cutoff',
+        on: {
+            change: () => {
+                if (!isHhmm(cutoffIn.value)) { cutoffIn.value = cfg.caloriesCutoff; return; }
+                cfg.caloriesCutoff = cutoffIn.value; savePlanConfig(cfg); scheduleAndRender();
+            },
+        },
     });
-    cutoffRow.appendChild(cutoffLabel); cutoffRow.appendChild(cutoffIn);
-    configPanel.appendChild(cutoffRow);
-    root.appendChild(configPanel);
+    root.appendChild(h('div', { class: 'plan-config-panel' },
+        h('div', { class: 'plan-section-title', text: 'Time Blocks' }),
+        blockList,
+        h('div', { class: 'plan-cutoff-row' },
+            h('label', { htmlFor: 'calorie-cutoff', text: '🎯 Calorie cutoff (eat before):', class: 'plan-cutoff-label' }),
+            cutoffIn,
+        ),
+    ));
 
     // ── Schedule output ───────────────────────────────────────
-    const scheduleTitle = document.createElement('div');
-    scheduleTitle.className = 'plan-section-title';
-    scheduleTitle.style.marginTop = '24px';
-    root.appendChild(scheduleTitle);
-
-    const scheduleOut = document.createElement('div');
-    root.appendChild(scheduleOut);
+    const scheduleTitle = root.appendChild(h('div', { class: 'plan-section-title plan-section-spaced' }));
+    const scheduleOut = root.appendChild(h('div'));
 
     function scheduleAndRender() {
         clear(scheduleOut);
-        const selectedRecipes = getSelectedRecipes().filter(r => !r.adhoc);
-        const deduped: { recipe: Recipe; count: number }[] = [];
-        const seen = new Set<string>();
-        for (const id of state.selectedRecipeIds) {
-            const r = state.recipes.get(id);
-            if (!r || r.adhoc) continue;
-            if (seen.has(id)) { const e = deduped.find(x => x.recipe.id === id); if (e) e.count++; }
-            else { seen.add(id); deduped.push({ recipe: r, count: 1 }); }
-        }
+        const deduped = [...countBy(state.selectedRecipeIds)].flatMap(([id, count]) => {
+            const recipe = state.recipes.get(id);
+            return recipe && !recipe.adhoc ? [{ recipe, count }] : [];
+        });
 
         if (deduped.length === 0) {
-            const empty = document.createElement('p');
-            empty.textContent = 'No recipes selected.';
-            empty.style.color = '#888';
-            scheduleOut.appendChild(empty);
+            scheduleOut.appendChild(h('p', { text: 'No recipes selected.', class: 'muted-note' }));
             return;
         }
 
@@ -3726,625 +3694,72 @@ function renderPlanScreen(): void {
 
         const { scheduled, unscheduled } = schedulePlan(cfg, deduped);
 
-        scheduled.forEach(({ recipe, count, startMin, blockType, afterCutoff }) => {
-            const card = document.createElement('div');
-            card.className = 'plan-slot' + (afterCutoff ? ' plan-slot-late' : '');
-
-            const timeEl = document.createElement('span');
-            timeEl.className = 'plan-slot-time';
-            timeEl.textContent = fromMinutes(startMin);
-
-            const nameEl = document.createElement('span');
-            nameEl.className = 'plan-slot-name';
-            nameEl.textContent = recipe.name + (count > 1 ? ` ×${count}` : '');
-
-            const meta: string[] = [];
+        scheduled.forEach(({ recipe, count, startMin, afterCutoff }) => {
+            /** @type {string[]} */
+            const meta = [];
             if (recipe.planMinutes) meta.push(`${recipe.planMinutes} min`);
             if (recipe.portable) meta.push('portable');
             if (afterCutoff) meta.push('⚠ after cutoff');
 
-            const metaEl = document.createElement('span');
-            metaEl.className = 'plan-slot-meta';
-            metaEl.textContent = meta.join(' · ');
-
-            card.appendChild(timeEl); card.appendChild(nameEl); card.appendChild(metaEl);
-            scheduleOut.appendChild(card);
+            scheduleOut.appendChild(h('div', { class: 'plan-slot' + (afterCutoff ? ' plan-slot-late' : '') },
+                h('span', { class: 'plan-slot-time', text: fromMinutes(startMin) }),
+                h('span', { class: 'plan-slot-name', text: recipe.name + (count > 1 ? ` ×${count}` : '') }),
+                h('span', { class: 'plan-slot-meta', text: meta.join(' · ') }),
+            ));
         });
 
         if (unscheduled.length > 0) {
-            const warn = document.createElement('div');
-            warn.className = 'plan-unscheduled';
-            warn.textContent = '⚠ No available slot: ' + unscheduled.map(x => x.recipe.name).join(', ');
-            scheduleOut.appendChild(warn);
+            scheduleOut.appendChild(h('div', { class: 'plan-unscheduled', text: '⚠ No available slot: ' + unscheduled.map(x => x.recipe.name).join(', ') }));
         }
 
         const noPlan = deduped.filter(x => !x.recipe.planMinutes);
         if (noPlan.length > 0) {
-            const note = document.createElement('div');
-            note.className = 'plan-no-duration';
-            note.textContent = 'No duration set (won\'t block time): ' + noPlan.map(x => x.recipe.name).join(', ');
-            scheduleOut.appendChild(note);
+            scheduleOut.appendChild(h('div', { class: 'plan-no-duration', text: 'No duration set (won\'t block time): ' + noPlan.map(x => x.recipe.name).join(', ') }));
         }
 
         const batchPrep = deduped.filter(x => x.recipe.prepMinutes);
         if (batchPrep.length > 0) {
-            const batchTitle = document.createElement('div');
-            batchTitle.className = 'plan-section-title';
-            batchTitle.style.marginTop = '24px';
-            batchTitle.textContent = '🥘 Batch Prep (cook ahead)';
-            scheduleOut.appendChild(batchTitle);
-
+            scheduleOut.appendChild(h('div', { class: 'plan-section-title plan-section-spaced', text: '🥘 Batch Prep (cook ahead)' }));
             batchPrep.forEach(({ recipe }) => {
-                const row = document.createElement('div');
-                row.className = 'plan-batch-row';
-                const mins = recipe.prepMinutes!;
                 const days = recipe.perishableDays;
-                row.textContent = `${recipe.name} - ${mins} min cook time` + (days ? ` · keeps ${days} day${days > 1 ? 's' : ''} in fridge` : '');
-                scheduleOut.appendChild(row);
+                scheduleOut.appendChild(h('div', {
+                    class: 'plan-batch-row',
+                    text: `${recipe.name} - ${recipe.prepMinutes} min cook time` + (days ? ` · keeps ${days} day${days > 1 ? 's' : ''} in fridge` : ''),
+                }));
             });
         }
     }
 
     renderBlocks();
     scheduleAndRender();
-
-    const backBtn = createButton('← Back', () => navigateTo('select'));
-    backBtn.className = 'start-over-btn';
-    root.appendChild(backBtn);
+    root.appendChild(backButton('← Back', () => navigateTo('select')));
 }
 
 // ============================================================
-// STYLES
+// BUILD INFO
 // ============================================================
 
-const styles = `
-* { box-sizing: border-box; }
-
-/* Prevent double-tap zoom on interactive elements without breaking scroll */
-button, a, input, select { touch-action: manipulation; }
-
-/* Block pinch-zoom gestures page-wide (belt-and-suspenders alongside the viewport meta
-   tag's maximum-scale/user-scalable, which some iOS versions/accessibility settings can
-   partially override) - still allow normal scrolling in both directions. */
-html { color-scheme: dark; }
-html, body { touch-action: pan-x pan-y; }
-
-body {
-    background: #111;
-    color: #f0f0f0;
-    font-family: sans-serif;
-    padding: 24px;
-    padding-bottom: max(24px, env(safe-area-inset-bottom));
-    font-size: 20px;
+/**
+ * When the site was last published. GitHub Pages serves every file with a Last-Modified
+ * header set at deploy time, which the browser exposes as document.lastModified.
+ * @returns {string}
+ */
+function formatBuildTime() {
+    const date = new Date(document.lastModified);
+    if (isNaN(date.getTime())) return 'dev build';
+    return date.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
 }
 
-h1, h2 { margin-top: 0; font-size: 28px; }
-
-.search-label {
-    display: block;
-    font-size: 14px;
-    color: #aaa;
-    margin-bottom: 6px;
+/** @param {HTMLElement} root */
+function appendBuildFooter(root) {
+    root.appendChild(h('div', { class: 'build-footer', text: `Last compiled: ${formatBuildTime()}` }));
 }
-
-.visually-hidden:where(:not(:focus-within, :active)) {
-    position: absolute !important;
-    clip-path: inset(50%) !important;
-    overflow: hidden !important;
-    width: 1px !important;
-    height: 1px !important;
-    margin: -1px !important;
-    padding: 0 !important;
-    border: 0 !important;
-    white-space: nowrap !important;
-}
-
-.group-heading {
-    font-size: 18px;
-    color: #888;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin: 20px 0 6px;
-    font-weight: normal;
-}
-
-.search-input {
-    width: 100%;
-    font-size: 24px;
-    padding: 16px;
-    border-radius: 12px;
-    border: 2px solid #444;
-    background: #222;
-    color: #f0f0f0;
-    margin-bottom: 16px;
-}
-
-.show-hidden-toggle {
-    font-size: 14px;
-    padding: 8px 14px;
-    border-radius: 8px;
-    border: 1px solid #555;
-    background: #2a2a2a;
-    color: #aaa;
-    cursor: pointer;
-    margin-bottom: 16px;
-}
-.show-hidden-toggle:hover { background: #3a3a3a; border-color: #888; color: #f0f0f0; }
-
-.hidden-badge {
-    margin-left: 10px;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #888;
-    border: 1px solid #555;
-    border-radius: 10px;
-    padding: 2px 8px;
-}
-
-.panel.sound-check-btn {
-    padding: 4px 8px;
-    font-size: 16px;
-    background: transparent;
-    color: #666;
-    border: 1px solid #444;
-    border-radius: 8px;
-    margin: 0;
-}
-.panel.sound-check-btn:hover { color: #aaa; border-color: #666; }
-.panel.sound-check-btn .timer-duration-badge { display: none; }
-.panel.sound-check-btn.timer { font-size: 14px; padding: 4px 8px; margin: 0; }
-
-.recipe-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 8px 0;
-}
-
-.recipe-btn {
-    flex: 1;
-    font-size: 22px;
-    padding: 18px 20px;
-    border-radius: 12px;
-    border: 2px solid #444;
-    background: #222;
-    color: #f0f0f0;
-    cursor: pointer;
-    text-align: left;
-}
-
-.recipe-btn.selected {
-    background: #1a5c2a;
-    border-color: #2d9e4a;
-    color: white;
-}
-
-.count-badge {
-    margin-left: 10px;
-    font-size: 18px;
-    font-weight: bold;
-    background: rgba(255, 255, 255, 0.2);
-    padding: 2px 10px;
-    border-radius: 12px;
-}
-
-.count-minus-btn {
-    font-size: 28px;
-    padding: 10px 16px;
-    background: #2a2a2a;
-    border: 2px solid #444;
-    border-radius: 12px;
-    color: #f0f0f0;
-    cursor: pointer;
-    line-height: 1;
-}
-
-.adhoc-remove-btn {
-    font-size: 22px;
-    padding: 10px 14px;
-    background: none;
-    border: none;
-    color: #ef4444;
-    cursor: pointer;
-    line-height: 1;
-}
-.adhoc-remove-btn:hover { color: #f87171; }
-
-.add-ingredient-row { margin-top: 16px; display: flex; }
-.add-ingredient-btn {
-    flex: 1;
-    font-size: 20px;
-    padding: 16px;
-    border-radius: 12px;
-    border: 2px dashed #555;
-    background: transparent;
-    color: #aaa;
-    cursor: pointer;
-}
-.add-ingredient-btn:hover { border-color: #888; color: #f0f0f0; }
-
-.adhoc-sub { color: #888; margin: 0 0 16px 0; }
-
-#adhoc-list {
-    max-height: 50vh;
-    overflow-y: auto;
-    border: 2px solid #333;
-    border-radius: 12px;
-    padding: 8px;
-    margin-bottom: 16px;
-}
-.adhoc-item {
-    display: block;
-    width: 100%;
-    text-align: left;
-    background: #1a1a1a;
-    border: 2px solid #333;
-    border-radius: 10px;
-    color: #f0f0f0;
-    font-size: 18px;
-    padding: 12px 16px;
-    margin: 4px 0;
-    cursor: pointer;
-}
-.adhoc-item.selected { background: #1a5c2a; border-color: #2d9e4a; }
-
-.adhoc-detail {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    align-items: center;
-    padding: 12px 0;
-}
-.adhoc-detail:empty { display: none; }
-.adhoc-detail-label { flex-basis: 100%; font-size: 18px; color: #f0f0f0; }
-.adhoc-qty {
-    flex: 1; min-width: 80px;
-    background: #222; border: 2px solid #444; border-radius: 10px;
-    color: #f0f0f0; font-size: 20px; padding: 12px;
-}
-.adhoc-unit {
-    flex: 1; min-width: 100px;
-    background: #222; border: 2px solid #444; border-radius: 10px;
-    color: #f0f0f0; font-size: 20px; padding: 12px;
-}
-.adhoc-confirm {
-    flex-basis: 100%;
-    background: #16a34a; color: white; border: none;
-    border-radius: 12px; font-size: 22px; font-weight: bold;
-    padding: 18px; cursor: pointer;
-}
-.adhoc-confirm:hover { background: #15803d; }
-
-.copy-link-btn { font-size: 18px; padding: 10px 12px; background: none; border: none; color: #666; cursor: pointer; line-height: 1; transition: color 0.3s; }
-.copy-link-btn:hover  { color: #60a5fa; }
-.copy-link-btn:active { color: #2d9e4a; }
-
-.actions {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    background: #111; border-top: 2px solid #333;
-    padding: 16px 24px; padding-bottom: max(16px, env(safe-area-inset-bottom));
-    display: flex; gap: 16px; flex-wrap: wrap;
-}
-
-.action-btn { flex: 1; font-size: 24px; padding: 20px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; }
-.action-btn:first-child { background: #2563eb; color: white; }
-.action-btn:last-child  { background: #16a34a; color: white; }
-.actions .action-btn-nutrition { background: #7c3aed; color: white; }
-.actions .action-btn-prep { background: #b45309; color: white; }
-.actions .action-btn-plan { background: #0e7490; color: white; }
-/* ── Plan screen ── */
-.plan-config-panel { background: #1a1a1a; border-radius: 12px; padding: 16px; margin-bottom: 8px; }
-.plan-section-title { font-size: 14px; color: #888; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 12px; }
-.plan-block-list { display: flex; flex-direction: column; gap: 8px; }
-.plan-block-row { display: flex; align-items: center; gap: 8px; }
-.plan-time-input { background: #222; color: #f0f0f0; border: 1px solid #333; border-radius: 8px; padding: 6px 10px; font-size: 16px; width: 110px; }
-.plan-block-sep { color: #666; font-size: 18px; }
-.plan-type-select { background: #222; color: #f0f0f0; border: 1px solid #333; border-radius: 8px; padding: 6px 10px; font-size: 15px; flex: 1; }
-.plan-block-del { background: none; border: 1px solid #444; color: #888; border-radius: 8px; padding: 6px 12px; font-size: 18px; cursor: pointer; }
-.plan-add-block-btn { background: none; border: 1px dashed #444; color: #888; border-radius: 8px; padding: 8px 14px; font-size: 15px; cursor: pointer; margin-top: 4px; width: 100%; }
-.plan-cutoff-row { display: flex; align-items: center; gap: 12px; margin-top: 14px; padding-top: 14px; border-top: 1px solid #222; }
-.plan-cutoff-label { font-size: 15px; color: #aaa; flex: 1; }
-.plan-slot { display: flex; align-items: baseline; gap: 12px; padding: 12px 0; border-bottom: 1px solid #1a1a1a; }
-.plan-slot:last-of-type { border-bottom: none; }
-.plan-slot-late { opacity: 0.55; }
-.plan-slot-time { font-size: 15px; color: #6b9c6b; min-width: 80px; font-variant-numeric: tabular-nums; }
-.plan-slot-name { font-size: 19px; flex: 1; }
-.plan-slot-meta { font-size: 13px; color: #666; white-space: nowrap; }
-.plan-unscheduled { margin-top: 16px; color: #f87171; font-size: 14px; }
-.plan-no-duration { margin-top: 8px; color: #888; font-size: 13px; font-style: italic; }
-.plan-batch-row { padding: 10px 0; border-bottom: 1px solid #1a1a1a; font-size: 16px; color: #c4a35a; }
-/* ── Prep screen ── */
-.prep-recipe-title { font-size: 16px; color: #888; text-transform: uppercase; letter-spacing: 0.07em; margin: 20px 0 8px; }
-.prep-step { cursor: pointer; user-select: none; }
-.prep-step.prep-done { opacity: 0.4; text-decoration: line-through; }
-.prep-step-ingredients { font-size: 14px; color: #888; margin-top: 6px; }
-.prep-info-note { border: 1px dashed #374151; border-radius: 10px; padding: 10px 14px; margin: 0 0 8px; }
-.prep-info-header { display: flex; align-items: center; gap: 6px; cursor: pointer; color: #6b7280; font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; user-select: none; }
-.prep-info-body { margin-top: 8px; font-size: 16px; color: #d1d5db; }
-.prep-info-collapsed .prep-info-body { display: none; }
-.prep-info-line { padding: 8px 0; }
-.prep-info-line:first-child { padding-top: 0; }
-.prep-info-line:not(:first-child) { border-top: 1px dashed #374151; }
-/* ── Info step (cooking screen) ── */
-.info-step { cursor: default !important; border-color: #2a2a2a; background: #111827; }
-.info-step-header { display: flex; align-items: center; gap: 8px; cursor: pointer; color: #6b7280; font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; user-select: none; }
-.info-step-caret { font-size: 11px; }
-.info-step-body { margin-top: 12px; font-size: 18px; color: #d1d5db; }
-.info-step-note { padding: 10px 0; }
-.info-step-note:first-child { padding-top: 0; }
-.info-step-note:not(:first-child) { border-top: 1px dashed #2a2a2a; }
-.info-step-link { display: block; margin-top: 10px; color: #60a5fa; font-size: 17px; text-decoration: none; }
-.info-step-link:hover { text-decoration: underline; }
-.info-step-collapsed .info-step-body { display: none; }
-
-#recipe-list { padding-bottom: 120px; }
-
-.panel {
-    border: 2px solid #444; border-radius: 12px; padding: 20px; margin: 10px 0;
-    cursor: pointer; font-size: 22px; position: relative;
-    transition: opacity 0.3s, border-color 0.3s, background 0.3s;
-}
-
-.panel.container-step { border-color: #555; background: #1a1a1a; cursor: default; padding: 0; }
-
-.container-header {
-    padding: 16px 20px 12px; font-size: 18px; color: #888;
-    text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #333;
-}
-
-.container-children { padding: 8px 12px 12px; display: flex; flex-direction: column; gap: 6px; }
-.container-children .panel { margin: 0; font-size: 20px; padding: 14px 16px; }
-
-.panel.timer     { background: #ca8a04; color: black; border-color: #ca8a04; }
-.timer-duration-badge { margin-left: 10px; font-size: 13px; font-weight: 600; color: #ca8a04; background: #1a1a0a; border: 1px solid #ca8a04; border-radius: 6px; padding: 1px 7px; vertical-align: middle; white-space: nowrap; }
-.panel.timer .timer-duration-badge { display: none; }
-.panel.completed { background: #1a5c2a; color: white; border-color: #2d9e4a; }
-.panel.skipped   { background: #374151; color: #9ca3af; border-color: #4b5563; text-decoration: line-through; }
-
-.panel.ringing { background: #7f1d1d; color: white; border-color: #ef4444;
-    @media (prefers-reduced-motion: no-preference) { animation: alarmPulse 1s ease-in-out infinite; }
-}
-@keyframes alarmPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.65; } }
-.ringing-label { font-weight: 600; }
-.ringing-countdown { margin-top: 6px; font-size: 15px; opacity: 0.85; }
-
-.sound-blocked-banner {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-    background: #7f1d1d; color: white; border-bottom: 2px solid #ef4444;
-    padding: 10px 16px; text-align: center; font-size: 15px; font-weight: 600;
-    cursor: pointer;
-    @media (prefers-reduced-motion: no-preference) { animation: alarmPulse 1s ease-in-out infinite; }
-}
-.sound-error {
-    margin-top: 8px; font-size: 13px; font-weight: 600; color: #fecaca;
-    background: rgba(0, 0, 0, 0.25); border-radius: 6px; padding: 4px 8px;
-}
-.stop-alarm-btn {
-    display: block; width: 100%; margin-top: 14px; font-size: 20px; padding: 14px;
-    border-radius: 10px; border: 2px solid #fca5a5; background: #991b1b; color: white;
-    cursor: pointer; font-weight: 600;
-}
-.stop-alarm-btn:hover { background: #b91c1c; }
-
-.gate-question { margin-bottom: 14px; }
-.gate-run-count { margin: -8px 0 14px; font-size: 13px; opacity: 0.75; }
-.gate-button-row { display: flex; gap: 12px; }
-.gate-yes-btn, .gate-no-btn {
-    flex: 1; font-size: 20px; padding: 14px; border-radius: 10px; border: 2px solid;
-    cursor: pointer; font-weight: 600;
-}
-.gate-yes-btn { background: #1a5c2a; border-color: #2d9e4a; color: white; }
-.gate-no-btn  { background: #7f1d1d; border-color: #ef4444; color: white; }
-
-.panel.step-locked { opacity: 0.45; cursor: not-allowed; border-color: #333; border-left: 4px solid #ef4444; border-left-color: #ef4444; }
-
-.waiting-pill {
-    display: inline-block; margin-top: 8px; font-size: 13px;
-    color: #ef4444; background: rgba(239, 68, 68, 0.12);
-    border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 20px;
-    padding: 2px 10px; letter-spacing: 0.04em;
-}
-
-@keyframes unlockFlash {
-    0%   { border-color: #2d9e4a; background: rgba(45, 158, 74, 0.15); }
-    100% { border-color: #444;    background: transparent; }
-}
-.panel.step-unlocked {
-    @media (prefers-reduced-motion: no-preference) { animation: unlockFlash 0.8s ease-out forwards; }
-}
-
-.purchase-links { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
-.purchase-link { color: #60a5fa; font-size: 16px; text-decoration: none; }
-.purchase-link:hover { text-decoration: underline; }
-.purchase-link.default-product { color: #2d9e4a; font-weight: bold; }
-
-.inventory-row { margin-top: 10px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; cursor: default; }
-.inventory-have-label { font-size: 14px; color: #888; }
-.inventory-have-input {
-    width: 70px; font-size: 16px; padding: 4px 8px; border-radius: 6px;
-    border: 1px solid #444; background: #1a1a1a; color: #f0f0f0;
-}
-.inventory-have-input:focus { outline: none; border-color: #60a5fa; background: #1e2a3a; }
-.inventory-needed { font-size: 14px; color: #f59e0b; }
-.inventory-needed.inventory-satisfied { color: #2d9e4a; font-weight: 600; }
-.inventory-package-hint { font-size: 12px; color: #666; font-style: italic; width: 100%; }
-
-.start-over-btn { margin-top: 32px; font-size: 20px; padding: 16px 32px; border-radius: 12px; border: 2px solid #444; background: #222; color: #f0f0f0; cursor: pointer; }
-
-.empty { color: #666; font-style: italic; }
-
-.recipe-title-row { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
-.recipe-title-row h2 { margin: 0; flex: 1; }
-.recipe-title-row .copy-link-btn { margin-left: auto; }
-.cook-time-badge { font-size: 16px; color: #888; white-space: nowrap; }
-.cook-time-banner { font-size: 16px; color: #888; border: 1px solid #333; border-radius: 10px; padding: 10px 16px; margin-bottom: 16px; text-align: center; }
-
-/* ── Nutrition screen ── */
-
-.panel.nutrition-total { cursor: default; border-color: #555; background: #1a1a1a; }
-
-.nutrition-total-title { font-size: 16px; color: #888; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
-
-.nutrition-values { font-size: 20px; color: #f0f0f0; }
-
-.nutrition-coverage { font-size: 14px; color: #888; margin-top: 8px; }
-.nutrition-coverage.flagged { color: #f59e0b; }
-
-/* 30-day cost projection */
-.nutrition-monthly-cost { font-size: 15px; color: #6b9fcf; margin-top: 6px; }
-
-/* Partial-cost note - shown when some but not all ingredients have price data */
-.nutrition-cost-note { font-size: 13px; color: #f59e0b; margin-top: 4px; font-style: italic; }
-
-.panel.nutrition-recipe { cursor: default; padding: 0; }
-.nutrition-recipe-header { display: flex; align-items: center; gap: 10px; padding: 16px 20px 6px; cursor: pointer; }
-.nutrition-caret { color: #888; font-size: 16px; }
-.nutrition-recipe-name { font-size: 22px; flex: 1; }
-.nutrition-recipe-sub { font-size: 14px; color: #888; text-align: right; white-space: nowrap; }
-.panel.nutrition-recipe .nutrition-coverage { padding: 0 20px 14px; margin-top: 0; }
-
-.nutrition-serving-controls { display: flex; align-items: center; gap: 4px; }
-.nutrition-serving-btn { font-size: 18px; width: 32px; height: 32px; border-radius: 8px; border: 1px solid #555; background: #2a2a2a; color: #f0f0f0; cursor: pointer; line-height: 1; padding: 0; }
-.nutrition-serving-btn:hover { background: #3a3a3a; border-color: #888; }
-.nutrition-serving-count { font-size: 14px; color: #aaa; min-width: 28px; text-align: center; }
-
-.nutrition-bulk-actions { display: flex; gap: 8px; margin: 0 0 14px; }
-.nutrition-bulk-btn { font-size: 13px; padding: 6px 12px; border-radius: 8px; border: 1px solid #555; background: #2a2a2a; color: #aaa; cursor: pointer; }
-.nutrition-bulk-btn:hover { background: #3a3a3a; border-color: #888; color: #f0f0f0; }
-
-/* ── Bundles ── */
-.bundle-row { margin: 6px 0; }
-.bundle-btn { width: 100%; text-align: left; font-size: 20px; padding: 16px 20px; border-radius: 12px; border: 2px solid #2d5a8a; background: #0f2a45; color: #f0f0f0; cursor: pointer; display: flex; flex-direction: column; gap: 4px; }
-.bundle-btn:hover { background: #163556; border-color: #4a8ac4; }
-.bundle-sub { font-size: 13px; color: #6b9fcf; font-weight: normal; }
-
-.nutrition-ingredients { border-top: 1px solid #333; padding: 6px 20px 14px; display: flex; flex-direction: column; }
-.nutrition-ingredients.collapsed { display: none; }
-
-.nutrition-ingredient-row {
-    display: flex; flex-wrap: wrap; justify-content: space-between;
-    align-items: baseline; gap: 4px 14px; font-size: 16px;
-    padding: 8px 0; border-bottom: 1px solid #222;
-}
-.nutrition-ingredient-row:last-child { border-bottom: none; }
-.nutrition-ingredient-name { color: #f0f0f0; }
-.nutrition-ingredient-value { color: #888; text-align: right; }
-
-.nutrition-flag {
-    color: #f59e0b; font-size: 13px;
-    background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.3);
-    border-radius: 16px; padding: 2px 10px; white-space: nowrap;
-}
-
-.nutrition-flag-reason { flex-basis: 100%; font-size: 13px; color: #d97706; font-style: italic; margin-top: 2px; }
-
-/* Cost flag - shown on a row where nutrition is ok but price is missing/uncomputable */
-.nutrition-cost-flag { flex-basis: 100%; font-size: 12px; color: #f59e0b; font-style: italic; margin-top: 1px; opacity: 0.8; }
-
-.nutrition-provenance { flex-basis: 100%; font-size: 12px; color: #666; font-style: italic; margin-top: 2px; }
-.nutrition-recipe-eaten { border-color: #2d9e4a; }
-.nutrition-recipe-eaten .nutrition-recipe-name { color: #2d9e4a; }
-.nutrition-recipe-excluded { opacity: 0.5; }
-.nutrition-eaten-btn { background: none; border: 1px solid #555; color: #888; border-radius: 50%; width: 26px; height: 26px; font-size: 13px; cursor: pointer; flex-shrink: 0; padding: 0; line-height: 1; }
-.nutrition-eaten-btn:hover { border-color: #2d9e4a; color: #2d9e4a; }
-.nutrition-recipe-eaten .nutrition-eaten-btn { background: #2d9e4a; border-color: #2d9e4a; color: white; }
-.nutrition-ingredient-toggle { background: none; border: 1px solid #444; color: #666; border-radius: 4px; width: 20px; height: 20px; font-size: 13px; cursor: pointer; flex-shrink: 0; padding: 0; line-height: 1; margin-right: 6px; }
-.nutrition-ingredient-toggle:hover { border-color: #aaa; color: #f0f0f0; }
-.nutrition-ingredient-excluded { opacity: 0.4; }
-
-/* ── Macro targets panel ── */
-
-.panel.macro-targets { cursor: default; border-color: #3b3b3b; background: #161616; }
-
-.macro-targets-title { font-size: 14px; color: #666; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px; }
-
-.macro-row {
-    display: grid;
-    grid-template-columns: 80px 1fr 1fr 1fr;
-    gap: 8px;
-    align-items: center;
-    padding: 7px 0;
-    border-bottom: 1px solid #222;
-}
-.macro-row:last-child { border-bottom: none; }
-
-.macro-header span { font-size: 12px; color: #555; text-transform: uppercase; letter-spacing: 0.06em; }
-
-.macro-label { font-size: 17px; color: #f0f0f0; }
-
-.macro-target-wrap { display: flex; align-items: center; gap: 5px; }
-
-.macro-target-input {
-    width: 72px;
-    background: #252525;
-    border: 1px solid #555;
-    border-radius: 8px;
-    color: #f0f0f0;
-    font-size: 15px;
-    padding: 4px 8px;
-}
-.macro-target-input:focus { outline: none; border-color: #60a5fa; background: #1e2a3a; }
-
-.macro-unit-label { font-size: 13px; color: #666; }
-
-.macro-actual { font-size: 16px; color: #aaa; }
-
-.macro-remaining { font-size: 16px; color: #aaa; }
-.macro-remaining.met  { color: #2d9e4a; font-weight: bold; }
-.macro-remaining.over { color: #ef4444; font-weight: bold; }
-
-.macro-row-indent { border-bottom: none; padding: 3px 0; }
-.macro-label-sub  { font-size: 14px; color: #888; padding-left: 12px; }
-
-/* ── Recipe suggestions ── */
-.panel.nutrition-suggestions { cursor: default; border-color: #2d4a2d; background: #0f1f0f; }
-.nutrition-suggestions-title { font-size: 14px; color: #4a8c4a; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 12px; }
-.suggestion-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #1a2a1a; }
-.suggestion-row:last-child { border-bottom: none; }
-.suggestion-info { flex: 1; display: flex; flex-direction: column; gap: 3px; }
-.suggestion-name { font-size: 18px; color: #f0f0f0; }
-.suggestion-stats { font-size: 13px; color: #6b9c6b; }
-.suggestion-add-btn { font-size: 16px; padding: 8px 18px; border-radius: 10px; border: 1px solid #2d9e4a; background: transparent; color: #2d9e4a; cursor: pointer; white-space: nowrap; }
-.suggestion-add-btn:hover { background: #1a5c2a; color: #f0f0f0; }
-.suggestion-more-hint { font-size: 13px; color: #888; padding: 8px 0; }
-
-@media (max-width: 500px) {
-    body { padding: 14px; padding-bottom: max(14px, env(safe-area-inset-bottom)); font-size: 18px; }
-    h2 { font-size: 22px; }
-
-    .search-input { font-size: 20px; padding: 12px; }
-    .recipe-btn { font-size: 18px; padding: 14px 16px; }
-
-    /* Actions bar: 2-per-row wrap on narrow screens */
-    .actions { gap: 8px; padding: 10px 12px; padding-bottom: max(10px, env(safe-area-inset-bottom)); }
-    .action-btn { font-size: 17px; padding: 14px 8px; flex: 1 1 calc(50% - 4px); }
-    #recipe-list { padding-bottom: 180px; }
-
-    /* Macro targets: tighter grid */
-    .macro-row { grid-template-columns: 65px 70px 1fr 1fr; gap: 4px; }
-    .macro-label { font-size: 14px; }
-    .macro-target-input { width: 58px; font-size: 13px; }
-    .macro-actual, .macro-remaining { font-size: 13px; }
-
-    .inventory-have-input { width: 58px; font-size: 14px; }
-    .inventory-have-label, .inventory-needed { font-size: 13px; }
-
-    /* Nutrition header: allow sub to wrap below the name row */
-    .nutrition-recipe-header { flex-wrap: wrap; }
-    .nutrition-recipe-sub { white-space: normal; flex-basis: 100%; text-align: left; padding-left: 26px; }
-    .nutrition-recipe-name { font-size: 18px; }
-
-    .panel { font-size: 18px; padding: 14px; }
-}
-`;
 
 // ============================================================
 // BOOTSTRAP
 // ============================================================
 
-function bootstrap(): void {
-    document.head.insertAdjacentHTML('beforeend', `<style>${styles}</style>`);
+function bootstrap() {
     document.body.innerHTML = `<div id="app"></div><div id="status-live" class="visually-hidden" role="status" aria-live="polite"></div>`;
     document.title = SCREEN_TITLES[state.screen];
     document.addEventListener('click', () => unlockAudioContext(), { once: true });
@@ -4367,14 +3782,13 @@ function bootstrap(): void {
     registerRecipeAgentTools();
 }
 
-const RECIPE_SCREENS = ['select', 'shopping', 'cooking', 'nutrition', 'add-ingredient', 'prep', 'plan'] as const;
+const RECIPE_SCREENS = ['select', 'shopping', 'cooking', 'nutrition', 'add-ingredient', 'prep', 'plan'];
 
-function registerRecipeAgentTools(): void {
+function registerRecipeAgentTools() {
     if (!('modelContext' in document)) return;
-    const modelContext = (document as Document & {
-        modelContext?: { registerTool: (tool: object, options?: { signal: AbortSignal }) => Promise<unknown> | unknown };
-    }).modelContext;
-    if (!modelContext) return;
+    const doc = /** @type {Document & { modelContext?: { registerTool: (tool: object, options?: { signal: AbortSignal }) => Promise<unknown> | unknown } }} */ (document);
+    const modelContext = doc.modelContext;
+    if (!modelContext || typeof modelContext.registerTool !== 'function') return;
     const controller = new AbortController();
     const recipes = () => [...state.recipes.values()].filter(recipe => !recipe.hidden || state.showHidden);
 
@@ -4386,7 +3800,8 @@ function registerRecipeAgentTools(): void {
                 type: 'object',
                 properties: { query: { type: 'string', description: 'Words from the recipe name. An empty query lists visible recipes.' } },
             },
-            execute(input: { query?: unknown }) {
+            /** @param {any} input */
+            execute(input) {
                 const query = typeof input?.query === 'string' ? input.query.trim().toLowerCase() : '';
                 return {
                     recipes: recipes()
@@ -4402,7 +3817,8 @@ function registerRecipeAgentTools(): void {
             description: 'Read how many servings are currently selected.',
             inputSchema: { type: 'object', properties: {} },
             execute() {
-                const counts = new Map<string, number>();
+                /** @type {Map<string, number>} */
+                const counts = new Map();
                 for (const id of state.selectedRecipeIds) counts.set(id, (counts.get(id) ?? 0) + 1);
                 return {
                     selected: [...counts].map(([id, servings]) => ({ id, name: state.recipes.get(id)?.name ?? id, servings })),
@@ -4418,7 +3834,8 @@ function registerRecipeAgentTools(): void {
                 properties: { recipeId: { type: 'string', description: 'Recipe id from search-recipes.' } },
                 required: ['recipeId'],
             },
-            execute(input: { recipeId?: unknown }) {
+            /** @param {any} input */
+            execute(input) {
                 const recipe = typeof input?.recipeId === 'string' ? state.recipes.get(input.recipeId) : undefined;
                 if (!recipe) return { error: 'Unknown recipe id. Call search-recipes first.' };
                 state.selectedRecipeIds.push(recipe.id);
@@ -4436,7 +3853,8 @@ function registerRecipeAgentTools(): void {
                 properties: { recipeId: { type: 'string', description: 'Recipe id from list-selected-recipes.' } },
                 required: ['recipeId'],
             },
-            execute(input: { recipeId?: unknown }) {
+            /** @param {any} input */
+            execute(input) {
                 if (typeof input?.recipeId !== 'string') return { error: 'Pass a recipe id.' };
                 const idx = state.selectedRecipeIds.lastIndexOf(input.recipeId);
                 if (idx === -1) return { error: 'That recipe has no selected servings.' };
@@ -4455,18 +3873,19 @@ function registerRecipeAgentTools(): void {
                 properties: { screen: { type: 'string', enum: [...RECIPE_SCREENS], description: 'Which screen to show.' } },
                 required: ['screen'],
             },
-            execute(input: { screen?: unknown }) {
-                if (typeof input?.screen !== 'string' || !(RECIPE_SCREENS as readonly string[]).includes(input.screen)) {
+            /** @param {any} input */
+            execute(input) {
+                if (typeof input?.screen !== 'string' || !RECIPE_SCREENS.includes(input.screen)) {
                     return { error: 'Unknown screen.', screens: RECIPE_SCREENS };
                 }
-                navigateTo(input.screen as Screen);
+                navigateTo(/** @type {Screen} */ (input.screen));
                 return { screen: input.screen };
             },
             annotations: { readOnlyHint: false },
         },
     ];
     for (const tool of tools) {
-        void Promise.resolve(modelContext.registerTool(tool, { signal: controller.signal })).catch(() => {});
+        Promise.resolve(modelContext.registerTool(tool, { signal: controller.signal })).catch(() => {});
     }
     window.addEventListener('pagehide', () => controller.abort(), { once: true });
 }
@@ -4485,7 +3904,7 @@ export const stores = {
 // INGREDIENT FACTORY
 // ============================================================
 
-type IngredientDefaults = Partial<Omit<Ingredient, typeof __ingredient>>;
+/** @typedef {Partial<IngredientFields>} IngredientDefaults */
 
 // Every ingredient must resolve to real nutrition data - there is no "missing" path. That data
 // can live in exactly one of two places, and the two overloads below are what enforce it at
@@ -4496,19 +3915,28 @@ type IngredientDefaults = Partial<Omit<Ingredient, typeof __ingredient>>;
 //      butter: Organic Unsweetened / Creamy / Crunchy really do have different macros, so no
 //      single generic number would be honest for whichever variant isn't selected).
 // Passing neither is a compile error, not a silently-missing-data ingredient.
-function ingredientFactory(
-    name: string,
-    defaults: IngredientDefaults & { nutrition: NutritionLabel }
-): (quantity: number, unit: Unit) => Ingredient;
-function ingredientFactory(
-    name: string,
-    defaults: IngredientDefaults & { products: (Product & { nutrition: NutritionLabel })[] }
-): (quantity: number, unit: Unit) => Ingredient;
-function ingredientFactory(name: string, defaults: IngredientDefaults = {}) {
-    return (quantity: number, unit: Unit): Ingredient => {
-        const ing: any = { name, quantity, unit, ...defaults };
-        ing.rename = (newName: string) => { ing.name = newName; };
-        return ing as unknown as Ingredient;
+/**
+ * @overload
+ * @param {string} name
+ * @param {IngredientDefaults & { nutrition: NutritionLabel }} defaults
+ * @returns {(quantity: number, unit: Unit) => Ingredient}
+ */
+/**
+ * @overload
+ * @param {string} name
+ * @param {IngredientDefaults & { products: (Product & { nutrition: NutritionLabel })[] }} defaults
+ * @returns {(quantity: number, unit: Unit) => Ingredient}
+ */
+/**
+ * @param {string} name
+ * @param {IngredientDefaults} [defaults]
+ */
+function ingredientFactory(name, defaults = {}) {
+    return /** @param {number} quantity @param {Unit} unit @returns {Ingredient} */ (quantity, unit) => {
+        /** @type {any} */
+        const ing = { name, quantity, unit, ...defaults };
+        ing.rename = /** @param {string} newName */ (newName) => { ing.name = newName; };
+        return /** @type {Ingredient} */ (/** @type {unknown} */ (ing));
     };
 }
 
@@ -4522,7 +3950,6 @@ export const i = {
     // Generic/typical nutrition (not from this listing's own label) - a standard whole
     // grapefruit, ~236g. Real produce values, just not brand-specific.
     grapefruit: ingredientFactory('Pink Grapefruit', {
-        defaultBrand: 'Organic',
         products: [{
             brand: 'Organic', variant: 'Red Grapefruit', size: 1, sizeUnit: u.unit,
             listings: [{ price: 1.79, link: 'https://www.amazon.com/Fresh-Produce-Brands-Vary-B000P6G148/dp/B000P6G148' }],
@@ -4535,7 +3962,6 @@ export const i = {
     // Nutrition zeroed at the user's request - vinegar is close enough to calorie-free at
     // typical usage to be a defensible placeholder (same reasoning as whiteVinegar above).
     champagneVinegar: ingredientFactory('Champagne Vinegar', {
-        defaultBrand: 'O Olive Oil & Vinegar',
         products: [{
             brand: 'O Olive Oil & Vinegar', variant: 'California Champagne Vinegar', size: 10.1, sizeUnit: u.fluidOunce,
             listings: [{ price: 7.96, link: 'https://www.amazon.com/Olive-Oil-California-Champagne-Vinegar/dp/B07CQQ35PK' }],
@@ -4548,7 +3974,6 @@ export const i = {
     // Generic/typical nutrition (not from this listing's own label) - salt is essentially
     // pure sodium chloride regardless of brand, so ~2300mg sodium/tsp is a standard real value.
     seaSalt: ingredientFactory('Sea Salt', {
-        defaultBrand: 'Ancient',
         products: [{
             brand: 'Ancient', variant: 'Spring Salt, Organic', size: 7, sizeUnit: u.ounce, organic: true,
             listings: [{ price: 14.5, link: 'https://www.amazon.com/Spring-Salt-Organic-Natural-Microplastic/dp/B091V3KBC2' }],
@@ -4561,7 +3986,6 @@ export const i = {
     // Nutrition zeroed at the user's request - the label is image-only on Amazon (typical
     // for dried herbs), so this is a placeholder, not a real (scraped or measured) value.
     rosemary: ingredientFactory('Rosemary', {
-        defaultBrand: '365',
         products: [{
             brand: '365', variant: 'Organic', organic: true,
             listings: [{ store: stores.wholeFoods, price: 3.99, link: 'https://www.amazon.com/365-Everyday-Value-Organic-Rosemary/dp/B074H6M37H' }],
@@ -4574,7 +3998,6 @@ export const i = {
     // Generic/typical nutrition (not from this listing's own label) - standard mushroom
     // values, per roughly one whole king trumpet mushroom (~100g).
     kingOysterMushroom: ingredientFactory('King Trumpet Mushroom', {
-        defaultBrand: 'Mushroom King Farm',
         products: [{
             brand: 'Mushroom King Farm', variant: 'Organic Sliced', size: 4, sizeUnit: u.ounce, organic: true,
             listings: [{ price: 6.29, link: 'https://www.amazon.com/MUSHROOM-Organic-King-Trumpet-Mushrooms/dp/B0F9LQG2V8' }],
@@ -4585,7 +4008,6 @@ export const i = {
     }),
 
     cassavaFlour: ingredientFactory('Cassava Flour', {
-        defaultBrand: "Otto's Naturals",
         products: [{
             brand: "Otto's Naturals", variant: 'Organic', size: 1.5, sizeUnit: u.pound, organic: true,
             listings: [{ price: 19.99, link: 'https://www.amazon.com/Ottos-Naturals-Organic-Grain-Free-Gluten-Free/dp/B08QZVC7WH' }],
@@ -4596,7 +4018,6 @@ export const i = {
     }),
 
     cornstarch: ingredientFactory('Corn Starch', {
-        defaultBrand: '365',
         products: [{
             brand: '365', size: 16, sizeUnit: u.ounce,
             listings: [{ store: stores.wholeFoods, price: 2.18, link: 'https://www.amazon.com/365-Everyday-Value-Corn-Starch/dp/B074H67H5C' }],
@@ -4609,7 +4030,6 @@ export const i = {
     // Generic/typical nutrition (not from this listing's own label) - standard fennel bulb
     // values, per one medium bulb (~234g).
     fennel: ingredientFactory('Fennel', {
-        defaultBrand: 'Organic',
         products: [{
             brand: 'Organic', size: 1, sizeUnit: u.unit,
             listings: [{ price: 2.21, link: 'https://www.amazon.com/Fresh-Produce-Brands-May-Vary/dp/B00E3J6RC4' }],
@@ -4622,7 +4042,6 @@ export const i = {
     // Generic/typical nutrition (not from this listing's own label) - standard radicchio
     // values, per one head (~350g).
     radicchio: ingredientFactory('Radicchio', {
-        defaultBrand: 'Organic',
         products: [{
             brand: 'Organic', size: 1, sizeUnit: u.unit,
             listings: [{ price: 4.61, link: 'https://www.amazon.com/produce-aisle-101767-Organic-Radicchio/dp/B00E3KS6LS' }],
@@ -4635,7 +4054,6 @@ export const i = {
     // Nutrition zeroed at the user's request - the label is image-only on Amazon (typical
     // for dried herbs), so this is a placeholder, not a real (scraped or measured) value.
     dillWeed: ingredientFactory('Dill Weed', {
-        defaultBrand: '365',
         products: [{
             brand: '365', variant: 'Organic', size: 0.46, sizeUnit: u.ounce, organic: true,
             listings: [{ store: stores.wholeFoods, price: 3.99, link: 'https://www.amazon.com/365-Everyday-Value-Organic-Dill/dp/B074H773GP' }],
@@ -4649,7 +4067,6 @@ export const i = {
     // white vinegar is also close enough to calorie-free at typical usage to be a defensible
     // placeholder even so, but flagging same as the others since it's not from a real label.
     whiteVinegar: ingredientFactory('White Vinegar', {
-        defaultBrand: '365',
         products: [{
             brand: '365', variant: 'Organic Distilled', size: 32, sizeUnit: u.fluidOunce, organic: true,
             listings: [{ store: stores.wholeFoods, price: 2.99, link: 'https://www.amazon.com/365-Everyday-Value-Organic-Distilled/dp/B074J6FD4L' }],
@@ -4660,7 +4077,6 @@ export const i = {
     }),
 
     thyme: ingredientFactory('Thyme', {
-        defaultBrand: '365',
         products: [{
             brand: '365', variant: 'Organic', size: 0.67, sizeUnit: u.ounce, organic: true,
             listings: [{ store: stores.wholeFoods, price: 3.99, link: 'https://www.amazon.com/365-Everyday-Value-Organic-Thyme/dp/B074HBKSCL' }],
@@ -4674,7 +4090,6 @@ export const i = {
     // which is genuinely small enough that standard cooking-oil-spray labels round it to
     // 0 cal/0g fat per spray (the same convention as e.g. PAM) - not a placeholder zero.
     avocadoOil: ingredientFactory('Avocado Oil', {
-        defaultBrand: 'Chosen Foods',
         shimmerAt: 330,
         products: [{
             brand: 'Chosen Foods', variant: 'Organic 100% Avocado Oil', size: 16.9, sizeUnit: u.fluidOunce, organic: true,
@@ -4688,7 +4103,6 @@ export const i = {
     // Generic/typical nutrition (not from this listing's own label) - standard honey-mustard
     // dressing values, per 1 tbsp (15g).
     honeyDijonMustard: ingredientFactory('Honey Dijon Mustard', {
-        defaultBrand: 'SideDish',
         products: [{
             brand: 'SideDish', variant: 'Honey Dijon Dressing', size: 8, sizeUnit: u.fluidOunce,
             listings: [{ price: 9.99, link: 'https://www.amazon.com/SideDish-Honey-Dijon-Dressing-OZ/dp/B0CSTW8YFP' }],
@@ -4701,7 +4115,6 @@ export const i = {
     // Generic/typical nutrition (not from this listing's own label) - a standard medium
     // orange, ~131g.
     orange: ingredientFactory('Orange', {
-        defaultBrand: 'Organic',
         products: [{
             brand: 'Organic', variant: 'Valencia', size: 1, sizeUnit: u.unit,
             listings: [{ price: 1.32, link: 'https://www.amazon.com/365-by-Whole-Foods-Market/dp/B003TQ3554' }],
@@ -4714,7 +4127,6 @@ export const i = {
     // Generic/typical nutrition (not from this listing's own label) - standard arugula
     // values, per 100g.
     arugula: ingredientFactory('Arugula', {
-        defaultBrand: '365',
         products: [{
             brand: '365', variant: 'Organic Baby Arugula Salad', size: 5, sizeUnit: u.ounce, organic: true,
             listings: [{ store: stores.wholeFoods, price: 3.99, link: 'https://www.amazon.com/365-Whole-Foods-Market-Organic/dp/B09ZHX8Y9V' }],
@@ -4728,7 +4140,6 @@ export const i = {
     // cholesterol line at all (dairy sour cream normally has some), so that field specifically
     // is unconfirmed rather than a verified zero. Everything else here is real scraped data.
     sourCream: ingredientFactory('Sour Cream', {
-        defaultBrand: '365',
         products: [{
             brand: '365', variant: 'Organic', size: 16, sizeUnit: u.ounce, organic: true,
             listings: [{ store: stores.wholeFoods, price: 3.39, link: 'https://www.amazon.com/365-Whole-Foods-Market-Organic/dp/B07BS4YGL5' }],
@@ -4739,7 +4150,6 @@ export const i = {
     }),
 
     paprika: ingredientFactory('Paprika', {
-        defaultBrand: '365',
         products: [{
             brand: '365', variant: 'Organic', size: 1.69, sizeUnit: u.ounce, organic: true,
             listings: [{ store: stores.wholeFoods, price: 3.99, link: 'https://www.amazon.com/365-Everyday-Value-Organic-Paprika/dp/B074H81LWT' }],
@@ -4752,7 +4162,6 @@ export const i = {
     // Nutrition zeroed at the user's request - Amazon's label for this listing is
     // image-only, so this is a placeholder, not a real (scraped or measured) value.
     garlicPowder: ingredientFactory('Garlic Powder', {
-        defaultBrand: '365',
         products: [{
             brand: '365', variant: 'Organic', size: 2.33, sizeUnit: u.ounce, organic: true,
             listings: [{ store: stores.wholeFoods, price: 3.99, link: 'https://www.amazon.com/365-Everyday-Value-Organic-Garlic/dp/B00JJZ57FK' }],
@@ -4765,7 +4174,6 @@ export const i = {
     // Nutrition zeroed at the user's request - Amazon's label for this listing is
     // image-only, so this is a placeholder, not a real (scraped or measured) value.
     onionPowder: ingredientFactory('Onion Powder', {
-        defaultBrand: '365',
         products: [{
             brand: '365', variant: 'Organic', size: 2.33, sizeUnit: u.ounce, organic: true,
             listings: [{ store: stores.wholeFoods, price: 3.99, link: 'https://www.amazon.com/365-Everyday-Value-Organic-Onion/dp/B00DQMKSY4' }],
@@ -4779,7 +4187,6 @@ export const i = {
     // values, scaled up from a typical ~94 cal/tbsp to a full cup (16 tbsp), matching how
     // this ingredient is actually consumed in the one recipe that uses it.
     mayonnaise: ingredientFactory('Mayonnaise', {
-        defaultBrand: '365',
         products: [{
             brand: '365', variant: 'Organic Squeezable', size: 11.2, sizeUnit: u.fluidOunce, organic: true,
             listings: [{ store: stores.wholeFoods, price: 3.79, link: 'https://www.amazon.com/365-Everyday-Value-Mayonnaise-Squeezable/dp/B074H64C5R' }],
@@ -4790,7 +4197,6 @@ export const i = {
     }),
 
     babyBellaMushroom: ingredientFactory('Baby Bella Mushroom', {
-        defaultBrand: '365',
         products: [{
             brand: '365', variant: 'Organic Whole', size: 8, sizeUnit: u.ounce, organic: true,
             listings: [{ store: stores.wholeFoods, price: 3.79, link: 'https://www.amazon.com/365-Everyday-Value-Organic-Mushrooms/dp/B07NQDLF47' }],
@@ -4804,7 +4210,6 @@ export const i = {
     // Italian sausage values, scaled to the whole 10oz (283g) package (recipe consumes it as
     // "1 bag").
     abbotPeaItalianSausage: ingredientFactory('Abbot\'s Plant-Based Italian Sausage', {
-        defaultBrand: "Abbot's",
         products: [{
             brand: "Abbot's", size: 10, sizeUnit: u.ounce,
             listings: [{ price: 9.49, link: 'https://www.amazon.com/Abbots-Plant-Based-Italian-Gluten-Free-High-Protein/dp/B0FB447RLJ' }],
@@ -4815,7 +4220,6 @@ export const i = {
     }),
 
     egg: ingredientFactory('Egg', {
-        defaultBrand: '365',
         products: [{
             brand: '365', variant: 'Organic Large Brown Grade A (12 Count)', size: 12, sizeUnit: u.unit, organic: true,
             listings: [{ store: stores.wholeFoods, price: 5.99, link: 'https://www.amazon.com/365-Everyday-Value-Brown-Organic/dp/B07PDH5138' }],
@@ -4826,7 +4230,6 @@ export const i = {
     }),
 
     spaghettiSauce: ingredientFactory('Spaghetti Sauce', {
-        defaultBrand: '365',
         products: [{
             brand: '365', variant: 'Organic 4 Cheese Pasta Sauce', size: 25, sizeUnit: u.ounce, organic: true,
             listings: [{ store: stores.wholeFoods, price: 3.49, link: 'https://www.amazon.com/365-Everyday-Value-Organic-Cheese/dp/B074H66176' }],
@@ -4844,7 +4247,6 @@ export const i = {
     // Nutrition zeroed at the user's request - no text nutrition table was available for
     // this listing, so this is a placeholder, not a real (scraped or measured) value.
     bakingSoda: ingredientFactory('Baking Soda', {
-        defaultBrand: 'Arm & Hammer',
         products: [{
             brand: 'Arm & Hammer', size: 16, sizeUnit: u.ounce,
             listings: [{ price: 4.50, link: 'https://www.amazon.com/Arm-Hammer-Pure-Baking-Soda/dp/B00K1JFAVE' }],
@@ -4855,7 +4257,6 @@ export const i = {
     }),
 
     pankoBreadCrumbs: ingredientFactory('Panko Bread Crumbs', {
-        defaultBrand: '365',
         products: [{
             brand: '365', size: 8, sizeUnit: u.ounce,
             listings: [{ store: stores.wholeFoods, price: 1.99, link: 'https://www.amazon.com/365-Everyday-Value-Panko-Crumbs/dp/B074H5LYGT' }],
@@ -4868,7 +4269,6 @@ export const i = {
     // Nutrition zeroed at the user's request - the label is image-only on Amazon (typical
     // for dried herbs), so this is a placeholder, not a real (scraped or measured) value.
     parsleyFlakes: ingredientFactory('Parsley Flakes', {
-        defaultBrand: '365',
         products: [{
             brand: '365', variant: 'Organic Parsley', size: 0.24, sizeUnit: u.ounce, organic: true,
             listings: [{ store: stores.wholeFoods, price: 3.99, link: 'https://www.amazon.com/365-Everyday-Value-Organic-Parsley/dp/B074H81M9K' }],
@@ -4879,7 +4279,6 @@ export const i = {
     }),
 
     lentilSpaghetti: ingredientFactory('Lentil Spaghetti', {
-        defaultBrand: 'Whole Foods Market',
         products: [{
             brand: 'Whole Foods Market', variant: 'Organic Red Lentil Gluten Free', size: 8, sizeUnit: u.ounce, organic: true,
             listings: [{ store: stores.wholeFoods, price: 3.29, link: 'https://www.amazon.com/Whole-Foods-Market-Organic-Spaghetti/dp/B07FX14M71' }],
@@ -4891,7 +4290,6 @@ export const i = {
     }),
 
     instantOatmeal: ingredientFactory('Instant Oatmeal (Maple & Brown Sugar, Lower Sugar)', {
-        defaultBrand: 'Quaker',
         products: [{
             brand: 'Quaker', variant: 'Lower Sugar, Maple & Brown Sugar (1.19 oz, Pack of 44)', listings: [{ store: stores.amazon, price: 13.72, discount: { subscribeAndSave15: true }, link: 'https://www.amazon.com/dp/B094TG5HDJ' }], size: 44, sizeUnit: u.unit,
         }],
@@ -4903,7 +4301,6 @@ export const i = {
     // Generic/typical nutrition (not from this listing's own label) - standard onion values,
     // per 1 tbsp minced (~10g), matching how this ingredient is actually used in recipes.
     whiteOnion: ingredientFactory('White Onion', {
-        defaultBrand: 'Organic',
         products: [{
             brand: 'Organic', size: 1, sizeUnit: u.unit,
             listings: [{ price: 1.49, link: 'https://www.amazon.com/Organic-White-Onion-1-Each/dp/B0787Z3T3B' }],
@@ -4916,7 +4313,6 @@ export const i = {
     // Nutrition zeroed at the user's request - Amazon's label for these listings is
     // image-only, so this is a placeholder, not a real (scraped or measured) value.
     blackPepper: ingredientFactory('Black Pepper', {
-        defaultBrand: '365',
         products: [{
             brand: '365', variant: 'Organic Ground (1.8 oz)', size: 1.8, sizeUnit: u.ounce, organic: true,
             listings: [
@@ -4937,7 +4333,6 @@ export const i = {
     }),
 
     asianSaladKit: ingredientFactory('Asian Inspired Salad Kit', {
-        defaultBrand: '365',
         products: [{
             brand: '365', variant: 'Organic Asian Inspired (12 oz)', listings: [{ store: stores.wholeFoods, price: 5.99, link: 'https://www.amazon.com/dp/B07B67Y9MH' }], size: 1, sizeUnit: u.unit,
         }],
@@ -4948,7 +4343,6 @@ export const i = {
     }),
 
     blueZonesBasilPestoVeggieBowl: ingredientFactory('Blue Zones Kitchen Basil Pesto Veggie Bowl', {
-        defaultBrand: 'Blue Zones Kitchen',
         products: [{
             brand: 'Blue Zones Kitchen', variant: 'Basil Pesto Veggie Bowl', size: 8.5, sizeUnit: u.ounce, packageUnit: u.unit,
             listings: [{ store: stores.wholeFoods, price: 7.99, link: 'https://www.wholefoodsmarket.com/grocery/product/blue-zones-blue-zones-kitchen-basil-pesto-veggie-bowl-8-5-ounce-b0f24t4vqj' }],
@@ -4960,7 +4354,6 @@ export const i = {
     }),
 
     carrot: ingredientFactory('Carrots', {
-        defaultBrand: '365',
         products: [{
             brand: '365', variant: 'Organic Shredded (10 oz)', listings: [{ store: stores.wholeFoods, price: 2.99, link: 'https://www.amazon.com/dp/B078J1FS9V' }], size: 10, sizeUnit: u.ounce,
         }, {
@@ -4976,7 +4369,6 @@ export const i = {
     }),
 
     edamame: ingredientFactory('Shelled Edamame', {
-        defaultBrand: '365',
         products: [{
             brand: '365', variant: 'Organic Frozen Shelled', listings: [{ store: stores.wholeFoods, price: 3.49, link: 'https://www.amazon.com/dp/B074H6S8D8' }], size: 10, sizeUnit: u.ounce, packageUnit: u.bag,
         }],
@@ -4989,7 +4381,6 @@ export const i = {
     }),
 
     yellowOnion: ingredientFactory('Yellow Onion', {
-        defaultBrand: 'Whole Foods Market',
         products: [{
             brand: 'Whole Foods Market', variant: 'Organic, Loose', listings: [{ store: stores.wholeFoods, price: 2.99, link: 'https://www.amazon.com/dp/B07QV6B5WV' }], size: 1, sizeUnit: u.pound, organic: true, bulk: true,
         }],
@@ -5003,7 +4394,6 @@ export const i = {
     }),
 
     cabbage: ingredientFactory('Green Cabbage', {
-        defaultBrand: 'Whole Foods Market',
         products: [{
             brand: 'Whole Foods Market', variant: 'Organic, Loose (~2.5 lb head)', listings: [{ store: stores.wholeFoods, price: 1.99, link: 'https://www.amazon.com/dp/B0787TK5FV' }], size: 1, sizeUnit: u.pound, organic: true, bulk: true,
         }],
@@ -5017,7 +4407,6 @@ export const i = {
 
     coleslawMix: ingredientFactory('Coleslaw Mix', {
         // Green cabbage, red cabbage, and carrots
-        defaultBrand: '365',
         products: [{
             brand: '365', variant: 'Organic (12 oz)', listings: [{ store: stores.wholeFoods, price: 3.49, link: 'https://www.amazon.com/dp/B07FWN3244' }], size: 12, sizeUnit: u.ounce, packageUnit: u.bag,
         }],
@@ -5032,7 +4421,6 @@ export const i = {
     }),
 
     greenOnion: ingredientFactory('Green Onion', {
-        defaultBrand: 'Whole Foods Market',
         products: [{
             brand: 'Whole Foods Market', variant: 'Organic Scallions (1 Bunch)', listings: [{ store: stores.wholeFoods, price: 1.99, link: 'https://www.amazon.com/dp/B07883LXVL' }], size: 1, sizeUnit: u.bunch, packageUnit: u.bunch,
         }],
@@ -5084,7 +4472,6 @@ export const i = {
     }),
 
     creamySesameDressing: ingredientFactory('Creamy Sesame Salad Dressing', {
-        defaultBrand: 'SideDish',
         products: [{
             brand: 'SideDish', variant: 'Creamy Sesame (8 fl oz)', listings: [{ store: stores.wholeFoods, price: 6.53, link: 'https://www.amazon.com/dp/B0CR56SHBK' }], size: 8, sizeUnit: u.fluidOunce,
         }],
@@ -5111,7 +4498,6 @@ export const i = {
     }),
 
     chickpeas: ingredientFactory('Chickpeas (Garbanzo Beans)', {
-        defaultBrand: '365',
         conversions: {
             [u.cup.name]: { to: u.ounce, factor: 13.4 / 1.5 },  // 13.4 oz per ~1.5 cups (3 × ½ cup servings)
         },
@@ -5124,7 +4510,6 @@ export const i = {
     }),
 
     cannelliniBean: ingredientFactory('Cannellini Beans', {
-        defaultBrand: '365',
         conversions: {
             [u.cup.name]: { to: u.ounce, factor: 13.4 / 1.5 },  // 13.4 oz per 1.5 cups (3 × ½ cup servings)
         },
@@ -5138,7 +4523,6 @@ export const i = {
 
     macadamiaNutMilk: ingredientFactory('Macadamia Nut Milk', {
         requiresDateLabel: true,
-        defaultBrand: 'Milkadamia',
         products: [{
             brand: 'Milkadamia', variant: 'Unsweetened', listings: [{ store: stores.wholeFoods, link: 'https://www.amazon.com/dp/B01JH2O854', price: 6.19 }], size: 32, sizeUnit: u.fluidOunce,
             nutrition: {
@@ -5171,7 +4555,6 @@ export const i = {
     }),
 
     cocoaNibs: ingredientFactory('Cocoa Nibs', {
-        defaultBrand: 'Navitas',
         products: [{
             brand: 'Navitas', variant: 'Organic Raw',
             nutrition: {
@@ -5181,7 +4564,6 @@ export const i = {
     }),
 
     chiaSeed: ingredientFactory('Chia Seed', {
-        defaultBrand: '365',
         products: [{
             brand: '365', variant: 'Organic Black', listings: [{ store: stores.wholeFoods }],
             nutrition: {
@@ -5191,7 +4573,6 @@ export const i = {
     }),
 
     hempSeed: ingredientFactory('Hemp Seed', {
-        defaultBrand: 'Manitoba Harvest',
         products: [{
             brand: 'Manitoba Harvest', variant: 'Hemp Hearts', listings: [{ store: stores.wholeFoods }],
             nutrition: {
@@ -5201,7 +4582,6 @@ export const i = {
     }),
 
     antiOxidantBerryBlend: ingredientFactory('Antioxidant Berry Blend', {
-        defaultBrand: '365',
         products: [{
             brand: '365', variant: 'Organic Antioxidant Fruit Blend (frozen)', listings: [{ store: stores.wholeFoods }],
             size: 16, sizeUnit: u.ounce, organic: true,
@@ -5212,7 +4592,6 @@ export const i = {
     }),
 
     vanillaExtract: ingredientFactory('Vanilla Extract', {
-        defaultBrand: '365',
         products: [{
             brand: '365', variant: 'Organic Vanilla Extract', listings: [{ store: stores.wholeFoods, price: 8.79, link: 'https://www.amazon.com/365-Everyday-Value-Organic-Vanilla/dp/B074VBL8R9' }],
             nutrition: { [u.fluidOunce.name]: { servings: 2, servingSize: 2, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 } }, size: 2, sizeUnit: u.fluidOunce, organic: true,
@@ -5220,7 +4599,6 @@ export const i = {
     }),
 
     lemonJuice: ingredientFactory('Lemon Juice', {
-        defaultBrand: '365',
         products: [{
             brand: '365', variant: 'Organic Lemon Juice', listings: [{ store: stores.wholeFoods, price: 3.49, link: 'https://www.amazon.com/365-Everyday-Value-Organic-Concentrate/dp/B074J5WZS8?th=1' }],
             nutrition: { [u.tsp.name]: { servings: 59, servingSize: 1, calories: 0, fat: 0, saturatedFat: 0, transFat: 0, cholesterol: 0, carbs: 0, sodium: 0, sugar: 0, protein: 0, fiber: 0 } }, size: 10, sizeUnit: u.fluidOunce, organic: true,
@@ -5228,7 +4606,6 @@ export const i = {
     }),
 
     cherry: ingredientFactory('Cherry', {
-        defaultBrand: '365',
         conversions: {
             [u.unit.name]: { to: u.cup, factor: 1/15 },  // ~15 dark cherries per cup
             [u.cup.name]:  { to: u.ounce, factor: 5 },   // 1 cup dark cherries ≈ 5 oz
@@ -5251,7 +4628,6 @@ export const i = {
     }),
 
     spinach: ingredientFactory('Spinach', {
-        defaultBrand: '365',
         products: [{
             brand: '365', variant: 'Organic Whole Leaf (Frozen, 16 oz)', listings: [{ store: stores.wholeFoods, price: 3.59, link: 'https://www.amazon.com/dp/B074H5Y441' }], size: 16, sizeUnit: u.ounce,
         }],
@@ -5263,7 +4639,6 @@ export const i = {
     }),
 
     kale: ingredientFactory('Kale', {
-        defaultBrand: '365',
         products: [{
             brand: '365', variant: 'Organic Chopped (Frozen, 16 oz)', listings: [{ store: stores.wholeFoods, price: 3.59, link: 'https://www.amazon.com/dp/B074H5Y3WB' }], size: 16, sizeUnit: u.ounce,
         }],
@@ -5279,7 +4654,6 @@ export const i = {
     }),
 
     peanutButter: ingredientFactory('Peanut Butter', {
-        defaultBrand: '365',
         products: [
             {
                 brand: '365', variant: 'Organic Unsweetened', listings: [{ store: stores.wholeFoods, price: 4.19, link: 'https://www.amazon.com/365-Everyday-Value-Organic-Unsweetened/dp/B074H61LYV/ref=sr_1_9_0o_wf' }], size: 16, sizeUnit: u.ounce, organic: true,
@@ -5349,7 +4723,6 @@ export const i = {
     }),
 
     psyllium: ingredientFactory('Psyllium Husk', {
-        defaultBrand: '365',
         conversions: {
             [u.tbsp.name]: { to: u.ounce, factor: 0.214 },  // 12 oz / 56 tbsp servings
         },
@@ -5367,7 +4740,6 @@ export const i = {
     }),
 
     macadamiaBar: ingredientFactory('Macadamia Bar', {
-        defaultBrand: 'Blueprint',
         products: [
             {
                 brand: 'Blueprint', variant: 'Raspberry', listings: [{ store: stores.amazon, link: 'https://www.amazon.com/dp/B0DQLSW6FB', price: 29.00, discount: { subscribeAndSave10: true } }], size: 12, sizeUnit: u.unit,
@@ -5379,7 +4751,6 @@ export const i = {
     }),
 
     blackLentils: ingredientFactory('Black Lentils', {
-        defaultBrand: '365',
         conversions: {
             [u.gram.name]: { to: u.cup, factor: 1/180 },  // 45g = ¼ cup dry, per nutrition label
         },
@@ -5392,7 +4763,6 @@ export const i = {
     }),
 
     oliveOil: ingredientFactory('Extra Virgin Olive Oil', {
-        defaultBrand: 'Blueprint',
         shimmerAt: 300,
         conversions: {
             [u.shot.name]: { to: u.fluidOunce, factor: 1 },  // 1 shot = 1 fl oz
@@ -5407,9 +4777,8 @@ export const i = {
     }),
 
     longevityProtein: ingredientFactory('Longevity Protein', {
-        defaultBrand: 'Blueprint',
         products: [{
-            brand: 'Blueprint', variant: 'Chocolate (30 servings)', listings: [{ store: stores.amazon, price: 94, link: 'https://www.amazon.com/Blueprint-Bryan-Johnson-Longevity-Protein/dp/B0DNGJRLQF' }], 
+            brand: 'Blueprint', variant: 'Chocolate (30 servings)', listings: [{ store: stores.amazon, price: 94, link: 'https://www.amazon.com/Blueprint-Bryan-Johnson-Longevity-Protein/dp/B0DNGJRLQF' }],
             size: 30, sizeUnit: u.unit,
             nutrition: {
                 [u.unit.name]: { servings: 1, servingSize: 1, calories: 200, fat: 5, saturatedFat: 0.5, transFat: 0, cholesterol: 0, carbs: 13, sodium: 200, sugar: 0, protein: 26, fiber: 1 },
@@ -5418,7 +4787,6 @@ export const i = {
     }),
 
     blueberryNutMix: ingredientFactory('Blueberry Nut Mix', {
-        defaultBrand: 'Blueprint',
         products: [{
             brand: 'Blueprint', variant: 'Macadamia + Walnut + Blueberry', listings: [{ store: stores.amazon, price: 37, discount: { subscribeAndSave10: true }, link: 'https://www.amazon.com/Blueprint-Bryan-Johnson-Blueberry-Nut/dp/B0D3FZ29RJ' }], size: 30, sizeUnit: u.unit,
             nutrition: {
@@ -5429,7 +4797,6 @@ export const i = {
     }),
 
     longevityMix: ingredientFactory('Longevity Mix', {
-        defaultBrand: 'Blueprint',
         products: [{
             brand: 'Blueprint', variant: 'Blood Orange (30 servings)', listings: [{ store: stores.amazon, price: 49, link: 'https://www.amazon.com/dp/B0D3GBRNSX', discount: { subscribeAndSave10: true } }], size: 30, sizeUnit: u.unit,
         }],
@@ -5439,7 +4806,6 @@ export const i = {
     }),
 
     collagenPowder: ingredientFactory('Collagen Peptides', {
-        defaultBrand: 'Blueprint',
         products: [{
             brand: 'Blueprint', variant: 'Hydrolyzed Type I, II & III (30 servings)', listings: [{ store: stores.amazon, price: 45, link: 'https://www.amazon.com/dp/B0DV1PQDWH', discount: { subscribeAndSave10: true } }], size: 30, sizeUnit: u.unit,
         }],
@@ -5449,7 +4815,6 @@ export const i = {
     }),
 
     creatine: ingredientFactory('Creatine Monohydrate', {
-        defaultBrand: 'Blueprint',
         products: [{
             brand: 'Blueprint', variant: 'Unflavored (100 servings)', listings: [{ store: stores.amazon, price: 40, link: 'https://www.amazon.com/dp/B0DQLW13S2', discount: { subscribeAndSave10: true } }], size: 100, sizeUnit: u.unit,
         }],
@@ -5461,7 +4826,6 @@ export const i = {
     // Generic/typical nutrition (not from this listing's own label) - standard honey values,
     // per 1 tsp (~7g). Link is also currently dead ("Page Not Found") - needs a fresh one.
     manukaHoney: ingredientFactory('Manuka Honey', {
-        defaultBrand: 'Blueprint',
         products: [{
             brand: 'Blueprint', variant: 'Manuka Honey', listings: [{ store: stores.amazon, link: 'https://www.amazon.com/dp/B0DQLSXYZ' }],
             nutrition: {
@@ -5471,7 +4835,6 @@ export const i = {
     }),
 
     nutThins: ingredientFactory('Nut Thins', {
-        defaultBrand: 'Blue Diamond',
         products: [
             {
                 brand: 'Blue Diamond', variant: 'Hint Of Sea Salt', size: 4.25, sizeUnit: u.ounce,
@@ -5502,7 +4865,6 @@ export const i = {
     // skinless chicken thigh values, per 1 lb (453.6g).
     chickenThigh: ingredientFactory('Chicken Thighs (Boneless Skinless)', {
         isMeatProduct: true,
-        defaultBrand: '365',
         products: [{
             brand: '365', variant: 'Organic Boneless Skinless (1.5 lb)', listings: [{ store: stores.wholeFoods, price: 9.99, link: 'https://www.amazon.com/dp/B07813VZHR' }], size: 1.5, sizeUnit: u.pound,
             nutrition: {
@@ -5574,7 +4936,6 @@ export const i = {
     // From the product label: per 1 burger (71g); 4 burgers per 10 oz box. Sold as a
     // countable frozen patty, so the recipe measures it by the unit and the box counts as 4.
     drPraegersCrunchyCauliflowerBurger: ingredientFactory("Dr. Praeger's Crunchy Cauliflower Burger", {
-        defaultBrand: "Dr. Praeger's",
         products: [{
             brand: "Dr. Praeger's", variant: 'Crunchy Cauliflower Veggie Burgers (4 Count, 10 oz)',
             size: 4, sizeUnit: u.unit,
@@ -5609,7 +4970,6 @@ export const i = {
     }),
     // Generic/typical nutrition - standard USDA values for rolled oats, per 1 cup (~80g).
     rolledOats: ingredientFactory('Rolled Oats', {
-        defaultBrand: '365',
         products: [{
             brand: '365', variant: 'Old Fashioned Rolled Oats', listings: [{ store: stores.wholeFoods }],
             nutrition: {
@@ -5620,7 +4980,6 @@ export const i = {
 
     // Generic/typical nutrition - standard USDA values for pitted Medjool dates, per 1 date (~24g).
     medjoolDate: ingredientFactory('Medjool Dates (Pitted)', {
-        defaultBrand: '365',
         conversions: {
             [u.gram.name]: { to: u.unit, factor: 1 / 24 },  // ~24g per pitted Medjool date
         },
@@ -5634,7 +4993,6 @@ export const i = {
 
     // Generic/typical nutrition - allulose is a noncaloric sweetener, so zeroed.
     allulose: ingredientFactory('Allulose', {
-        defaultBrand: 'Wholesome Yum',
         products: [{
             brand: 'Wholesome Yum', variant: 'Powdered Allulose', listings: [{ store: stores.amazon, price: 16.99, link: 'https://www.amazon.com/dp/B07RLP444V' }],
             nutrition: {
@@ -5645,7 +5003,6 @@ export const i = {
 
     // Generic/typical nutrition - standard USDA values for maple extract, negligible per tsp.
     mapleExtract: ingredientFactory('Maple Extract', {
-        defaultBrand: 'McCormick',
         products: [{
             brand: 'McCormick', variant: 'Pure Maple Extract', listings: [{ store: stores.amazon, price: 5.49, link: 'https://www.amazon.com/McCormick-Pure-Maple-Flavor/dp/B00032GJCO' }],
             nutrition: {
@@ -5656,7 +5013,6 @@ export const i = {
 
     // Generic/typical nutrition - standard USDA values for ground flaxseed, per 1 tbsp (~7g).
     groundFlaxseed: ingredientFactory('Ground Flaxseed', {
-        defaultBrand: '365',
         products: [{
             brand: '365', variant: 'Organic Ground Flaxseed', listings: [{ store: stores.wholeFoods }],
             nutrition: {
@@ -5667,7 +5023,6 @@ export const i = {
 
     // Generic/typical nutrition - standard USDA values for vanilla powder, negligible per ¼ tsp.
     vanillaPowder: ingredientFactory('Vanilla Powder', {
-        defaultBrand: 'Native Vanilla',
         products: [{
             brand: 'Native Vanilla', variant: 'Bean Powder', listings: [{ store: stores.amazon, price: 15.99, link: 'https://www.amazon.com/Native-Vanilla-Organic-Powder-ounce/dp/B07Z7J3KBK' }],
             nutrition: {
@@ -5678,7 +5033,6 @@ export const i = {
 
     // Generic/typical nutrition - standard values for mini dark chocolate chips, per 1 tbsp (~11g).
     miniDarkChocolateChip: ingredientFactory('Mini Dark Chocolate Chips', {
-        defaultBrand: '365',
         products: [{
             brand: '365', variant: 'Mini Chocolate Chips (Dark)', listings: [{ store: stores.wholeFoods }],
             nutrition: {
@@ -5690,7 +5044,6 @@ export const i = {
     // From the product label: per 1 link (85g), 5 links per 12 oz package. The recipe tracks
     // the package by count (5 links) and remembers that chicken sausage needs to finish at 165°F.
     chickenSausage: ingredientFactory('Chicken Sausage', {
-        defaultBrand: '365',
         isMeatProduct: true,
         products: [{
             brand: '365', variant: 'Italian-Style Chicken Sausage (5 Count, 12 oz)', size: 5, sizeUnit: u.unit, organic: true,
@@ -5719,7 +5072,6 @@ export const i = {
     // From the product label: per 1 pack (100g), 4 servings per 12 oz package. The recipe
     // cooks one 4-serving pack for 4 minutes, which is also the package's cook time.
     tinglyChiliMomofukuNoodles: ingredientFactory('Tingly Chili Momofuku Noodles', {
-        defaultBrand: 'Momofuku',
         products: [{
             brand: 'Momofuku', variant: 'Tingly Chili (12 oz, 4 packs)', size: 4, sizeUnit: u.unit, packageUnit: u.package,
             listings: [{
@@ -5736,7 +5088,6 @@ export const i = {
     // Generic/typical nutrition (not from a specific brand's label) - fresh cranberries
     // per 12 oz bag, based on standard USDA values (1 cup whole = ~100g).
     cranberry: ingredientFactory('Fresh Cranberries', {
-        defaultBrand: 'generic',
         products: [{
             brand: 'generic', variant: 'Fresh Cranberries (12 oz bag)', size: 12, sizeUnit: u.ounce,
             listings: [{ price: 3.99 }],
@@ -5789,8 +5140,10 @@ registerGroup('Breakfast', [
         const HEMP           = i.hempSeed(1, u.tbsp);
         const VANILLA        = i.vanillaExtract(0.25, u.tsp);
         const FROZEN_PACK    = [BANANA, CHERRY, BERRY_BLEND, KALE, SPINACH, CELERY];
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         s(info(`One ${bag.name} is one serving of produce only. For the week, repeat the tray-freeze and flat-bag steps once per smoothie. Keep ${formatIngredient(MACADAMIA_NUT)}, ${formatIngredient(NIBS)}, ${formatIngredient(CHIA)}, and ${formatIngredient(HEMP)} out of the freezer, pre-portioned into a small pantry jar, one serving per jar.`));
         s(prepOnly(`Slice ${formatIngredient(BANANA)}`, {
@@ -5857,8 +5210,10 @@ registerGroup('Breakfast', [
         const CELERY_B = i.celery(1, u.unit);
         const PACK_A = [BANANA_A, CHERRY_A, BERRY_A, KALE_A, SPINACH_A, CELERY_A];
         const PACK_B = [BANANA_B, CHERRY_B, BERRY_B, KALE_B, SPINACH_B, CELERY_B];
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         s(info(`Use two ${bagA.name.replace(' 1', '')}s, one serving of produce in each, not one double bag. For the week, repeat the tray-freeze and flat-bag steps once per smoothie. Keep the macadamia nuts, cocoa nibs, chia, and hemp out of the freezer and pre-portion one serving of them into a small pantry jar.`));
         s(prepOnly(`Slice ${formatIngredient(BANANA_A)} for each bag`, {
@@ -5909,8 +5264,10 @@ registerGroup('Breakfast', [
         const kettle = e.kettle();
         const OATMEAL = i.instantOatmeal(2, u.unit);
         const WATER   = i.water(8, u.fluidOunce);
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         s(bowl.add([OATMEAL]));
         s(kettle.add([WATER]));
@@ -5924,8 +5281,10 @@ registerGroup('Breakfast', [
     withPlan(createRecipe('scrambled-eggs', 'Scrambled Eggs (NuWave, Stainless Steel)', (() => {
         const bowl = e.bowl();
         const pan  = e.pan();
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         s(bowl.add([
             i.egg(3, u.unit),
@@ -5956,8 +5315,10 @@ registerGroup('Breakfast', [
     })()), { planMinutes: 6, portable: false }),
     withPlan(createRecipe('iced-coffee', 'Iced Coffee', (() => {
         const glass = e.glass();
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         const ICE = i.iceCube(3, u.unit);
         const CREAMER = i.coffeeCreamer(3, u.tbsp);
@@ -5982,8 +5343,10 @@ withPlan(createRecipe(
         const bowl         = e.bowl();
         const foodProcessor = e.bulletMixer();
         const pan          = e.pan('8×8-inch pan');
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         const OATS       = i.rolledOats(180, u.gram);
         const PEANUT_BUTTER = i.peanutButter(128, u.gram);
@@ -6104,8 +5467,10 @@ registerRecipe(createRecipe(
         const bowl         = e.bowl();
         const cuttingBoard = e.cuttingBoard();
         const ONION = i.whiteOnion(2, u.tbsp);
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         s(instruction(`Mince ${formatIngredient(ONION)}`, { ingredients: [ONION], equipment: [cuttingBoard.name] }));
         s(bowl.add([
@@ -6132,8 +5497,10 @@ registerRecipe(withPlan(createRecipe(
         const mixer        = e.bulletMixer();
         const colander     = e.colander();
         const jar          = e.bowl('jar');
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         const CHILE_ARBOL  = i.chileDeArbol(6, u.unit);
         const CHILE_PEQUIN = i.chilePequin(3, u.unit);
@@ -6185,8 +5552,10 @@ registerGroup('Dinner', [
     withPlan(createRecipe('tingly-chili-momofuku-noodles', 'Tingly Chili Momofuku Noodles', (() => {
         const pot     = e.pot();
         const colander = e.colander();
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         const WATER  = i.water(26, u.ounce);
         const NOODLES = i.tinglyChiliMomofukuNoodles(1, u.unit);
@@ -6212,8 +5581,10 @@ registerGroup('Dinner', [
         const cuttingBoard = e.cuttingBoard();
         const PANKO        = i.pankoBreadCrumbs(3, u.cup);
         const MUSHROOMS    = i.kingOysterMushroom(4, u.unit);
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         s(oven.preheat(450));
         s(pankoPan.add([PANKO]));
@@ -6251,8 +5622,10 @@ registerGroup('Dinner', [
         const CARROTS        = i.carrot(1, u.pound);
         const BELLA_MUSHROOMS = i.babyBellaMushroom(8, u.ounce);
         const YELLOW_ONION    = i.yellowOnion(1, u.unit);
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         s(oven.preheat(450));
         s(instruction('Place sheet pan in oven while it preheats', { equipment: ['oven', 'sheet pan'] }));
@@ -6281,8 +5654,10 @@ registerGroup('Dinner', [
     createRecipe('pan-seared-chicken-sausage', 'Pan-Seared Chicken Sausage (Sear + Cover to Finish)', (() => {
         const pan = e.pan();
         const SAUSAGES = i.chickenSausage(5, u.unit);
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         s(pan.preheat(325));
         s(pan.add([
@@ -6304,8 +5679,10 @@ registerGroup('Dinner', [
     createRecipe('abbot-pea-protein-spaghetti', 'Abbot Pea Protein Spaghetti', (() => {
         const pot = e.pot();
         const pan = e.pan();
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         s(pan.add([i.avocadoOil(1, u.spray), i.abbotPeaItalianSausage(1, u.bag)]));
         s(pan.cook('Cook sausage', time.minutes(5), 5));
@@ -6326,8 +5703,10 @@ registerGroup('Dinner', [
     })()),
 
     withPlan(createRecipe('asian-dense-bean-salad-kit', 'Asian Dense Bean Salad (Kit Version)', (() => {
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
         const bowl = e.bowl('salad bowl');
         const microwave = e.microwave();
 
@@ -6353,8 +5732,10 @@ registerGroup('Dinner', [
         const CABBAGE   = i.cabbage(2, u.cup);
         const CHICKPEAS = i.chickpeas(1, u.cup);
         const CANNELLINI = i.cannelliniBean(1, u.cup);
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         s(prep('Soak chickpeas and cannellini beans overnight', { ingredients: [CHICKPEAS, CANNELLINI] }));
         s(prep('Peel and shred carrots', { ingredients: [CARROTS] }));
@@ -6400,8 +5781,10 @@ registerGroup('Dinner', [
         const CHICKPEAS    = i.chickpeas(1.125, u.cup);
         const CANNELLINI   = i.cannelliniBean(1.125, u.cup);
         const EDAMAME      = i.edamame(1, u.cup);
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
         const microwave = e.microwave();
 
         s(Timer.set(80, 's', 'If eating right away and edamame is frozen: microwave edamame', { equipment: [microwave.name], ingredients: [EDAMAME] }));
@@ -6433,8 +5816,10 @@ registerGroup('Dinner', [
         const CHICKPEAS    = i.chickpeas(4, u.cup);
         const CANNELLINI   = i.cannelliniBean(4, u.cup);
         const EDAMAME      = i.edamame(4, u.cup);
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
         const microwave = e.microwave();
 
         s(Timer.set(80, 's', 'If eating right away and edamame is frozen: microwave edamame', { equipment: [microwave.name], ingredients: [EDAMAME] }));
@@ -6464,8 +5849,10 @@ registerGroup('Dinner', [
         const pan = e.pan();
         const seasoningBowl = e.bowl('seasoning bowl');
         const THIGHS = i.chickenThigh(2, u.unit);
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         s(seasoningBowl.add([
             i.seaSalt(0.5, u.tsp),
@@ -6503,8 +5890,10 @@ registerGroup('Dinner', [
         const ORANGE     = i.orange(1, u.unit);
         const GRAPEFRUIT = i.grapefruit(1, u.unit);
 
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         s(prep('Trim fennel stalks and slice bulbs thinly, reserving the fronds', {
             equipment: [board.name, knife.name], ingredients: [FENNEL],
@@ -6552,8 +5941,10 @@ registerGroup('Dinner', [
         const BUN    = i.hamburgerBun(2, u.unit);
         const MUSTARD = i.mustard(1, u.tbsp);
         const PICKLE = i.pickle(2, u.unit);
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         s(pan.preheat(320));
         s(...pan.spray(OIL, { heatUp: true }));
@@ -6584,8 +5975,10 @@ registerGroup('Dinner', [
     })(), 'Dinner', 18),
 
     withPlan(createRecipe('quinoa-falafel', 'Quinoa Falafel', (() => {
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
         const bowl      = e.bowl('mixing bowl');
         const pasteBowl = e.bowl('small bowl');
         const colander  = e.colander();
@@ -6646,8 +6039,10 @@ registerGroup('Dinner', [
         (() => {
             const microwave = e.microwave();
             const BOWL = i.blueZonesBasilPestoVeggieBowl(1, u.unit);
-            const steps: Step[] = [];
-            const s = (...newSteps: Step[]) => steps.push(...newSteps);
+            /** @type {Step[]} */
+            const steps = [];
+            /** @param {...Step} newSteps */
+            const s = (...newSteps) => steps.push(...newSteps);
 
             s(instruction(`Peel back the film and microwave ${formatIngredient(BOWL)} without it`, {
                 equipment: [microwave.name, 'bowl'],
@@ -6665,8 +6060,10 @@ registerGroup('Dinner', [
     createRecipe('nuwave-pork-shoulder', 'Pork Shoulder (NuWave, 2 lb)', (() => {
         const pan = e.pan();
         const PORK = i.porkShoulder(2, u.pound);
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         s(info('For a 2 lb pork shoulder. Set the NuWave to 375°F, brown the pork uncovered, then cook it covered at 225°F for 2–3 hours until it hits 195–205°F inside.'));
 
@@ -6707,8 +6104,10 @@ registerGroup('Dinner', [
         'Cranberry Sauce (Serves 24, about 9 cups)',
         (() => {
             const pot = e.pot('6-quart pot');
-            const steps: Step[] = [];
-            const s = (...newSteps: Step[]) => steps.push(...newSteps);
+            /** @type {Step[]} */
+            const steps = [];
+            /** @param {...Step} newSteps */
+            const s = (...newSteps) => steps.push(...newSteps);
 
             const CRANBERRIES = i.cranberry(4, u.bag);
             const SUGAR       = i.sugar(4, u.cup);
@@ -6774,8 +6173,10 @@ registerGroup('Blueprint', [
 
 registerGroup('Lentils', [
     withPlan(createRecipe('ing-black-lentils-induction-195g', 'Black Lentils (195g ×3) (Induction Stovetop)', (() => {
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
         const LENTILS = i.blackLentils(195, u.gram);
         const WATER = i.water(24, u.fluidOunce);
         const pot = e.pot();
@@ -6792,8 +6193,10 @@ registerGroup('Lentils', [
         return steps;
     })()), { planMinutes: 3, portable: true, prepMinutes: 24, perishableDays: 3, sortOrder: 0 }),
     withPlan(createRecipe('ing-black-lentils-induction-130g', 'Black Lentils (130g ×2) (Induction Stovetop)', (() => {
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
         const LENTILS = i.blackLentils(130, u.gram);
         const WATER = i.water(24, u.fluidOunce);
         const pot = e.pot();
@@ -6811,8 +6214,10 @@ registerGroup('Lentils', [
         return steps;
     })()), { planMinutes: 3, portable: true, prepMinutes: 24, perishableDays: 3, sortOrder: 1, hidden: true }),
     withPlan(createRecipe('ing-black-lentils-induction', 'Black Lentils (65g ×1) (Induction Stovetop)', (() => {
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
         const LENTILS = i.blackLentils(65, u.gram);
         const WATER = i.water(15, u.fluidOunce);
         const pot = e.pot();
@@ -6829,8 +6234,10 @@ registerGroup('Lentils', [
         return steps;
     })()), { planMinutes: 3, portable: true, prepMinutes: 21, perishableDays: 3, sortOrder: 2 }),
     withPlan(createRecipe('ing-black-lentils-gas', 'Black Lentils (65g ×1) (Gas Stovetop)', (() => {
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
         const LENTILS = i.blackLentils(65, u.gram);
         const WATER = i.water(15, u.fluidOunce);
         const pot = e.pot();
@@ -6864,8 +6271,10 @@ registerRecipe(createRecipe(
     'freeze-bananas',
     'Freeze Bananas',
     (() => {
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
         const BANANA = i.banana(4, u.unit);
         const bag    = e.siliconeBag();
 
@@ -6920,8 +6329,10 @@ registerRecipe(withPlan(createRecipe(
         const PEPPER_OZ        = i.blackPepper(1, u.ounce);
         const MUSHROOM         = i.kingOysterMushroom(1, u.unit);
 
-        const steps: Step[] = [];
-        const s = (...newSteps: Step[]) => steps.push(...newSteps);
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
 
         s(info('Test recipe - exercises every step type, equipment method, and nutrition/cost edge case. Tap 3× rapidly on any timer/gate to skip it instantly.'));
         s(info('Info steps can link to another recipe.', { linkRecipeId: 'blueprint-smoothie' }));
@@ -6980,7 +6391,8 @@ registerRecipe(withPlan(createRecipe(
 // BUNDLES
 // ============================================================
 
-const DAILY_BLUEPRINT_RECIPE_IDS: string[] = [
+/** @type {string[]} */
+const DAILY_BLUEPRINT_RECIPE_IDS = [
     'blueprint-smoothie',
     'blueprint-longevity-drink',
     'ing-black-lentils-induction',

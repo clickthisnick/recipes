@@ -24,7 +24,7 @@ import {
     schedulePlan,
     subscribeAndSavePercent,
     u,
-} from '../dist/file.js';
+} from '../src/file.js';
 
 const require = createRequire(import.meta.url);
 const { requestPath, resolveSafePath } = require('../scripts/static-path.js');
@@ -170,7 +170,7 @@ test('static pages keep the fixes agents and the calculators rely on', () => {
     assert.equal(index.match(/<h1>/g).length, 1);
     assert.match(index, /tracker\.html/);
     assert.match(water, /toolname="calculate-gallons"/);
-    assert.match(readFileSync(resolve('src/file.ts'), 'utf8'), /name: 'search-recipes'/);
+    assert.match(readFileSync(resolve('src/file.js'), 'utf8'), /name: 'search-recipes'/);
 });
 
 test('WebMCP registration does nothing unless the browser provides it', () => {

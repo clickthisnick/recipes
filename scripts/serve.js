@@ -89,6 +89,6 @@ server.on('error', (err) => {
 server.listen(port, () => {
     const localUrl = `http://localhost:${port}/`;
     console.log(`Kitchen tools are ready at ${localUrl}`);
-    console.log(`Recipe app: ${localUrl}dist/main.html`);
+    console.log(`Recipe app: ${localUrl}main.html`);
     console.log(`Serving ${root}`);
 });

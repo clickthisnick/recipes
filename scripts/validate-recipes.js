@@ -3,7 +3,7 @@
 const { readFileSync } = require('fs');
 const { resolve } = require('path');
 
-const src = readFileSync(resolve(__dirname, '../src/file.ts'), 'utf8');
+const src = readFileSync(resolve(__dirname, '../src/file.js'), 'utf8');
 const lines = src.split('\n');
 
 const errors = [];
@@ -20,7 +20,7 @@ const warnings = [];
 // get rejected with NotAllowedError the first time a real (non-instant) timer tries to fire —
 // exactly the failure mode this check exists to prevent from ever being reintroduced.
 {
-    const fnMatch = src.match(/function unlockAudioContext\(\): void \{([\s\S]*?)\n\}/);
+    const fnMatch = src.match(/function unlockAudioContext\(\) \{([\s\S]*?)\n\}/);
     if (!fnMatch) {
         errors.push('Could not find unlockAudioContext() to verify it primes the shared alarm audio element.');
     } else {
@@ -278,7 +278,7 @@ const factoryType = {};
 {
     const eBlock = src.match(/export const e = \{([\s\S]*?)\n\};/);
     if (eBlock) {
-        for (const m of eBlock[1].matchAll(/(\w+):\s*\([^)]*\)\s*=>\s*new (\w+)\((?:'([^']+)')?/g)) {
+        for (const m of eBlock[1].matchAll(/(\w+):\s*(?:\/\*\*.*?\*\/\s*)?\([^)]*\)\s*=>\s*new (\w+)\((?:'([^']+)')?/g)) {
             const type = (m[3] || m[1]).toLowerCase();
             factoryType[m[1]] = type;
             equipmentWords.add(type);
