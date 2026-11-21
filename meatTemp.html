@@ -1,54 +1,103 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="color-scheme" content="light">
-    <meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'">
-    <title>Meat temperature | Recipes</title>
-    <link rel="stylesheet" href="./src/site.css">
-</head>
-<body>
-    <a class="skip-link visually-hidden" href="#content">Skip to content</a>
-    <main id="content">
-        <h1>Meat temperature chart</h1>
-        <p>Temperatures are in Fahrenheit.</p>
-        <div class="table-wrap" tabindex="0" role="region" aria-labelledby="meat-caption">
-            <table>
-                <caption id="meat-caption">Doneness temperatures</caption>
-                <thead>
-                    <tr>
-                        <th scope="col">Meat</th>
-                        <th scope="col">Temp</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr class="band"><th scope="row">Beef</th><td></td></tr>
-                    <tr class="band"><th scope="row">Rare</th><td>120&#8457; - 125&#8457;</td></tr>
-                    <tr class="band"><th scope="row">Medium-rare</th><td>130&#8457; - 135&#8457;</td></tr>
-                    <tr class="band"><th scope="row">Medium</th><td>140&#8457; - 145&#8457;</td></tr>
-                    <tr class="band"><th scope="row">Medium-well</th><td>150&#8457; - 155&#8457;</td></tr>
-                    <tr class="band"><th scope="row">Well done</th><td>160&#8457; and above</td></tr>
-                    <tr class="band-warm"><th scope="row">Lamb</th><td></td></tr>
-                    <tr class="band-warm"><th scope="row">Rare</th><td>135&#8457;</td></tr>
-                    <tr class="band-warm"><th scope="row">Medium-rare</th><td>140&#8457; - 150&#8457;</td></tr>
-                    <tr class="band-warm"><th scope="row">Medium</th><td>160&#8457;</td></tr>
-                    <tr class="band-warm"><th scope="row">Well done</th><td>165&#8457; and above</td></tr>
-                    <tr class="band"><th scope="row">Poultry</th><td></td></tr>
-                    <tr class="band"><th scope="row">Chicken</th><td>165&#8457; - 175&#8457;</td></tr>
-                    <tr class="band"><th scope="row">Turkey</th><td>165&#8457; - 175&#8457;</td></tr>
-                    <tr class="band-warm"><th scope="row">Pork</th><td>150&#8457;</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </main>
-    <script type="module">
-        import { readTableTool, registerAgentTools } from './src/site-logic.js';
-        registerAgentTools([readTableTool(
-            'read-meat-temperatures',
-            'Read the doneness temperatures shown on this chart.',
-            { row: 'tbody tr', require: 'temp', columns: { meat: { selector: 'th' }, temp: { selector: 'td' } } },
-        )]);
-    </script>
-</body>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="color-scheme" content="light" />
+        <meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'" />
+        <title>Meat temperature | Recipes</title>
+        <link rel="stylesheet" href="./src/site.css" />
+    </head>
+    <body>
+        <a class="skip-link visually-hidden" href="#content">Skip to content</a>
+        <main id="content">
+            <h1>Meat temperature chart</h1>
+            <p>Temperatures are in Fahrenheit.</p>
+            <div class="table-wrap" tabindex="0" role="region" aria-labelledby="meat-caption">
+                <table>
+                    <caption id="meat-caption">
+                        Doneness temperatures
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Meat</th>
+                            <th scope="col">Temp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="band">
+                            <th scope="row">Beef</th>
+                            <td></td>
+                        </tr>
+                        <tr class="band">
+                            <th scope="row">Rare</th>
+                            <td>120&#8457; - 125&#8457;</td>
+                        </tr>
+                        <tr class="band">
+                            <th scope="row">Medium-rare</th>
+                            <td>130&#8457; - 135&#8457;</td>
+                        </tr>
+                        <tr class="band">
+                            <th scope="row">Medium</th>
+                            <td>140&#8457; - 145&#8457;</td>
+                        </tr>
+                        <tr class="band">
+                            <th scope="row">Medium-well</th>
+                            <td>150&#8457; - 155&#8457;</td>
+                        </tr>
+                        <tr class="band">
+                            <th scope="row">Well done</th>
+                            <td>160&#8457; and above</td>
+                        </tr>
+                        <tr class="band-warm">
+                            <th scope="row">Lamb</th>
+                            <td></td>
+                        </tr>
+                        <tr class="band-warm">
+                            <th scope="row">Rare</th>
+                            <td>135&#8457;</td>
+                        </tr>
+                        <tr class="band-warm">
+                            <th scope="row">Medium-rare</th>
+                            <td>140&#8457; - 150&#8457;</td>
+                        </tr>
+                        <tr class="band-warm">
+                            <th scope="row">Medium</th>
+                            <td>160&#8457;</td>
+                        </tr>
+                        <tr class="band-warm">
+                            <th scope="row">Well done</th>
+                            <td>165&#8457; and above</td>
+                        </tr>
+                        <tr class="band">
+                            <th scope="row">Poultry</th>
+                            <td></td>
+                        </tr>
+                        <tr class="band">
+                            <th scope="row">Chicken</th>
+                            <td>165&#8457; - 175&#8457;</td>
+                        </tr>
+                        <tr class="band">
+                            <th scope="row">Turkey</th>
+                            <td>165&#8457; - 175&#8457;</td>
+                        </tr>
+                        <tr class="band-warm">
+                            <th scope="row">Pork</th>
+                            <td>150&#8457;</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+        <script type="module">
+            import { readTableTool, registerAgentTools } from './src/site-logic.js';
+            registerAgentTools([
+                readTableTool('read-meat-temperatures', 'Read the doneness temperatures shown on this chart.', {
+                    row: 'tbody tr',
+                    require: 'temp',
+                    columns: { meat: { selector: 'th' }, temp: { selector: 'td' } },
+                }),
+            ]);
+        </script>
+    </body>
 </html>

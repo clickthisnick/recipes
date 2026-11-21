@@ -1,32 +1,48 @@
 {
-    "name": "recipes",
-    "version": "1.0.0",
-    "description": "Personal recipes and kitchen tools",
-    "scripts": {
-        "start": "node scripts/serve.js",
-        "typecheck": "tsc --noEmit",
-        "validate": "node scripts/validate-recipes.js",
-        "pretest": "npm run typecheck && npm run validate",
-        "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test tests/*.test.mjs",
-        "lint": "eslint .",
-        "audit-amazon": "node scripts/audit-products.js",
-        "snapshot": "node tests/snapshot.mjs"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/clickthisnick/recipes.git"
-    },
-    "author": "",
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/clickthisnick/recipes/issues"
-    },
-    "homepage": "https://github.com/clickthisnick/recipes#readme",
-    "devDependencies": {
-        "@eslint/js": "^10.0.1",
-        "eslint": "^10.15.0",
-        "globals": "^17.14.0",
-        "playwright": "^1.65.1",
-        "typescript": "^7.0.2"
-    }
+  "name": "recipes",
+  "version": "1.0.0",
+  "description": "Personal recipes and kitchen tools",
+  "scripts": {
+    "start": "node scripts/serve.js",
+    "typecheck": "tsc --noEmit",
+    "validate": "node scripts/validate-recipes.js",
+    "pretest": "npm run typecheck && npm run validate",
+    "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-test-isolation=process --test tests/*.test.mjs",
+    "test:coverage": "node scripts/coverage.mjs",
+    "lint": "eslint .",
+    "format:check": "prettier --check .",
+    "html": "html-validate \"*.html\" \"dist/*.html\"",
+    "style": "stylelint \"src/**/*.css\"",
+    "spell": "node scripts/spell.mjs",
+    "actions": "node scripts/actionlint.mjs",
+    "size": "node scripts/size-budget.mjs",
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm run html && npm run style && npm run spell && npm run actions && npm run validate && npm run test:coverage && npm run size",
+    "prepare": "lefthook install || true",
+    "audit-amazon": "node scripts/audit-products.js",
+    "snapshot": "node tests/snapshot.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clickthisnick/recipes.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/clickthisnick/recipes/issues"
+  },
+  "homepage": "https://github.com/clickthisnick/recipes#readme",
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "actionlint": "^2.0.6",
+    "eslint": "^10.15.0",
+    "globals": "^17.14.0",
+    "html-validate": "^11.21.1",
+    "lefthook": "^2.2.2",
+    "linkedom": "^0.18.12",
+    "playwright": "^1.65.1",
+    "prettier": "^3.10.1",
+    "stylelint": "^18.1.0",
+    "stylelint-config-standard": "^41.1.0",
+    "typescript": "^7.0.2"
+  }
 }

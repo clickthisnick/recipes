@@ -68,9 +68,8 @@ async function loadAmazonListings(source) {
         const ingredientNutrition = sample.nutrition;
         for (const product of sample.products ?? []) {
             const productNutrition = product.nutrition;
-            const nutrition = productNutrition && Object.keys(productNutrition).length > 0
-                ? productNutrition
-                : ingredientNutrition;
+            const nutrition =
+                productNutrition && Object.keys(productNutrition).length > 0 ? productNutrition : ingredientNutrition;
             for (const listing of product.listings ?? []) {
                 const link = listing.link;
                 if (!link || !link.includes('amazon.com')) continue;
@@ -120,7 +119,9 @@ function computeNutritionDiff(product, scraped) {
         recorded = entries[0][1];
     } else if (entries.length > 1) {
         const rawUnit = scraped.servingUnitRaw.toLowerCase();
-        const match = entries.find(([key]) => rawUnit.includes(key.toLowerCase()) || key.toLowerCase().includes(rawUnit));
+        const match = entries.find(
+            ([key]) => rawUnit.includes(key.toLowerCase()) || key.toLowerCase().includes(rawUnit),
+        );
         recorded = match?.[1];
     }
     if (!recorded) return undefined;
@@ -151,7 +152,7 @@ function expectedTier(discount) {
 function parseNutritionSummary(text) {
     if (!text) return undefined;
     const match = text.match(
-        /Nutrition summary\s+[\d.]+\s+servings per container\s*\|\s*(.+?)\s*\((\d+(?:\.\d+)?)g\)\s*(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)mg\s+(\d+(?:\.\d+)?)g\s+(\d+(?:\.\d+)?)g\s+(\d+(?:\.\d+)?)g\s+Calories/i
+        /Nutrition summary\s+[\d.]+\s+servings per container\s*\|\s*(.+?)\s*\((\d+(?:\.\d+)?)g\)\s*(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)mg\s+(\d+(?:\.\d+)?)g\s+(\d+(?:\.\d+)?)g\s+(\d+(?:\.\d+)?)g\s+Calories/i,
     );
     if (!match) return undefined;
 
@@ -216,7 +217,9 @@ async function scrapeProductPage(page, url) {
     // summary above) — only used by the ad-hoc lookup mode (see main()), for pulling in a
     // brand-new ingredient's complete macros by hand when the page happens to expose one.
     const fullNutritionTable = await page.evaluate(() => {
-        const table = Array.from(document.querySelectorAll('table')).find((t) => /total fat|saturated fat|cholesterol/i.test(t.innerText));
+        const table = Array.from(document.querySelectorAll('table')).find((t) =>
+            /total fat|saturated fat|cholesterol/i.test(t.innerText),
+        );
         return table?.innerText;
     });
 
@@ -239,7 +242,7 @@ function buildReportMarkdown(state) {
     lines.push(
         done
             ? `**Status: done** — ${results.length}/${total} checked, ${flagged.length} flagged.`
-            : `**Status: running** — ${results.length}/${total} checked so far, ${flagged.length} flagged.`
+            : `**Status: running** — ${results.length}/${total} checked so far, ${flagged.length} flagged.`,
     );
     lines.push('');
 
@@ -256,7 +259,9 @@ function buildReportMarkdown(state) {
         lines.push('## OK');
         lines.push('');
         for (const r of ok) {
-            lines.push(`- \`${r.product.ingredientKey ?? '?'}\` — ${r.product.brand ?? '?'} — [file.js:${r.product.line}](../src/file.js#L${r.product.line}) · ${r.product.link}`);
+            lines.push(
+                `- \`${r.product.ingredientKey ?? '?'}\` — ${r.product.brand ?? '?'} — [file.js:${r.product.line}](../src/file.js#L${r.product.line}) · ${r.product.link}`,
+            );
         }
         lines.push('');
     }
@@ -340,7 +345,9 @@ async function main() {
     if (FILTER) {
         const needle = FILTER.toLowerCase();
         products = products.filter(
-            (p) => (p.ingredientKey ?? '').toLowerCase().includes(needle) || (p.brand ?? '').toLowerCase().includes(needle)
+            (p) =>
+                (p.ingredientKey ?? '').toLowerCase().includes(needle) ||
+                (p.brand ?? '').toLowerCase().includes(needle),
         );
     }
     if (LIMIT) products = products.slice(0, LIMIT);
@@ -366,7 +373,12 @@ async function main() {
             scraped = await scrapeProductPage(page, product.link);
         } catch (err) {
             console.log(`ERROR: ${err.message}`);
-            state.results.push({ status: 'flagged', product, priceDiff: undefined, notes: [`request failed: ${err.message}`] });
+            state.results.push({
+                status: 'flagged',
+                product,
+                priceDiff: undefined,
+                notes: [`request failed: ${err.message}`],
+            });
             writeReport(state);
             await sleep(DELAY_MS);
             continue;
@@ -398,11 +410,13 @@ async function main() {
             notes.push('could not read price from page (layout changed / out of stock?)');
         } else if (product.price !== undefined && Math.abs(scraped.price - product.price) > 0.01) {
             const oldLineText = product.priceLine ? sourceLines[product.priceLine - 1] : `price: ${product.price},`;
-            const newLineText = oldLineText.replace(
-                /price:\s*[0-9.]+/,
-                `price: ${scraped.price.toFixed(2)}`
-            );
-            priceDiff = { old: product.price, new: scraped.price, oldLineText: oldLineText.trim(), newLineText: newLineText.trim() };
+            const newLineText = oldLineText.replace(/price:\s*[0-9.]+/, `price: ${scraped.price.toFixed(2)}`);
+            priceDiff = {
+                old: product.price,
+                new: scraped.price,
+                oldLineText: oldLineText.trim(),
+                newLineText: newLineText.trim(),
+            };
         }
 
         const tier = expectedTier(product.discount);

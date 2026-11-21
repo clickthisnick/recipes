@@ -3,14 +3,10 @@ const globals = require('globals');
 
 module.exports = [
     {
-        ignores: [
-            'archived/**',
-            'node_modules/**',
-            '.agents/**',
-        ],
+        ignores: ['archived/**', 'node_modules/**', '.agents/**'],
     },
     {
-        files: ['scripts/**/*.js', 'src/**/*.js', 'tests/**/*.mjs'],
+        files: ['scripts/**/*.js', 'scripts/**/*.mjs', 'src/**/*.js', 'tests/**/*.mjs'],
         ...js.configs.recommended,
         languageOptions: {
             ecmaVersion: 2022,

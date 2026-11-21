@@ -1,111 +1,139 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="color-scheme" content="light">
-    <meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'">
-    <title>Expiration calculator | Recipes</title>
-    <link rel="stylesheet" href="./src/site.css">
-</head>
-<body>
-    <a class="skip-link visually-hidden" href="#content">Skip to content</a>
-    <main id="content">
-        <h1>Expiration calculator</h1>
-        <p>Today: <time id="today"></time></p>
-        <p id="expiration-status" class="status visually-hidden" role="status" aria-live="polite"></p>
-        <div class="table-wrap" tabindex="0" role="region" aria-labelledby="expiration-caption">
-            <table>
-                <caption id="expiration-caption">Days until these items expire</caption>
-                <thead>
-                    <tr>
-                        <th scope="col">Item</th>
-                        <th scope="col">Days to expire</th>
-                        <th scope="col">Expiration date</th>
-                        <th scope="col">Used</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th scope="row">Mushrooms</th>
-                        <td>3</td>
-                        <td data-expiration-days="3"></td>
-                        <td><input id="used-mushrooms" data-testid="used-mushrooms" type="checkbox"> <label for="used-mushrooms">Used<span class="visually-hidden"> Mushrooms</span></label></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Sausage</th>
-                        <td>3</td>
-                        <td data-expiration-days="3"></td>
-                        <td><input id="used-sausage" data-testid="used-sausage" type="checkbox"> <label for="used-sausage">Used<span class="visually-hidden"> Sausage</span></label></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Carrot</th>
-                        <td>7</td>
-                        <td data-expiration-days="7"></td>
-                        <td><input id="used-carrot" data-testid="used-carrot" type="checkbox"> <label for="used-carrot">Used<span class="visually-hidden"> Carrot</span></label></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </main>
-    <script type="module">
-        import { addCalendarDays, bindRowCheckboxes, formatUsDate, isoDate, registerAgentTools } from './src/site-logic.js';
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="color-scheme" content="light" />
+        <meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'" />
+        <title>Expiration calculator | Recipes</title>
+        <link rel="stylesheet" href="./src/site.css" />
+    </head>
+    <body>
+        <a class="skip-link visually-hidden" href="#content">Skip to content</a>
+        <main id="content">
+            <h1>Expiration calculator</h1>
+            <p>Today: <time id="today"></time></p>
+            <p id="expiration-status" class="status visually-hidden" role="status" aria-live="polite"></p>
+            <div class="table-wrap" tabindex="0" role="region" aria-labelledby="expiration-caption">
+                <table>
+                    <caption id="expiration-caption">
+                        Days until these items expire
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Item</th>
+                            <th scope="col">Days to expire</th>
+                            <th scope="col">Expiration date</th>
+                            <th scope="col">Used</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">Mushrooms</th>
+                            <td>3</td>
+                            <td data-expiration-days="3"></td>
+                            <td>
+                                <input id="used-mushrooms" data-testid="used-mushrooms" type="checkbox" />
+                                <label for="used-mushrooms">Used<span class="visually-hidden"> Mushrooms</span></label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Sausage</th>
+                            <td>3</td>
+                            <td data-expiration-days="3"></td>
+                            <td>
+                                <input id="used-sausage" data-testid="used-sausage" type="checkbox" />
+                                <label for="used-sausage">Used<span class="visually-hidden"> Sausage</span></label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Carrot</th>
+                            <td>7</td>
+                            <td data-expiration-days="7"></td>
+                            <td>
+                                <input id="used-carrot" data-testid="used-carrot" type="checkbox" />
+                                <label for="used-carrot">Used<span class="visually-hidden"> Carrot</span></label>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+        <script type="module">
+            import {
+                addCalendarDays,
+                bindRowCheckboxes,
+                formatUsDate,
+                isoDate,
+                registerAgentTools,
+            } from './src/site-logic.js';
 
-        const today = new Date();
-        const todayEl = document.getElementById('today');
-        todayEl.textContent = formatUsDate(today);
-        todayEl.dateTime = isoDate(today);
+            const today = new Date();
+            const todayEl = document.getElementById('today');
+            todayEl.textContent = formatUsDate(today);
+            todayEl.dateTime = isoDate(today);
 
-        for (const cell of document.querySelectorAll('[data-expiration-days]')) {
-            const days = Number(cell.getAttribute('data-expiration-days'));
-            cell.textContent = formatUsDate(addCalendarDays(today, days));
-        }
+            for (const cell of document.querySelectorAll('[data-expiration-days]')) {
+                const days = Number(cell.getAttribute('data-expiration-days'));
+                cell.textContent = formatUsDate(addCalendarDays(today, days));
+            }
 
-        bindRowCheckboxes(document.getElementById('expiration-status'), 'marked used', 'marked still in the fridge');
+            bindRowCheckboxes(
+                document.getElementById('expiration-status'),
+                'marked used',
+                'marked still in the fridge',
+            );
 
-        function expirationItems() {
-            return [...document.querySelectorAll('tbody tr')].map((row) => ({
-                name: row.querySelector('th')?.textContent ?? '',
-                days: Number(row.querySelector('[data-expiration-days]')?.getAttribute('data-expiration-days')),
-                date: row.querySelector('[data-expiration-days]')?.textContent ?? '',
-                used: Boolean(row.querySelector('input')?.checked),
-            }));
-        }
+            function expirationItems() {
+                return [...document.querySelectorAll('tbody tr')].map((row) => ({
+                    name: row.querySelector('th')?.textContent ?? '',
+                    days: Number(row.querySelector('[data-expiration-days]')?.getAttribute('data-expiration-days')),
+                    date: row.querySelector('[data-expiration-days]')?.textContent ?? '',
+                    used: Boolean(row.querySelector('input')?.checked),
+                }));
+            }
 
-        registerAgentTools([
-            {
-                name: 'list-expiration-dates',
-                description: 'Read each item, how many days it keeps, and the date calculated from today.',
-                inputSchema: { type: 'object', properties: {} },
-                execute() { return { items: expirationItems() }; },
-                annotations: { readOnlyHint: true },
-            },
-            {
-                name: 'set-item-used',
-                description: 'Mark an expiration-list item used or still in the fridge.',
-                inputSchema: {
-                    type: 'object',
-                    properties: {
-                        name: { type: 'string', description: 'Item name as shown in the table.' },
-                        used: { type: 'boolean', description: 'Whether the item has been used.' },
+            registerAgentTools([
+                {
+                    name: 'list-expiration-dates',
+                    description: 'Read each item, how many days it keeps, and the date calculated from today.',
+                    inputSchema: { type: 'object', properties: {} },
+                    execute() {
+                        return { items: expirationItems() };
                     },
-                    required: ['name', 'used'],
+                    annotations: { readOnlyHint: true },
                 },
-                execute(input) {
-                    if (typeof input?.name !== 'string' || typeof input?.used !== 'boolean') {
-                        return { error: 'Pass the item name and whether it is used.' };
-                    }
-                    const row = [...document.querySelectorAll('tbody tr')]
-                        .find((entry) => entry.querySelector('th')?.textContent === input.name);
-                    if (!row) return { error: `No item named "${input.name}".`, items: expirationItems().map((item) => item.name) };
-                    const box = row.querySelector('input');
-                    box.checked = input.used;
-                    box.dispatchEvent(new Event('change'));
-                    return { name: input.name, used: box.checked };
+                {
+                    name: 'set-item-used',
+                    description: 'Mark an expiration-list item used or still in the fridge.',
+                    inputSchema: {
+                        type: 'object',
+                        properties: {
+                            name: { type: 'string', description: 'Item name as shown in the table.' },
+                            used: { type: 'boolean', description: 'Whether the item has been used.' },
+                        },
+                        required: ['name', 'used'],
+                    },
+                    execute(input) {
+                        if (typeof input?.name !== 'string' || typeof input?.used !== 'boolean') {
+                            return { error: 'Pass the item name and whether it is used.' };
+                        }
+                        const row = [...document.querySelectorAll('tbody tr')].find(
+                            (entry) => entry.querySelector('th')?.textContent === input.name,
+                        );
+                        if (!row)
+                            return {
+                                error: `No item named "${input.name}".`,
+                                items: expirationItems().map((item) => item.name),
+                            };
+                        const box = row.querySelector('input');
+                        box.checked = input.used;
+                        box.dispatchEvent(new Event('change'));
+                        return { name: input.name, used: box.checked };
+                    },
+                    annotations: { readOnlyHint: false },
                 },
-                annotations: { readOnlyHint: false },
-            },
-        ]);
-    </script>
-</body>
+            ]);
+        </script>
+    </body>
 </html>

@@ -49,9 +49,27 @@ test('expiration dates stay on the local calendar', () => {
 test('custom food JSON rejects empty and negative values', () => {
     const missing = customFoodRecord('  ', { calories: 1 });
     assert.equal(missing.ok, false);
-    const negative = customFoodRecord('Tea', { calories: -5, protein: 0, carbs: 0, total_fat: 0, saturated_fat: 0, fiber: 0, sugar: 0, sodium: 0 });
+    const negative = customFoodRecord('Tea', {
+        calories: -5,
+        protein: 0,
+        carbs: 0,
+        total_fat: 0,
+        saturated_fat: 0,
+        fiber: 0,
+        sugar: 0,
+        sodium: 0,
+    });
     assert.equal(negative.ok, false);
-    const built = customFoodRecord('Raspberry Bar', { calories: 10, protein: 1, carbs: 2, total_fat: 0, saturated_fat: 0, fiber: 0, sugar: 0, sodium: 3 });
+    const built = customFoodRecord('Raspberry Bar', {
+        calories: 10,
+        protein: 1,
+        carbs: 2,
+        total_fat: 0,
+        saturated_fat: 0,
+        fiber: 0,
+        sugar: 0,
+        sodium: 3,
+    });
     assert.equal(built.ok, true);
     assert.equal(built.record.key, foodKeyFromName('Raspberry Bar'));
     assert.equal(built.record.entry.calories.unit, 'cal');
@@ -111,14 +129,17 @@ test('saved plan and inventory ignore corrupt values', () => {
 
 test('the day plan skips blocks that cannot hold the recipe', () => {
     const recipe = { id: 'snack', name: 'Snack', steps: [], portable: true, planMinutes: 30 };
-    const result = schedulePlan({
-        blocks: [
-            { id: 'away', start: '08:00', end: '12:00', type: 'away' },
-            { id: 'lunch', start: '12:00', end: '12:20', type: 'portable' },
-            { id: 'later', start: '15:00', end: '16:00', type: 'home' },
-        ],
-        caloriesCutoff: '14:00',
-    }, [{ recipe, count: 1 }]);
+    const result = schedulePlan(
+        {
+            blocks: [
+                { id: 'away', start: '08:00', end: '12:00', type: 'away' },
+                { id: 'lunch', start: '12:00', end: '12:20', type: 'portable' },
+                { id: 'later', start: '15:00', end: '16:00', type: 'home' },
+            ],
+            caloriesCutoff: '14:00',
+        },
+        [{ recipe, count: 1 }],
+    );
     assert.equal(result.scheduled.length, 1);
     assert.equal(result.scheduled[0].startMin, 15 * 60);
     assert.equal(result.scheduled[0].afterCutoff, true);
@@ -174,7 +195,16 @@ test('static pages keep the fixes agents and the calculators rely on', () => {
 });
 
 test('WebMCP registration does nothing unless the browser provides it', () => {
-    const stop = registerAgentTools([{ name: 'unused', description: 'unused', inputSchema: { type: 'object', properties: {} }, execute() { return {}; } }]);
+    const stop = registerAgentTools([
+        {
+            name: 'unused',
+            description: 'unused',
+            inputSchema: { type: 'object', properties: {} },
+            execute() {
+                return {};
+            },
+        },
+    ]);
     assert.equal(typeof stop, 'function');
     stop();
 });

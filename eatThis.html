@@ -1,231 +1,321 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="color-scheme" content="light">
-    <meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'">
-    <title>Eat this instead | Recipes</title>
-    <link rel="stylesheet" href="./src/site.css">
-</head>
-<body>
-    <a class="skip-link visually-hidden" href="#content">Skip to content</a>
-    <main id="content">
-        <h1>Eat this instead</h1>
-        <p>Going out to eat: <strong>Look for acai bowl / yogurt / smoothie place</strong></p>
-        <p id="eat-status" class="status visually-hidden" role="status" aria-live="polite"></p>
-        <div class="table-wrap" tabindex="0" role="region" aria-labelledby="eat-caption">
-            <table id="eat-table">
-                <caption id="eat-caption">Healthy alternative table</caption>
-                <thead>
-                    <tr>
-                        <th scope="col">Food</th>
-                        <th scope="col">Calories</th>
-                        <th scope="col">Price</th>
-                        <th scope="col">Description</th>
-                        <th scope="col">Tried</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th scope="row">Kefir</th>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Sugar Free Chobani Yogurt</th>
-                        <td></td>
-                        <td>$7.99</td>
-                        <td>Good. Have to buy in bulk though</td>
-                        <td><input id="tried-chobani" type="checkbox"> <label for="tried-chobani">Tried<span class="visually-hidden"> Sugar Free Chobani Yogurt</span></label></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Ice Cream</th>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Nick's Mint Chokladchip</th>
-                        <td>270</td>
-                        <td>$7.99</td>
-                        <td>Expensive. Sometimes melty and refrozen which tastes awful.</td>
-                        <td><input id="tried-nicks" type="checkbox"> <label for="tried-nicks">Tried<span class="visually-hidden"> Nick's Mint Chokladchip</span></label></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Chobani Yogurt Flip Cup</th>
-                        <td></td>
-                        <td></td>
-                        <td>Tastes good. Too small to satisfy though.</td>
-                        <td><input id="tried-flip" type="checkbox"> <label for="tried-flip">Tried<span class="visually-hidden"> Chobani Yogurt Flip Cup</span></label></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Meat</th>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Buffalo Wild Wings</th>
-                        <td></td>
-                        <td>$50</td>
-                        <td>Expensive and too much food. Very salty.</td>
-                        <td><input id="tried-bww" type="checkbox"> <label for="tried-bww">Tried<span class="visually-hidden"> Buffalo Wild Wings</span></label></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">TGI Fridays Frozen Wings</th>
-                        <td></td>
-                        <td>$20</td>
-                        <td>Sugary and lots of breading</td>
-                        <td><input id="tried-tgi" type="checkbox"> <label for="tried-tgi">Tried<span class="visually-hidden"> TGI Fridays Frozen Wings</span></label></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Frozen Hot Wings</th>
-                        <td></td>
-                        <td>$12</td>
-                        <td>Tastes good enough to satisfy the itch</td>
-                        <td><input id="tried-hot-wings" type="checkbox"> <label for="tried-hot-wings">Tried<span class="visually-hidden"> Frozen Hot Wings</span></label></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Quinoa Mushroom Burger With Franks Hot Sauce</th>
-                        <td></td>
-                        <td>$5</td>
-                        <td>Non Meat - Meaty and Salt</td>
-                        <td><input id="tried-burger" type="checkbox"> <label for="tried-burger">Tried<span class="visually-hidden"> Quinoa Mushroom Burger With Franks Hot Sauce</span></label></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Pastries</th>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Kodiak Frozen Waffles</th>
-                        <td></td>
-                        <td></td>
-                        <td>Tastes dense and good with allulose</td>
-                        <td><input id="tried-waffles" type="checkbox"> <label for="tried-waffles">Tried<span class="visually-hidden"> Kodiak Frozen Waffles</span></label></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Bagel Point Plain Bagel</th>
-                        <td></td>
-                        <td>2</td>
-                        <td>Bready and delicious</td>
-                        <td><input id="tried-bagel" type="checkbox"> <label for="tried-bagel">Tried<span class="visually-hidden"> Bagel Point Plain Bagel</span></label></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Funfetti Pancake Mix</th>
-                        <td></td>
-                        <td>11</td>
-                        <td>1g Sugar but tastes good</td>
-                        <td><input id="tried-funfetti" type="checkbox"> <label for="tried-funfetti">Tried<span class="visually-hidden"> Funfetti Pancake Mix</span></label></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Pizza</th>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Trader Joe's Frozen Tart</th>
-                        <td>600</td>
-                        <td>$5.49</td>
-                        <td>Crunchy Fluffy Tarte, small but flavorful</td>
-                        <td><input id="tried-tart" type="checkbox"> <label for="tried-tart">Tried<span class="visually-hidden"> Trader Joe's Frozen Tart</span></label></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Margarita Frozen Pesto Pizza</th>
-                        <td>900</td>
-                        <td>$9.00</td>
-                        <td>Cardboard</td>
-                        <td><input id="tried-pesto" type="checkbox"> <label for="tried-pesto">Tried<span class="visually-hidden"> Margarita Frozen Pesto Pizza</span></label></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Pizza / Pepperoni Pizza</th>
-                        <td>1740</td>
-                        <td>$9.00</td>
-                        <td>Lots of dough</td>
-                        <td><input id="tried-pepperoni" type="checkbox"> <label for="tried-pepperoni">Tried<span class="visually-hidden"> Pizza / Pepperoni Pizza</span></label></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Chips Salsa</th>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Salsa With Crunched Up Pita Chips (Like Fatoushe / Add Cucumbers Ingredients)</th>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td><input id="tried-salsa" type="checkbox"> <label for="tried-salsa">Tried<span class="visually-hidden"> Salsa With Crunched Up Pita Chips</span></label></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Mediterranean Salad</th>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td><input id="tried-salad" type="checkbox"> <label for="tried-salad">Tried<span class="visually-hidden"> Mediterranean Salad</span></label></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </main>
-    <script type="module">
-        import { bindRowCheckboxes, registerAgentTools } from './src/site-logic.js';
-        bindRowCheckboxes(document.getElementById('eat-status'), 'marked tried', 'marked not tried');
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="color-scheme" content="light" />
+        <meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'" />
+        <title>Eat this instead | Recipes</title>
+        <link rel="stylesheet" href="./src/site.css" />
+    </head>
+    <body>
+        <a class="skip-link visually-hidden" href="#content">Skip to content</a>
+        <main id="content">
+            <h1>Eat this instead</h1>
+            <p>Going out to eat: <strong>Look for acai bowl / yogurt / smoothie place</strong></p>
+            <p id="eat-status" class="status visually-hidden" role="status" aria-live="polite"></p>
+            <div class="table-wrap" tabindex="0" role="region" aria-labelledby="eat-caption">
+                <table id="eat-table">
+                    <caption id="eat-caption">
+                        Healthy alternative table
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Food</th>
+                            <th scope="col">Calories</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Tried</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">Kefir</th>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Sugar Free Chobani Yogurt</th>
+                            <td></td>
+                            <td>$7.99</td>
+                            <td>Good. Have to buy in bulk though</td>
+                            <td>
+                                <input id="tried-chobani" type="checkbox" />
+                                <label for="tried-chobani"
+                                    >Tried<span class="visually-hidden"> Sugar Free Chobani Yogurt</span></label
+                                >
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Ice Cream</th>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Nick's Mint Chokladchip</th>
+                            <td>270</td>
+                            <td>$7.99</td>
+                            <td>Expensive. Sometimes melty and refrozen which tastes awful.</td>
+                            <td>
+                                <input id="tried-nicks" type="checkbox" />
+                                <label for="tried-nicks"
+                                    >Tried<span class="visually-hidden"> Nick's Mint Chokladchip</span></label
+                                >
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Chobani Yogurt Flip Cup</th>
+                            <td></td>
+                            <td></td>
+                            <td>Tastes good. Too small to satisfy though.</td>
+                            <td>
+                                <input id="tried-flip" type="checkbox" />
+                                <label for="tried-flip"
+                                    >Tried<span class="visually-hidden"> Chobani Yogurt Flip Cup</span></label
+                                >
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Meat</th>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Buffalo Wild Wings</th>
+                            <td></td>
+                            <td>$50</td>
+                            <td>Expensive and too much food. Very salty.</td>
+                            <td>
+                                <input id="tried-bww" type="checkbox" />
+                                <label for="tried-bww"
+                                    >Tried<span class="visually-hidden"> Buffalo Wild Wings</span></label
+                                >
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">TGI Fridays Frozen Wings</th>
+                            <td></td>
+                            <td>$20</td>
+                            <td>Sugary and lots of breading</td>
+                            <td>
+                                <input id="tried-tgi" type="checkbox" />
+                                <label for="tried-tgi"
+                                    >Tried<span class="visually-hidden"> TGI Fridays Frozen Wings</span></label
+                                >
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Frozen Hot Wings</th>
+                            <td></td>
+                            <td>$12</td>
+                            <td>Tastes good enough to satisfy the itch</td>
+                            <td>
+                                <input id="tried-hot-wings" type="checkbox" />
+                                <label for="tried-hot-wings"
+                                    >Tried<span class="visually-hidden"> Frozen Hot Wings</span></label
+                                >
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Quinoa Mushroom Burger With Franks Hot Sauce</th>
+                            <td></td>
+                            <td>$5</td>
+                            <td>Non Meat - Meaty and Salt</td>
+                            <td>
+                                <input id="tried-burger" type="checkbox" />
+                                <label for="tried-burger"
+                                    >Tried<span class="visually-hidden">
+                                        Quinoa Mushroom Burger With Franks Hot Sauce</span
+                                    ></label
+                                >
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Pastries</th>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Kodiak Frozen Waffles</th>
+                            <td></td>
+                            <td></td>
+                            <td>Tastes dense and good with allulose</td>
+                            <td>
+                                <input id="tried-waffles" type="checkbox" />
+                                <label for="tried-waffles"
+                                    >Tried<span class="visually-hidden"> Kodiak Frozen Waffles</span></label
+                                >
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Bagel Point Plain Bagel</th>
+                            <td></td>
+                            <td>2</td>
+                            <td>Bready and delicious</td>
+                            <td>
+                                <input id="tried-bagel" type="checkbox" />
+                                <label for="tried-bagel"
+                                    >Tried<span class="visually-hidden"> Bagel Point Plain Bagel</span></label
+                                >
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Funfetti Pancake Mix</th>
+                            <td></td>
+                            <td>11</td>
+                            <td>1g Sugar but tastes good</td>
+                            <td>
+                                <input id="tried-funfetti" type="checkbox" />
+                                <label for="tried-funfetti"
+                                    >Tried<span class="visually-hidden"> Funfetti Pancake Mix</span></label
+                                >
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Pizza</th>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Trader Joe's Frozen Tart</th>
+                            <td>600</td>
+                            <td>$5.49</td>
+                            <td>Crunchy Fluffy Tarte, small but flavorful</td>
+                            <td>
+                                <input id="tried-tart" type="checkbox" />
+                                <label for="tried-tart"
+                                    >Tried<span class="visually-hidden"> Trader Joe's Frozen Tart</span></label
+                                >
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Margarita Frozen Pesto Pizza</th>
+                            <td>900</td>
+                            <td>$9.00</td>
+                            <td>Cardboard</td>
+                            <td>
+                                <input id="tried-pesto" type="checkbox" />
+                                <label for="tried-pesto"
+                                    >Tried<span class="visually-hidden"> Margarita Frozen Pesto Pizza</span></label
+                                >
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Pizza / Pepperoni Pizza</th>
+                            <td>1740</td>
+                            <td>$9.00</td>
+                            <td>Lots of dough</td>
+                            <td>
+                                <input id="tried-pepperoni" type="checkbox" />
+                                <label for="tried-pepperoni"
+                                    >Tried<span class="visually-hidden"> Pizza / Pepperoni Pizza</span></label
+                                >
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Chips Salsa</th>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">
+                                Salsa With Crunched Up Pita Chips (Like Fatoushe / Add Cucumbers Ingredients)
+                            </th>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>
+                                <input id="tried-salsa" type="checkbox" />
+                                <label for="tried-salsa"
+                                    >Tried<span class="visually-hidden"> Salsa With Crunched Up Pita Chips</span></label
+                                >
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Mediterranean Salad</th>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>
+                                <input id="tried-salad" type="checkbox" />
+                                <label for="tried-salad"
+                                    >Tried<span class="visually-hidden"> Mediterranean Salad</span></label
+                                >
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+        <script type="module">
+            import { bindRowCheckboxes, registerAgentTools } from './src/site-logic.js';
+            bindRowCheckboxes(document.getElementById('eat-status'), 'marked tried', 'marked not tried');
 
-        function alternatives() {
-            return [...document.querySelectorAll('#eat-table tbody tr')].map((row) => ({
-                food: row.querySelector('th')?.textContent ?? '',
-                calories: row.querySelectorAll('td')[0]?.textContent ?? '',
-                price: row.querySelectorAll('td')[1]?.textContent ?? '',
-                description: row.querySelectorAll('td')[2]?.textContent ?? '',
-                tried: Boolean(row.querySelector('input')?.checked),
-            }));
-        }
+            function alternatives() {
+                return [...document.querySelectorAll('#eat-table tbody tr')].map((row) => ({
+                    food: row.querySelector('th')?.textContent ?? '',
+                    calories: row.querySelectorAll('td')[0]?.textContent ?? '',
+                    price: row.querySelectorAll('td')[1]?.textContent ?? '',
+                    description: row.querySelectorAll('td')[2]?.textContent ?? '',
+                    tried: Boolean(row.querySelector('input')?.checked),
+                }));
+            }
 
-        registerAgentTools([
-            {
-                name: 'list-eating-alternatives',
-                description: 'Read the eating-out alternatives and which ones are marked tried.',
-                inputSchema: { type: 'object', properties: {} },
-                execute() { return { foods: alternatives() }; },
-                annotations: { readOnlyHint: true },
-            },
-            {
-                name: 'set-alternative-tried',
-                description: 'Mark one eating alternative tried or not tried.',
-                inputSchema: {
-                    type: 'object',
-                    properties: {
-                        food: { type: 'string', description: 'Food name as shown in the table.' },
-                        tried: { type: 'boolean', description: 'Whether that food has been tried.' },
+            registerAgentTools([
+                {
+                    name: 'list-eating-alternatives',
+                    description: 'Read the eating-out alternatives and which ones are marked tried.',
+                    inputSchema: { type: 'object', properties: {} },
+                    execute() {
+                        return { foods: alternatives() };
                     },
-                    required: ['food', 'tried'],
+                    annotations: { readOnlyHint: true },
                 },
-                execute(input) {
-                    if (typeof input?.food !== 'string' || typeof input?.tried !== 'boolean') {
-                        return { error: 'Pass the food name and whether it was tried.' };
-                    }
-                    const row = [...document.querySelectorAll('#eat-table tbody tr')]
-                        .find((entry) => entry.querySelector('th')?.textContent === input.food);
-                    const box = row?.querySelector('input');
-                    if (!box) return { error: `No food named "${input.food}" with a Tried checkbox.`, foods: alternatives().filter((item) => item.food).map((item) => item.food) };
-                    box.checked = input.tried;
-                    box.dispatchEvent(new Event('change'));
-                    return { food: input.food, tried: box.checked };
+                {
+                    name: 'set-alternative-tried',
+                    description: 'Mark one eating alternative tried or not tried.',
+                    inputSchema: {
+                        type: 'object',
+                        properties: {
+                            food: { type: 'string', description: 'Food name as shown in the table.' },
+                            tried: { type: 'boolean', description: 'Whether that food has been tried.' },
+                        },
+                        required: ['food', 'tried'],
+                    },
+                    execute(input) {
+                        if (typeof input?.food !== 'string' || typeof input?.tried !== 'boolean') {
+                            return { error: 'Pass the food name and whether it was tried.' };
+                        }
+                        const row = [...document.querySelectorAll('#eat-table tbody tr')].find(
+                            (entry) => entry.querySelector('th')?.textContent === input.food,
+                        );
+                        const box = row?.querySelector('input');
+                        if (!box)
+                            return {
+                                error: `No food named "${input.food}" with a Tried checkbox.`,
+                                foods: alternatives()
+                                    .filter((item) => item.food)
+                                    .map((item) => item.food),
+                            };
+                        box.checked = input.tried;
+                        box.dispatchEvent(new Event('change'));
+                        return { food: input.food, tried: box.checked };
+                    },
+                    annotations: { readOnlyHint: false },
                 },
-                annotations: { readOnlyHint: false },
-            },
-        ]);
-    </script>
-</body>
+            ]);
+        </script>
+    </body>
 </html>

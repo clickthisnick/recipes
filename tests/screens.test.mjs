@@ -1,0 +1,73 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+import { parseHTML } from 'linkedom';
+
+test('the recipe screens render from the select list through cooking', async () => {
+    const { document, window } = parseHTML('<!doctype html><html><head></head><body></body></html>');
+    globalThis.document = document;
+    globalThis.window = window;
+    for (const key of [
+        'HTMLElement',
+        'HTMLButtonElement',
+        'HTMLInputElement',
+        'HTMLSelectElement',
+        'Document',
+        'Node',
+        'Event',
+    ]) {
+        if (window[key]) globalThis[key] = window[key];
+    }
+    window.setTimeout = (fn) => {
+        fn();
+        return 1;
+    };
+    window.clearTimeout = () => {};
+    window.setInterval = () => 1;
+    window.clearInterval = () => {};
+    window.location = { origin: 'http://localhost:3000', pathname: '/main.html', search: '', hash: '' };
+    globalThis.MutationObserver = class {
+        observe() {}
+        disconnect() {}
+    };
+    document.modelContext = {
+        registerTool() {
+            return Promise.resolve();
+        },
+    };
+
+    await import('../src/file.js');
+    document.dispatchEvent(new window.Event('DOMContentLoaded'));
+
+    assert.equal(document.title, 'Recipes');
+    const recipe = document.querySelector('[data-testid="recipe-scrambled-eggs"]');
+    assert.ok(recipe);
+    recipe.click();
+    assert.equal(document.querySelectorAll('.recipe-btn.selected').length, 1);
+
+    const open = (id) => document.querySelector(`[data-testid="${id}"]`).click();
+    const back = () =>
+        [...document.querySelectorAll('button')].find((button) => /Back/.test(button.textContent)).click();
+    const startOver = () =>
+        [...document.querySelectorAll('button')].find((button) => /Start Over/.test(button.textContent)).click();
+    const heading = () => document.querySelector('h1, h2').textContent;
+
+    open('go-shopping');
+    assert.match(heading(), /Shopping/);
+    startOver();
+    document.querySelector('[data-testid="recipe-scrambled-eggs"]').click();
+
+    open('open-nutrition');
+    assert.match(heading(), /Nutrition/);
+    startOver();
+    document.querySelector('[data-testid="recipe-scrambled-eggs"]').click();
+
+    open('open-plan');
+    assert.match(heading(), /Day Planner/);
+    back();
+    assert.match(heading(), /Recipes/);
+    document.querySelector('[data-testid="recipe-scrambled-eggs"]').click();
+
+    open('start-cooking');
+    assert.match(heading(), /Cooking/);
+    assert.ok(document.querySelectorAll('.panel').length > 1);
+});

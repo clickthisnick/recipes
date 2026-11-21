@@ -1,0 +1,6 @@
+node_modules
+archived
+.agents
+package-lock.json
+# Recipe calls stay on one line so scripts/validate-recipes.js can see s(name.add(.
+src/file.js

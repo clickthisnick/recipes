@@ -1,0 +1,10 @@
+{
+    "coverage": {
+        "lines": 90,
+        "branches": 75,
+        "functions": 75
+    },
+    "size": {
+        "maxBytes": 481688
+    }
+}

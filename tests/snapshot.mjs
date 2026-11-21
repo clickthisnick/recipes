@@ -18,8 +18,17 @@ if (process.argv[2] === '--compare') {
     for (const file of readdirSync(a).sort()) {
         const left = readFileSync(join(a, file));
         let right;
-        try { right = readFileSync(join(b, file)); } catch { console.log(`missing  ${file}`); diffs++; continue; }
-        if (!left.equals(right)) { console.log(`differs  ${file}`); diffs++; }
+        try {
+            right = readFileSync(join(b, file));
+        } catch {
+            console.log(`missing  ${file}`);
+            diffs++;
+            continue;
+        }
+        if (!left.equals(right)) {
+            console.log(`differs  ${file}`);
+            diffs++;
+        }
     }
     console.log(diffs ? `${diffs} file(s) differ` : 'identical');
     process.exit(diffs ? 1 : 0);
@@ -29,13 +38,20 @@ const { webkit } = await import('playwright');
 const out = process.env.SNAP_DIR || '/tmp/snap';
 mkdirSync(out, { recursive: true });
 const port = Number(process.env.SNAP_PORT || 3917);
-const server = spawn(process.execPath, ['scripts/serve.js'], { env: { ...process.env, PORT: String(port) }, stdio: 'ignore' });
+const server = spawn(process.execPath, ['scripts/serve.js'], {
+    env: { ...process.env, PORT: String(port) },
+    stdio: 'ignore',
+});
 await new Promise((r) => setTimeout(r, 600));
 const base = `http://localhost:${port}`;
 const FIXED = new Date('2026-11-20T18:00:00-05:00');
 
 const browser = await webkit.launch();
-const context = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, hasTouch: false });
+const context = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    deviceScaleFactor: 1,
+    hasTouch: false,
+});
 const errors = [];
 
 async function open(path) {
@@ -43,7 +59,9 @@ async function open(path) {
     page.on('pageerror', (e) => errors.push(`${path}: ${e.message}`));
     // Headless WebKit audio is flaky; the alarm logic, not the speaker, is under test.
     await page.addInitScript(() => {
-        HTMLMediaElement.prototype.play = function play() { return Promise.resolve(); };
+        HTMLMediaElement.prototype.play = function play() {
+            return Promise.resolve();
+        };
         HTMLMediaElement.prototype.pause = function pause() {};
     });
     await page.clock.install({ time: FIXED });
@@ -56,7 +74,9 @@ async function snap(page, name) {
     await page.waitForTimeout(150);
     const html = await page.evaluate(() => {
         const clone = document.body.cloneNode(true);
-        clone.querySelectorAll('.build-footer').forEach((el) => { el.textContent = 'BUILD'; });
+        clone.querySelectorAll('.build-footer').forEach((el) => {
+            el.textContent = 'BUILD';
+        });
         // Attribute order is not behavior: sort it so refactors that set props in a
         // different order compare equal.
         for (const el of [clone, ...clone.querySelectorAll('*')]) {
@@ -68,7 +88,13 @@ async function snap(page, name) {
     });
     writeFileSync(join(out, `${name}.html`), html + '\n');
     await page.mouse.move(0, 0);
-    await page.screenshot({ path: join(out, `${name}.png`), fullPage: true, animations: 'disabled', caret: 'hide', mask: [page.locator('.build-footer')] });
+    await page.screenshot({
+        path: join(out, `${name}.png`),
+        fullPage: true,
+        animations: 'disabled',
+        caret: 'hide',
+        mask: [page.locator('.build-footer')],
+    });
 }
 
 const tid = (page, id) => page.locator(`[data-testid="${id}"]`);
@@ -100,7 +126,10 @@ await selectRecipes(p, ['quinoa-falafel', 'pan-seared-chicken-sausage', 'pan-sea
 await tid(p, 'go-shopping').click();
 await snap(p, '06-shopping');
 await p.locator('.inventory-have-input').first().fill('1');
-await p.locator('.panel').nth(1).click({ position: { x: 5, y: 5 } });
+await p
+    .locator('.panel')
+    .nth(1)
+    .click({ position: { x: 5, y: 5 } });
 await snap(p, '07-shopping-edited');
 await p.close();
 
@@ -108,7 +137,10 @@ p = await open('/main.html');
 await selectRecipes(p, ['quinoa-falafel', 'blueprint-smoothie', 'blueprint-smoothie']);
 await tid(p, 'open-nutrition').click();
 await snap(p, '08-nutrition');
-await p.locator('.nutrition-recipe-header').first().click({ position: { x: 5, y: 5 } });
+await p
+    .locator('.nutrition-recipe-header')
+    .first()
+    .click({ position: { x: 5, y: 5 } });
 await p.locator('.nutrition-ingredient-toggle').first().click();
 await p.locator('.nutrition-eaten-btn').nth(1).click();
 await snap(p, '09-nutrition-expanded');
@@ -152,7 +184,10 @@ p = await open('/main.html?recipe=test-recipe-all-features');
 await snap(p, '20-cooking-all-features');
 for (const notes of await p.locator('.info-step-header, .info-step summary').all()) await notes.click();
 await snap(p, '21-cooking-notes-open');
-const timer = p.locator('.panel:not(.step-locked):not(.sound-check-btn)').filter({ has: p.locator('.timer-duration-badge') }).first();
+const timer = p
+    .locator('.panel:not(.step-locked):not(.sound-check-btn)')
+    .filter({ has: p.locator('.timer-duration-badge') })
+    .first();
 await timer.click();
 await p.clock.runFor(3000);
 await snap(p, '22-cooking-timer-running');
@@ -173,7 +208,17 @@ await snap(p, '26-cooking-gate-retry');
 await p.close();
 
 // ── Static pages ────────────────────────────────────────────
-for (const page of ['index', 'meatTemp', 'cordSlicer', 'frozenFood', 'eatThis', 'groceryList', 'expirationCalculator', 'waterIntake', 'tracker']) {
+for (const page of [
+    'index',
+    'meatTemp',
+    'cordSlicer',
+    'frozenFood',
+    'eatThis',
+    'groceryList',
+    'expirationCalculator',
+    'waterIntake',
+    'tracker',
+]) {
     p = await open(`/${page}.html`);
     await snap(p, `30-${page}`);
     if (page === 'groceryList' || page === 'eatThis' || page === 'expirationCalculator') {

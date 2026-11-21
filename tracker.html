@@ -1,383 +1,621 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="color-scheme" content="light">
-    <meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'">
-    <title>Nutrition tracker | Recipes</title>
-    <link rel="stylesheet" href="./src/site.css">
-    <style>
-        header { background: #4caf50; color: #fff; padding: 1rem; margin: -1rem -1rem 1rem; }
-        header h1 { margin: 0; }
-        .selected-foods { display: flex; flex-direction: column; gap: 0.5rem; margin-block: 1rem; }
-        .food-tag { display: flex; justify-content: space-between; gap: 0.5rem; align-items: center; background: #e5e5e5; padding: 0.4rem 0.8rem; border-radius: 6px; max-width: 32rem; }
-        .food-controls { display: flex; gap: 0.25rem; }
-        #nutrition-table { margin-top: 1rem; }
-        textarea { width: 100%; max-width: 40rem; min-block-size: 12rem; }
-    </style>
-</head>
-<body>
-    <a class="skip-link visually-hidden" href="#tracker">Skip to tracker</a>
-    <header><h1>Nutrition tracker</h1></header>
-    <div class="tabs" aria-label="Nutrition tools">
-        <button type="button" id="show-tracker" aria-pressed="true" data-testid="tab-tracker">Nutrition Tracker</button>
-        <button type="button" id="show-custom" aria-pressed="false" data-testid="tab-custom">Add Custom Food</button>
-    </div>
-    <p id="tracker-status" class="status visually-hidden" role="status" aria-live="polite"></p>
-
-    <section id="tracker">
-        <h2>Nutrition Tracker</h2>
-        <div class="field">
-            <label for="food-select">Food</label>
-            <select id="food-select" data-testid="food-select">
-                <option value="">Choose a food</option>
-            </select>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="color-scheme" content="light" />
+        <meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'" />
+        <title>Nutrition tracker | Recipes</title>
+        <link rel="stylesheet" href="./src/site.css" />
+        <style>
+            header {
+                background: #4caf50;
+                color: #fff;
+                padding: 1rem;
+                margin: -1rem -1rem 1rem;
+            }
+            header h1 {
+                margin: 0;
+            }
+            .selected-foods {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+                margin-block: 1rem;
+            }
+            .food-tag {
+                display: flex;
+                justify-content: space-between;
+                gap: 0.5rem;
+                align-items: center;
+                background: #e5e5e5;
+                padding: 0.4rem 0.8rem;
+                border-radius: 6px;
+                max-width: 32rem;
+            }
+            .food-controls {
+                display: flex;
+                gap: 0.25rem;
+            }
+            #nutrition-table {
+                margin-top: 1rem;
+            }
+            textarea {
+                width: 100%;
+                max-width: 40rem;
+                min-block-size: 12rem;
+            }
+        </style>
+    </head>
+    <body>
+        <a class="skip-link visually-hidden" href="#tracker">Skip to tracker</a>
+        <header><h1>Nutrition tracker</h1></header>
+        <div class="tabs" aria-label="Nutrition tools">
+            <button type="button" id="show-tracker" aria-pressed="true" data-testid="tab-tracker">
+                Nutrition Tracker
+            </button>
+            <button type="button" id="show-custom" aria-pressed="false" data-testid="tab-custom">
+                Add Custom Food
+            </button>
         </div>
-        <div class="selected-foods" id="selected-foods"></div>
-        <button type="button" id="update-nutrition" data-testid="update-nutrition">Update Nutrition</button>
-        <div class="table-wrap" tabindex="0" role="region" aria-labelledby="nutrition-caption">
-            <table id="nutrition-table" hidden>
-                <caption id="nutrition-caption">Intake compared with FDA daily limits</caption>
-                <thead>
-                    <tr>
-                        <th scope="col">Nutrient</th>
-                        <th scope="col">Your intake</th>
-                        <th scope="col">FDA daily limit</th>
-                    </tr>
-                </thead>
-                <tbody id="nutrition-body"></tbody>
-            </table>
-        </div>
-    </section>
+        <p id="tracker-status" class="status visually-hidden" role="status" aria-live="polite"></p>
 
-    <section id="custom" hidden>
-        <h2>Add Custom Food</h2>
-        <p>Copy this JSON and manually add it to your foods list in your app repo.</p>
-        <form id="custom-form" toolname="build-custom-food" tooldescription="Build JSON for a custom food so it can be pasted into the tracker source." toolautosubmit>
+        <section id="tracker">
+            <h2>Nutrition Tracker</h2>
             <div class="field">
-                <label for="custom-name">Food name</label>
-                <input id="custom-name" name="name" type="text" required maxlength="80" autocomplete="off" data-error="custom-name-error" data-testid="custom-name">
-                <p id="custom-name-error" class="error-msg"><span role="img" aria-label="Error">❌</span> Name is required.</p>
+                <label for="food-select">Food</label>
+                <select id="food-select" data-testid="food-select">
+                    <option value="">Choose a food</option>
+                </select>
             </div>
-            <div id="nutrient-fields"></div>
-            <button type="submit" data-testid="build-custom-food">Build JSON</button>
-        </form>
-        <div class="field">
-            <label for="custom-food-json">Food JSON</label>
-            <textarea id="custom-food-json" readonly data-testid="custom-food-json"></textarea>
-        </div>
-        <button type="button" id="copy-custom-food" data-testid="copy-custom-food">
-            Copy JSON<span class="visually-hidden"> for the custom food</span>
-        </button>
-        <p id="copy-status" class="status" role="status"></p>
-    </section>
+            <div class="selected-foods" id="selected-foods"></div>
+            <button type="button" id="update-nutrition" data-testid="update-nutrition">Update Nutrition</button>
+            <div class="table-wrap" tabindex="0" role="region" aria-labelledby="nutrition-caption">
+                <table id="nutrition-table" hidden>
+                    <caption id="nutrition-caption">
+                        Intake compared with FDA daily limits
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Nutrient</th>
+                            <th scope="col">Your intake</th>
+                            <th scope="col">FDA daily limit</th>
+                        </tr>
+                    </thead>
+                    <tbody id="nutrition-body"></tbody>
+                </table>
+            </div>
+        </section>
 
-    <script type="module">
-        import { TRACKER_NUTRIENTS, bindUserInvalid, customFoodRecord, registerAgentTools, sumSelectedNutrition } from './src/site-logic.js';
+        <section id="custom" hidden>
+            <h2>Add Custom Food</h2>
+            <p>Copy this JSON and manually add it to your foods list in your app repo.</p>
+            <form
+                id="custom-form"
+                toolname="build-custom-food"
+                tooldescription="Build JSON for a custom food so it can be pasted into the tracker source."
+                toolautosubmit
+            >
+                <div class="field">
+                    <label for="custom-name">Food name</label>
+                    <input
+                        id="custom-name"
+                        name="name"
+                        type="text"
+                        required
+                        maxlength="80"
+                        autocomplete="off"
+                        data-error="custom-name-error"
+                        data-testid="custom-name"
+                    />
+                    <p id="custom-name-error" class="error-msg">
+                        <span role="img" aria-label="Error">❌</span> Name is required.
+                    </p>
+                </div>
+                <div id="nutrient-fields"></div>
+                <button type="submit" data-testid="build-custom-food">Build JSON</button>
+            </form>
+            <div class="field">
+                <label for="custom-food-json">Food JSON</label>
+                <textarea id="custom-food-json" readonly data-testid="custom-food-json"></textarea>
+            </div>
+            <button type="button" id="copy-custom-food" data-testid="copy-custom-food">
+                Copy JSON<span class="visually-hidden"> for the custom food</span>
+            </button>
+            <p id="copy-status" class="status" role="status"></p>
+        </section>
 
-        const units = { c: 'cal', g: 'g', mg: 'mg' };
-        const fdaLimits = {
-            calories: { value: 2700, unit: units.c },
-            protein: { value: 75, unit: units.g },
-            carbs: { value: 412, unit: units.g },
-            total_fat: { value: 117, unit: units.g },
-            saturated_fat: { value: 30, unit: units.g },
-            fiber: { value: 34, unit: units.g },
-            sugar: { value: 50, unit: units.g },
-            sodium: { value: 2300, unit: units.mg },
-        };
-        const NUTRIENTS = Object.keys(fdaLimits);
+        <script type="module">
+            import {
+                TRACKER_NUTRIENTS,
+                bindUserInvalid,
+                customFoodRecord,
+                registerAgentTools,
+                sumSelectedNutrition,
+            } from './src/site-logic.js';
 
-        const components = {
-            Blueprint_Bananna_Protein: { calories: { value: 270, unit: units.c }, protein: { value: 27, unit: units.g }, carbs: { value: 24, unit: units.g }, total_fat: { value: 9, unit: units.g }, saturated_fat: { value: 4.5, unit: units.g }, fiber: { value: 7, unit: units.g }, sugar: { value: 7, unit: units.g }, sodium: { value: 160, unit: units.mg } },
-            '4_Kalamata_Olives': { calories: { value: 45, unit: units.c }, protein: { value: 0, unit: units.g }, carbs: { value: 0, unit: units.g }, total_fat: { value: 4.5, unit: units.g }, saturated_fat: { value: 0.5, unit: units.g }, fiber: { value: 0, unit: units.g }, sugar: { value: 0, unit: units.g }, sodium: { value: 190, unit: units.mg } },
-            Blueprint_Cocoa: { calories: { value: 15, unit: units.c }, protein: { value: 1, unit: units.g }, carbs: { value: 3, unit: units.g }, total_fat: { value: 0.5, unit: units.g }, saturated_fat: { value: 0, unit: units.g }, fiber: { value: 1, unit: units.g }, sugar: { value: 0, unit: units.g }, sodium: { value: 0, unit: units.mg } },
-            Blueprint_Blueberry_Nut_Mix: { calories: { value: 70, unit: units.c }, protein: { value: 1, unit: units.g }, carbs: { value: 8, unit: units.g }, total_fat: { value: 4.5, unit: units.g }, saturated_fat: { value: 0.5, unit: units.g }, fiber: { value: 2, unit: units.g }, sugar: { value: 5, unit: units.g }, sodium: { value: 0, unit: units.mg } },
-            Blueprint_Longevity_Protein: { calories: { value: 200, unit: units.c }, protein: { value: 26, unit: units.g }, carbs: { value: 12, unit: units.g }, total_fat: { value: 6, unit: units.g }, saturated_fat: { value: 1, unit: units.g }, fiber: { value: 3, unit: units.g }, sugar: { value: 0, unit: units.g }, sodium: { value: 190, unit: units.mg } },
-            Blueprint_Macadamia_Puree: { calories: { value: 190, unit: units.c }, protein: { value: 2, unit: units.g }, carbs: { value: 3, unit: units.g }, total_fat: { value: 20, unit: units.g }, saturated_fat: { value: 3.5, unit: units.g }, fiber: { value: 2, unit: units.g }, sugar: { value: 1, unit: units.g }, sodium: { value: 25, unit: units.mg } },
-            Blueprint_Olive_Oil_Tbsp: { calories: { value: 120, unit: units.c }, protein: { value: 0, unit: units.g }, carbs: { value: 0, unit: units.g }, total_fat: { value: 14, unit: units.g }, saturated_fat: { value: 2, unit: units.g }, fiber: { value: 0, unit: units.g }, sugar: { value: 0, unit: units.g }, sodium: { value: 0, unit: units.mg } },
-            Blueprint_Longevity_Vitamin_Mix: { calories: { value: 110, unit: units.c }, protein: { value: 20, unit: units.g }, carbs: { value: 3, unit: units.g }, total_fat: { value: 0, unit: units.g }, saturated_fat: { value: 0, unit: units.g }, fiber: { value: 0, unit: units.g }, sugar: { value: 0, unit: units.g }, sodium: { value: 0, unit: units.mg } },
-            '1 Cup Milkadamia Unsweetened': { calories: { value: 40, unit: units.c }, protein: { value: 1, unit: units.g }, carbs: { value: 0, unit: units.g }, total_fat: { value: 3.5, unit: units.g }, saturated_fat: { value: 0.5, unit: units.g }, fiber: { value: 0, unit: units.g }, sugar: { value: 0, unit: units.g }, sodium: { value: 105, unit: units.mg } },
-            medium_avocado: { calories: { value: 240, unit: units.c }, protein: { value: 3, unit: units.g }, carbs: { value: 12, unit: units.g }, total_fat: { value: 22, unit: units.g }, saturated_fat: { value: 3, unit: units.g }, fiber: { value: 10, unit: units.g }, sugar: { value: 1, unit: units.g }, sodium: { value: 10, unit: units.mg } },
-            sixteenth_tsp_salt: { calories: { value: 0, unit: units.c }, protein: { value: 0, unit: units.g }, carbs: { value: 0, unit: units.g }, total_fat: { value: 0, unit: units.g }, saturated_fat: { value: 0, unit: units.g }, fiber: { value: 0, unit: units.g }, sugar: { value: 0, unit: units.g }, sodium: { value: 375, unit: units.mg } },
-        };
+            const units = { c: 'cal', g: 'g', mg: 'mg' };
+            const fdaLimits = {
+                calories: { value: 2700, unit: units.c },
+                protein: { value: 75, unit: units.g },
+                carbs: { value: 412, unit: units.g },
+                total_fat: { value: 117, unit: units.g },
+                saturated_fat: { value: 30, unit: units.g },
+                fiber: { value: 34, unit: units.g },
+                sugar: { value: 50, unit: units.g },
+                sodium: { value: 2300, unit: units.mg },
+            };
+            const NUTRIENTS = Object.keys(fdaLimits);
 
-        const foodData = {
-            bp_longevity_vitamin_mix: { name: 'Blueprint_Longevity_Vitamin_Mix', components: [{ key: 'Blueprint_Longevity_Vitamin_Mix', quantity: 1 }] },
-            bp_longevity_protein: { name: 'Blueprint Longevity Protein', components: [{ key: 'Blueprint_Longevity_Protein', quantity: 1 }, { key: 'Blueprint_Blueberry_Nut_Mix', quantity: 1 }, { key: 'Blueprint_Cocoa', quantity: 1 }, { key: 'Blueprint_Olive_Oil_Tbsp', quantity: 2 }, { key: 'Blueprint_Macadamia_Puree', quantity: 1 }] },
-            bp_longevity_protein_without_macadamia: { name: 'Blueprint Longevity Protein (No Macadamia)', components: [{ key: 'Blueprint_Longevity_Protein', quantity: 1 }, { key: 'Blueprint_Blueberry_Nut_Mix', quantity: 1 }, { key: 'Blueprint_Cocoa', quantity: 1 }, { key: 'Blueprint_Olive_Oil_Tbsp', quantity: 2 }] },
-            avocado_with_olives: { name: 'Medium Avocado + 4 Kalamata Olives', components: [{ key: 'medium_avocado', quantity: 1 }, { key: '4_Kalamata_Olives', quantity: 1 }] },
-            blueprint_bananna_protein: { name: 'Blueprint Bananna Protein (With Water)', components: [{ key: 'Blueprint_Bananna_Protein', quantity: 1 }] },
-            grams_65_black_lentils_dry: { name: '365 Organic Black Lentils (65g dry)', calories: { value: 260, unit: units.c }, protein: { value: 20, unit: units.g }, carbs: { value: 45, unit: units.g }, total_fat: { value: 2, unit: units.g }, saturated_fat: { value: 0, unit: units.g }, fiber: { value: 14, unit: units.g }, sugar: { value: 0, unit: units.g }, sodium: { value: 0, unit: units.mg } },
-            psyillium_husks: { name: 'Tablespoon Whole Foods Organic Psyllium Husks', calories: { value: 20, unit: units.c }, protein: { value: 0, unit: units.g }, carbs: { value: 8, unit: units.g }, total_fat: { value: 0, unit: units.g }, saturated_fat: { value: 0, unit: units.g }, fiber: { value: 7, unit: units.g }, sugar: { value: 0, unit: units.g }, sodium: { value: 0, unit: units.mg } },
-            custom_sweet_grens_super_green_goddess: { name: 'Sweet Greens: Super Green Goddess w/Extra Virgin Olive Oil', calories: { value: 415, unit: units.c }, protein: { value: 11, unit: units.g }, carbs: { value: 35, unit: units.g }, total_fat: { value: 26, unit: units.g }, saturated_fat: { value: 0, unit: units.g }, fiber: { value: 0, unit: units.g }, sugar: { value: 0, unit: units.g }, sodium: { value: 0, unit: units.mg } },
-            raspberry_bar: { name: 'Raspberry Bar', calories: { value: 160, unit: units.c }, protein: { value: 9, unit: units.g }, carbs: { value: 4, unit: units.g }, total_fat: { value: 12, unit: units.g }, saturated_fat: { value: 0, unit: units.g }, fiber: { value: 1, unit: units.g }, sugar: { value: 1, unit: units.g }, sodium: { value: 190, unit: units.mg } },
-        };
+            const components = {
+                Blueprint_Bananna_Protein: {
+                    calories: { value: 270, unit: units.c },
+                    protein: { value: 27, unit: units.g },
+                    carbs: { value: 24, unit: units.g },
+                    total_fat: { value: 9, unit: units.g },
+                    saturated_fat: { value: 4.5, unit: units.g },
+                    fiber: { value: 7, unit: units.g },
+                    sugar: { value: 7, unit: units.g },
+                    sodium: { value: 160, unit: units.mg },
+                },
+                '4_Kalamata_Olives': {
+                    calories: { value: 45, unit: units.c },
+                    protein: { value: 0, unit: units.g },
+                    carbs: { value: 0, unit: units.g },
+                    total_fat: { value: 4.5, unit: units.g },
+                    saturated_fat: { value: 0.5, unit: units.g },
+                    fiber: { value: 0, unit: units.g },
+                    sugar: { value: 0, unit: units.g },
+                    sodium: { value: 190, unit: units.mg },
+                },
+                Blueprint_Cocoa: {
+                    calories: { value: 15, unit: units.c },
+                    protein: { value: 1, unit: units.g },
+                    carbs: { value: 3, unit: units.g },
+                    total_fat: { value: 0.5, unit: units.g },
+                    saturated_fat: { value: 0, unit: units.g },
+                    fiber: { value: 1, unit: units.g },
+                    sugar: { value: 0, unit: units.g },
+                    sodium: { value: 0, unit: units.mg },
+                },
+                Blueprint_Blueberry_Nut_Mix: {
+                    calories: { value: 70, unit: units.c },
+                    protein: { value: 1, unit: units.g },
+                    carbs: { value: 8, unit: units.g },
+                    total_fat: { value: 4.5, unit: units.g },
+                    saturated_fat: { value: 0.5, unit: units.g },
+                    fiber: { value: 2, unit: units.g },
+                    sugar: { value: 5, unit: units.g },
+                    sodium: { value: 0, unit: units.mg },
+                },
+                Blueprint_Longevity_Protein: {
+                    calories: { value: 200, unit: units.c },
+                    protein: { value: 26, unit: units.g },
+                    carbs: { value: 12, unit: units.g },
+                    total_fat: { value: 6, unit: units.g },
+                    saturated_fat: { value: 1, unit: units.g },
+                    fiber: { value: 3, unit: units.g },
+                    sugar: { value: 0, unit: units.g },
+                    sodium: { value: 190, unit: units.mg },
+                },
+                Blueprint_Macadamia_Puree: {
+                    calories: { value: 190, unit: units.c },
+                    protein: { value: 2, unit: units.g },
+                    carbs: { value: 3, unit: units.g },
+                    total_fat: { value: 20, unit: units.g },
+                    saturated_fat: { value: 3.5, unit: units.g },
+                    fiber: { value: 2, unit: units.g },
+                    sugar: { value: 1, unit: units.g },
+                    sodium: { value: 25, unit: units.mg },
+                },
+                Blueprint_Olive_Oil_Tbsp: {
+                    calories: { value: 120, unit: units.c },
+                    protein: { value: 0, unit: units.g },
+                    carbs: { value: 0, unit: units.g },
+                    total_fat: { value: 14, unit: units.g },
+                    saturated_fat: { value: 2, unit: units.g },
+                    fiber: { value: 0, unit: units.g },
+                    sugar: { value: 0, unit: units.g },
+                    sodium: { value: 0, unit: units.mg },
+                },
+                Blueprint_Longevity_Vitamin_Mix: {
+                    calories: { value: 110, unit: units.c },
+                    protein: { value: 20, unit: units.g },
+                    carbs: { value: 3, unit: units.g },
+                    total_fat: { value: 0, unit: units.g },
+                    saturated_fat: { value: 0, unit: units.g },
+                    fiber: { value: 0, unit: units.g },
+                    sugar: { value: 0, unit: units.g },
+                    sodium: { value: 0, unit: units.mg },
+                },
+                '1 Cup Milkadamia Unsweetened': {
+                    calories: { value: 40, unit: units.c },
+                    protein: { value: 1, unit: units.g },
+                    carbs: { value: 0, unit: units.g },
+                    total_fat: { value: 3.5, unit: units.g },
+                    saturated_fat: { value: 0.5, unit: units.g },
+                    fiber: { value: 0, unit: units.g },
+                    sugar: { value: 0, unit: units.g },
+                    sodium: { value: 105, unit: units.mg },
+                },
+                medium_avocado: {
+                    calories: { value: 240, unit: units.c },
+                    protein: { value: 3, unit: units.g },
+                    carbs: { value: 12, unit: units.g },
+                    total_fat: { value: 22, unit: units.g },
+                    saturated_fat: { value: 3, unit: units.g },
+                    fiber: { value: 10, unit: units.g },
+                    sugar: { value: 1, unit: units.g },
+                    sodium: { value: 10, unit: units.mg },
+                },
+                sixteenth_tsp_salt: {
+                    calories: { value: 0, unit: units.c },
+                    protein: { value: 0, unit: units.g },
+                    carbs: { value: 0, unit: units.g },
+                    total_fat: { value: 0, unit: units.g },
+                    saturated_fat: { value: 0, unit: units.g },
+                    fiber: { value: 0, unit: units.g },
+                    sugar: { value: 0, unit: units.g },
+                    sodium: { value: 375, unit: units.mg },
+                },
+            };
 
-        function calculateFromComponents(list) {
-            const totals = {};
-            NUTRIENTS.forEach((nutrient) => { totals[nutrient] = { value: 0, unit: fdaLimits[nutrient].unit }; });
-            list.forEach(({ key, quantity }) => {
-                const component = components[key];
-                if (!component) return;
+            const foodData = {
+                bp_longevity_vitamin_mix: {
+                    name: 'Blueprint_Longevity_Vitamin_Mix',
+                    components: [{ key: 'Blueprint_Longevity_Vitamin_Mix', quantity: 1 }],
+                },
+                bp_longevity_protein: {
+                    name: 'Blueprint Longevity Protein',
+                    components: [
+                        { key: 'Blueprint_Longevity_Protein', quantity: 1 },
+                        { key: 'Blueprint_Blueberry_Nut_Mix', quantity: 1 },
+                        { key: 'Blueprint_Cocoa', quantity: 1 },
+                        { key: 'Blueprint_Olive_Oil_Tbsp', quantity: 2 },
+                        { key: 'Blueprint_Macadamia_Puree', quantity: 1 },
+                    ],
+                },
+                bp_longevity_protein_without_macadamia: {
+                    name: 'Blueprint Longevity Protein (No Macadamia)',
+                    components: [
+                        { key: 'Blueprint_Longevity_Protein', quantity: 1 },
+                        { key: 'Blueprint_Blueberry_Nut_Mix', quantity: 1 },
+                        { key: 'Blueprint_Cocoa', quantity: 1 },
+                        { key: 'Blueprint_Olive_Oil_Tbsp', quantity: 2 },
+                    ],
+                },
+                avocado_with_olives: {
+                    name: 'Medium Avocado + 4 Kalamata Olives',
+                    components: [
+                        { key: 'medium_avocado', quantity: 1 },
+                        { key: '4_Kalamata_Olives', quantity: 1 },
+                    ],
+                },
+                blueprint_bananna_protein: {
+                    name: 'Blueprint Bananna Protein (With Water)',
+                    components: [{ key: 'Blueprint_Bananna_Protein', quantity: 1 }],
+                },
+                grams_65_black_lentils_dry: {
+                    name: '365 Organic Black Lentils (65g dry)',
+                    calories: { value: 260, unit: units.c },
+                    protein: { value: 20, unit: units.g },
+                    carbs: { value: 45, unit: units.g },
+                    total_fat: { value: 2, unit: units.g },
+                    saturated_fat: { value: 0, unit: units.g },
+                    fiber: { value: 14, unit: units.g },
+                    sugar: { value: 0, unit: units.g },
+                    sodium: { value: 0, unit: units.mg },
+                },
+                psyillium_husks: {
+                    name: 'Tablespoon Whole Foods Organic Psyllium Husks',
+                    calories: { value: 20, unit: units.c },
+                    protein: { value: 0, unit: units.g },
+                    carbs: { value: 8, unit: units.g },
+                    total_fat: { value: 0, unit: units.g },
+                    saturated_fat: { value: 0, unit: units.g },
+                    fiber: { value: 7, unit: units.g },
+                    sugar: { value: 0, unit: units.g },
+                    sodium: { value: 0, unit: units.mg },
+                },
+                custom_sweet_grens_super_green_goddess: {
+                    name: 'Sweet Greens: Super Green Goddess w/Extra Virgin Olive Oil',
+                    calories: { value: 415, unit: units.c },
+                    protein: { value: 11, unit: units.g },
+                    carbs: { value: 35, unit: units.g },
+                    total_fat: { value: 26, unit: units.g },
+                    saturated_fat: { value: 0, unit: units.g },
+                    fiber: { value: 0, unit: units.g },
+                    sugar: { value: 0, unit: units.g },
+                    sodium: { value: 0, unit: units.mg },
+                },
+                raspberry_bar: {
+                    name: 'Raspberry Bar',
+                    calories: { value: 160, unit: units.c },
+                    protein: { value: 9, unit: units.g },
+                    carbs: { value: 4, unit: units.g },
+                    total_fat: { value: 12, unit: units.g },
+                    saturated_fat: { value: 0, unit: units.g },
+                    fiber: { value: 1, unit: units.g },
+                    sugar: { value: 1, unit: units.g },
+                    sodium: { value: 190, unit: units.mg },
+                },
+            };
+
+            function calculateFromComponents(list) {
+                const totals = {};
                 NUTRIENTS.forEach((nutrient) => {
-                    totals[nutrient].value += (component[nutrient]?.value || 0) * quantity;
+                    totals[nutrient] = { value: 0, unit: fdaLimits[nutrient].unit };
                 });
-            });
-            return totals;
-        }
-
-        Object.values(foodData).forEach((food) => {
-            if (food.components) food.nutrition = calculateFromComponents(food.components);
-        });
-
-        const menuModel = [
-            { type: 'category', label: 'Blueprint Longevity Protein', items: ['bp_longevity_protein', 'bp_longevity_protein_without_macadamia'] },
-            { type: 'item', key: 'bp_longevity_vitamin_mix' },
-            { type: 'item', key: 'grams_65_black_lentils_dry' },
-            { type: 'item', key: 'avocado_with_olives' },
-            { type: 'item', key: 'raspberry_bar' },
-            { type: 'item', key: 'custom_sweet_grens_super_green_goddess' },
-            { type: 'item', key: 'psyillium_husks' },
-            { type: 'item', key: 'blueprint_bananna_protein' },
-        ];
-
-        const foodSelect = document.getElementById('food-select');
-        const loose = document.createElement('optgroup');
-        loose.label = 'Foods';
-        menuModel.forEach((entry) => {
-            if (entry.type === 'category') {
-                const group = document.createElement('optgroup');
-                group.label = entry.label;
-                entry.items.forEach((key) => group.append(optionFor(key)));
-                foodSelect.append(group);
-            } else {
-                loose.append(optionFor(entry.key));
+                list.forEach(({ key, quantity }) => {
+                    const component = components[key];
+                    if (!component) return;
+                    NUTRIENTS.forEach((nutrient) => {
+                        totals[nutrient].value += (component[nutrient]?.value || 0) * quantity;
+                    });
+                });
+                return totals;
             }
-        });
-        foodSelect.append(loose);
 
-        function optionFor(key) {
-            const option = document.createElement('option');
-            option.value = key;
-            option.textContent = foodData[key].name;
-            return option;
-        }
-
-        const selectedFoods = {};
-        const status = document.getElementById('tracker-status');
-        const trackerPanel = document.getElementById('tracker');
-        const customPanel = document.getElementById('custom');
-        const trackerTab = document.getElementById('show-tracker');
-        const customTab = document.getElementById('show-custom');
-
-        function showTab(id) {
-            const custom = id === 'custom';
-            trackerPanel.hidden = custom;
-            customPanel.hidden = !custom;
-            trackerTab.setAttribute('aria-pressed', custom ? 'false' : 'true');
-            customTab.setAttribute('aria-pressed', custom ? 'true' : 'false');
-            const next = custom ? '#custom' : '#tracker';
-            if (window.location.hash !== next) history.replaceState(null, '', next);
-        }
-
-        trackerTab.addEventListener('click', () => showTab('tracker'));
-        customTab.addEventListener('click', () => showTab('custom'));
-        window.addEventListener('hashchange', () => showTab(window.location.hash === '#custom' ? 'custom' : 'tracker'));
-        showTab(window.location.hash === '#custom' ? 'custom' : 'tracker');
-
-        foodSelect.addEventListener('change', () => {
-            const key = foodSelect.value;
-            if (!key) return;
-            selectedFoods[key] = (selectedFoods[key] || 0) + 1;
-            foodSelect.value = '';
-            renderSelectedFoods();
-            status.textContent = `Added ${foodData[key].name}. Quantity ${selectedFoods[key]}.`;
-        });
-
-        function renderSelectedFoods() {
-            const list = document.getElementById('selected-foods');
-            list.replaceChildren();
-            Object.entries(selectedFoods).forEach(([key, quantity]) => {
-                const row = document.createElement('div');
-                row.className = 'food-tag';
-                const name = document.createElement('span');
-                name.textContent = `${foodData[key].name} (x${quantity})`;
-                const controls = document.createElement('div');
-                controls.className = 'food-controls';
-                controls.append(qtyButton(key, -1, '−'), qtyButton(key, 1, '+'));
-                row.append(name, controls);
-                list.append(row);
+            Object.values(foodData).forEach((food) => {
+                if (food.components) food.nutrition = calculateFromComponents(food.components);
             });
-        }
 
-        function qtyButton(key, delta, symbol) {
-            const button = document.createElement('button');
-            button.type = 'button';
-            button.textContent = symbol;
-            const action = delta < 0 ? 'Decrease' : 'Increase';
-            const extra = document.createElement('span');
-            extra.className = 'visually-hidden';
-            extra.textContent = ` ${action} quantity of ${foodData[key].name}`;
-            button.append(extra);
-            button.addEventListener('click', () => changeQty(key, delta));
-            return button;
-        }
+            const menuModel = [
+                {
+                    type: 'category',
+                    label: 'Blueprint Longevity Protein',
+                    items: ['bp_longevity_protein', 'bp_longevity_protein_without_macadamia'],
+                },
+                { type: 'item', key: 'bp_longevity_vitamin_mix' },
+                { type: 'item', key: 'grams_65_black_lentils_dry' },
+                { type: 'item', key: 'avocado_with_olives' },
+                { type: 'item', key: 'raspberry_bar' },
+                { type: 'item', key: 'custom_sweet_grens_super_green_goddess' },
+                { type: 'item', key: 'psyillium_husks' },
+                { type: 'item', key: 'blueprint_bananna_protein' },
+            ];
 
-        function changeQty(key, delta) {
-            selectedFoods[key] += delta;
-            if (selectedFoods[key] <= 0) delete selectedFoods[key];
-            renderSelectedFoods();
-            const left = selectedFoods[key] || 0;
-            status.textContent = left
-                ? `${foodData[key].name} quantity is ${left}.`
-                : `Removed ${foodData[key].name}.`;
-        }
-
-        document.getElementById('update-nutrition').addEventListener('click', () => {
-            const totals = sumSelectedNutrition(foodData, selectedFoods, NUTRIENTS);
-            const body = document.getElementById('nutrition-body');
-            body.replaceChildren();
-            NUTRIENTS.forEach((nutrient) => {
-                const row = document.createElement('tr');
-                const name = document.createElement('th');
-                name.scope = 'row';
-                name.textContent = nutrient.replaceAll('_', ' ');
-                const intake = document.createElement('td');
-                intake.textContent = `${totals[nutrient].toFixed(1)} ${fdaLimits[nutrient].unit}`;
-                const limit = document.createElement('td');
-                limit.textContent = `${fdaLimits[nutrient].value} ${fdaLimits[nutrient].unit}`;
-                row.append(name, intake, limit);
-                body.append(row);
-            });
-            const table = document.getElementById('nutrition-table');
-            table.hidden = false;
-            status.textContent = 'Nutrition updated.';
-        });
-
-        const nutrientFields = document.getElementById('nutrient-fields');
-        TRACKER_NUTRIENTS.forEach(([key, label]) => {
-            const field = document.createElement('div');
-            field.className = 'field';
-            const fieldLabel = document.createElement('label');
-            fieldLabel.htmlFor = `nutrient-${key}`;
-            fieldLabel.textContent = label;
-            const input = document.createElement('input');
-            input.id = `nutrient-${key}`;
-            input.name = key;
-            input.type = 'number';
-            input.min = '0';
-            input.step = 'any';
-            input.required = true;
-            input.dataset.error = `error-${key}`;
-            input.dataset.testid = `nutrient-${key}`;
-            const error = document.createElement('p');
-            error.id = `error-${key}`;
-            error.className = 'error-msg';
-            const icon = document.createElement('span');
-            icon.setAttribute('role', 'img');
-            icon.setAttribute('aria-label', 'Error');
-            icon.textContent = '❌';
-            error.append(icon, ` ${label} must be zero or a positive number.`);
-            field.append(fieldLabel, input, error);
-            nutrientFields.append(field);
-        });
-
-        const customForm = document.getElementById('custom-form');
-        bindUserInvalid(customForm);
-        const jsonBox = document.getElementById('custom-food-json');
-        customForm.addEventListener('submit', (event) => {
-            if (!customForm.checkValidity()) {
-                if (event.agentInvoked && event.respondWith) {
-                    event.respondWith(Promise.resolve('Name and every nutrient are required, and nutrients cannot be negative.'));
+            const foodSelect = document.getElementById('food-select');
+            const loose = document.createElement('optgroup');
+            loose.label = 'Foods';
+            menuModel.forEach((entry) => {
+                if (entry.type === 'category') {
+                    const group = document.createElement('optgroup');
+                    group.label = entry.label;
+                    entry.items.forEach((key) => group.append(optionFor(key)));
+                    foodSelect.append(group);
+                } else {
+                    loose.append(optionFor(entry.key));
                 }
-                return;
-            }
-            event.preventDefault();
-            const values = {};
-            TRACKER_NUTRIENTS.forEach(([key]) => {
-                values[key] = Number(customForm.elements[key].value);
             });
-            const built = customFoodRecord(customForm.elements.name.value, values);
-            if (!built.ok) {
-                status.textContent = built.errors[0];
-                if (event.agentInvoked && event.respondWith) event.respondWith(Promise.resolve(built.errors[0]));
-                return;
-            }
-            jsonBox.value = JSON.stringify({ [built.record.key]: built.record.entry }, null, 2);
-            status.textContent = 'JSON ready to copy.';
-            if (event.agentInvoked && event.respondWith) event.respondWith(Promise.resolve(jsonBox.value));
-        });
+            foodSelect.append(loose);
 
-        const copyButton = document.getElementById('copy-custom-food');
-        const copyStatus = document.getElementById('copy-status');
-        let copyTimer = 0;
-        async function copyJson() {
-            const text = jsonBox.value.trim();
-            window.clearTimeout(copyTimer);
-            if (!text) {
-                copyStatus.textContent = 'Copy failed';
-                return;
+            function optionFor(key) {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = foodData[key].name;
+                return option;
             }
-            try {
-                await navigator.clipboard.writeText(text);
-                copyStatus.textContent = 'Copied';
-            } catch {
-                copyStatus.textContent = 'Copy failed';
+
+            const selectedFoods = {};
+            const status = document.getElementById('tracker-status');
+            const trackerPanel = document.getElementById('tracker');
+            const customPanel = document.getElementById('custom');
+            const trackerTab = document.getElementById('show-tracker');
+            const customTab = document.getElementById('show-custom');
+
+            function showTab(id) {
+                const custom = id === 'custom';
+                trackerPanel.hidden = custom;
+                customPanel.hidden = !custom;
+                trackerTab.setAttribute('aria-pressed', custom ? 'false' : 'true');
+                customTab.setAttribute('aria-pressed', custom ? 'true' : 'false');
+                const next = custom ? '#custom' : '#tracker';
+                if (window.location.hash !== next) history.replaceState(null, '', next);
             }
-            copyTimer = window.setTimeout(() => { copyStatus.textContent = ''; }, 2000);
-        }
-        copyButton.addEventListener('click', copyJson);
 
-        function selectedSummary() {
-            return Object.entries(selectedFoods).map(([key, quantity]) => ({
-                key,
-                name: foodData[key].name,
-                quantity,
-            }));
-        }
+            trackerTab.addEventListener('click', () => showTab('tracker'));
+            customTab.addEventListener('click', () => showTab('custom'));
+            window.addEventListener('hashchange', () =>
+                showTab(window.location.hash === '#custom' ? 'custom' : 'tracker'),
+            );
+            showTab(window.location.hash === '#custom' ? 'custom' : 'tracker');
 
-        registerAgentTools([
-            {
-                name: 'list-tracker-foods',
-                description: 'List foods that can be added to the nutrition tracker, plus the current selection.',
-                inputSchema: { type: 'object', properties: {} },
-                execute() {
-                    return {
-                        foods: Object.entries(foodData).map(([key, food]) => ({ key, name: food.name })),
-                        selected: selectedSummary(),
-                    };
-                },
-                annotations: { readOnlyHint: true },
-            },
-            {
-                name: 'set-tracker-quantity',
-                description: 'Set how many of a tracker food are selected. Zero removes it.',
-                inputSchema: {
-                    type: 'object',
-                    properties: {
-                        key: { type: 'string', description: 'Food key from list-tracker-foods.' },
-                        quantity: { type: 'number', minimum: 0, description: 'How many of that food to count.' },
+            foodSelect.addEventListener('change', () => {
+                const key = foodSelect.value;
+                if (!key) return;
+                selectedFoods[key] = (selectedFoods[key] || 0) + 1;
+                foodSelect.value = '';
+                renderSelectedFoods();
+                status.textContent = `Added ${foodData[key].name}. Quantity ${selectedFoods[key]}.`;
+            });
+
+            function renderSelectedFoods() {
+                const list = document.getElementById('selected-foods');
+                list.replaceChildren();
+                Object.entries(selectedFoods).forEach(([key, quantity]) => {
+                    const row = document.createElement('div');
+                    row.className = 'food-tag';
+                    const name = document.createElement('span');
+                    name.textContent = `${foodData[key].name} (x${quantity})`;
+                    const controls = document.createElement('div');
+                    controls.className = 'food-controls';
+                    controls.append(qtyButton(key, -1, '−'), qtyButton(key, 1, '+'));
+                    row.append(name, controls);
+                    list.append(row);
+                });
+            }
+
+            function qtyButton(key, delta, symbol) {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.textContent = symbol;
+                const action = delta < 0 ? 'Decrease' : 'Increase';
+                const extra = document.createElement('span');
+                extra.className = 'visually-hidden';
+                extra.textContent = ` ${action} quantity of ${foodData[key].name}`;
+                button.append(extra);
+                button.addEventListener('click', () => changeQty(key, delta));
+                return button;
+            }
+
+            function changeQty(key, delta) {
+                selectedFoods[key] += delta;
+                if (selectedFoods[key] <= 0) delete selectedFoods[key];
+                renderSelectedFoods();
+                const left = selectedFoods[key] || 0;
+                status.textContent = left
+                    ? `${foodData[key].name} quantity is ${left}.`
+                    : `Removed ${foodData[key].name}.`;
+            }
+
+            document.getElementById('update-nutrition').addEventListener('click', () => {
+                const totals = sumSelectedNutrition(foodData, selectedFoods, NUTRIENTS);
+                const body = document.getElementById('nutrition-body');
+                body.replaceChildren();
+                NUTRIENTS.forEach((nutrient) => {
+                    const row = document.createElement('tr');
+                    const name = document.createElement('th');
+                    name.scope = 'row';
+                    name.textContent = nutrient.replaceAll('_', ' ');
+                    const intake = document.createElement('td');
+                    intake.textContent = `${totals[nutrient].toFixed(1)} ${fdaLimits[nutrient].unit}`;
+                    const limit = document.createElement('td');
+                    limit.textContent = `${fdaLimits[nutrient].value} ${fdaLimits[nutrient].unit}`;
+                    row.append(name, intake, limit);
+                    body.append(row);
+                });
+                const table = document.getElementById('nutrition-table');
+                table.hidden = false;
+                status.textContent = 'Nutrition updated.';
+            });
+
+            const nutrientFields = document.getElementById('nutrient-fields');
+            TRACKER_NUTRIENTS.forEach(([key, label]) => {
+                const field = document.createElement('div');
+                field.className = 'field';
+                const fieldLabel = document.createElement('label');
+                fieldLabel.htmlFor = `nutrient-${key}`;
+                fieldLabel.textContent = label;
+                const input = document.createElement('input');
+                input.id = `nutrient-${key}`;
+                input.name = key;
+                input.type = 'number';
+                input.min = '0';
+                input.step = 'any';
+                input.required = true;
+                input.dataset.error = `error-${key}`;
+                input.dataset.testid = `nutrient-${key}`;
+                const error = document.createElement('p');
+                error.id = `error-${key}`;
+                error.className = 'error-msg';
+                const icon = document.createElement('span');
+                icon.setAttribute('role', 'img');
+                icon.setAttribute('aria-label', 'Error');
+                icon.textContent = '❌';
+                error.append(icon, ` ${label} must be zero or a positive number.`);
+                field.append(fieldLabel, input, error);
+                nutrientFields.append(field);
+            });
+
+            const customForm = document.getElementById('custom-form');
+            bindUserInvalid(customForm);
+            const jsonBox = document.getElementById('custom-food-json');
+            customForm.addEventListener('submit', (event) => {
+                if (!customForm.checkValidity()) {
+                    if (event.agentInvoked && event.respondWith) {
+                        event.respondWith(
+                            Promise.resolve('Name and every nutrient are required, and nutrients cannot be negative.'),
+                        );
+                    }
+                    return;
+                }
+                event.preventDefault();
+                const values = {};
+                TRACKER_NUTRIENTS.forEach(([key]) => {
+                    values[key] = Number(customForm.elements[key].value);
+                });
+                const built = customFoodRecord(customForm.elements.name.value, values);
+                if (!built.ok) {
+                    status.textContent = built.errors[0];
+                    if (event.agentInvoked && event.respondWith) event.respondWith(Promise.resolve(built.errors[0]));
+                    return;
+                }
+                jsonBox.value = JSON.stringify({ [built.record.key]: built.record.entry }, null, 2);
+                status.textContent = 'JSON ready to copy.';
+                if (event.agentInvoked && event.respondWith) event.respondWith(Promise.resolve(jsonBox.value));
+            });
+
+            const copyButton = document.getElementById('copy-custom-food');
+            const copyStatus = document.getElementById('copy-status');
+            let copyTimer = 0;
+            async function copyJson() {
+                const text = jsonBox.value.trim();
+                window.clearTimeout(copyTimer);
+                if (!text) {
+                    copyStatus.textContent = 'Copy failed';
+                    return;
+                }
+                try {
+                    await navigator.clipboard.writeText(text);
+                    copyStatus.textContent = 'Copied';
+                } catch {
+                    copyStatus.textContent = 'Copy failed';
+                }
+                copyTimer = window.setTimeout(() => {
+                    copyStatus.textContent = '';
+                }, 2000);
+            }
+            copyButton.addEventListener('click', copyJson);
+
+            function selectedSummary() {
+                return Object.entries(selectedFoods).map(([key, quantity]) => ({
+                    key,
+                    name: foodData[key].name,
+                    quantity,
+                }));
+            }
+
+            registerAgentTools([
+                {
+                    name: 'list-tracker-foods',
+                    description: 'List foods that can be added to the nutrition tracker, plus the current selection.',
+                    inputSchema: { type: 'object', properties: {} },
+                    execute() {
+                        return {
+                            foods: Object.entries(foodData).map(([key, food]) => ({ key, name: food.name })),
+                            selected: selectedSummary(),
+                        };
                     },
-                    required: ['key', 'quantity'],
+                    annotations: { readOnlyHint: true },
                 },
-                execute(input) {
-                    if (typeof input?.key !== 'string' || !Number.isFinite(input?.quantity) || input.quantity < 0) {
-                        return { error: 'Pass a food key and a quantity of zero or more.' };
-                    }
-                    if (!foodData[input.key]) {
-                        return { error: `Unknown food key "${input.key}".`, keys: Object.keys(foodData) };
-                    }
-                    if (input.quantity === 0) delete selectedFoods[input.key];
-                    else selectedFoods[input.key] = input.quantity;
-                    renderSelectedFoods();
-                    document.getElementById('update-nutrition').click();
-                    return { key: input.key, quantity: selectedFoods[input.key] ?? 0 };
+                {
+                    name: 'set-tracker-quantity',
+                    description: 'Set how many of a tracker food are selected. Zero removes it.',
+                    inputSchema: {
+                        type: 'object',
+                        properties: {
+                            key: { type: 'string', description: 'Food key from list-tracker-foods.' },
+                            quantity: { type: 'number', minimum: 0, description: 'How many of that food to count.' },
+                        },
+                        required: ['key', 'quantity'],
+                    },
+                    execute(input) {
+                        if (typeof input?.key !== 'string' || !Number.isFinite(input?.quantity) || input.quantity < 0) {
+                            return { error: 'Pass a food key and a quantity of zero or more.' };
+                        }
+                        if (!foodData[input.key]) {
+                            return { error: `Unknown food key "${input.key}".`, keys: Object.keys(foodData) };
+                        }
+                        if (input.quantity === 0) delete selectedFoods[input.key];
+                        else selectedFoods[input.key] = input.quantity;
+                        renderSelectedFoods();
+                        document.getElementById('update-nutrition').click();
+                        return { key: input.key, quantity: selectedFoods[input.key] ?? 0 };
+                    },
+                    annotations: { readOnlyHint: false },
                 },
-                annotations: { readOnlyHint: false },
-            },
-        ]);
-    </script>
-</body>
+            ]);
+        </script>
+    </body>
 </html>
