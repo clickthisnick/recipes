@@ -1,46 +1,58 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="color-scheme" content="dark">
-    <meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'">
-    <title>Kitchen tools | Recipes</title>
-    <link rel="stylesheet" href="./src/site.css">
-    <style>
-        html { background: #000; color-scheme: dark; }
-        body { background: #000; color: #fff; }
-        a { color: #d3d3d3; }
-        h1 { font-size: 1.75rem; }
-    </style>
-</head>
-<body>
-    <a class="skip-link visually-hidden" href="#tools">Skip to tools</a>
-    <header>
-        <h1>Kitchen tools</h1>
-    </header>
-    <main id="tools">
-        <nav aria-label="Kitchen tools">
-            <ul>
-                <li><a href="./main.html">Recipes</a></li>
-                <li><a href="./tracker.html">Nutrition tracker</a></li>
-                <li><a href="./meatTemp.html">Meat temperature</a></li>
-                <li><a href="./waterIntake.html">Water intake</a></li>
-                <li><a href="./groceryList.html">Grocery list</a></li>
-                <li><a href="./expirationCalculator.html">Expiration calculator</a></li>
-                <li><a href="./cordSlicer.html">Pull cord slicer amount</a></li>
-                <li><a href="./frozenFood.html">Frozen food portions</a></li>
-                <li><a href="./eatThis.html">Eat this instead</a></li>
-            </ul>
-        </nav>
-    </main>
-    <script type="module">
-        import { readTableTool, registerAgentTools } from './src/site-logic.js';
-        registerAgentTools([readTableTool(
-            'list-kitchen-tools',
-            'List the kitchen tools linked from this home page.',
-            { row: 'nav a', resultKey: 'tools', columns: { name: {}, href: { attr: 'href' } } },
-        )]);
-    </script>
-</body>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="color-scheme" content="dark" />
+        <meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'" />
+        <title>Kitchen tools | Recipes</title>
+        <link rel="stylesheet" href="./src/site.css" />
+        <style>
+            html {
+                background: #000;
+                color-scheme: dark;
+            }
+            body {
+                background: #000;
+                color: #fff;
+            }
+            a {
+                color: #d3d3d3;
+            }
+            h1 {
+                font-size: 1.75rem;
+            }
+        </style>
+    </head>
+    <body>
+        <a class="skip-link visually-hidden" href="#tools">Skip to tools</a>
+        <header>
+            <h1>Kitchen tools</h1>
+        </header>
+        <main id="tools">
+            <nav aria-label="Kitchen tools">
+                <ul>
+                    <li><a href="./main.html">Recipes</a></li>
+                    <li><a href="./tracker.html">Nutrition tracker</a></li>
+                    <li><a href="./meatTemp.html">Meat temperature</a></li>
+                    <li><a href="./waterIntake.html">Water intake</a></li>
+                    <li><a href="./groceryList.html">Grocery list</a></li>
+                    <li><a href="./expirationCalculator.html">Expiration calculator</a></li>
+                    <li><a href="./cordSlicer.html">Pull cord slicer amount</a></li>
+                    <li><a href="./frozenFood.html">Frozen food portions</a></li>
+                    <li><a href="./eatThis.html">Eat this instead</a></li>
+                </ul>
+            </nav>
+        </main>
+        <script type="module">
+            import { readTableTool, registerAgentTools } from './src/site-logic.js';
+            registerAgentTools([
+                readTableTool('list-kitchen-tools', 'List the kitchen tools linked from this home page.', {
+                    row: 'nav a',
+                    resultKey: 'tools',
+                    columns: { name: {}, href: { attr: 'href' } },
+                }),
+            ]);
+        </script>
+    </body>
 </html>

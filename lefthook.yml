@@ -1,0 +1,20 @@
+# Fast checks only. `npm run check` is the full gate and is what CI runs.
+pre-commit:
+  parallel: true
+  commands:
+    prettier:
+      glob: '*.{js,mjs,cjs,css,html,md,json,yml,yaml}'
+      exclude: "(^|/)(archived|\\.agents|package-lock\\.json)"
+      run: npx prettier --check {staged_files}
+    eslint:
+      glob: '*.{js,mjs,cjs}'
+      exclude: "(^|/)(archived|\\.agents)/"
+      run: npx eslint --no-warn-ignored {staged_files}
+    stylelint:
+      glob: '*.css'
+      run: npx stylelint --allow-empty-input {staged_files}
+    html:
+      glob: '*.html'
+      run: npx html-validate {staged_files}
+    codespell:
+      run: node scripts/spell.mjs

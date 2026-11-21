@@ -1,29 +1,29 @@
 # Vendored agent guides and archived recipes are left as-is.
 exclude: ^(\.agents|archived)/
 repos:
-    - repo: https://github.com/pre-commit/pre-commit-hooks
-      rev: v6.0.0
-      hooks:
-          - id: check-added-large-files
-          - id: check-case-conflict
-          - id: check-merge-conflict
-          - id: check-yaml
-          - id: detect-private-key
-          - id: end-of-file-fixer
-          - id: mixed-line-ending
-          - id: trailing-whitespace
-          - id: no-commit-to-branch
-    - repo: https://github.com/codespell-project/codespell
-      rev: v2.4.1
-      hooks:
-          - id: codespell
-            args: ['-L bu,steams']
-            exclude: ^package-lock\.json$
-    - repo: local
-      hooks:
-          - id: eslint
-            name: eslint
-            entry: npm run lint
-            language: system
-            pass_filenames: false
-            files: \.(c?js|mjs)$
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: check-yaml
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+      - id: trailing-whitespace
+      - id: no-commit-to-branch
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.1
+    hooks:
+      - id: codespell
+        args: ['-L bu,steams']
+        exclude: ^package-lock\.json$
+  - repo: local
+    hooks:
+      - id: eslint
+        name: eslint
+        entry: npm run lint
+        language: system
+        pass_filenames: false
+        files: \.(c?js|mjs)$

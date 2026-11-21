@@ -1,103 +1,138 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="color-scheme" content="light">
-    <meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'">
-    <title>Water intake | Recipes</title>
-    <link rel="stylesheet" href="./src/site.css">
-</head>
-<body>
-    <a class="skip-link visually-hidden" href="#content">Skip to content</a>
-    <main id="content">
-        <h1>Water intake</h1>
-        <p>How many containers are needed to drink a gallon of water.</p>
-        <div class="table-wrap" tabindex="0" role="region" aria-labelledby="gallon-chart-caption">
-            <table>
-                <caption id="gallon-chart-caption">Containers per gallon</caption>
-                <thead>
-                    <tr>
-                        <th scope="col">Container</th>
-                        <th scope="col">Quantity needed for a gallon</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr class="band">
-                        <th scope="row">Liter</th>
-                        <td id="liters-per-gallon">3.78</td>
-                    </tr>
-                    <tr class="band">
-                        <th scope="row">Clean bottles</th>
-                        <td id="bottles-per-gallon">5.12</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <h2>What you drank</h2>
-        <form id="water-form" toolname="calculate-gallons" tooldescription="Convert liters and clean bottles into gallons using the chart on this page." toolautosubmit>
-            <div class="field">
-                <label for="liters">Liters</label>
-                <input id="liters" name="liters" type="number" min="0" step="any" inputmode="decimal" value="0" required data-error="liters-error" data-testid="liters" toolparamdescription="How many liters were drunk.">
-                <p id="liters-error" class="error-msg"><span role="img" aria-label="Error">❌</span> Enter zero or a positive number of liters.</p>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="color-scheme" content="light" />
+        <meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'" />
+        <title>Water intake | Recipes</title>
+        <link rel="stylesheet" href="./src/site.css" />
+    </head>
+    <body>
+        <a class="skip-link visually-hidden" href="#content">Skip to content</a>
+        <main id="content">
+            <h1>Water intake</h1>
+            <p>How many containers are needed to drink a gallon of water.</p>
+            <div class="table-wrap" tabindex="0" role="region" aria-labelledby="gallon-chart-caption">
+                <table>
+                    <caption id="gallon-chart-caption">
+                        Containers per gallon
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Container</th>
+                            <th scope="col">Quantity needed for a gallon</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="band">
+                            <th scope="row">Liter</th>
+                            <td id="liters-per-gallon">3.78</td>
+                        </tr>
+                        <tr class="band">
+                            <th scope="row">Clean bottles</th>
+                            <td id="bottles-per-gallon">5.12</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-            <div class="field">
-                <label for="clean-bottles">Clean bottles</label>
-                <input id="clean-bottles" name="bottles" type="number" min="0" step="any" inputmode="decimal" value="0" required data-error="bottles-error" data-testid="clean-bottles" toolparamdescription="How many clean bottles were drunk.">
-                <p id="bottles-error" class="error-msg"><span role="img" aria-label="Error">❌</span> Enter zero or a positive number of clean bottles.</p>
-            </div>
-            <button type="submit" id="calculate-gallons" data-testid="calculate-gallons">Calculate gallons</button>
-        </form>
-        <p id="gallons-result" class="status" role="status" aria-live="polite">Gallons drank: 0</p>
-    </main>
-    <script type="module">
-        import { bindUserInvalid, gallonsDrank } from './src/site-logic.js';
 
-        const form = document.getElementById('water-form');
-        const liters = document.getElementById('liters');
-        const bottles = document.getElementById('clean-bottles');
-        const result = document.getElementById('gallons-result');
-        bindUserInvalid(form);
+            <h2>What you drank</h2>
+            <form
+                id="water-form"
+                toolname="calculate-gallons"
+                tooldescription="Convert liters and clean bottles into gallons using the chart on this page."
+                toolautosubmit
+            >
+                <div class="field">
+                    <label for="liters">Liters</label>
+                    <input
+                        id="liters"
+                        name="liters"
+                        type="number"
+                        min="0"
+                        step="any"
+                        inputmode="decimal"
+                        value="0"
+                        required
+                        data-error="liters-error"
+                        data-testid="liters"
+                        toolparamdescription="How many liters were drunk."
+                    />
+                    <p id="liters-error" class="error-msg">
+                        <span role="img" aria-label="Error">❌</span> Enter zero or a positive number of liters.
+                    </p>
+                </div>
+                <div class="field">
+                    <label for="clean-bottles">Clean bottles</label>
+                    <input
+                        id="clean-bottles"
+                        name="bottles"
+                        type="number"
+                        min="0"
+                        step="any"
+                        inputmode="decimal"
+                        value="0"
+                        required
+                        data-error="bottles-error"
+                        data-testid="clean-bottles"
+                        toolparamdescription="How many clean bottles were drunk."
+                    />
+                    <p id="bottles-error" class="error-msg">
+                        <span role="img" aria-label="Error">❌</span> Enter zero or a positive number of clean bottles.
+                    </p>
+                </div>
+                <button type="submit" id="calculate-gallons" data-testid="calculate-gallons">Calculate gallons</button>
+            </form>
+            <p id="gallons-result" class="status" role="status" aria-live="polite">Gallons drank: 0</p>
+        </main>
+        <script type="module">
+            import { bindUserInvalid, gallonsDrank } from './src/site-logic.js';
 
-        const params = new URLSearchParams(window.location.search);
-        if (params.has('liters')) liters.value = params.get('liters');
-        if (params.has('bottles')) bottles.value = params.get('bottles');
+            const form = document.getElementById('water-form');
+            const liters = document.getElementById('liters');
+            const bottles = document.getElementById('clean-bottles');
+            const result = document.getElementById('gallons-result');
+            bindUserInvalid(form);
 
-        function ratesFromChart() {
-            return {
-                litersPerGallon: Number(document.getElementById('liters-per-gallon').textContent),
-                bottlesPerGallon: Number(document.getElementById('bottles-per-gallon').textContent),
-            };
-        }
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('liters')) liters.value = params.get('liters');
+            if (params.has('bottles')) bottles.value = params.get('bottles');
 
-        function showResult() {
-            const outcome = gallonsDrank(liters.value, bottles.value, ratesFromChart());
-            if (!outcome.ok) {
-                result.textContent = outcome.error;
-                return;
+            function ratesFromChart() {
+                return {
+                    litersPerGallon: Number(document.getElementById('liters-per-gallon').textContent),
+                    bottlesPerGallon: Number(document.getElementById('bottles-per-gallon').textContent),
+                };
             }
-            const gallons = outcome.gallons.toFixed(2);
-            result.textContent = `Gallons drank: ${gallons}`;
-            const next = new URL(window.location.href);
-            next.searchParams.set('liters', liters.value);
-            next.searchParams.set('bottles', bottles.value);
-            window.history.replaceState(null, '', next);
-        }
 
-        form.addEventListener('submit', (event) => {
-            if (!form.checkValidity()) {
-                if (event.agentInvoked && event.respondWith) {
-                    event.respondWith(Promise.resolve('Enter zero or a positive number for each container.'));
+            function showResult() {
+                const outcome = gallonsDrank(liters.value, bottles.value, ratesFromChart());
+                if (!outcome.ok) {
+                    result.textContent = outcome.error;
+                    return;
                 }
-                return;
+                const gallons = outcome.gallons.toFixed(2);
+                result.textContent = `Gallons drank: ${gallons}`;
+                const next = new URL(window.location.href);
+                next.searchParams.set('liters', liters.value);
+                next.searchParams.set('bottles', bottles.value);
+                window.history.replaceState(null, '', next);
             }
-            event.preventDefault();
-            showResult();
-            if (event.agentInvoked && event.respondWith) event.respondWith(Promise.resolve(result.textContent));
-        });
 
-        if (params.has('liters') || params.has('bottles')) showResult();
-    </script>
-</body>
+            form.addEventListener('submit', (event) => {
+                if (!form.checkValidity()) {
+                    if (event.agentInvoked && event.respondWith) {
+                        event.respondWith(Promise.resolve('Enter zero or a positive number for each container.'));
+                    }
+                    return;
+                }
+                event.preventDefault();
+                showResult();
+                if (event.agentInvoked && event.respondWith) event.respondWith(Promise.resolve(result.textContent));
+            });
+
+            if (params.has('liters') || params.has('bottles')) showResult();
+        </script>
+    </body>
 </html>

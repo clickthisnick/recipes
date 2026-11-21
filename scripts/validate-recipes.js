@@ -28,12 +28,14 @@ const warnings = [];
         if (/new Audio\(/.test(body)) {
             errors.push(
                 'unlockAudioContext() creates a separate "new Audio(...)" instance instead of priming the ' +
-                'shared alarm `audio` element — this regresses the NotAllowedError bug (see comment above ' +
-                'this check). It must call `audio.play()` on the shared element directly.'
+                    'shared alarm `audio` element — this regresses the NotAllowedError bug (see comment above ' +
+                    'this check). It must call `audio.play()` on the shared element directly.',
             );
         }
         if (!/\baudio\.play\(\)/.test(body)) {
-            errors.push('unlockAudioContext() no longer calls audio.play() on the shared alarm element — real timers may fail to ring with NotAllowedError.');
+            errors.push(
+                'unlockAudioContext() no longer calls audio.play() on the shared alarm element — real timers may fail to ring with NotAllowedError.',
+            );
         }
     }
 }
@@ -51,7 +53,7 @@ for (let i = 0; i < addCalls.length - 1; i++) {
     const b = addCalls[i + 1];
     if (a.variable !== b.variable) continue;
     const between = lines.slice(a.lineIdx + 1, b.lineIdx);
-    if (!between.some(l => /^\s+s\(/.test(l))) {
+    if (!between.some((l) => /^\s+s\(/.test(l))) {
         errors.push(`line ${a.lineNum}: consecutive .add() on "${a.variable}" — consolidate into a single add()`);
     }
 }
@@ -67,7 +69,10 @@ for (let i = 0; i < addCalls.length - 1; i++) {
 const unitNameMap = {};
 let inUnitBlock = false;
 for (const line of lines) {
-    if (/^export const u\s*=\s*\{/.test(line)) { inUnitBlock = true; continue; }
+    if (/^export const u\s*=\s*\{/.test(line)) {
+        inUnitBlock = true;
+        continue;
+    }
     if (inUnitBlock) {
         if (/^\}/.test(line)) break;
         const m = line.match(/^\s+(\w+):\s*\{[^}]*name:\s*'([^']*)'/);
@@ -88,12 +93,38 @@ function resolveUnit(expr) {
 // deliberate zero-placeholders (e.g. a spice whose Amazon listing has an image-only label) —
 // add a key here once you've confirmed the zero is intentional, to silence this warning.
 const EXPECTED_ZERO_NUTRITION = [
-    'parsleyFlakes', 'garlicPowder', 'onionPowder', 'blackPepper', 'bakingSoda', 'paprika', 'thyme', 'rosemary', 'dillWeed',
-    'whiteVinegar', 'champagneVinegar', 'water', 'creatine', 'avocadoOil', 'iceCube',
-    'allulose', 'mapleExtract', 'vanillaPowder',
+    'parsleyFlakes',
+    'garlicPowder',
+    'onionPowder',
+    'blackPepper',
+    'bakingSoda',
+    'paprika',
+    'thyme',
+    'rosemary',
+    'dillWeed',
+    'whiteVinegar',
+    'champagneVinegar',
+    'water',
+    'creatine',
+    'avocadoOil',
+    'iceCube',
+    'allulose',
+    'mapleExtract',
+    'vanillaPowder',
 ];
 
-const ZERO_CHECK_FIELDS = ['calories', 'fat', 'saturatedFat', 'transFat', 'cholesterol', 'carbs', 'sodium', 'sugar', 'protein', 'fiber'];
+const ZERO_CHECK_FIELDS = [
+    'calories',
+    'fat',
+    'saturatedFat',
+    'transFat',
+    'cholesterol',
+    'carbs',
+    'sodium',
+    'sugar',
+    'protein',
+    'fiber',
+];
 
 function isAllZeroNutritionValue(val) {
     return ZERO_CHECK_FIELDS.every((field) => {
@@ -103,25 +134,25 @@ function isAllZeroNutritionValue(val) {
 }
 
 // Per-ingredient state
-let tracking       = false;
+let tracking = false;
 let ingredientName = '';
-let ingredientKey  = '';
+let ingredientKey = '';
 let ingredientLine = 0;
-let depth          = 0;   // brace depth relative to start of ingredient's defaults object
+let depth = 0; // brace depth relative to start of ingredient's defaults object
 
-let section      = null;  // 'conversions' | 'nutrition' | null
-let sectionDepth = 0;     // depth level that direct children of this section sit at
+let section = null; // 'conversions' | 'nutrition' | null
+let sectionDepth = 0; // depth level that direct children of this section sit at
 
 let conversionPairs = []; // { from, to } — ingredient-wide (conversions are shared across all its products)
-let nutritionKeys   = []; // string[] — reset per nutrition BLOCK (see checkNutritionBlock), not per ingredient
+let nutritionKeys = []; // string[] — reset per nutrition BLOCK (see checkNutritionBlock), not per ingredient
 let nutritionValues = []; // { key, val, lineNum } — same per-block scope as nutritionKeys
 let allNutritionEntries = []; // { val, lineNum } — ingredient-wide, for the all-zero check (Check 4) only
 
 function resetIngredient() {
-    tracking       = false;
-    section        = null;
+    tracking = false;
+    section = null;
     conversionPairs = [];
-    nutritionKeys   = [];
+    nutritionKeys = [];
     nutritionValues = [];
     allNutritionEntries = [];
 }
@@ -137,8 +168,8 @@ function checkNutritionBlock() {
         if (nutritionKeys.includes(from) && nutritionKeys.includes(to)) {
             errors.push(
                 `line ${ingredientLine}: "${ingredientName}" — nutrition has entries for both` +
-                ` "${from}" and "${to}" but a conversion between them already exists;` +
-                ` remove the redundant entry`
+                    ` "${from}" and "${to}" but a conversion between them already exists;` +
+                    ` remove the redundant entry`,
             );
         }
     }
@@ -152,14 +183,14 @@ function checkNutritionBlock() {
             if (nutritionValues[a].val === nutritionValues[b].val) {
                 errors.push(
                     `line ${nutritionValues[b].lineNum}: "${ingredientName}" — nutrition values for` +
-                    ` "${nutritionValues[a].key}" and "${nutritionValues[b].key}" are identical;` +
-                    ` use a conversion with factor: 1 instead`
+                        ` "${nutritionValues[a].key}" and "${nutritionValues[b].key}" are identical;` +
+                        ` use a conversion with factor: 1 instead`,
                 );
             }
         }
     }
 
-    nutritionKeys   = [];
+    nutritionKeys = [];
     nutritionValues = [];
 }
 
@@ -172,7 +203,7 @@ function flushIngredient() {
             if (isAllZeroNutritionValue(entry.val)) {
                 warnings.push(
                     `line ${entry.lineNum}: "${ingredientName}" (${ingredientKey}) — nutrition for "${entry.key}" is all zero;` +
-                    ` add real data, or add "${ingredientKey}" to EXPECTED_ZERO_NUTRITION if intentional`
+                        ` add real data, or add "${ingredientKey}" to EXPECTED_ZERO_NUTRITION if intentional`,
                 );
             }
         }
@@ -188,7 +219,7 @@ for (let i = 0; i < lines.length; i++) {
     if (!tracking) {
         const m = line.match(/(\w+):\s*ingredientFactory\('([^']+)'/);
         if (m) {
-            ingredientKey  = m[1];
+            ingredientKey = m[1];
             ingredientName = m[2];
             ingredientLine = i + 1;
             tracking = true;
@@ -208,10 +239,13 @@ for (let i = 0; i < lines.length; i++) {
 
     // Detect section opens *before* updating depth so sectionDepth = post-update depth
     if (section === null && delta > 0) {
-        if (/\bconversions\s*:\s*\{/.test(line))
-            { section = 'conversions'; sectionDepth = depth + delta; }
-        else if (/\bnutrition\s*:\s*\{/.test(line))
-            { section = 'nutrition'; sectionDepth = depth + delta; }
+        if (/\bconversions\s*:\s*\{/.test(line)) {
+            section = 'conversions';
+            sectionDepth = depth + delta;
+        } else if (/\bnutrition\s*:\s*\{/.test(line)) {
+            section = 'nutrition';
+            sectionDepth = depth + delta;
+        }
     }
 
     const prevDepth = depth;
@@ -268,7 +302,9 @@ flushIngredient(); // catch the last ingredient
 // arrays automatically and aren't scanned. False positives are expected — this never fails
 // the build.
 
-function escapeRegex(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+function escapeRegex(s) {
+    return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 // Equipment vocabulary: types declared in `export const e = { ... }`, plus any ad-hoc string
 // literals used directly in an `equipment: [...]` array (covers e.g. 'sheet pan', which isn't
@@ -278,7 +314,9 @@ const factoryType = {};
 {
     const eBlock = src.match(/export const e = \{([\s\S]*?)\n\};/);
     if (eBlock) {
-        for (const m of eBlock[1].matchAll(/(\w+):\s*(?:\/\*\*.*?\*\/\s*)?\([^)]*\)\s*=>\s*new (\w+)\((?:'([^']+)')?/g)) {
+        for (const m of eBlock[1].matchAll(
+            /(\w+):\s*(?:\/\*\*.*?\*\/\s*)?\([^)]*\)\s*=>\s*new (\w+)\((?:'([^']+)')?/g,
+        )) {
             const type = (m[3] || m[1]).toLowerCase();
             factoryType[m[1]] = type;
             equipmentWords.add(type);
@@ -307,7 +345,10 @@ function keyToName(key) {
 
 const ingredientKeyByPhrase = new Map(); // phrase -> Set<key>
 function registerIngredientPhrase(display, key) {
-    const full = display.toLowerCase().replace(/\s*\([^)]*\)/g, '').trim(); // strip parenthetical notes
+    const full = display
+        .toLowerCase()
+        .replace(/\s*\([^)]*\)/g, '')
+        .trim(); // strip parenthetical notes
     if (full.length >= 3) {
         if (!ingredientKeyByPhrase.has(full)) ingredientKeyByPhrase.set(full, new Set());
         ingredientKeyByPhrase.get(full).add(key);
@@ -337,7 +378,7 @@ for (const m of src.matchAll(/const (\w+)\s*=\s*i\.(\w+)\(/g)) {
     ingredientVarKey[m[1]] = m[2];
 }
 
-const equipmentPhrases    = [...equipmentWords].sort((a, b) => b.length - a.length);
+const equipmentPhrases = [...equipmentWords].sort((a, b) => b.length - a.length);
 const ingredientPhraseList = [...ingredientKeyByPhrase.keys()].sort((a, b) => b.length - a.length);
 
 // Returns matched phrases, masking each match before testing shorter phrases so e.g. "oven"
@@ -368,19 +409,29 @@ function splitTopLevelArgs(str) {
             current += ch;
             i++;
             while (i < str.length && str[i] !== quote) {
-                if (str[i] === '\\') { current += str[i]; i++; }
-                if (i < str.length) { current += str[i]; i++; }
+                if (str[i] === '\\') {
+                    current += str[i];
+                    i++;
+                }
+                if (i < str.length) {
+                    current += str[i];
+                    i++;
+                }
             }
             if (i < str.length) current += str[i];
             continue;
         }
         if (ch === '(' || ch === '[' || ch === '{') depth++;
         else if (ch === ')' || ch === ']' || ch === '}') depth--;
-        if (ch === ',' && depth === 0) { args.push(current); current = ''; continue; }
+        if (ch === ',' && depth === 0) {
+            args.push(current);
+            current = '';
+            continue;
+        }
         current += ch;
     }
     if (current.trim().length) args.push(current);
-    return args.map(a => a.trim());
+    return args.map((a) => a.trim());
 }
 
 // Finds the matching closing ')' for the '(' at str[openIdx], skipping over parens inside
@@ -399,7 +450,10 @@ function readBalanced(str, openIdx) {
             continue;
         }
         if (ch === '(') depth++;
-        else if (ch === ')') { depth--; if (depth === 0) return i; }
+        else if (ch === ')') {
+            depth--;
+            if (depth === 0) return i;
+        }
     }
     return -1;
 }
@@ -411,7 +465,10 @@ function extractArray(optsStr, key) {
     let depth = 0;
     for (let i = start; i < optsStr.length; i++) {
         if (optsStr[i] === '[') depth++;
-        else if (optsStr[i] === ']') { depth--; if (depth === 0) return optsStr.slice(start + 1, i); }
+        else if (optsStr[i] === ']') {
+            depth--;
+            if (depth === 0) return optsStr.slice(start + 1, i);
+        }
     }
     return '';
 }
@@ -420,8 +477,12 @@ function extractArray(optsStr, key) {
 // is deliberately excluded — it's a narrative note shown to the user, not an action step,
 // so it has no reason to declare equipment/ingredients.
 const TEXT_ARG_INDEX = {
-    instruction: 0, prep: 0, prepOnly: 0, timerStep: 0,
-    'Timer.set': 2, 'Timer.gate': 0,
+    instruction: 0,
+    prep: 0,
+    prepOnly: 0,
+    timerStep: 0,
+    'Timer.set': 2,
+    'Timer.gate': 0,
 };
 
 const STEP_FACTORY_RE = /\b(instruction|prep|prepOnly|Timer\.set|Timer\.gate|timerStep)\(/g;
@@ -453,7 +514,7 @@ const STEP_FACTORY_RE = /\b(instruction|prep|prepOnly|Timer\.set|Timer\.gate|tim
             if (DEGREE_IN_TEXT.test(text)) {
                 errors.push(
                     `line ${call.lineNum}: step text contains "${text}" but the temperature ` +
-                    `(${call.temp}°) is already rendered by the action; remove the degrees from the text`
+                        `(${call.temp}°) is already rendered by the action; remove the degrees from the text`,
                 );
             }
         }
@@ -462,15 +523,15 @@ const STEP_FACTORY_RE = /\b(instruction|prep|prepOnly|Timer\.set|Timer\.gate|tim
 
 let sm;
 while ((sm = STEP_FACTORY_RE.exec(src)) !== null) {
-    const callStart  = sm.index;
-    const openParen   = callStart + sm[0].length - 1;
-    const closeParen  = readBalanced(src, openParen);
+    const callStart = sm.index;
+    const openParen = callStart + sm[0].length - 1;
+    const closeParen = readBalanced(src, openParen);
     if (closeParen === -1) continue;
     const argsStr = src.slice(openParen + 1, closeParen);
     const lineNum = src.slice(0, callStart).split('\n').length;
 
     const args = splitTopLevelArgs(argsStr);
-    const idx  = TEXT_ARG_INDEX[sm[1]];
+    const idx = TEXT_ARG_INDEX[sm[1]];
     const rawTextArg = args[idx];
     if (!rawTextArg) continue;
 
@@ -481,9 +542,9 @@ while ((sm = STEP_FACTORY_RE.exec(src)) !== null) {
     const text = (literalMatch[1] ?? literalMatch[2] ?? '').toLowerCase();
     if (!text) continue;
 
-    const rest    = args.slice(idx + 1).join(', ');
+    const rest = args.slice(idx + 1).join(', ');
     const equipArr = extractArray(rest, 'equipment').toLowerCase();
-    const ingArr   = extractArray(rest, 'ingredients');
+    const ingArr = extractArray(rest, 'ingredients');
 
     // An explicit instruction that declares ingredients must state an amount.
     // Prefer interpolating formatIngredient() so the text and the declared
@@ -497,7 +558,7 @@ while ((sm = STEP_FACTORY_RE.exec(src)) !== null) {
         if (!usesFormattedIngredient && !statesLiteralAmount) {
             errors.push(
                 `line ${lineNum}: instruction declares ingredients but does not state an amount; ` +
-                'use formatIngredient(...) in the instruction text or include the amount explicitly'
+                    'use formatIngredient(...) in the instruction text or include the amount explicitly',
             );
         }
     }
@@ -507,7 +568,7 @@ while ((sm = STEP_FACTORY_RE.exec(src)) !== null) {
         const coveredVar = Object.entries(equipmentVarType).some(
             // equipArr is lowercased above, so this must match case-insensitively —
             // otherwise a camelCase var like `saladBowl` never matches its own `.name`.
-            ([varName, type]) => type === phrase && new RegExp(`\\b${varName}\\.name\\b`, 'i').test(equipArr)
+            ([varName, type]) => type === phrase && new RegExp(`\\b${varName}\\.name\\b`, 'i').test(equipArr),
         );
         if (!coveredLiteral && !coveredVar) {
             warnings.push(`line ${lineNum}: text mentions "${phrase}" but step doesn't declare it in \`equipment\``);
@@ -518,7 +579,7 @@ while ((sm = STEP_FACTORY_RE.exec(src)) !== null) {
         const keys = ingredientKeyByPhrase.get(phrase);
         const coveredInline = [...keys].some((key) => new RegExp(`\\bi\\.${key}\\(`).test(ingArr));
         const coveredVar = Object.entries(ingredientVarKey).some(
-            ([varName, k]) => keys.has(k) && new RegExp(`\\b${varName}\\b`).test(ingArr)
+            ([varName, k]) => keys.has(k) && new RegExp(`\\b${varName}\\b`).test(ingArr),
         );
         if (!coveredInline && !coveredVar) {
             warnings.push(`line ${lineNum}: text mentions "${phrase}" but step doesn't declare it in \`ingredients\``);
@@ -550,10 +611,10 @@ const OIL_SMOKE_POINTS = {
     const createRe = /\bcreateRecipe\(\s*'([^']+)'/g;
     let cm;
     while ((cm = createRe.exec(src)) !== null) {
-        const openIdx  = cm.index + 'createRecipe'.length; // index of '('
+        const openIdx = cm.index + 'createRecipe'.length; // index of '('
         const closeIdx = readBalanced(src, openIdx);
         if (closeIdx === -1) continue;
-        const block  = src.slice(cm.index, closeIdx + 1);
+        const block = src.slice(cm.index, closeIdx + 1);
         const lineNo = src.slice(0, cm.index).split('\n').length;
 
         if (cm[1] === 'test-recipe-all-features') continue;
@@ -562,9 +623,7 @@ const OIL_SMOKE_POINTS = {
         // here (`const v = e.pan(...)`), not merely mentioned in step text.
         if (!/const\s+\w+\s*=\s*e\.pan\(/.test(block)) continue;
 
-        const usedOils = Object.keys(OIL_SMOKE_POINTS).filter(
-            (key) => new RegExp(`\\bi\\.${key}\\(`).test(block)
-        );
+        const usedOils = Object.keys(OIL_SMOKE_POINTS).filter((key) => new RegExp(`\\bi\\.${key}\\(`).test(block));
         if (usedOils.length === 0) continue;
 
         // Temperature signals that matter for burning: explicit preheat() calls and
@@ -581,8 +640,8 @@ const OIL_SMOKE_POINTS = {
             if (maxTemp <= smoke) continue;
             errors.push(
                 `line ${lineNo}: recipe "${cm[1]}" renders ${key} above its smoke point ` +
-                `(${smoke}°F) - preheat is ${maxTemp}°F; swap in a higher-smoke-point oil ` +
-                `(e.g. avocado) or lower the temperature`
+                    `(${smoke}°F) - preheat is ${maxTemp}°F; swap in a higher-smoke-point oil ` +
+                    `(e.g. avocado) or lower the temperature`,
             );
         }
     }
@@ -592,16 +651,16 @@ const OIL_SMOKE_POINTS = {
 
 if (warnings.length > 0) {
     console.warn('Recipe validation warnings (non-blocking):');
-    warnings.forEach(w => console.warn(`  ${w}`));
+    warnings.forEach((w) => console.warn(`  ${w}`));
 }
 
 if (errors.length > 0) {
     console.error('Recipe validation failed:');
-    errors.forEach(e => console.error(`  ${e}`));
+    errors.forEach((e) => console.error(`  ${e}`));
     process.exit(1);
 }
 
 console.log(
     `Recipe validation passed (${addCalls.length} add() calls, ${Object.keys(unitNameMap).length} units checked)` +
-    `${warnings.length > 0 ? `, ${warnings.length} warning(s)` : ''}.`
+        `${warnings.length > 0 ? `, ${warnings.length} warning(s)` : ''}.`,
 );

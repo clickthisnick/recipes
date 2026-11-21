@@ -35,16 +35,25 @@ A ringing card shows how overdue the deadline is and keeps updating until Stop A
 ## Authoring
 
 ```js
-withPlan(createRecipe('my-recipe', 'My Recipe', (() => {
-    const pan = e.pan();
-    const steps = [];
-    const s = (...newSteps) => steps.push(...newSteps);
-    const EGG = i.egg(3, u.unit);
+withPlan(
+    createRecipe(
+        'my-recipe',
+        'My Recipe',
+        (() => {
+            const pan = e.pan();
+            const steps = [];
+            const s = (...newSteps) => steps.push(...newSteps);
+            const EGG = i.egg(3, u.unit);
 
-    s(pan.add([EGG]));
-    s(pan.cook('Cook eggs', time.minutes(5)));
-    return steps;
-})(), undefined, 12), { planMinutes: 5 });
+            s(pan.add([EGG]));
+            s(pan.cook('Cook eggs', time.minutes(5)));
+            return steps;
+        })(),
+        undefined,
+        12,
+    ),
+    { planMinutes: 5 },
+);
 ```
 
 - Reuse one ingredient object when later steps must lock or transfer that same item. A second `i.egg(...)` is a different item.

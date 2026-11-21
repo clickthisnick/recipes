@@ -75,7 +75,11 @@ export function sumSelectedNutrition(foods, selected, nutrients) {
 }
 
 export function foodKeyFromName(name) {
-    const key = String(name ?? '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+    const key = String(name ?? '')
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '_')
+        .replace(/^_|_$/g, '');
     return key || 'custom_food';
 }
 
@@ -110,9 +114,7 @@ export function bindUserInvalid(form) {
     const linkError = (field, shown) => {
         const errorId = field.dataset.error;
         if (!errorId) return;
-        const ids = (field.getAttribute('aria-describedby') || '')
-            .split(/\s+/)
-            .filter((id) => id && id !== errorId);
+        const ids = (field.getAttribute('aria-describedby') || '').split(/\s+/).filter((id) => id && id !== errorId);
         if (shown) ids.push(errorId);
         if (ids.length) field.setAttribute('aria-describedby', ids.join(' '));
         else field.removeAttribute('aria-describedby');

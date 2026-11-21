@@ -1,37 +1,38 @@
 # AGENTS.md
 
-This is a personal recipes project. Keep all recipe and product data, plus code, in the canonical source file.
+Personal recipe app. The source of truth is `src/file.js` (plain JavaScript, JSDoc types). `main.html` loads it with `src/app.css`. Do not read or print all of `src/file.js`; search with `rg`, then read a narrow range.
 
-## Scope
+## Before you finish
 
-- Canonical source: `src/file.js`. Read and edit here. It is plain JavaScript that browsers run directly; types are JSDoc comments checked by `npm run typecheck` (`tsc --noEmit`). There is no build step.
-- `main.html` is the small app shell that loads `src/file.js` and `src/app.css` (the app's styles).
-- `dist/main.html` is only a redirect to `../main.html`. It keeps the query string and hash so old `/dist/main.html?recipe=` links still open. Do not delete it and do not put a build back in `dist/`.
-- `archived/` is dead code. Out of scope.
-- `src/requirements.md` is reference/spec documentation, not source of truth.
-- Notes live in `docs/notes/`. The product-ingest prompt is `docs/prompts/ingest-product-prompt`.
-- `node_modules/` is never inspected.
+Run `npm run check`. It is the only required command. It runs, in order:
 
-## Modern Web Guidance
+1. Prettier (`src/file.js` is excluded so `s(name.add(` stays on one line for the recipe validator)
+2. ESLint (flat config)
+3. `tsc --noEmit`
+4. html-validate
+5. stylelint
+6. codespell
+7. actionlint
+8. recipe validation
+9. tests with the coverage floor in `guardrails.json`
+10. the shipped-asset size budget in `guardrails.json`
 
-- Before writing or editing web UI, CSS, or client-side JS (including HTML pages, dialogs, forms, animations, accessibility, and performance), consult `modern-web-guidance` first: `npx -y modern-web-guidance@latest search "<focused query>"`, then `retrieve "<id>"` for relevant guides.
-- Follow the skill instructions in `.agents/skills/modern-web-guidance/SKILL.md`, including retrieving broader discipline guides (e.g., `html`, `css`, `forms`, `accessibility`, `performance`, `security`) when they apply.
-- Keep browser-support fallbacks as the guides require unless the user specifies a custom support policy.
+`npm test` is the same tests without the coverage floor. It still typechecks and validates first.
 
-## Working with src/file.js (cost-sensitive)
+## Rules
 
-`src/file.js` is very large, so do not read or print the whole file. Prefer targeted commands:
+- Plain JavaScript with JSDoc. No build step and no generated `dist/` bundle. `dist/main.html` is only a redirect to `../main.html` that keeps the query string and hash. Do not delete it.
+- Keep `archived/` untouched.
+- Recipes stay as code in `src/file.js`, not JSON.
+- Do not add a dependency without a stated reason. Current tool dependencies: Prettier, ESLint, TypeScript, html-validate, stylelint, actionlint, and lefthook are the checks; linkedom renders the app in Node so coverage can reach the screens without a browser.
+- Every bug fix gets a test.
+- Never lower the coverage floor or the size budget in `guardrails.json`.
+- Do not make visible UI changes unless asked.
+- Keep existing URLs working, including the `dist/main.html` redirect.
+- `src/requirements.md` is notes, not the source of truth. Other notes are in `docs/notes/`. The product prompt is `docs/prompts/ingest-product-prompt`.
+- Before editing HTML, CSS, or client-side JavaScript, read `.agents/skills/modern-web-guidance/SKILL.md` and follow it.
+- New ingredients go at the end of `export const i`. Reuse an existing `i.*` ingredient instead of adding a near-duplicate. In step text, wrap ingredients with `formatIngredient(...)`.
 
-- Start with `rg -n` to locate symbols, then `sed -n 'A,Bp' src/file.js` for narrow ranges.
-- Locate ingredients with `rg -n "ingredientFactory|export const i"`.
-- Locate recipes with `rg -n "registerGroup|registerRecipe|withPlan\\(createRecipe"`.
-- Add new ingredient entries near the end of `export const i`, not in the middle of unrelated blocks.
-- Reuse existing `i.*` ingredients instead of adding near-duplicates.
+## CI
 
-## Adding a Recipe
-
-1. Add missing ingredient entries with nutrition/conversions in `src/file.js`.
-2. Add the recipe to the matching existing group array (Breakfast, Dinner, etc.) unless standalone registration is required.
-3. Use `formatIngredient(...)` in instruction text whenever an ingredient is listed in a step.
-4. Run `npm test` (it typechecks, validates recipes, then runs the tests). Fix any type error or validation failure; non-blocking warnings are acceptable unless they are new for your recipe.
-5. When it passes, report that; do not paste the full output.
+GitHub Actions (`.github/workflows/ci.yml`) runs on push and pull request with `contents: read`. The job installs dependencies and runs `npm run check` only. Dependabot updates npm and GitHub Actions weekly, in one group each. Lefthook (`lefthook.yml`) runs Prettier, ESLint, stylelint, html-validate, and codespell on commit. Those hooks are not a substitute for `npm run check`.

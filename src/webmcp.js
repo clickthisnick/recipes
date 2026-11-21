@@ -8,7 +8,10 @@
  */
 export function registerAgentTools(tools) {
     if (typeof document === 'undefined') return () => {};
-    const doc = /** @type {Document & { modelContext?: { registerTool: (tool: object, options?: { signal: AbortSignal }) => Promise<unknown> | unknown } }} */ (document);
+    const doc =
+        /** @type {Document & { modelContext?: { registerTool: (tool: object, options?: { signal: AbortSignal }) => Promise<unknown> | unknown } }} */ (
+            document
+        );
     const context = doc.modelContext;
     if (!context || typeof context.registerTool !== 'function') return () => {};
     const controller = new AbortController();
@@ -53,7 +56,9 @@ export function readTableTool(name, description, spec) {
                 for (const [key, col] of Object.entries(spec.columns ?? {})) {
                     const target = col.selector ? el.querySelector(col.selector) : el;
                     record[key] = col.attr
-                        ? (target ? target.getAttribute(col.attr) : null)
+                        ? target
+                            ? target.getAttribute(col.attr)
+                            : null
                         : (target?.textContent ?? '');
                 }
                 if (spec.require && !record[spec.require]) continue;

@@ -17,6 +17,4 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: npm run lint
-      - run: npm test
-      - run: pip install codespell==2.4.1 && codespell -L bu,steams --skip "./package-lock.json,./node_modules/*,./.agents/*,./archived/*"
+      - run: npm run check
