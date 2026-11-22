@@ -1,14 +1,9 @@
 import { registerAgentTools } from './webmcp.js';
 
-// ============================================================
 // RECIPE SYSTEM
 // Single-file architecture optimized for readability and AI context
-// ============================================================
 
-// ============================================================
 // TYPES
-// ============================================================
-
 /** @typedef {'instruction' | 'timer' | 'cleanup' | 'info' | 'gate'} StepType */
 /** @typedef {'select' | 'shopping' | 'cooking' | 'nutrition' | 'add-ingredient' | 'prep' | 'plan'} Screen */
 
@@ -281,10 +276,7 @@ function savePlanConfig(cfg) {
  * @property {string[]} recipeIds
  */
 
-// ============================================================
 // GLOBAL STATE
-// ============================================================
-
 const SHOW_HIDDEN_RECIPES_KEY = 'recipe-show-hidden';
 
 const state = {
@@ -329,28 +321,19 @@ function getNutritionExcluded(recipeId) {
     return excluded;
 }
 
-// ============================================================
 // ID HELPERS
-// ============================================================
-
 let nextStepId = 1;
 /** @returns {number} */
 function createId() { return nextStepId++; }
 
-// ============================================================
 // TIME HELPERS
-// ============================================================
-
 export const time = {
     seconds: /** @param {number} v @returns {number} */ (v) => v,
     minutes: /** @param {number} v @returns {number} */ (v) => v * 60,
     hours:   /** @param {number} v @returns {number} */ (v) => v * 3600,
 };
 
-// ============================================================
 // UNITS
-// ============================================================
-
 export const u = {
     none:       { name: '' },
     cup:        { name: 'cup',    plural: 'cups' },
@@ -372,10 +355,7 @@ export const u = {
 
 };
 
-// ============================================================
 // UNIT CONVERSION
-// ============================================================
-
 /** @type {Record<string, Record<string, number>>} */
 const CONVERSION_FACTORS = {
     // Volume cluster
@@ -431,10 +411,7 @@ export function convertWithDensity(
     return convertWithDensity(afterDensity, intermediate, to, conversions, seen);
 }
 
-// ============================================================
 // FORMATTERS
-// ============================================================
-
 /**
  * @param {string} word
  * @param {number} count
@@ -490,10 +467,7 @@ function formatQuantityUnit(quantity, unit) {
     return `${formatQuantity(quantity)} ${unitText}`;
 }
 
-// ============================================================
 // STEP FACTORIES
-// ============================================================
-
 /**
  * @param {Partial<Step> & { type: StepType; text: string }} input
  * @returns {Step}
@@ -627,10 +601,7 @@ export function generateCleanupLabels(
         ));
 }
 
-// ============================================================
 // EQUIPMENT
-// ============================================================
-
 class Equipment {
     /**
      * @param {string} type
@@ -1009,10 +980,7 @@ export const e = {
     siliconeBag:  /** @param {string} [label] */ (label) => new Equipment('silicone bag',  label),
 };
 
-// ============================================================
 // RECIPE REGISTRATION
-// ============================================================
-
 /**
  * Every step, parent before its children, in recipe order.
  * @param {Step[]} steps
@@ -1120,10 +1088,7 @@ export function registerBundle(bundle) {
     state.bundles.set(bundle.id, bundle);
 }
 
-// ============================================================
 // AD-HOC INGREDIENTS
-// ============================================================
-
 const ADHOC_GROUP = 'Custom additions';
 
 /**
@@ -1206,10 +1171,7 @@ function getNutritionAddableRecipes(query) {
     return searchRecipes(query.trim(), { includeAdhoc: false }).sort((a, b) => a.name.localeCompare(b.name));
 }
 
-// ============================================================
 // COOK TIME
-// ============================================================
-
 /**
  * @param {Recipe} recipe
  * @returns {number}
@@ -1252,10 +1214,7 @@ function formatCookTime(seconds) {
     return mins === 0 ? `${hrs} hr` : `${hrs} hr ${mins} min`;
 }
 
-// ============================================================
 // COOKING PLAN
-// ============================================================
-
 /**
  * @param {Recipe[]} recipes
  * @returns {Step[]}
@@ -1317,10 +1276,7 @@ function buildCookingPlan(recipes) {
     return steps;
 }
 
-// ============================================================
 // SHOPPING LIST
-// ============================================================
-
 /** @returns {Ingredient[]} */
 function buildShoppingList() {
     const combined = /** @type {Map<string, Ingredient>} */ (new Map());
@@ -1341,10 +1297,7 @@ function buildShoppingList() {
     return [...combined.values()];
 }
 
-// ============================================================
 // PANTRY INVENTORY
-// ============================================================
-
 // How much of each ingredient (name + unit) is already on hand, independent of
 // which recipes are selected. Persisted in localStorage so it survives reloads.
 const INVENTORY_KEY = 'recipe-inventory';
@@ -1393,10 +1346,7 @@ function inventoryKey(ingredient, byPackage) {
     return byPackage ? `${base}::pkg` : base;
 }
 
-// ============================================================
 // NUTRITION + COST
-// ============================================================
-
 /**
  * @typedef {{ status: 'ok'; totals: NutritionTotals; brand?: string }
  *     | { status: 'missing' }
@@ -1651,10 +1601,7 @@ function coverageLabel(covered, total, flagged) {
     return `${covered} of ${total} ingredients have data · ${flagged} flagged`;
 }
 
-// ============================================================
 // DOM HELPERS
-// ============================================================
-
 /**
  * @param {string} id
  * @returns {HTMLElement}
@@ -1770,10 +1717,7 @@ function removeServing(recipeId) {
     if (idx !== -1) state.selectedRecipeIds.splice(idx, 1);
 }
 
-// ============================================================
 // COPY TO CLIPBOARD
-// ============================================================
-
 /**
  * @param {string} recipeId
  * @returns {string}
@@ -1820,10 +1764,7 @@ function createCopyButton(recipeId) {
     return btn;
 }
 
-// ============================================================
 // AUDIO UNLOCK
-// ============================================================
-
 function unlockAudioContext() {
     if (state.audioUnlocked) return;
     state.audioUnlocked = true;
@@ -1843,10 +1784,7 @@ function unlockAudioContext() {
     }).catch(() => { audio.muted = wasMuted; });
 }
 
-// ============================================================
 // SCREEN: SELECT
-// ============================================================
-
 function renderSelectScreen() {
     const root = screen('Recipes');
     root.appendChild(h('search', {}, ...searchField('recipe-search', 'Search recipes', 'Recipe name', state.searchQuery, (value) => {
@@ -2019,10 +1957,7 @@ function updateActionButtons() {
     }
 }
 
-// ============================================================
 // SCREEN: SHOPPING
-// ============================================================
-
 function renderShoppingScreen() {
     const root = screen('Shopping List');
     const inventory = loadInventory();
@@ -2149,10 +2084,7 @@ function renderShoppingScreen() {
     root.appendChild(createStartOverButton());
 }
 
-// ============================================================
 // MACRO TARGETS PANEL
-// ============================================================
-
 /**
  * @param {NutritionTotals} grand
  * @returns {HTMLElement}
@@ -2247,10 +2179,7 @@ function renderMacroTargetsPanel(grand) {
     return panel;
 }
 
-// ============================================================
 // RECIPE SUGGESTIONS
-// ============================================================
-
 /**
  * @typedef {Object} SuggestedRecipe
  * @property {Recipe} recipe
@@ -2311,10 +2240,7 @@ function buildRecipeSuggestions(grand) {
     return results.sort((a, b) => b.score - a.score).slice(0, 3);
 }
 
-// ============================================================
 // SCREEN: NUTRITION
-// ============================================================
-
 function renderNutritionScreen() {
     const root = screen('Nutrition');
     const recipes = getSelectedRecipes();
@@ -2560,10 +2486,7 @@ function renderNutritionAddRecipeList() {
     }
 }
 
-// ============================================================
 // SCREEN: ADD INGREDIENT
-// ============================================================
-
 let adhocSearchQuery = '';
 /** @type {string | null} */
 let adhocSelectedKey = null;
@@ -2695,10 +2618,7 @@ function renderAdhocDetail() {
     );
 }
 
-// ============================================================
 // SCREEN: COOKING
-// ============================================================
-
 /**
  * @param {number} seconds
  * @returns {string}
@@ -2826,10 +2746,7 @@ function notesBox(kind, steps, inline = false) {
     );
 }
 
-// ============================================================
 // STEP LOCKING
-// ============================================================
-
 /**
  * @param {HTMLElement} panel
  * @param {Step} step
@@ -2877,10 +2794,7 @@ function applyLock(panel, step) {
     setTimeout(unlock, 0);
 }
 
-// ============================================================
 // STEP RENDERING
-// ============================================================
-
 /**
  * @param {Step} step
  * @param {() => void} [onDone]
@@ -3027,10 +2941,7 @@ function skipTimer(step, panel, onDone) {
     onDone?.();
 }
 
-// ============================================================
 // START OVER
-// ============================================================
-
 /** @returns {HTMLButtonElement} */
 function createStartOverButton() {
     return backButton('↩ Start Over', () => {
@@ -3064,10 +2975,7 @@ function createStartOverButton() {
     });
 }
 
-// ============================================================
 // NAVIGATION
-// ============================================================
-
 /** @type {Record<Screen, string>} */
 const SCREEN_TITLES = {
     select: 'Recipes',
@@ -3086,9 +2994,7 @@ function navigateTo(screen) {
     render();
 }
 
-// ============================================================
 // WAKE LOCK
-// ============================================================
 //
 // Prevents the screen from auto-locking while a timer/gate countdown is running. Without
 // it, the screen sleeps mid-cook, the browser suspends the page's JS (including the
@@ -3123,10 +3029,7 @@ if (typeof document !== 'undefined') {
     });
 }
 
-// ============================================================
 // TIMERS
-// ============================================================
-
 /**
  * Ticks against an absolute deadline (rather than decrementing a counter once per tick) so
  * that a countdown suspended by the browser (backgrounded tab, locked screen) still fires
@@ -3192,10 +3095,7 @@ function startTimer(step, panel, onDone) {
     );
 }
 
-// ============================================================
 // GATE (check-then-loop) STEPS
-// ============================================================
-
 /**
  * @param {Step} step
  * @param {HTMLElement} panel
@@ -3258,10 +3158,7 @@ function skipGateRetryTimer(step, panel, onDone) {
     renderGateQuestion(step, panel, onDone);
 }
 
-// ============================================================
 // AUDIO
-// ============================================================
-
 /** @returns {HTMLAudioElement} */
 function createAlarmAudio() {
     if (typeof Audio === 'function') return new Audio('src/sounds/pager-beep.mp3');
@@ -3462,20 +3359,14 @@ function createSoundTestPanel() {
     return panel;
 }
 
-// ============================================================
 // URL ROUTING
-// ============================================================
-
 /** @returns {string | null} */
 function getRecipeIdFromURL() {
     const params = new URLSearchParams(window.location.search);
     return params.get('recipe');
 }
 
-// ============================================================
 // SCREEN: PREP
-// ============================================================
-
 function renderPrepScreen() {
     const root = screen('Prep');
 
@@ -3506,10 +3397,7 @@ function renderPrepScreen() {
     root.appendChild(backButton('← Back', () => navigateTo('select')));
 }
 
-// ============================================================
 // RENDER
-// ============================================================
-
 function render() {
     switch (state.screen) {
         case 'select':         return renderSelectScreen();
@@ -3522,10 +3410,7 @@ function render() {
     }
 }
 
-// ============================================================
 // SCREEN: PLAN
-// ============================================================
-
 /**
  * @param {string} hhmm
  * @returns {number}
@@ -3751,10 +3636,7 @@ function renderPlanScreen() {
     root.appendChild(backButton('← Back', () => navigateTo('select')));
 }
 
-// ============================================================
 // BUILD INFO
-// ============================================================
-
 /**
  * When the site was last published. GitHub Pages serves every file with a Last-Modified
  * header set at deploy time, which the browser exposes as document.lastModified.
@@ -3771,10 +3653,7 @@ function appendBuildFooter(root) {
     root.appendChild(h('div', { class: 'build-footer', text: `Last compiled: ${formatBuildTime()}` }));
 }
 
-// ============================================================
 // BOOTSTRAP
-// ============================================================
-
 function bootstrap() {
     document.body.innerHTML = `<div id="app"></div><div id="status-live" class="visually-hidden" role="status" aria-live="polite"></div>`;
     document.title = SCREEN_TITLES[state.screen];
@@ -3890,20 +3769,14 @@ function registerRecipeAgentTools() {
     ]);
 }
 
-// ============================================================
 // STORES
-// ============================================================
-
 export const stores = {
     amazon:      'Amazon',
     amazonFresh: 'Amazon Fresh',
     wholeFoods:  'Whole Foods',
 };
 
-// ============================================================
 // INGREDIENT FACTORY
-// ============================================================
-
 /** @typedef {Partial<IngredientFields>} IngredientDefaults */
 
 // Every ingredient must resolve to real nutrition data - there is no "missing" path. That data
@@ -3940,10 +3813,7 @@ function ingredientFactory(name, defaults = {}) {
     };
 }
 
-// ============================================================
 // ITEMS
-// ============================================================
-
 export const i = {
     // No nutrition available yet - a real fruit with meaningful calories/carbs, so a zero
     // placeholder would be actively misleading.
@@ -5114,12 +4984,44 @@ export const i = {
         },
     }),
 
+    // Goodles Cheddy Mac, one 6 oz box (macaroni + cheese packet). Label serving is
+    // 2.6 oz dry mix (74 g), about 2.5 servings per box: 260 cal, 3.5 g fat, 1.5 g
+    // sat fat, 0 g trans fat, 10 mg cholesterol, 590 mg sodium, 47 g carbs, 7 g fiber,
+    // 5 g sugar, 14 g protein. servingSize 0.4 box = one label serving.
+    // https://www.goodles.com/products/cheddy-mac/
+    goodlesCheddyMac: ingredientFactory('Goodles Cheddy Mac', {
+        products: [{
+            brand: 'Goodles',
+            variant: 'Cheddy Mac, creamy cheddar macaroni (6 oz)',
+            size: 1,
+            sizeUnit: u.unit,
+            listings: [{ link: 'https://www.goodles.com/products/cheddy-mac/' }],
+            nutrition: {
+                [u.unit.name]: { servings: 2.5, servingSize: 0.4, calories: 260, fat: 3.5, saturatedFat: 1.5, transFat: 0, cholesterol: 10, carbs: 47, sodium: 590, sugar: 5, protein: 14, fiber: 7 },
+            },
+        }],
+    }),
+
+    // USDA SR Legacy 173410, Butter, salted, scaled from per 100 g to 1 tbsp (14.2 g).
+    // The Cheddy Mac box says "butter" and does not say salted or unsalted.
+    saltedButter: ingredientFactory('Salted Butter', {
+        nutrition: {
+            [u.tbsp.name]: { servings: 1, servingSize: 1, calories: 102, fat: 11.52, saturatedFat: 7.29, transFat: 0.47, cholesterol: 30.53, carbs: 0.01, sodium: 91, sugar: 0.01, protein: 0.12, fiber: 0 },
+        },
+    }),
+
+    // USDA SR Legacy 170872, milk, lowfat, 1% milkfat, with added vitamin A and D,
+    // scaled from per 100 g to 1 cup (244 g). Trans fat is not reported on that record.
+    // The Cheddy Mac box says "low fat milk".
+    lowFatMilk: ingredientFactory('Low-Fat Milk', {
+        nutrition: {
+            [u.cup.name]: { servings: 1, servingSize: 1, calories: 102, fat: 2.37, saturatedFat: 1.54, transFat: 0, cholesterol: 12.2, carbs: 12.18, sodium: 107, sugar: 12.69, protein: 8.22, fiber: 0 },
+        },
+    }),
+
 };
 
-// ============================================================
 // RECIPES
-// ============================================================
-
 registerGroup('Breakfast', [
     withPlan(createRecipe('blueprint-smoothie', 'Blueprint Smoothie (Nutribullet, 1 serving)', (() => {
         const mixer = e.bulletMixer();
@@ -5573,6 +5475,45 @@ registerGroup('Dinner', [
 
         return steps;
     })()), { planMinutes: 10, portable: false }),
+    // Cheddy Mac box: 6 cups water, cook 8–9 minutes, 1/4 cup low-fat milk,
+    // optional 2 Tbsp butter, then the cheese packet. Water here is 32 ounces (4 cups).
+    withPlan(createRecipe('goodles-noodles', 'Goodles Noodles (Cheddy Mac)', (() => {
+        const pot = e.pot();
+        const colander = e.colander();
+        /** @type {Step[]} */
+        const steps = [];
+        /** @param {...Step} newSteps */
+        const s = (...newSteps) => steps.push(...newSteps);
+
+        const WATER = i.water(32, u.ounce);
+        const GOODLES = i.goodlesCheddyMac(1, u.unit);
+        const MILK = i.lowFatMilk(0.25, u.cup);
+        const BUTTER = i.saltedButter(2, u.tbsp);
+
+        s(info('Cheddy Mac box directions boil the macaroni in 6 cups of water for 8–9 minutes, then stir in 1/4 cup low-fat milk and the cheese packet. This recipe uses 32 ounces (4 cups) of water. The box lists 2 Tbsp butter as optional for richer flavor, and this recipe includes it. The box does not season the boiling water.', {
+            ingredients: [WATER, MILK, BUTTER],
+        }));
+        s(pot.add([WATER]));
+        s(Timer.gate('Is the water boiling?', 1, 'm', { equipment: [pot.name], ingredients: [WATER] }));
+        s(pot.add([[GOODLES, 'macaroni only; set the cheese packet aside']]));
+        s(pot.cook('Cook the macaroni, stirring occasionally', time.minutes(8)));
+        s(Timer.gate('Has the macaroni cooked 8–9 minutes?', 1, 'm', { equipment: [pot.name], ingredients: [GOODLES] }));
+        s(instruction(`Drain ${formatIngredient(GOODLES)} in the colander, without rinsing, and return the macaroni to the pot.`, {
+            equipment: [pot.name, colander.name],
+            ingredients: [GOODLES],
+        }));
+        s(pot.add([
+            MILK,
+            BUTTER,
+            [GOODLES, 'cheese packet'],
+        ]));
+        s(instruction(`Stir ${formatIngredient(MILK)}, ${formatIngredient(BUTTER)}, and the cheese packet from ${formatIngredient(GOODLES)} until it is smooth and creamy`, {
+            equipment: [pot.name],
+            ingredients: [GOODLES, MILK, BUTTER],
+        }));
+
+        return steps;
+    })()), { planMinutes: 15, portable: false }),
     createRecipe('breaded-mushrooms', 'Breaded Mushrooms', (() => {
         const pankoPan     = e.pan('panko pan');
         const pankoBowl    = e.bowl('panko bowl');
@@ -6292,9 +6233,7 @@ registerRecipe(createRecipe(
     70,
 ));
 
-// ============================================================
 // TESTING
-// ============================================================
 // Not a real dish - exercises every step type, equipment method, and
 // nutrition/cost edge case in one flow so app changes can be manually smoke
 // tested end to end. Hidden from the default Select list; reachable via
@@ -6387,10 +6326,7 @@ registerRecipe(withPlan(createRecipe(
     2,
 ), { planMinutes: 2, portable: false, prepMinutes: 1, perishableDays: 1, hidden: true }));
 
-// ============================================================
 // BUNDLES
-// ============================================================
-
 /** @type {string[]} */
 const DAILY_BLUEPRINT_RECIPE_IDS = [
     'blueprint-smoothie',
@@ -6415,10 +6351,7 @@ registerBundle({
     recipeIds: Array(5).fill(DAILY_BLUEPRINT_RECIPE_IDS).flat(),
 });
 
-// ============================================================
 // START APP
-// ============================================================
-
 if (typeof document !== 'undefined') {
     document.addEventListener('DOMContentLoaded', bootstrap);
 }
