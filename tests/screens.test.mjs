@@ -70,4 +70,24 @@ test('the recipe screens render from the select list through cooking', async () 
     open('start-cooking');
     assert.match(heading(), /Cooking/);
     assert.ok(document.querySelectorAll('.panel').length > 1);
+    const eggPreheat = [...document.querySelectorAll('.panel')].find((panel) =>
+        panel.textContent.includes('Preheat Nuwave pan to 300°'),
+    );
+    assert.equal(eggPreheat.querySelector('.timer-duration-badge').textContent, '2m');
+
+    startOver();
+    document.querySelector('[data-testid="recipe-pan-seared-chicken-sausage"]').click();
+    open('start-cooking');
+    const sausagePreheat = [...document.querySelectorAll('.panel')].find((panel) =>
+        panel.textContent.includes('Preheat Nuwave pan to 350°'),
+    );
+    assert.equal(sausagePreheat.querySelector('.timer-duration-badge').textContent, '2m');
+
+    startOver();
+    document.querySelector('[data-testid="recipe-steakhouse-roasted-vegetables"]').click();
+    open('start-cooking');
+    const ovenPreheat = [...document.querySelectorAll('.panel')].find((panel) =>
+        panel.textContent.includes('Preheat oven to 450°'),
+    );
+    assert.equal(ovenPreheat.querySelector('.timer-duration-badge').textContent, '15m');
 });

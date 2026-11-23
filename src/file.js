@@ -659,8 +659,7 @@ class Equipment {
     /**
      * The target temp this vessel was last preheated to. Later steps (e.g. addOil +
      * heatUp) read it so the heat-up wait reflects how hot the pan already is.
-     * Pan overrides preheat with the NuWave induction timings. Other equipment keeps
-     * the 15-minute default below.
+     * Pan overrides preheat to 2 minutes. Other equipment keeps the 15-minute default below.
      * @protected
      * @type {number | undefined}
      */
@@ -957,8 +956,7 @@ class Pan extends Equipment {
      */
     preheat(temperature) {
         this._targetTemp = temperature;
-        const duration = temperature <= 350 ? time.seconds(45) : time.minutes(2);
-        return timerStep(`Preheat ${this.name} to ${temperature}°`, duration, { equipment: [this.name] });
+        return timerStep(`Preheat ${this.name} to ${temperature}°`, time.minutes(2), { equipment: [this.name] });
     }
 }
 
@@ -5600,7 +5598,7 @@ registerGroup('Dinner', [
         /** @param {...Step} newSteps */
         const s = (...newSteps) => steps.push(...newSteps);
 
-        s(pan.preheat(325));
+        s(pan.preheat(350));
         s(pan.add([
             i.avocadoOil(1, u.spray),
             [SAUSAGES, 'add in a single layer'],
@@ -6287,7 +6285,7 @@ registerRecipe(withPlan(createRecipe(
         }));
 
         s(oven.preheat(400));    // fixed 15 min duration - tap 3× to skip
-        s(nuwave.preheat(325));  // Pan preheat - 45 s at 325° - tap 3× to skip
+        s(nuwave.preheat(325));  // Pan preheat - 2 min - tap 3× to skip
 
         s(pan.add([i.oliveOil(1, u.tbsp)]));
         s(cuttingBoard.slice(MUSHROOM));
