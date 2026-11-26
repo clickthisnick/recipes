@@ -5523,7 +5523,7 @@ registerGroup('Dinner', [
         return steps;
     })()), { planMinutes: 10, portable: false }),
     // Cheddy Mac box: 6 cups water, cook 8–9 minutes, 1/4 cup low-fat milk,
-    // optional 2 Tbsp butter, then the cheese packet. Water here is 21 ounces at 575°F.
+    // optional 2 Tbsp butter, then the cheese packet. Water here is 20 ounces at 575°F.
     withPlan(createRecipe('goodles-noodles', 'Goodles Noodles (Cheddy Mac)', (() => {
         const pot = e.pot();
         const colander = e.colander();
@@ -5532,16 +5532,16 @@ registerGroup('Dinner', [
         /** @param {...Step} newSteps */
         const s = (...newSteps) => steps.push(...newSteps);
 
-        const WATER = i.water(21, u.ounce);
+        const WATER = i.water(20, u.ounce);
         const GOODLES = i.goodlesCheddyMac(1, u.unit);
         const MILK = i.lowFatMilk(0.25, u.cup);
         const BUTTER = i.saltedButter(2, u.tbsp);
 
-        s(info('Cheddy Mac box directions boil the macaroni in 6 cups of water for 8–9 minutes, then stir in 1/4 cup low-fat milk and the cheese packet. This recipe uses 21 ounces of water. The box lists 2 Tbsp butter as optional for richer flavor, and this recipe includes it. The box does not season the boiling water.', {
+        s(info('Cheddy Mac box directions boil the macaroni in 6 cups of water for 8–9 minutes, then stir in 1/4 cup low-fat milk and the cheese packet. This recipe uses 20 ounces of water. The box lists 2 Tbsp butter as optional for richer flavor, and this recipe includes it. The box does not season the boiling water.', {
             ingredients: [WATER, MILK, BUTTER],
         }));
         s(pot.add([WATER]));
-        s(pot.boilWater(575, 21));
+        s(pot.boilWater(575, 20));
         s(pot.add([[GOODLES, 'macaroni only; set the cheese packet aside']]));
         s(pot.cook('Cook the macaroni, stirring occasionally', time.minutes(9)));
         s(Timer.gate('Has the macaroni cooked 8–9 minutes?', 1, 'm', { equipment: [pot.name], ingredients: [GOODLES] }));

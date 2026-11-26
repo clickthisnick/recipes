@@ -97,15 +97,15 @@ test('the recipe screens render from the select list through cooking', async () 
     open('start-cooking');
     assert.match(heading(), /Cooking/);
     const cooking = document.body.textContent;
-    assert.match(cooking, /21 ounces Water/);
+    assert.match(cooking, /20 ounces Water/);
     assert.match(
         cooking,
-        /Bring water to a boil in pot \(575°\)\. Estimated ~7 min\. At 575°: 16 oz ~5 min 20 sec, 21 oz ~7 min, 32 oz ~10 min 40 sec, 48 oz ~16 min/,
+        /Bring water to a boil in pot \(575°\)\. Estimated ~6 min 40 sec\. At 575°: 16 oz ~5 min 20 sec, 21 oz ~7 min, 32 oz ~10 min 40 sec, 48 oz ~16 min/,
     );
     assert.match(cooking, /macaroni only; set the cheese packet aside/);
     assert.match(cooking, /Cook the macaroni, stirring occasionally/);
     const badges = [...document.querySelectorAll('.timer-duration-badge')].map((badge) => badge.textContent);
-    assert.ok(badges.includes('7m'));
+    assert.ok(badges.includes('6m 40s'));
     assert.ok(badges.includes('9m'));
     assert.equal(cooking.includes('32 ounces'), false);
 });
