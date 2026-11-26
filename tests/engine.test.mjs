@@ -6,6 +6,7 @@ import {
     convertUnits,
     convertWithDensity,
     createRecipe,
+    e,
     formatIngredient,
     generateCleanupLabels,
     getSelectedRecipes,
@@ -79,6 +80,19 @@ test('step builders chain dependencies and date labels land after the last use',
         [...walkSteps(recipe.steps)].map((step) => step.type),
         ['timer', 'instruction'],
     );
+});
+
+test('the NuWave pan preheats in 2 minutes and other appliances stay at 15', () => {
+    const pan = e.pan();
+    const step = pan.preheat(350);
+    assert.equal(pan.targetTemp, 350);
+    assert.equal(step.text, 'Preheat Nuwave pan to 350°');
+    assert.equal(step.durationSeconds, time.minutes(2));
+    assert.equal(e.pan().preheat(300).durationSeconds, time.minutes(2));
+    assert.equal(e.pan().preheat(400).durationSeconds, time.minutes(2));
+    assert.equal(e.oven().preheat(450).durationSeconds, time.minutes(15));
+    assert.equal(e.pot().preheat(215).durationSeconds, time.minutes(15));
+    assert.equal(e.toasterOven().preheat(350).durationSeconds, time.minutes(15));
 });
 
 test('an empty selection reports no servings', () => {

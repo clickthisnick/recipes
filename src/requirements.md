@@ -57,7 +57,7 @@ withPlan(
 ```
 
 - Reuse one ingredient object when later steps must lock or transfer that same item. A second `i.egg(...)` is a different item.
-- `e.pan()` is the NuWave pan: preheat is 45 seconds at 350° or below and 2 minutes above 350°. Other equipment preheats for 15 minutes.
+- `e.pan()` is the NuWave pan: preheat is 2 minutes. Other equipment preheats for 15 minutes.
 - `transfer()` throws at definition time if the ingredient is not in the source vessel.
 - `prep(text)` shows on Prep and Cooking. `prepOnly(text)` shows on Prep only.
 - `requiresDateLabel: true` inserts a "write today's date" step after the ingredient's last use.
