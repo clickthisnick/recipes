@@ -963,8 +963,10 @@ class Pan extends Equipment {
 // Calibration: 575°F with 21 oz of water takes 7 minutes.
 // minutes = 7 * (ounces / 21) * ((575 - 70) / (tempF - 70))
 // Linear in ounces, inverse in degrees above room temperature (70°F), nearest second.
+// 575°F and 21 oz is measured (7 min). Every other time is labeled Estimated.
 const BOIL_ROOM_F = 70;
 const BOIL_POINT_F = 212;
+const BOIL_MEASURED = [{ tempF: 575, ounces: 21, seconds: time.minutes(7) }];
 
 /** @param {number} totalSeconds @returns {string} */
 function formatBoilEstimate(totalSeconds) {
@@ -1002,9 +1004,9 @@ class Pot extends Equipment {
         if (!Number.isFinite(ounces) || ounces <= 0) {
             throw new Error(`boilWater() on '${this.name}': ounces must be positive, got ${ounces}`);
         }
-        const seconds = boilWaterSeconds(tempF, ounces);
-        const scale = [16, 21, 32, 48].map((oz) => `${oz} oz ~${formatBoilEstimate(boilWaterSeconds(tempF, oz))}`).join(', ');
-        const label = `Bring water to a boil in ${this.name} (${tempF}°). Estimated ~${formatBoilEstimate(seconds)}. At ${tempF}°: ${scale}`;
+        const hit = BOIL_MEASURED.find((row) => row.tempF === tempF && row.ounces === ounces);
+        const seconds = hit ? hit.seconds : boilWaterSeconds(tempF, ounces);
+        const label = `Bring water to a boil in ${this.name} (${tempF}°) ${hit ? '' : 'Estimated '}~${formatBoilEstimate(seconds)}`;
         return timerStep(label, seconds, { equipment: [this.name] });
     }
 }
