@@ -120,3 +120,49 @@ test('a recipe with nowhere to sit stays unscheduled', () => {
     assert.equal(zero.scheduled.length, 1);
     assert.equal(zero.scheduled[0].count, 2);
 });
+
+test('pot boilWater times a real timer from heat and ounces', () => {
+    const pot = e.pot();
+    const calibrated = pot.boilWater(575, 21);
+    assert.equal(calibrated.type, 'timer');
+    assert.equal(calibrated.durationSeconds, 7 * 60);
+    assert.deepEqual(calibrated.equipment, ['pot']);
+    assert.equal(
+        calibrated.text,
+        'Bring water to a boil in pot (575°). Estimated ~7 min. At 575°: 16 oz ~5 min 20 sec, 21 oz ~7 min, 32 oz ~10 min 40 sec, 48 oz ~16 min',
+    );
+
+    const moreWater = pot.boilWater(575, 32);
+    assert.equal(moreWater.durationSeconds, 10 * 60 + 40);
+    assert.match(moreWater.text, /Estimated ~10 min 40 sec/);
+
+    const cooler = pot.boilWater(450, 21);
+    assert.equal(cooler.durationSeconds, 9 * 60 + 18);
+    assert.match(cooler.text, /Estimated ~9 min 18 sec/);
+    assert.match(cooler.text, /At 450°: 16 oz ~/);
+
+    const labeled = e.pot('6-quart pot').boilWater(575, 48);
+    assert.equal(labeled.durationSeconds, 16 * 60);
+    assert.match(labeled.text, /^Bring water to a boil in 6-quart pot \(575°\)\. Estimated ~16 min\./);
+
+    const longBoil = pot.boilWater(213, 200);
+    assert.ok(longBoil.durationSeconds > 3600);
+    assert.match(longBoil.text, /Estimated ~\d+ hr /);
+
+    const fewSeconds = pot.boilWater(575, 0.05);
+    assert.equal(fewSeconds.durationSeconds, 1);
+    assert.match(fewSeconds.text, /Estimated ~1 sec/);
+
+    const none = pot.boilWater(575, 0.01);
+    assert.equal(none.durationSeconds, 0);
+    assert.match(none.text, /Estimated ~0 sec/);
+
+    assert.throws(() => pot.boilWater(70, 21), /room temperature/);
+    assert.throws(() => pot.boilWater(32, 21), /room temperature/);
+    assert.throws(() => pot.boilWater(Number.NaN, 21), /room temperature/);
+    assert.throws(() => pot.boilWater(212, 21), /boiling/);
+    assert.throws(() => pot.boilWater(180, 21), /boiling/);
+    assert.throws(() => pot.boilWater(575, 0), /ounces/);
+    assert.throws(() => pot.boilWater(575, -4), /ounces/);
+    assert.throws(() => pot.boilWater(575, Number.NaN), /ounces/);
+});

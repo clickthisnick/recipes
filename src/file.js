@@ -960,10 +960,59 @@ class Pan extends Equipment {
     }
 }
 
+// Calibration: 575°F with 21 oz of water takes 7 minutes.
+// minutes = 7 * (ounces / 21) * ((575 - 70) / (tempF - 70))
+// Linear in ounces, inverse in degrees above room temperature (70°F), nearest second.
+const BOIL_ROOM_F = 70;
+const BOIL_POINT_F = 212;
+
+/** @param {number} totalSeconds @returns {string} */
+function formatBoilEstimate(totalSeconds) {
+    const hrs = Math.floor(totalSeconds / 3600);
+    const mins = Math.floor((totalSeconds % 3600) / 60);
+    const secs = totalSeconds % 60;
+    const parts = [];
+    if (hrs) parts.push(`${hrs} hr`);
+    if (mins) parts.push(`${mins} min`);
+    if (secs) parts.push(`${secs} sec`);
+    return parts.join(' ') || '0 sec';
+}
+
+/** @param {number} tempF @param {number} ounces @returns {number} */
+function boilWaterSeconds(tempF, ounces) {
+    return Math.round((7 * ounces * (575 - BOIL_ROOM_F) * 60) / (21 * (tempF - BOIL_ROOM_F)));
+}
+
+class Pot extends Equipment {
+    /** @param {string} [label] */
+    constructor(label) { super('pot', label); }
+
+    /**
+     * @param {number} tempF
+     * @param {number} ounces
+     * @returns {Step}
+     */
+    boilWater(tempF, ounces) {
+        if (!Number.isFinite(tempF) || tempF <= BOIL_ROOM_F) {
+            throw new Error(`boilWater() on '${this.name}': temperature must be above room temperature (${BOIL_ROOM_F}°F), got ${tempF}`);
+        }
+        if (tempF <= BOIL_POINT_F) {
+            throw new Error(`boilWater() on '${this.name}': temperature must be above boiling (${BOIL_POINT_F}°F), got ${tempF}`);
+        }
+        if (!Number.isFinite(ounces) || ounces <= 0) {
+            throw new Error(`boilWater() on '${this.name}': ounces must be positive, got ${ounces}`);
+        }
+        const seconds = boilWaterSeconds(tempF, ounces);
+        const scale = [16, 21, 32, 48].map((oz) => `${oz} oz ~${formatBoilEstimate(boilWaterSeconds(tempF, oz))}`).join(', ');
+        const label = `Bring water to a boil in ${this.name} (${tempF}°). Estimated ~${formatBoilEstimate(seconds)}. At ${tempF}°: ${scale}`;
+        return timerStep(label, seconds, { equipment: [this.name] });
+    }
+}
+
 export const e = {
     bowl:         /** @param {string} [label] */ (label) => new Equipment('bowl',          label),
     pan:          /** @param {string} [label] */ (label) => new Pan(label),
-    pot:          /** @param {string} [label] */ (label) => new Equipment('pot',           label),
+    pot:          /** @param {string} [label] */ (label) => new Pot(label),
     oven:         /** @param {string} [label] */ (label) => new Equipment('oven',          label),
     toasterOven:  /** @param {string} [label] */ (label) => new Equipment('toaster oven',  label),
     instantPot:   /** @param {string} [label] */ (label) => new Equipment('instant pot',   label),
@@ -5474,7 +5523,7 @@ registerGroup('Dinner', [
         return steps;
     })()), { planMinutes: 10, portable: false }),
     // Cheddy Mac box: 6 cups water, cook 8–9 minutes, 1/4 cup low-fat milk,
-    // optional 2 Tbsp butter, then the cheese packet. Water here is 32 ounces (4 cups).
+    // optional 2 Tbsp butter, then the cheese packet. Water here is 20 ounces at 575°F.
     withPlan(createRecipe('goodles-noodles', 'Goodles Noodles (Cheddy Mac)', (() => {
         const pot = e.pot();
         const colander = e.colander();
@@ -5483,18 +5532,18 @@ registerGroup('Dinner', [
         /** @param {...Step} newSteps */
         const s = (...newSteps) => steps.push(...newSteps);
 
-        const WATER = i.water(32, u.ounce);
+        const WATER = i.water(20, u.ounce);
         const GOODLES = i.goodlesCheddyMac(1, u.unit);
         const MILK = i.lowFatMilk(0.25, u.cup);
         const BUTTER = i.saltedButter(2, u.tbsp);
 
-        s(info('Cheddy Mac box directions boil the macaroni in 6 cups of water for 8–9 minutes, then stir in 1/4 cup low-fat milk and the cheese packet. This recipe uses 32 ounces (4 cups) of water. The box lists 2 Tbsp butter as optional for richer flavor, and this recipe includes it. The box does not season the boiling water.', {
+        s(info('Cheddy Mac box directions boil the macaroni in 6 cups of water for 8–9 minutes, then stir in 1/4 cup low-fat milk and the cheese packet. This recipe uses 20 ounces of water. The box lists 2 Tbsp butter as optional for richer flavor, and this recipe includes it. The box does not season the boiling water.', {
             ingredients: [WATER, MILK, BUTTER],
         }));
         s(pot.add([WATER]));
-        s(Timer.gate('Is the water boiling?', 1, 'm', { equipment: [pot.name], ingredients: [WATER] }));
+        s(pot.boilWater(575, 20));
         s(pot.add([[GOODLES, 'macaroni only; set the cheese packet aside']]));
-        s(pot.cook('Cook the macaroni, stirring occasionally', time.minutes(8)));
+        s(pot.cook('Cook the macaroni, stirring occasionally', time.minutes(9)));
         s(Timer.gate('Has the macaroni cooked 8–9 minutes?', 1, 'm', { equipment: [pot.name], ingredients: [GOODLES] }));
         s(instruction(`Drain ${formatIngredient(GOODLES)} in the colander, without rinsing, and return the macaroni to the pot.`, {
             equipment: [pot.name, colander.name],
