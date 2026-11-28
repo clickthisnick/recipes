@@ -140,6 +140,69 @@ test('WebMCP registration stores tools and stops on page hide', async () => {
     globalThis.window = previousWindow;
 });
 
+test('WebMCP prefers document.modelContext and falls back to navigator.modelContext', async () => {
+    const previousDocument = globalThis.document;
+    const navigatorDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'navigator');
+    const defineNavigator = (value) => {
+        Object.defineProperty(globalThis, 'navigator', { configurable: true, writable: true, value });
+    };
+    try {
+        const fromDocument = [];
+        globalThis.document = {
+            modelContext: {
+                registerTool(tool) {
+                    fromDocument.push(tool.name);
+                    return Promise.resolve();
+                },
+            },
+        };
+        defineNavigator({
+            modelContext: {
+                registerTool(tool) {
+                    fromDocument.push(`nav:${tool.name}`);
+                    return Promise.resolve();
+                },
+            },
+        });
+        registerAgentTools([{ name: 'search-recipes' }]);
+        await Promise.resolve();
+        assert.deepEqual(fromDocument, ['search-recipes']);
+
+        const fromNavigator = [];
+        globalThis.document = {};
+        defineNavigator({
+            modelContext: {
+                registerTool(tool, options) {
+                    fromNavigator.push({ name: tool.name, aborted: options.signal.aborted });
+                    return Promise.resolve();
+                },
+            },
+        });
+        const stop = registerAgentTools([{ name: 'calculate-gallons' }]);
+        await Promise.resolve();
+        assert.deepEqual(fromNavigator, [{ name: 'calculate-gallons', aborted: false }]);
+        stop();
+
+        const continued = [];
+        globalThis.document = {
+            modelContext: {
+                registerTool(tool) {
+                    if (tool.name === 'throws') throw new Error('sync');
+                    if (tool.name === 'rejects') return Promise.reject(new Error('async'));
+                    continued.push(tool.name);
+                    return Promise.resolve();
+                },
+            },
+        };
+        registerAgentTools([{ name: 'throws' }, { name: 'rejects' }, { name: 'ok' }]);
+        await Promise.resolve();
+        assert.deepEqual(continued, ['ok']);
+    } finally {
+        globalThis.document = previousDocument;
+        Object.defineProperty(globalThis, 'navigator', navigatorDescriptor);
+    }
+});
+
 test('the app shell stays well formed and the old URL still redirects', () => {
     const main = readFileSync(resolve('main.html'), 'utf8');
     const redirect = readFileSync(resolve('dist/main.html'), 'utf8');

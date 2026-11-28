@@ -90,12 +90,7 @@
         <section id="custom" hidden>
             <h2>Add Custom Food</h2>
             <p>Copy this JSON and manually add it to your foods list in your app repo.</p>
-            <form
-                id="custom-form"
-                toolname="build-custom-food"
-                tooldescription="Build JSON for a custom food so it can be pasted into the tracker source."
-                toolautosubmit
-            >
+            <form id="custom-form">
                 <div class="field">
                     <label for="custom-name">Food name</label>
                     <input
@@ -521,29 +516,26 @@
             const customForm = document.getElementById('custom-form');
             bindUserInvalid(customForm);
             const jsonBox = document.getElementById('custom-food-json');
-            customForm.addEventListener('submit', (event) => {
-                if (!customForm.checkValidity()) {
-                    if (event.agentInvoked && event.respondWith) {
-                        event.respondWith(
-                            Promise.resolve('Name and every nutrient are required, and nutrients cannot be negative.'),
-                        );
-                    }
-                    return;
+
+            function applyCustomFood(name, values) {
+                const built = customFoodRecord(name, values);
+                if (!built.ok) {
+                    status.textContent = built.errors[0];
+                    return { error: built.errors[0] };
                 }
+                jsonBox.value = JSON.stringify({ [built.record.key]: built.record.entry }, null, 2);
+                status.textContent = 'JSON ready to copy.';
+                return { json: jsonBox.value };
+            }
+
+            customForm.addEventListener('submit', (event) => {
+                if (!customForm.checkValidity()) return;
                 event.preventDefault();
                 const values = {};
                 TRACKER_NUTRIENTS.forEach(([key]) => {
                     values[key] = Number(customForm.elements[key].value);
                 });
-                const built = customFoodRecord(customForm.elements.name.value, values);
-                if (!built.ok) {
-                    status.textContent = built.errors[0];
-                    if (event.agentInvoked && event.respondWith) event.respondWith(Promise.resolve(built.errors[0]));
-                    return;
-                }
-                jsonBox.value = JSON.stringify({ [built.record.key]: built.record.entry }, null, 2);
-                status.textContent = 'JSON ready to copy.';
-                if (event.agentInvoked && event.respondWith) event.respondWith(Promise.resolve(jsonBox.value));
+                applyCustomFood(customForm.elements.name.value, values);
             });
 
             const copyButton = document.getElementById('copy-custom-food');
@@ -612,6 +604,35 @@
                         renderSelectedFoods();
                         document.getElementById('update-nutrition').click();
                         return { key: input.key, quantity: selectedFoods[input.key] ?? 0 };
+                    },
+                    annotations: { readOnlyHint: false },
+                },
+                {
+                    name: 'build-custom-food',
+                    description: 'Build JSON for a custom food so it can be pasted into the tracker source.',
+                    inputSchema: {
+                        type: 'object',
+                        properties: {
+                            name: { type: 'string', description: 'Food name.' },
+                            ...Object.fromEntries(
+                                TRACKER_NUTRIENTS.map(([key, label]) => [
+                                    key,
+                                    { type: 'number', minimum: 0, description: label },
+                                ]),
+                            ),
+                        },
+                        required: ['name', ...TRACKER_NUTRIENTS.map(([key]) => key)],
+                    },
+                    execute(input) {
+                        const name = typeof input?.name === 'string' ? input.name : '';
+                        const values = {};
+                        for (const [key] of TRACKER_NUTRIENTS) values[key] = input?.[key];
+                        customForm.elements.name.value = name;
+                        for (const [key] of TRACKER_NUTRIENTS) {
+                            const amount = values[key];
+                            customForm.elements[key].value = amount == null || amount === '' ? '' : String(amount);
+                        }
+                        return applyCustomFood(name, values);
                     },
                     annotations: { readOnlyHint: false },
                 },

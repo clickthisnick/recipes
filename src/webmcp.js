@@ -1,6 +1,12 @@
 // One WebMCP registration path for the recipe app and the static pages.
-// Chrome's current API is document.modelContext. navigator.modelContext is gone.
-// Other browsers have no modelContext, so registration is a no-op.
+// Chrome 152+ exposes document.modelContext. Older Chrome still has navigator.modelContext.
+// registerTool returns a Promise as of Chrome 151. Browsers with neither skip registration.
+
+/**
+ * @typedef {{
+ *   registerTool: (tool: object, options?: { signal?: AbortSignal }) => Promise<unknown> | unknown,
+ * }} ModelContext
+ */
 
 /**
  * @param {any[]} tools
@@ -8,16 +14,20 @@
  */
 export function registerAgentTools(tools) {
     if (typeof document === 'undefined') return () => {};
-    const doc =
-        /** @type {Document & { modelContext?: { registerTool: (tool: object, options?: { signal: AbortSignal }) => Promise<unknown> | unknown } }} */ (
-            document
-        );
-    const context = doc.modelContext;
-    if (!context || typeof context.registerTool !== 'function') return () => {};
+    const modelContext =
+        /** @type {Document & { modelContext?: ModelContext }} */ (document).modelContext ||
+        /** @type {Navigator & { modelContext?: ModelContext }} */ (navigator).modelContext;
+    if (!modelContext || typeof modelContext.registerTool !== 'function') return () => {};
     const controller = new AbortController();
-    for (const tool of tools) {
-        Promise.resolve(context.registerTool(tool, { signal: controller.signal })).catch(() => {});
-    }
+    void (async () => {
+        for (const tool of tools) {
+            try {
+                await modelContext.registerTool(tool, { signal: controller.signal });
+            } catch {
+                // A failed registration leaves the page usable.
+            }
+        }
+    })();
     const stop = () => controller.abort();
     if (typeof window !== 'undefined') window.addEventListener('pagehide', stop, { once: true });
     return stop;
