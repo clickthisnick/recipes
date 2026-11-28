@@ -190,7 +190,10 @@ test('static pages keep the fixes agents and the calculators rely on', () => {
     assert.match(index, /<title>Kitchen tools \| Recipes<\/title>/);
     assert.equal(index.match(/<h1>/g).length, 1);
     assert.match(index, /tracker\.html/);
-    assert.match(water, /toolname="calculate-gallons"/);
+    assert.match(water, /name: 'calculate-gallons'/);
+    assert.doesNotMatch(water, /toolname=/);
+    assert.match(tracker, /name: 'build-custom-food'/);
+    assert.doesNotMatch(tracker, /toolname=/);
     assert.match(readFileSync(resolve('src/file.js'), 'utf8'), /name: 'search-recipes'/);
 });
 

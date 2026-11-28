@@ -38,12 +38,7 @@
             </div>
 
             <h2>What you drank</h2>
-            <form
-                id="water-form"
-                toolname="calculate-gallons"
-                tooldescription="Convert liters and clean bottles into gallons using the chart on this page."
-                toolautosubmit
-            >
+            <form id="water-form">
                 <div class="field">
                     <label for="liters">Liters</label>
                     <input
@@ -57,7 +52,6 @@
                         required
                         data-error="liters-error"
                         data-testid="liters"
-                        toolparamdescription="How many liters were drunk."
                     />
                     <p id="liters-error" class="error-msg">
                         <span role="img" aria-label="Error">❌</span> Enter zero or a positive number of liters.
@@ -76,7 +70,6 @@
                         required
                         data-error="bottles-error"
                         data-testid="clean-bottles"
-                        toolparamdescription="How many clean bottles were drunk."
                     />
                     <p id="bottles-error" class="error-msg">
                         <span role="img" aria-label="Error">❌</span> Enter zero or a positive number of clean bottles.
@@ -87,7 +80,7 @@
             <p id="gallons-result" class="status" role="status" aria-live="polite">Gallons drank: 0</p>
         </main>
         <script type="module">
-            import { bindUserInvalid, gallonsDrank } from './src/site-logic.js';
+            import { bindUserInvalid, gallonsDrank, registerAgentTools } from './src/site-logic.js';
 
             const form = document.getElementById('water-form');
             const liters = document.getElementById('liters');
@@ -110,7 +103,7 @@
                 const outcome = gallonsDrank(liters.value, bottles.value, ratesFromChart());
                 if (!outcome.ok) {
                     result.textContent = outcome.error;
-                    return;
+                    return outcome;
                 }
                 const gallons = outcome.gallons.toFixed(2);
                 result.textContent = `Gallons drank: ${gallons}`;
@@ -118,19 +111,40 @@
                 next.searchParams.set('liters', liters.value);
                 next.searchParams.set('bottles', bottles.value);
                 window.history.replaceState(null, '', next);
+                return outcome;
             }
 
             form.addEventListener('submit', (event) => {
-                if (!form.checkValidity()) {
-                    if (event.agentInvoked && event.respondWith) {
-                        event.respondWith(Promise.resolve('Enter zero or a positive number for each container.'));
-                    }
-                    return;
-                }
+                if (!form.checkValidity()) return;
                 event.preventDefault();
                 showResult();
-                if (event.agentInvoked && event.respondWith) event.respondWith(Promise.resolve(result.textContent));
             });
+
+            registerAgentTools([
+                {
+                    name: 'calculate-gallons',
+                    description: 'Convert liters and clean bottles into gallons using the chart on this page.',
+                    inputSchema: {
+                        type: 'object',
+                        properties: {
+                            liters: { type: 'number', minimum: 0, description: 'How many liters were drunk.' },
+                            bottles: { type: 'number', minimum: 0, description: 'How many clean bottles were drunk.' },
+                        },
+                        required: ['liters', 'bottles'],
+                    },
+                    execute(input) {
+                        if (typeof input?.liters !== 'number' || typeof input?.bottles !== 'number') {
+                            return { error: 'Enter zero or a positive number for each container.' };
+                        }
+                        liters.value = String(input.liters);
+                        bottles.value = String(input.bottles);
+                        const outcome = showResult();
+                        if (!outcome.ok) return { error: outcome.error };
+                        return { gallons: Number(outcome.gallons.toFixed(2)) };
+                    },
+                    annotations: { readOnlyHint: false },
+                },
+            ]);
 
             if (params.has('liters') || params.has('bottles')) showResult();
         </script>
